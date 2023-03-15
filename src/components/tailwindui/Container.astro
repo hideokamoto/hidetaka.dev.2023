@@ -1,0 +1,10 @@
+---
+import InnerContainer from "./Containers/InnerContainer.astro";
+import OuterContainer from "./Containers/OuterContainer.astro";
+---
+
+<OuterContainer class={Astro.props.class}>
+    <InnerContainer>
+        <slot></slot>
+    </InnerContainer>
+</OuterContainer>

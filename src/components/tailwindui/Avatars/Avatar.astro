@@ -1,0 +1,20 @@
+---
+
+const {class:className, ...props} = Astro.props
+---
+<a
+    href="/"
+    aria-label="Home"
+    class:list={[className, 'pointer-events-auto']}
+    {...props}
+  >
+    <img
+      src={Astro.props.avatarImage}
+      alt=""
+      sizes={Astro.props.large ? '4rem' : '2.25rem'}
+      class:list={[
+        'rounded-full bg-zinc-100 object-cover dark:bg-zinc-800',
+        Astro.props.large ? 'h-16 w-16' : 'h-9 w-9'
+      ]}
+    />
+</a>

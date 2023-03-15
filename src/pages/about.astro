@@ -1,63 +1,80 @@
 ---
-import Layout from '../layouts/BlogPost.astro';
+import Container from '../components/tailwindui/Container.astro';
+import MailIcon from '../components/tailwindui/Icons/MailIcon.astro';
+import Layout from '../components/tailwindui/Layout.astro';
+import GitHubIcon from '../components/tailwindui/SocialIcons/GitHubIcon.astro';
+import LinkedInIcon from '../components/tailwindui/SocialIcons/LinkedInIcon.astro';
+import Twitter from '../components/tailwindui/SocialIcons/Twitter.astro';
+import SocialLink from '../components/tailwindui/SocialLink.astro';
+
 ---
-
-<Layout
-	title="About Me"
-	description="Lorem ipsum dolor sit amet"
-	pubDate={new Date('August 08 2021')}
-	updatedDate={new Date('August 08 2022')}
-	heroImage="/placeholder-about.jpg"
->
-	<p>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-		labore et dolore magna aliqua. Vitae ultricies leo integer malesuada nunc vel risus commodo
-		viverra. Adipiscing enim eu turpis egestas pretium. Euismod elementum nisi quis eleifend quam
-		adipiscing. In hac habitasse platea dictumst vestibulum. Sagittis purus sit amet volutpat. Netus
-		et malesuada fames ac turpis egestas. Eget magna fermentum iaculis eu non diam phasellus
-		vestibulum lorem. Varius sit amet mattis vulputate enim. Habitasse platea dictumst quisque
-		sagittis. Integer quis auctor elit sed vulputate mi. Dictumst quisque sagittis purus sit amet.
-	</p>
-
-	<p>
-		Morbi tristique senectus et netus. Id semper risus in hendrerit gravida rutrum quisque non
-		tellus. Habitasse platea dictumst quisque sagittis purus sit amet. Tellus molestie nunc non
-		blandit massa. Cursus vitae congue mauris rhoncus. Accumsan tortor posuere ac ut. Fringilla urna
-		porttitor rhoncus dolor. Elit ullamcorper dignissim cras tincidunt lobortis. In cursus turpis
-		massa tincidunt dui ut ornare lectus. Integer feugiat scelerisque varius morbi enim nunc.
-		Bibendum neque egestas congue quisque egestas diam. Cras ornare arcu dui vivamus arcu felis
-		bibendum. Dignissim suspendisse in est ante in nibh mauris. Sed tempus urna et pharetra pharetra
-		massa massa ultricies mi.
-	</p>
-
-	<p>
-		Mollis nunc sed id semper risus in. Convallis a cras semper auctor neque. Diam sit amet nisl
-		suscipit. Lacus viverra vitae congue eu consequat ac felis donec. Egestas integer eget aliquet
-		nibh praesent tristique magna sit amet. Eget magna fermentum iaculis eu non diam. In vitae
-		turpis massa sed elementum. Tristique et egestas quis ipsum suspendisse ultrices. Eget lorem
-		dolor sed viverra ipsum. Vel turpis nunc eget lorem dolor sed viverra. Posuere ac ut consequat
-		semper viverra nam. Laoreet suspendisse interdum consectetur libero id faucibus. Diam phasellus
-		vestibulum lorem sed risus ultricies tristique. Rhoncus dolor purus non enim praesent elementum
-		facilisis. Ultrices tincidunt arcu non sodales neque. Tempus egestas sed sed risus pretium quam
-		vulputate. Viverra suspendisse potenti nullam ac tortor vitae purus faucibus ornare. Fringilla
-		urna porttitor rhoncus dolor purus non. Amet dictum sit amet justo donec enim.
-	</p>
-
-	<p>
-		Mattis ullamcorper velit sed ullamcorper morbi tincidunt. Tortor posuere ac ut consequat semper
-		viverra. Tellus mauris a diam maecenas sed enim ut sem viverra. Venenatis urna cursus eget nunc
-		scelerisque viverra mauris in. Arcu ac tortor dignissim convallis aenean et tortor at. Curabitur
-		gravida arcu ac tortor dignissim convallis aenean et tortor. Egestas tellus rutrum tellus
-		pellentesque eu. Fusce ut placerat orci nulla pellentesque dignissim enim sit amet. Ut enim
-		blandit volutpat maecenas volutpat blandit aliquam etiam. Id donec ultrices tincidunt arcu. Id
-		cursus metus aliquam eleifend mi.
-	</p>
-
-	<p>
-		Tempus quam pellentesque nec nam aliquam sem. Risus at ultrices mi tempus imperdiet. Id porta
-		nibh venenatis cras sed felis eget velit. Ipsum a arcu cursus vitae. Facilisis magna etiam
-		tempor orci eu lobortis elementum. Tincidunt dui ut ornare lectus sit. Quisque non tellus orci
-		ac. Blandit libero volutpat sed cras. Nec tincidunt praesent semper feugiat nibh sed pulvinar
-		proin gravida. Egestas integer eget aliquet nibh praesent tristique magna.
-	</p>
+<Layout>
+	<Container class="mt-16 sm:mt-32">
+        <div class="grid grid-cols-1 gap-y-16 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:gap-y-12">
+          <div class="lg:pl-20">
+            <div class="max-w-xs px-2.5 lg:max-w-none">
+              <img
+                src={'https://hidetaka.dev/images/profile.jpg'}
+                alt=""
+                sizes="(min-width: 1024px) 32rem, 20rem"
+                class="aspect-square rotate-3 rounded-2xl bg-zinc-100 object-cover dark:bg-zinc-800"
+              />
+            </div>
+          </div>
+          <div class="lg:order-first lg:row-span-2">
+            <h1 class="text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-5xl">
+              I'm Spencer Sharp. I live in New York City, where I design the
+              future.
+            </h1>
+            <div class="mt-6 space-y-7 text-base text-zinc-600 dark:text-zinc-400">
+              <p>
+                I've loved making things for as long as I can remember, and
+                wrote my first program when I was 6 years old, just two weeks
+                after my mom brought home the brand new Macintosh LC 550 that I
+                taught myself to type on.
+              </p>
+              <p>
+                The only thing I loved more than computers as a kid was space.
+                When I was 8, I climbed the 40-foot oak tree at the back of our
+                yard while wearing my older sister's motorcycle helmet, counted
+                down from three, and jumped — hoping the tree was tall enough
+                that with just a bit of momentum I'd be able to get to orbit.
+              </p>
+              <p>
+                I spent the next few summers indoors working on a rocket design,
+                while I recovered from the multiple surgeries it took to fix my
+                badly broken legs. It took nine iterations, but when I was 15 I
+                sent my dad's Blackberry into orbit and was able to transmit a
+                photo back down to our family computer from space.
+              </p>
+              <p>
+                Today, I'm the founder of Planetaria, where we're working on
+                civilian space suits and manned shuttle kits you can assemble at
+                home so that the next generation of kids really <em>can</em>{' '}
+                make it to orbit — from the comfort of their own backyards.
+              </p>
+            </div>
+          </div>
+          <div class="lg:pl-20">
+            <ul role="list">
+              <SocialLink href="#" icon={Twitter}>
+                Follow on Twitter
+              </SocialLink>
+              <SocialLink href="#" icon={GitHubIcon} className="mt-4">
+                Follow on GitHub
+              </SocialLink>
+              <SocialLink href="#" icon={LinkedInIcon} className="mt-4">
+                Follow on LinkedIn
+              </SocialLink>
+              <SocialLink
+                href="mailto:test@example.com"
+                icon={MailIcon}
+                className="mt-8 border-t border-zinc-100 pt-8 dark:border-zinc-700/40"
+              >
+                test@example.com
+              </SocialLink>
+            </ul>
+          </div>
+        </div>
+	</Container>
 </Layout>

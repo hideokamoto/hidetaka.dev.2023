@@ -1,0 +1,57 @@
+---
+
+import Article from "../components/tailwindui/BlogPosts/Article.astro";
+import Card from "../components/tailwindui/Card.astro";
+import CardDescription from "../components/tailwindui/Cards/CardDescription.astro";
+import CardLink from "../components/tailwindui/Cards/CardLink.astro";
+import LinkIcon from "../components/tailwindui/Icons/LinkIcon.astro";
+import Layout from "../components/tailwindui/Layout.astro";
+import SimpleLayout from "../components/tailwindui/SimpleLayout.astro";
+import { getCollection } from 'astro:content';
+import CardTitle from "../components/tailwindui/Cards/CardTitle.astro";
+import CardEyebrow from "../components/tailwindui/Cards/CardEyebrow.astro";
+import { formatDate } from "../libs/formatDate";
+import CardCta from "../components/tailwindui/Cards/CardCta.astro";
+const articles = (await getCollection('blog')).sort(
+	(a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf()
+);
+
+---
+
+<Layout>
+    <SimpleLayout
+        title="Writing on software design, company building, and the aerospace industry."
+        intro="All of my long-form thoughts on programming, leadership, product design, and more, collected in chronological order."
+    >
+        <div class="md:border-l md:border-zinc-100 md:pl-6 md:dark:border-zinc-700/40">
+            <div class="flex max-w-3xl flex-col space-y-16">
+                {articles.map((article) => (
+                    <article class="md:grid md:grid-cols-4 md:items-baseline">
+                      <Card class="md:col-span-3">
+                        <CardTitle href={`/articles/${article.slug}`}>
+                          {article.data.title}
+                        </CardTitle>
+                        <CardEyebrow
+                          as="time"
+                          dateTime={article.data.pubDate}
+                          class="md:hidden"
+                          decorate
+                        >
+                          {formatDate(article.data.pubDate.toISOString())}
+                        </CardEyebrow>
+                        <CardDescription>{article.data.description}</CardDescription>
+                        <CardCta>Read article</CardCta>
+                      </Card>
+                      <CardEyebrow
+                        as="time"
+                        dateTime={article.data.pubDate.toISOString()}
+                        class="mt-1 hidden md:block"
+                      >
+                          {formatDate(article.data.pubDate.toISOString())}
+                      </CardEyebrow>
+                    </article>
+                ))}
+            </div>
+        </div>
+    </SimpleLayout>
+</Layout>
