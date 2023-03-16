@@ -18,7 +18,7 @@ const {
     <CardTitle as="h3" href={href}>
       {title}
     </CardTitle>
-    <CardEyebrow decorate>{event}</CardEyebrow>
+    {event ? <CardEyebrow decorate>{event}</CardEyebrow> : null}
     <CardDescription>{description}</CardDescription>
     <CardCta>{cta}</CardCta>
 </Card>
