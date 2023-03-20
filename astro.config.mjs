@@ -10,15 +10,21 @@ import react from "@astrojs/react";
 export default defineConfig({
   site: 'https://example.com',
   integrations: [mdx(), sitemap(), markdoc({
-    nodes: {
-      heading: {
-        render: 'Heading',
+    tags: {
+      externalLink: {
+        render: 'ExternalLink',
         attributes: {
-          level: {
-            type: String
+          class: {
+            type: String,
+          },
+          href: {
+            type: String,
+          },
+          lebel: {
+            type: String,
           }
         }
-      }
-    }
+      },
+    },
   }), tailwind(), react()]
 });
