@@ -4,7 +4,7 @@ import OuterContainer from "./Containers/OuterContainer.astro";
 ---
 
 <OuterContainer class={Astro.props.class}>
-    <InnerContainer>
+    <InnerContainer class={Astro.props.innerClass}>
         <slot></slot>
     </InnerContainer>
 </OuterContainer>
