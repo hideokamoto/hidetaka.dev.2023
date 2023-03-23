@@ -5,12 +5,9 @@ import SpeakingAppearance from "../components/tailwindui/Speakings/SpeakingAppea
 import SpeakingSection from "../components/tailwindui/Speakings/SpeakingSection.astro";
 import { listEndedEvents, listUpcomingEvents } from "../libs/microCMS/apis";
 import type { MicroCMSEventsRecord } from "../libs/microCMS/types";
+import { sortByEventDate } from "../libs/microCMS/utils";
 
-const sortByEventDate = (events: MicroCMSEventsRecord[]) => {
-    return events.sort((a, b) => {
-        return new Date(b.date).getTime() - new Date(a.date).getTime()
-    })
-}
+
 const isOnlineEvent = (event: Pick<MicroCMSEventsRecord, 'place'>) => {
   if (!event.place) return false
   if (/オンライン/.test(event.place)) return true

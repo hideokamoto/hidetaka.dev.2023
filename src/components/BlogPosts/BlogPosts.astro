@@ -1,14 +1,56 @@
 ---
-import { getCollection } from 'astro:content';
+import { loadWPPosts } from '../../libs/dataSources/wordpress';
 import Article from '../tailwindui/BlogPosts/Article.astro';
-const posts = (await getCollection('blog')).sort(
-	(a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf()
-);
+import Card from '../tailwindui/Card.astro';
+import CardCta from '../tailwindui/Cards/CardCta.astro';
+import CardDescription from '../tailwindui/Cards/CardDescription.astro';
+import CardEyebrow from '../tailwindui/Cards/CardEyebrow.astro';
+import CardTitle from '../tailwindui/Cards/CardTitle.astro';
+const posts = await loadWPPosts('en')
 
+
+export function formatDate(dateString: string): string {
+    return new Date(`${dateString}`).toLocaleDateString('en-US', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC',
+    })
+  }
+  
 ---
 
+
 <div class="flex flex-col gap-16">
-    {posts.map((article) => (
-      <Article article={article} />
-    ))}
+
+  <div class="md:border-l md:border-zinc-100 md:pl-6 md:dark:border-zinc-700/40">
+    <div class="flex max-w-3xl flex-col space-y-16">
+        {posts.map((article) => (
+            <article class="md:grid md:grid-cols-4 md:items-baseline">
+              <Card class="md:col-span-3">
+                <CardTitle href={`${article.href}`}>
+                  {article.title}
+                </CardTitle>
+                <CardEyebrow
+                  as="time"
+                  dateTime={article.datetime}
+                  class="md:hidden"
+                  decorate
+                >
+                  {formatDate(article.datetime)}
+                </CardEyebrow>
+                <CardDescription>{article.description}</CardDescription>
+                <CardCta>Read article</CardCta>
+              </Card>
+              <CardEyebrow
+                as="time"
+                dateTime={article.datetime}
+                class="mt-1 hidden md:block"
+              >
+                  {formatDate(article.datetime)}
+              </CardEyebrow>
+            </article>
+        ))}
+    </div>
+</div>
 </div>

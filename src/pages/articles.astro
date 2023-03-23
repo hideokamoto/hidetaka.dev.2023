@@ -1,21 +1,14 @@
 ---
-
-import Article from "../components/tailwindui/BlogPosts/Article.astro";
 import Card from "../components/tailwindui/Card.astro";
 import CardDescription from "../components/tailwindui/Cards/CardDescription.astro";
-import CardLink from "../components/tailwindui/Cards/CardLink.astro";
-import LinkIcon from "../components/tailwindui/Icons/LinkIcon.astro";
 import Layout from "../components/tailwindui/Layout.astro";
 import SimpleLayout from "../components/tailwindui/SimpleLayout.astro";
-import { getCollection } from 'astro:content';
 import CardTitle from "../components/tailwindui/Cards/CardTitle.astro";
 import CardEyebrow from "../components/tailwindui/Cards/CardEyebrow.astro";
 import CardCta from "../components/tailwindui/Cards/CardCta.astro";
 import { loadBlogPosts } from "../libs/dataSources/blogs";
 const posts = await loadBlogPosts('ja')
-const articles = (await getCollection('blog')).sort(
-	(a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf()
-);
+
 export function formatDate(dateString: string): string {
     return new Date(`${dateString}`).toLocaleDateString('en-US', {
       day: 'numeric',
