@@ -1,6 +1,6 @@
 ---
-import { getLanguageFromURL } from "../libs/urlUtils/lang.util"
-import SpeakingPage from "../containers/pages/SpeakingPage.astro";
+import { getLanguageFromURL } from "../../libs/urlUtils/lang.util"
+import SpeakingPage from "../../containers/pages/SpeakingPage.astro";
 
 const currentPage = new URL(Astro.request.url).pathname;
 const lang = getLanguageFromURL(currentPage);
