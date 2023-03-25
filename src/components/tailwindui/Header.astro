@@ -2,6 +2,7 @@
 import Avatar from "./Avatars/Avatar.astro";
 import AvatarContainer from "./Avatars/AvatarContainer.astro";
 import Container from "./Container.astro";
+import DesktopLangSwitcher from "./Headers/DesktopLangSwitcher.astro";
 import DesktopNavigation from "./Headers/DesktopNavigation.astro";
 import MobileNavigation from "./Headers/MobileNavigation.astro";
 import ModeToggle from "./Headers/ModeToggle.astro";
@@ -34,12 +35,7 @@ import NavItem from "./Headers/NavItem.astro";
         <DesktopNavigation class="pointer-events-auto hidden md:block" />
       </div>
       <div class="flex flex-1 justify-end md:justify-center">
-        <nav class="pointer-events-auto hidden md:block">
-          <ul class="flex rounded-full bg-white/90 px-3 text-sm font-medium text-zinc-800 shadow-lg shadow-zinc-800/5 ring-1 ring-zinc-900/5 backdrop-blur dark:bg-zinc-800/90 dark:text-zinc-200 dark:ring-white/10">
-            <NavItem href="/ja-JP">Japanese</NavItem>
-            <NavItem href="/">English</NavItem>
-          </ul>
-        </nav>
+        <DesktopLangSwitcher />
       </div>
       {/*
       <div class="flex justify-end md:flex-1">

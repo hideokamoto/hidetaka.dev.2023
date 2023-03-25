@@ -1,4 +1,4 @@
-import rss from '@astrojs/rss';
+import rss, { RSSOptions } from '@astrojs/rss';
 import type { APIContext } from 'astro';
 import { listMyNPMPackages } from '../../libs/dataSources/npmjs';
 import { listMyWordPressPlugins } from '../../libs/dataSources/wporg';
@@ -6,7 +6,7 @@ import { listMyWordPressPlugins } from '../../libs/dataSources/wporg';
 export async function get(context: APIContext) {
     const npmPackages = await listMyNPMPackages()
     const wpPlugins = await listMyWordPressPlugins()
-    const items = [
+    const items:RSSOptions['items'] = [
         ...npmPackages.map(({package: pkg}) => {
             return {
                 link: pkg.links.npm,

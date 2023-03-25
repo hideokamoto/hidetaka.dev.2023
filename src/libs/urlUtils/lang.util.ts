@@ -3,5 +3,15 @@ export function getLanguageFromURL(pathname: string) {
 	//const langCodeMatch = pathname.match(/\/([a-z]{2}-?[a-z]{0,2})/);
     // ja-JP, en-US
     const langCodeMatch = pathname.match(/^\/(\w{2})-([\w-]{2,})/);
-	return langCodeMatch ? langCodeMatch[1] : 'en';
+	return langCodeMatch ? langCodeMatch[1] : 'en-US';
+}
+
+export const changeLanguageURL = (pathname: string, targetLang: 'en-US' | 'ja-JP' = 'en-US'): string => {
+    const lang = getLanguageFromURL(pathname)
+    if (lang === targetLang) return pathname
+    if (lang === 'en-US') {
+      return `/${targetLang}${pathname}`
+    }
+    const replaceTarget = targetLang === 'en-US' ? '' : `/${targetLang}`
+    return pathname.replace(/^\/(\w{2})-([\w-]{2,})/, replaceTarget)  
 }
