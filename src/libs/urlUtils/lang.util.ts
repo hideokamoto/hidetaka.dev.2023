@@ -15,3 +15,8 @@ export const changeLanguageURL = (pathname: string, targetLang: 'en-US' | 'ja-JP
     const replaceTarget = targetLang === 'en-US' ? '' : `/${targetLang}`
     return pathname.replace(/^\/(\w{2})-([\w-]{2,})/, replaceTarget)  
 }
+export const getPathnameWithLangType = (targetPath: string, lang: string): string => {
+  if (/en/.test(lang)) return `/${targetPath}`
+  if (/ja/.test(lang)) return `/ja-JP/${targetPath}`
+  return `/${lang}/${targetPath}`
+}
