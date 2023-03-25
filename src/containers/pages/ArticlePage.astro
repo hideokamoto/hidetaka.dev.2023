@@ -11,7 +11,7 @@ import { removeHtmlTags } from "../../libs/sanitize";
 const {
     lang = 'en'
 } = Astro.props
-const posts = await loadBlogPosts(lang)
+const posts = await loadBlogPosts(/ja/.test(lang) ? 'ja' : 'en')
 
 export function formatDate(dateString: string, lang: string = 'en'): string {
     return new Date(`${dateString}`).toLocaleDateString(/ja/.test(lang) ? 'ja-JP' : 'en-US', {

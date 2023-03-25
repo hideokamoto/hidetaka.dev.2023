@@ -1,17 +1,18 @@
 ---
 import { loadWPPosts } from '../../libs/dataSources/wordpress';
 import { removeHtmlTags } from '../../libs/sanitize';
-import Article from '../tailwindui/BlogPosts/Article.astro';
 import Card from '../tailwindui/Card.astro';
 import CardCta from '../tailwindui/Cards/CardCta.astro';
 import CardDescription from '../tailwindui/Cards/CardDescription.astro';
 import CardEyebrow from '../tailwindui/Cards/CardEyebrow.astro';
 import CardTitle from '../tailwindui/Cards/CardTitle.astro';
-const posts = await loadWPPosts('en')
+
+const { lang = 'en-US'} = Astro.props
+const posts = await loadWPPosts(/ja/.test(lang) ? 'ja' : 'en')
 
 
-export function formatDate(dateString: string): string {
-    return new Date(`${dateString}`).toLocaleDateString('en-US', {
+export function formatDate(dateString: string, lang: string): string {
+    return new Date(`${dateString}`).toLocaleDateString(lang, {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
@@ -38,7 +39,7 @@ export function formatDate(dateString: string): string {
                   class="md:hidden"
                   decorate
                 >
-                  {formatDate(article.datetime)}
+                  {formatDate(article.datetime, lang)}
                 </CardEyebrow>
                 <CardDescription>{removeHtmlTags(article.description)}</CardDescription>
                 <CardCta>Read article</CardCta>
@@ -48,7 +49,7 @@ export function formatDate(dateString: string): string {
                 dateTime={article.datetime}
                 class="mt-1 hidden md:block"
               >
-                  {formatDate(article.datetime)}
+                  {formatDate(article.datetime, lang)}
               </CardEyebrow>
             </article>
         ))}
