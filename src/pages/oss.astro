@@ -1,0 +1,10 @@
+---
+import { getLanguageFromURL } from "../libs/urlUtils/lang.util"
+import OSSPage from "../containers/pages/OSSPage.astro";
+
+const currentPage = new URL(Astro.request.url).pathname;
+const lang = getLanguageFromURL(currentPage);
+  
+---
+
+<OSSPage lang={lang} />

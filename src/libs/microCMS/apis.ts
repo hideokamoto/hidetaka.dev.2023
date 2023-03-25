@@ -43,7 +43,7 @@ export const listUpcomingEvents = async () => {
   })
   return events
 }
-export const listBooks = async () => {
+export const listBooks = async (): Promise<MicroCMSProjectsRecord[]> => {
   if (!microCMSClient) {
     if (process.env.MICROCMS_API_MODE === 'mock') {
       return MICROCMS_MOCK_BOOKs

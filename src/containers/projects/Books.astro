@@ -1,0 +1,60 @@
+---
+import Card from "../../components/tailwindui/Card.astro";
+import CardDescription from "../../components/tailwindui/Cards/CardDescription.astro";
+import CardTitle from "../../components/tailwindui/Cards/CardTitle.astro";
+import CardEyebrow from "../../components/tailwindui/Cards/CardEyebrow.astro";
+import CardCta from "../../components/tailwindui/Cards/CardCta.astro";
+import BookThumbnail from "../../components/Books/BookThumbnail.astro";
+import { listBooks } from "../../libs/microCMS/apis";
+
+const books = await listBooks()
+
+const formatDate = (dateString?: string): string => {
+    return new Date(`${dateString}`).toLocaleDateString('en-US', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC',
+    })
+}
+
+---
+
+<div class:list={[
+  "md:border-l md:border-zinc-100 md:pl-6 md:dark:border-zinc-700/40",
+  Astro.props.class
+  ]}
+>
+    <div class="flex max-w-3xl flex-col space-y-16">
+        {books.map((book) => (
+            <section class="md:grid md:grid-cols-4 md:items-baseline">
+                <div class="order-first">
+                    <CardEyebrow
+                        as="time"
+                        dateTime={book.published_at}
+                        class="mt-1 hidden md:block"
+                    >
+                        {formatDate(book.published_at)}
+                    </CardEyebrow>
+                    <BookThumbnail book={book} />
+                </div>
+                <Card class="md:col-span-3 md:ml-5">
+                    <CardTitle href={book.url}>
+                        {book.title}
+                    </CardTitle>
+                    <CardEyebrow
+                        as="time"
+                        dateTime={book.published_at}
+                        class="md:hidden"
+                        decorate
+                    >
+                        {formatDate(book.published_at)}
+                    </CardEyebrow>
+                    <CardDescription>{book.is_solo ? '単著' : '共著・寄稿'}</CardDescription>
+                    <CardDescription>Written in {book.lang[0]}</CardDescription>
+                    <CardCta>View Book</CardCta>
+                </Card>
+            </section>
+        ))}
+    </div>
+</div>

@@ -1,0 +1,14 @@
+---
+const {
+    book: {
+        affiliateLink,
+        image
+    }
+} = Astro.props
+---
+
+{affiliateLink ? (
+    <div set:html={{affiliateLink}} />
+): image ? (
+<img src={image.url} width={image.width} height={image.height} alt='book thumbnail' />
+): null}
