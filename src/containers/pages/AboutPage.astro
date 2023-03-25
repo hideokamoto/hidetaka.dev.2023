@@ -13,13 +13,13 @@ const {
     lang = 'en'
 } = Astro.props
 
-const entry = await getEntryBySlug('profiles', 'hero');
+const entry = await getEntryBySlug('profiles', `hero${/ja/.test(lang) ? '-ja' : ''}`);
 const speakerProfile = await getEntryBySlug('profiles', `speaker-profile${/ja/.test(lang) ? '-ja' : ''}`);
 const { Content } = entry ? await entry.render() : { Content: null};
 const { Content: SpeakerProfile } = speakerProfile ? await speakerProfile.render() : {Content: null}
 
 ---
-<Layout title="About">
+<Layout title={"About Hidetaka Okamoto"}>
 	<Container class="mt-16 sm:mt-32">
         <div class="grid grid-cols-1 gap-y-16 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:gap-y-12">
           <div class="lg:pl-20">
@@ -34,10 +34,10 @@ const { Content: SpeakerProfile } = speakerProfile ? await speakerProfile.render
           </div>
           <div class="lg:order-first lg:row-span-2">
             <h1 class="text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-5xl">
-							<span class='block text-zinc-800 dark:text-zinc-100'>Hello!</span>
-							<span class='block text-zinc-800 dark:text-zinc-100'>
-								I&lsquo;m <span class='text-indigo-600'>Hidetaka Okamoto</span>
-							</span>
+				<span class='block text-zinc-800 dark:text-zinc-100'>Hello!</span>
+				<span class='block text-zinc-800 dark:text-zinc-100'>
+					I&lsquo;m <span class='text-indigo-600'>Hidetaka Okamoto</span>
+				</span>
             </h1>
             <div class="mt-6 space-y-7 text-base text-zinc-600 dark:text-zinc-400">
               <MarkdocContent content={Content} />

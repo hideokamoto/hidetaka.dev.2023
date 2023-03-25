@@ -1,0 +1,65 @@
+---
+import Card from "../../components/tailwindui/Card.astro";
+import CardDescription from "../../components/tailwindui/Cards/CardDescription.astro";
+import Layout from "../../components/tailwindui/Layout.astro";
+import SimpleLayout from "../../components/tailwindui/SimpleLayout.astro";
+import CardTitle from "../../components/tailwindui/Cards/CardTitle.astro";
+import CardEyebrow from "../../components/tailwindui/Cards/CardEyebrow.astro";
+import CardCta from "../../components/tailwindui/Cards/CardCta.astro";
+import { loadBlogPosts } from "../../libs/dataSources/blogs";
+import { removeHtmlTags } from "../../libs/sanitize";
+const {
+    lang = 'en'
+} = Astro.props
+const posts = await loadBlogPosts(lang)
+
+export function formatDate(dateString: string, lang: string = 'en'): string {
+    return new Date(`${dateString}`).toLocaleDateString(/ja/.test(lang) ? 'ja-JP' : 'en-US', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      timeZone: 'UTC',
+    })
+  }
+  
+
+const title = /ja/.test(lang) ? '最近のブログ記事' : 'Revent publications'
+---
+
+<Layout title={title} >
+    <SimpleLayout
+        title={title}
+        intro="I posted several blog platform. So we can easy to summarize of my blog in this page."
+    >
+        <div class="md:border-l md:border-zinc-100 md:pl-6 md:dark:border-zinc-700/40">
+            <div class="flex max-w-3xl flex-col space-y-16">
+                {posts.map((article) => (
+                    <article class="md:grid md:grid-cols-4 md:items-baseline">
+                      <Card class="md:col-span-3">
+                        <CardTitle href={`${article.href}`}>
+                          {article.title}
+                        </CardTitle>
+                        <CardEyebrow
+                          as="time"
+                          dateTime={article.datetime}
+                          class="md:hidden"
+                          decorate
+                        >
+                          {formatDate(article.datetime)}
+                        </CardEyebrow>
+                        <CardDescription set:text={removeHtmlTags(article.description)} />
+                        <CardCta>Read article</CardCta>
+                      </Card>
+                      <CardEyebrow
+                        as="time"
+                        dateTime={article.datetime}
+                        class="mt-1 hidden md:block"
+                      >
+                          {formatDate(article.datetime)}
+                      </CardEyebrow>
+                    </article>
+                ))}
+            </div>
+        </div>
+    </SimpleLayout>
+</Layout>
