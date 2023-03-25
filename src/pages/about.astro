@@ -1,56 +1,8 @@
 ---
-import Container from '../components/tailwindui/Container.astro';
-import MailIcon from '../components/tailwindui/Icons/MailIcon.astro';
-import Layout from '../components/tailwindui/Layout.astro';
-import SimpleLayout from '../components/tailwindui/SimpleLayout.astro';
-import GitHubIcon from '../components/tailwindui/SocialIcons/GitHubIcon.astro';
-import LinkedInIcon from '../components/tailwindui/SocialIcons/LinkedInIcon.astro';
-import Twitter from '../components/tailwindui/SocialIcons/Twitter.astro';
-import SocialLink from '../components/tailwindui/SocialLink.astro';
+import AboutPage from '../containers/pages/AboutPage.astro';
+import { getLanguageFromURL } from '../libs/urlUtils/lang.util';
 
-import { getEntryBySlug } from 'astro:content';
-import MarkdocContent from '../components/MarkdocContent.astro';
-const entry = await getEntryBySlug('profiles', 'hero');
-
-const { Content } = entry ? await entry.render() : { Content: null};
+const currentPage = new URL(Astro.request.url).pathname;
+const lang = getLanguageFromURL(currentPage);
 ---
-<Layout title="About">
-	<Container class="mt-16 sm:mt-32">
-        <div class="grid grid-cols-1 gap-y-16 lg:grid-cols-2 lg:grid-rows-[auto_1fr] lg:gap-y-12">
-          <div class="lg:pl-20">
-            <div class="max-w-xs px-2.5 lg:max-w-none">
-              <img
-                src={'https://hidetaka.dev/images/profile.jpg'}
-                alt=""
-                sizes="(min-width: 1024px) 32rem, 20rem"
-                class="aspect-square rotate-3 rounded-2xl bg-zinc-100 object-cover dark:bg-zinc-800"
-              />
-            </div>
-          </div>
-          <div class="lg:order-first lg:row-span-2">
-            <h1 class="text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-5xl">
-							<span class='block text-zinc-800 dark:text-zinc-100'>Hello!</span>
-							<span class='block text-zinc-800 dark:text-zinc-100'>
-								I&lsquo;m <span class='text-indigo-600'>Hidetaka Okamoto</span>
-							</span>
-            </h1>
-            <div class="mt-6 space-y-7 text-base text-zinc-600 dark:text-zinc-400">
-              <MarkdocContent content={Content} />
-            </div>
-          </div>
-          <div class="lg:pl-20">
-            <ul role="list">
-              <SocialLink href="https://twitter.com/hidetaka_dev" icon={Twitter}>
-                Follow on Twitter
-              </SocialLink>
-              <SocialLink href="https://github.com/hideokamoto" icon={GitHubIcon} className="mt-4">
-                Follow on GitHub
-              </SocialLink>
-              <SocialLink href="https://www.linkedin.com/in/hideokamoto/" icon={LinkedInIcon} className="mt-4">
-                Follow on LinkedIn
-              </SocialLink>
-            </ul>
-          </div>
-        </div>
-	</Container>
-</Layout>
+<AboutPage lang={lang} />
