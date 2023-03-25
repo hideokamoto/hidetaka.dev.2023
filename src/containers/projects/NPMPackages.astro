@@ -23,7 +23,10 @@ const formatDate = (dateString: string): string => {
 ---
 <ul
     role="list"
-    class="grid grid-cols-1 gap-x-12 gap-y-16 sm:grid-cols-2 lg:grid-cols-3"
+    class:list={[
+        "grid grid-cols-1 gap-x-12 gap-y-16 sm:grid-cols-2 lg:grid-cols-3",
+        Astro.props.class
+    ]}
 >
         {packages.map(pkg => (
             <Card as="li">
