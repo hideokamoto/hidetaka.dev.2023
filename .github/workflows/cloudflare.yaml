@@ -1,5 +1,15 @@
 name: Deploy
 
+inputs:
+  path:
+    description: "Path of the directory containing your site"
+    required: false
+    default: "."
+  node-version:
+    description: "The node version to use"
+    required: false
+    default: "16"
+
 on:
   push:
     branches:
@@ -13,8 +23,29 @@ jobs:
     name: Deploy
     steps:
       - uses: actions/checkout@v2
-      - name: Install, build, and upload your site
-        uses: withastro/action@v0
+
+      - name: Check lockfiles
+        shell: "bash"
+        run: |
+          echo "PACKAGE_MANAGER=yarn" >> $GITHUB_ENV
+          echo "LOCKFILE=yarn.lock" >> $GITHUB_ENV
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: ${{ env.PACKAGE_MANAGER }}
+      - name: Install
+        shell: "bash"
+        run: |
+          cd ${{ inputs.path }}
+          $PACKAGE_MANAGER install
+      - name: Build
+        shell: "bash"
+        run: |
+          cd ${{ inputs.path }}
+          MICROCMS_API_KEY=${{ secrets.MICROCMS_API_KEY }} $PACKAGE_MANAGER run build          $PACKAGE_MANAGER run build
+          
       - name: Publish
         uses: cloudflare/wrangler-action@2.0.0
         with:
