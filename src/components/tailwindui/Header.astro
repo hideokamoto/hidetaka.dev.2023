@@ -1,12 +1,9 @@
 ---
-import Avatar from "./Avatars/Avatar.astro";
-import AvatarContainer from "./Avatars/AvatarContainer.astro";
 import Container from "./Container.astro";
 import DesktopLangSwitcher from "./Headers/DesktopLangSwitcher.astro";
 import DesktopNavigation from "./Headers/DesktopNavigation.astro";
 import MobileNavigation from "./Headers/MobileNavigation.astro";
 import ModeToggle from "./Headers/ModeToggle.astro";
-import NavItem from "./Headers/NavItem.astro";
 
 ---
 <header
@@ -37,13 +34,11 @@ import NavItem from "./Headers/NavItem.astro";
       <div class="flex flex-1 justify-end md:justify-center">
         <DesktopLangSwitcher />
       </div>
-      {/*
       <div class="flex justify-end md:flex-1">
         <div class="pointer-events-auto">
           <ModeToggle />
         </div>
       </div>
-       */}
     </div>
   </Container>
 </div>
