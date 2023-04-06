@@ -13,7 +13,7 @@ export const loadWPPosts = async (locale: 'en' | 'ja'): Promise<FeedItem[]> => {
           (post: WPPost): FeedItem => ({
             title: post.title.rendered,
             description: post.excerpt.rendered,
-            href: post.link.replace(/api./, ''),
+            href: post.link.replace(/wp-api./, ''),
             datetime: post.date,
             dataSource,
             id: post.id,
