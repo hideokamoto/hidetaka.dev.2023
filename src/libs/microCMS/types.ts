@@ -1,3 +1,5 @@
+import type { createClient } from "microcms-js-sdk"
+
 export type MicroCMSRecord = {
     id: string
     createdAt: string
@@ -39,3 +41,4 @@ export type MicroCMSRecord = {
     is_solo: boolean
   }
   
+  export type MicroCMSClient = Pick<ReturnType<typeof createClient>, 'get'>

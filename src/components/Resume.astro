@@ -4,9 +4,6 @@ import BriefcaseIcon from "./tailwindui/Icons/BriefcaseIcon.astro";
 import { MicroCMSAPI } from '../libs/microCMS/apis';
 import { createCFMicroCMSClient } from '../libs/microCMS/cloudflare';
 
-console.log({
-  resume: Astro.request
-})
 const microCMS = new MicroCMSAPI(createCFMicroCMSClient(Astro.request))
 const spokenEvents = sortByEventDate(await microCMS.listEndedEvents())
 

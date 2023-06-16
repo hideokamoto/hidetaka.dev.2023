@@ -1,11 +1,11 @@
 import dayjs from 'dayjs'
 import { MICROCMS_MOCK_BOOKs, MICROCMS_MOCK_EVENTs } from './mocks'
-import type { MicroCMSEventsRecord, MicroCMSProjectsRecord } from './types'
+import type { MicroCMSClient, MicroCMSEventsRecord, MicroCMSProjectsRecord } from './types'
 import type { createClient } from 'microcms-js-sdk'
 
 export class MicroCMSAPI {
-  private readonly client: ReturnType<typeof createClient>
-  constructor(client: ReturnType<typeof createClient>) {
+  private readonly client: MicroCMSClient
+  constructor(client: MicroCMSClient) {
     this.client = client
   }
   public async listEndedEvents() {

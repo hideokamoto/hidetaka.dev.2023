@@ -13,9 +13,6 @@ export const prerender = true
 
 const currentPage = new URL(Astro.request.url).pathname;
 const lang = getLanguageFromURL(currentPage)
-console.log({
-  index: Astro.request
-})
 ---
 
 <Layout>
