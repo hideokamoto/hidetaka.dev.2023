@@ -5,9 +5,11 @@ import CardTitle from "../../components/tailwindui/Cards/CardTitle.astro";
 import CardEyebrow from "../../components/tailwindui/Cards/CardEyebrow.astro";
 import CardCta from "../../components/tailwindui/Cards/CardCta.astro";
 import BookThumbnail from "../../components/Books/BookThumbnail.astro";
-import { listBooks } from "../../libs/microCMS/apis";
+import { MicroCMSAPI } from '../../libs/microCMS/apis';
+import { createCFMicroCMSClient } from '../../libs/microCMS/cloudflare';
 
-const books = await listBooks()
+const microCMS = new MicroCMSAPI(createCFMicroCMSClient(Astro.request))
+const books = await microCMS.listBooks()
 
 const formatDate = (dateString?: string): string => {
     return new Date(`${dateString}`).toLocaleDateString('en-US', {

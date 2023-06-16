@@ -5,14 +5,17 @@ import GitHubIcon from '../../components/tailwindui/SocialIcons/GitHubIcon.astro
 import LinkedInIcon from '../../components/tailwindui/SocialIcons/LinkedInIcon.astro';
 import Twitter from '../../components/tailwindui/SocialIcons/Twitter.astro';
 import SocialLink from '../../components/tailwindui/SocialLink.astro';
-import { getPageById } from '../../libs/microCMS/apis';
+import { MicroCMSAPI } from '../../libs/microCMS/apis';
+import { createCFMicroCMSClient } from '../../libs/microCMS/cloudflare';
 
 const {
     lang = 'en'
 } = Astro.props
 
-const profilePage = await getPageById('profile', /ja/.test(lang) ? 'ja' : 'en');
-const speakerProfilePage = await getPageById('speaker-profile', /ja/.test(lang) ? 'ja' : 'en');
+const microCMS = new MicroCMSAPI(createCFMicroCMSClient(Astro.request))
+
+const profilePage = await microCMS.getPageById('profile', /ja/.test(lang) ? 'ja' : 'en');
+const speakerProfilePage = await microCMS.getPageById('speaker-profile', /ja/.test(lang) ? 'ja' : 'en');
 
 
 ---

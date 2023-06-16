@@ -1,9 +1,12 @@
 import rss from '@astrojs/rss';
 import type { APIContext } from 'astro';
-import { listBooks } from '../../libs/microCMS/apis';
+import { MicroCMSAPI } from '../../libs/microCMS/apis';
+import { createCFMicroCMSClient } from '../../libs/microCMS/cloudflare';
 
 export async function get(context: APIContext) {
-    const books = await listBooks()
+    const microCMS = new MicroCMSAPI(createCFMicroCMSClient(context.request))
+    
+    const books = await microCMS.listBooks()
     const items = [
         ...books.map(book => {
             return {

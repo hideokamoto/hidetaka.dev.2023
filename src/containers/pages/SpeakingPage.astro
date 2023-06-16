@@ -3,14 +3,16 @@ import Layout from "../../components/tailwindui/Layout.astro";
 import SimpleLayout from "../../components/tailwindui/SimpleLayout.astro";
 import SpeakingAppearance from "../../components/tailwindui/Speakings/SpeakingAppearance.astro";
 import SpeakingSection from "../../components/tailwindui/Speakings/SpeakingSection.astro";
-import { listEndedEvents, listUpcomingEvents } from "../../libs/microCMS/apis";
+import { MicroCMSAPI } from '../../libs/microCMS/apis';
+import { createCFMicroCMSClient } from '../../libs/microCMS/cloudflare';
 import { sortByEventDate } from "../../libs/microCMS/utils";
 
 const {
     lang = 'en'
 } = Astro.props
-const endedEvents = sortByEventDate(await listEndedEvents())
-const upcomingEvents = sortByEventDate(await listUpcomingEvents())
+const microCMS = new MicroCMSAPI(createCFMicroCMSClient(Astro.request))
+const endedEvents = sortByEventDate(await microCMS.listEndedEvents())
+const upcomingEvents = sortByEventDate(await microCMS.listUpcomingEvents())
 
 const title = /ja/.test(lang) ? '最近の登壇情報' : 'Revent speaking'
 ---

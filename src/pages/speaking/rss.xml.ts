@@ -2,10 +2,12 @@
 
 import rss from '@astrojs/rss';
 import type { APIContext } from 'astro';
-import { listUpcomingEvents } from '../../libs/microCMS/apis';
+import { MicroCMSAPI } from '../../libs/microCMS/apis';
+import { createCFMicroCMSClient } from '../../libs/microCMS/cloudflare';
 
 export async function get(context: APIContext) {
-    const events = await listUpcomingEvents()
+    const microCMS = new MicroCMSAPI(createCFMicroCMSClient(context.request))
+    const events = await microCMS.listUpcomingEvents()
 	return rss({
 		title: "Speaking schedule | Hidetaka Okamoto",
 		description: "Upcoming event schedule that Hidetaka will talk at",

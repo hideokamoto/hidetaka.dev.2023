@@ -1,9 +1,11 @@
 ---
-import { listEndedEvents } from "../libs/microCMS/apis";
 import { sortByEventDate } from "../libs/microCMS/utils";
 import BriefcaseIcon from "./tailwindui/Icons/BriefcaseIcon.astro";
+import { MicroCMSAPI } from '../libs/microCMS/apis';
+import { createCFMicroCMSClient } from '../libs/microCMS/cloudflare';
 
-const spokenEvents = sortByEventDate(await listEndedEvents())
+const microCMS = new MicroCMSAPI(createCFMicroCMSClient(Astro.request))
+const spokenEvents = sortByEventDate(await microCMS.listEndedEvents())
 
 ---
 <div class="rounded-2xl border border-zinc-100 p-6 dark:border-zinc-700/40">
