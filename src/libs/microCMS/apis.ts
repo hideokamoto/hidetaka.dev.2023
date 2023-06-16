@@ -24,6 +24,22 @@ export const listEndedEvents = async () => {
   return events
 }
 
+export const getPageById = async (id: string, lang: 'ja' | 'en' = 'ja') => {
+  const result = await microCMSClient?.get({
+    endpoint: 'pages',
+    contentId: id,
+  })
+  return {
+    id: result.id,
+    createdAt: result.createdAt,
+    updatedAt: result.updatedAt,
+    publishedAt: result.publishedAt,
+    revisedAt: result.revisedAt,
+    title: lang === 'ja' ? result.title : result['title-en'],
+    content: lang === 'ja' ? result.content : result['content-en']
+  }
+}
+
 export const listUpcomingEvents = async () => {
   const thisMonth = dayjs().format('YYYY-MM')
   if (!microCMSClient) {
