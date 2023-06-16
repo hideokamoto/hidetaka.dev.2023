@@ -10,12 +10,12 @@
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/cloudflare": "^6.2.2",
+    "@astrojs/cloudflare": "^6.5.0",
     "@astrojs/markdoc": "^0.0.1",
     "@astrojs/rss": "^2.1.1",
     "@astrojs/sitemap": "^1.1.0",
     "@astrojs/tailwind": "^3.1.1",
-    "astro": "^2.1.4",
+    "astro": "^2.6.4",
     "clsx": "^1.2.1",
     "dayjs": "^1.11.7",
     "microcms-js-sdk": "^2.3.2",
