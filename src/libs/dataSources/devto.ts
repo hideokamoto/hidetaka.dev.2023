@@ -6,12 +6,14 @@ export const loadDevToPosts = async (): Promise<FeedItem[]> => {
       name: 'Dev.to',
       color: 'bg-green-100 text-gren-800',
     }
-    const personal = await fetch('https://dev.to/api/articles?username=hideokamoto').then((data) =>
-      data.json(),
-    )
-    const stripe = await fetch('https://dev.to/api/articles?username=hideokamoto_stripe').then(
-      (data) => data.json(),
-    )
+    const personal = await fetch('https://dev.to/api/articles?username=hideokamoto').then((data) => {
+      if (data.ok) return data.json()
+      return []
+    })
+    const stripe = await fetch('https://dev.to/api/articles?username=hideokamoto_stripe').then((data) => {
+      if (data.ok) return data.json()
+      return []
+    })
     return [...personal, ...stripe].map((data): FeedItem => {
       return {
         id: data.id,
