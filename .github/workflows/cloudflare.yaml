@@ -1,6 +1,8 @@
 name: Deploy
 
 on:
+  repository_dispatch:
+    types: [update_post]
   push:
     branches:
       - main
