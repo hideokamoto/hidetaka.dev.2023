@@ -6,8 +6,6 @@ import { createClient } from "microcms-js-sdk";
  */
 export const createCFMicroCMSClient = (request: Request) => {
     const runtime = getRuntime(request)
-    console.log(runtime)
-    console.log(import.meta.env)
     if (!runtime || !runtime.env) {
         /**
          * For the local env
