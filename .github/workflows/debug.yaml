@@ -28,7 +28,6 @@ jobs:
         shell: bash
         run: |
           echo "MICROCMS_API_KEY=${{ secrets.MICROCMS_API_KEY }}" > .env
-          cat .env
       - name: Build
         shell: "bash"
         run: |

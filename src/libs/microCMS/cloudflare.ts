@@ -17,6 +17,7 @@ export const createCFMicroCMSClient = (request: Request):MicroCMSClient => {
         }
     }
     const viteEnvAPIKEY = import.meta.env.MICROCMS_API_KEY
+    console.log(viteEnvAPIKEY)
     if (viteEnvAPIKEY) {
         return createClient({
             serviceDomain: 'hidetaka',
@@ -24,6 +25,7 @@ export const createCFMicroCMSClient = (request: Request):MicroCMSClient => {
         })
     }
     const envAPIKEY = process.env.MICROCMS_API_KEY
+    console.log(envAPIKEY)
     if (envAPIKEY) {
         return createClient({
             serviceDomain: 'hidetaka',

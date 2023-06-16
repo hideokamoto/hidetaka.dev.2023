@@ -11,10 +11,6 @@ export default defineConfig({
     name: 'ssr-debug',
     hooks: {
       'astro:build:setup': (options) => {
-        console.log(JSON.stringify({
-          vite: options.vite,
-          mode: options.target
-        }, null, 2))
       }
     }
   }],
