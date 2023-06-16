@@ -24,14 +24,17 @@ jobs:
       - name: Install
         shell: "bash"
         run: yarn install
+      - name: Env
+        shell: bash
+        run: |
+          echo "MICROCMS_API_KEY=${{ secrets.MICROCMS_API_KEY }}" > .env
       - name: Build
         shell: "bash"
         run: |
-          MICROCMS_API_KEY=${{ secrets.MICROCMS_API_KEY }} yarn run build  
+          yarn run build  
       - name: Publish
         uses: cloudflare/wrangler-action@2.0.0
         with:
           apiToken: ${{ secrets.CF_API_TOKEN }}
           accountId: ${{ secrets.CF_ACCOUNT_ID }}
           command: pages publish --project-name=${{ secrets.CF_PROJECT_NAME }} ./dist
-
