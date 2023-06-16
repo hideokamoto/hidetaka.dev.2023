@@ -23,6 +23,9 @@ export const createCFMicroCMSClient = (request: Request):MicroCMSClient => {
             apiKey: import.meta.env.MICROCMS_API_KEY as string,
         })
     }
+    console.log({
+        message: "Failed to load the microcms API keys"
+    })
     return {
         async get(props) {
             if (props.contentId) {
