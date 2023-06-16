@@ -27,8 +27,8 @@ jobs:
       - name: Env
         shell: bash
         run: |
-          echo "MICROCMS_API_KEY=${{ secrets.MICROCMS_API_KEY }}" > .dev.vars
-          cat .dev.vars
+          echo "MICROCMS_API_KEY=${{ secrets.MICROCMS_API_KEY }}" > .env
+          cat .env
       - name: Build
         shell: "bash"
         run: |
