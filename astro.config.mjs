@@ -12,6 +12,7 @@ export default defineConfig({
     hooks: {
       'astro:build:setup': (options) => {
         console.log(options)
+        console.log(JSON.stringify(options.vite, null, 2))
       }
     }
   }],
