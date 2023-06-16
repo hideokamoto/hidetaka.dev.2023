@@ -32,4 +32,4 @@ jobs:
       - name: Build
         shell: "bash"
         run: |
-          MICROCMS_API_KEY=${{ secrets.MICROCMS_API_KEY }} yarn run build  
+          yarn run build  

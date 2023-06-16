@@ -7,6 +7,7 @@ import type { MicroCMSClient } from "./types";
  */
 export const createCFMicroCMSClient = (request: Request):MicroCMSClient => {
     const runtime = getRuntime(request)
+    console.log(runtime.env)
     if (runtime && runtime.env) {
         const cfRuntimeAPIKEY = (runtime.env as any).MICROCMS_API_KEY as string
         if (cfRuntimeAPIKEY) {
@@ -17,6 +18,7 @@ export const createCFMicroCMSClient = (request: Request):MicroCMSClient => {
         }
     }
     const viteEnvAPIKEY = import.meta.env.MICROCMS_API_KEY
+    console.log(import.meta.env)
     if (viteEnvAPIKEY) {
         return createClient({
             serviceDomain: 'hidetaka',
