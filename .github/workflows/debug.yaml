@@ -24,6 +24,11 @@ jobs:
       - name: Install
         shell: "bash"
         run: yarn install
+      - name: Env
+        shell: bash
+        run: |
+          echo "MICROCMS_API_KEY=${{ secrets.MICROCMS_API_KEY }}" > .dev.vars
+          cat .dev.vars
       - name: Build
         shell: "bash"
         run: |
