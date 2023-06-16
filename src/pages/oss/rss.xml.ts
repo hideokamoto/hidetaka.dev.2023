@@ -3,6 +3,11 @@ import type { APIContext } from 'astro';
 import { listMyNPMPackages } from '../../libs/dataSources/npmjs';
 import { listMyWordPressPlugins } from '../../libs/dataSources/wporg';
 
+/**
+ * Static Page
+ * This page will rebuild by the microCMS Webhook
+ */
+export const prerender = true
 export async function get(context: APIContext) {
     const npmPackages = await listMyNPMPackages()
     const wpPlugins = await listMyWordPressPlugins()
