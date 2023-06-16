@@ -23,5 +23,7 @@
     "microcms-js-sdk": "^2.3.2",
     "tailwindcss": "^3.0.24"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "wrangler": "^3.1.0"
+  }
 }
