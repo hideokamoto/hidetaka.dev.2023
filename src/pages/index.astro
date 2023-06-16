@@ -5,6 +5,11 @@ import BlogPosts from '../components/BlogPosts/BlogPosts.astro';
 import Resume from '../components/Resume.astro';
 import Hero from '../containers/Hero.astro';
 import { getLanguageFromURL } from '../libs/urlUtils/lang.util';
+/**
+ * Static Page
+ * This page will rebuild by the microCMS Webhook
+ */
+export const prerender = true
 
 const currentPage = new URL(Astro.request.url).pathname;
 const lang = getLanguageFromURL(currentPage)
