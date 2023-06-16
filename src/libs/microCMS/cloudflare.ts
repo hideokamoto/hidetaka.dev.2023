@@ -16,6 +16,7 @@ export const createCFMicroCMSClient = (request: Request):MicroCMSClient => {
             })
         }
     }
+    console.log(import.meta.env)
     const envAPIKEY = import.meta.env.MICROCMS_API_KEY
     if (envAPIKEY) {
         return createClient({
