@@ -7,7 +7,7 @@ import OuterContainer from '../components/tailwindui/Containers/OuterContainer.a
 import { MicroCMSAPI } from '../libs/microCMS/apis';
 import { createCFMicroCMSClient } from '../libs/microCMS/cloudflare';
 
-const microCMS = new MicroCMSAPI(createCFMicroCMSClient(Astro.request))
+const microCMS = new MicroCMSAPI(createCFMicroCMSClient((Astro.locals as any).runtime))
 const {
     lang = 'en'
 } = Astro.props

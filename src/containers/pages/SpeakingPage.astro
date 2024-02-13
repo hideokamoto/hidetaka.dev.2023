@@ -10,7 +10,8 @@ import { sortByEventDate } from "../../libs/microCMS/utils";
 const {
     lang = 'en'
 } = Astro.props
-const microCMS = new MicroCMSAPI(createCFMicroCMSClient(Astro.request))
+
+const microCMS = new MicroCMSAPI(createCFMicroCMSClient(Astro))
 const endedEvents = sortByEventDate(await microCMS.listEndedEvents())
 const upcomingEvents = sortByEventDate(await microCMS.listUpcomingEvents())
 
