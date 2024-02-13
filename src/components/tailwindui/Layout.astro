@@ -20,7 +20,7 @@ const siteDescription = Astro.props.description ?? SITE_DESCRIPTION
         </div>
         <div class="relative">
           <Header />
-            <main>
+            <main transition:animate="fade">
                 <slot></slot>
             </main>
             <Footer />

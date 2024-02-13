@@ -22,11 +22,11 @@ export const createCFMicroCMSClient = (runtime: any):MicroCMSClient => {
             apiKey: import.meta.env.MICROCMS_API_KEY as string,
         })
     }
-    const envAPIKEY = process.env.MICROCMS_API_KEY
+    const envAPIKEY = (process.env as any).MICROCMS_API_KEY
     if (envAPIKEY) {
         return createClient({
             serviceDomain: 'hidetaka',
-            apiKey: process.env.MICROCMS_API_KEY as string,
+            apiKey: (process.env as any).MICROCMS_API_KEY as string,
         })
     }
     console.log({
