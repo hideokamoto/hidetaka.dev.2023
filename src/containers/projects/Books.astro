@@ -8,7 +8,7 @@ import BookThumbnail from "../../components/Books/BookThumbnail.astro";
 import { MicroCMSAPI } from '../../libs/microCMS/apis';
 import { createCFMicroCMSClient } from '../../libs/microCMS/cloudflare';
 
-const microCMS = new MicroCMSAPI(createCFMicroCMSClient(Astro.request))
+const microCMS = new MicroCMSAPI(createCFMicroCMSClient((Astro.locals as any).runtime))
 const books = await microCMS.listBooks()
 
 const formatDate = (dateString?: string): string => {

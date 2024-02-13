@@ -12,7 +12,7 @@ const {
     lang = 'en'
 } = Astro.props
 
-const microCMS = new MicroCMSAPI(createCFMicroCMSClient(Astro.request))
+const microCMS = new MicroCMSAPI(createCFMicroCMSClient((Astro.locals as any).runtime))
 
 const profilePage = await microCMS.getPageById('profile', /ja/.test(lang) ? 'ja' : 'en');
 const speakerProfilePage = await microCMS.getPageById('speaker-profile', /ja/.test(lang) ? 'ja' : 'en');
