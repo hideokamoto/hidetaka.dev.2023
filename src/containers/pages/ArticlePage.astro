@@ -47,6 +47,13 @@ const title = /ja/.test(lang) ? '最近のブログ記事' : 'Revent publication
                         >
                           {formatDate(article.datetime)}
                         </CardEyebrow>
+                        <CardEyebrow
+                          decorate
+                        >
+                          <a href={article.dataSource.href} target="_blank">
+                            {article.dataSource.name}
+                          </a>
+                        </CardEyebrow>
                         <CardDescription set:text={removeHtmlTags(article.description)} />
                         <CardCta>Read article</CardCta>
                       </Card>

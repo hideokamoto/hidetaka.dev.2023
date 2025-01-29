@@ -10,7 +10,6 @@ import CardTitle from '../tailwindui/Cards/CardTitle.astro';
 const { lang = 'en-US'} = Astro.props
 const posts = await loadBlogPosts(/ja/.test(lang) ? 'ja' : 'en')
 
-
 export function formatDate(dateString: string, lang: string): string {
     return new Date(`${dateString}`).toLocaleDateString(lang, {
       day: 'numeric',
@@ -21,8 +20,6 @@ export function formatDate(dateString: string, lang: string): string {
   }
   
 ---
-
-
 <div class="flex flex-col gap-16">
 
   <div class="md:border-l md:border-zinc-100 md:pl-6 md:dark:border-zinc-700/40">
@@ -40,6 +37,13 @@ export function formatDate(dateString: string, lang: string): string {
                   decorate
                 >
                   {formatDate(article.datetime, lang)}
+                </CardEyebrow>
+                <CardEyebrow
+                  decorate
+                >
+                  <a href={article.dataSource.href} target="_blank">
+                    {article.dataSource.name}
+                  </a>
                 </CardEyebrow>
                 <CardDescription>{removeHtmlTags(article.description)}</CardDescription>
                 <CardCta>Read article</CardCta>
