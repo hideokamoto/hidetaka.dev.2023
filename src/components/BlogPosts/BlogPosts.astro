@@ -1,5 +1,5 @@
 ---
-import { loadWPPosts } from '../../libs/dataSources/wordpress';
+import { loadBlogPosts } from '../../libs/dataSources/blogs';
 import { removeHtmlTags } from '../../libs/sanitize';
 import Card from '../tailwindui/Card.astro';
 import CardCta from '../tailwindui/Cards/CardCta.astro';
@@ -8,7 +8,7 @@ import CardEyebrow from '../tailwindui/Cards/CardEyebrow.astro';
 import CardTitle from '../tailwindui/Cards/CardTitle.astro';
 
 const { lang = 'en-US'} = Astro.props
-const posts = await loadWPPosts(/ja/.test(lang) ? 'ja' : 'en')
+const posts = await loadBlogPosts(/ja/.test(lang) ? 'ja' : 'en')
 
 
 export function formatDate(dateString: string, lang: string): string {
