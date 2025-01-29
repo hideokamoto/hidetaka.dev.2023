@@ -62,6 +62,24 @@ export class MicroCMSAPI {
     })
     return events
   }
+  public async listGuestPosts (): Promise<MicroCMSProjectsRecord[]> {
+    if (!this.client) {
+      if (process.env.MICROCMS_API_MODE === 'mock') {
+        return MICROCMS_MOCK_BOOKs
+      }
+      return []
+    }
+    const { contents: events } = await this.client.get<{
+      contents: MicroCMSProjectsRecord[]
+    }>({
+      endpoint: 'projects',
+      queries: {
+        orders: '-published_at',
+        filters: `project_type[contains]guest_posts`,
+      },
+    })
+    return events
+  }
   public async listBooks (): Promise<MicroCMSProjectsRecord[]> {
     if (!this.client) {
       if (process.env.MICROCMS_API_MODE === 'mock') {
