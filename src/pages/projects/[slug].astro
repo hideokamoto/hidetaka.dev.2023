@@ -121,23 +121,24 @@ const title = `Project: ${project.title}`
               <div class="mt-10 lg:col-start-1 lg:row-start-2 lg:max-w-lg lg:self-start">
                 <section aria-labelledby="options-heading">
                   <h2 id="options-heading" class="sr-only">Product info</h2>
-                   <!-- Size picker -->
+
+                   <!-- project type -->
                     <div class="mt-8">
-                        <div class="flex items-center justify-between">
-                        <h2 class="text-sm font-medium text-gray-900">tools</h2>
-                        </div>
-        
-                        <div class="grid grid-cols-3 gap-3 sm:grid-cols-4">
-                            {['wordpress','aws','line'].map(tag => {
-                                return (
-                                <div
-                                    class="flex items-center justify-center rounded-md border px-3 py-3 text-sm font-medium  sm:flex-1">
-                                    <span>{tag}</span>
-                                </div>
-                                )
-                            })}
-                        </div>
-                    </div>
+                      <div class="flex items-center justify-between">
+                      <h2 class="text-sm font-medium text-gray-900">tools</h2>
+                      </div>
+      
+                      <div class="grid grid-cols-3 gap-3 sm:grid-cols-4">
+                          {project.tags.map(tag => {
+                              return (
+                              <div
+                                  class="flex items-center justify-center rounded-md border px-3 py-3 text-sm font-medium  sm:flex-1">
+                                  <span>{tag}</span>
+                              </div>
+                              )
+                          })}
+                      </div>
+                  </div>
           
                     <div class="mt-10">
                       <a 
