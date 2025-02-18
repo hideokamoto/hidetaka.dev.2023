@@ -1,7 +1,6 @@
 import dayjs from 'dayjs'
 import { MICROCMS_MOCK_BOOKs, MICROCMS_MOCK_EVENTs } from './mocks'
 import type { MicroCMSClient, MicroCMSEventsRecord, MicroCMSProjectsRecord } from './types'
-import type { createClient } from 'microcms-js-sdk'
 
 export class MicroCMSAPI {
   private readonly client: MicroCMSClient
@@ -79,6 +78,18 @@ export class MicroCMSAPI {
       },
     })
     return events
+  }
+  public async listAllProjects (): Promise<MicroCMSProjectsRecord[]> {
+    if (!this.client) {
+      if (process.env.MICROCMS_API_MODE === 'mock') {
+        return MICROCMS_MOCK_BOOKs
+      }
+      return []
+    }
+    const projects = await this.client.getAllContents({
+      endpoint: 'projects',
+    })
+    return projects
   }
   public async listApps (): Promise<MicroCMSProjectsRecord[]> {
     if (!this.client) {

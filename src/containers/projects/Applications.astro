@@ -7,6 +7,7 @@ import CardCta from "../../components/tailwindui/Cards/CardCta.astro";
 import BookThumbnail from "../../components/Books/BookThumbnail.astro";
 import { MicroCMSAPI } from '../../libs/microCMS/apis';
 import { createCFMicroCMSClient } from '../../libs/microCMS/cloudflare';
+import { getPathnameWithLangType } from "../../libs/urlUtils/lang.util";
 
 const microCMS = new MicroCMSAPI(createCFMicroCMSClient((Astro.locals as any).runtime))
 const apps = await microCMS.listApps()
@@ -19,7 +20,7 @@ const formatDate = (dateString?: string): string => {
       timeZone: 'UTC',
     })
 }
-
+const lang = Astro.props.lang ?? 'en'
 ---
 
 <ul
@@ -31,8 +32,8 @@ const formatDate = (dateString?: string): string => {
 >
         {apps.map(app => (
             <Card as="li">
-                    <BookThumbnail book={app} />
-                <CardTitle href={`${app.url}`}>
+                <BookThumbnail book={app}  />
+                <CardTitle href={getPathnameWithLangType(`projects/${app.id}`, lang)}>
                   {app.title}
                 </CardTitle>
                 <CardEyebrow
@@ -43,7 +44,7 @@ const formatDate = (dateString?: string): string => {
                   {formatDate(app.published_at)}
                 </CardEyebrow>
                 <CardDescription>{app.tags.map(tag => tag).join(', ')}</CardDescription>
-                <CardCta>Visit App</CardCta>
+                <CardCta>View detail</CardCta>
               </Card>
         ))}
 </ul>

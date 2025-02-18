@@ -38,7 +38,13 @@ export type MicroCMSRecord = {
     affiliate_link?: string
     image?: MicroCMSImageObject
     lang: ['Japanese' | 'English']
-    is_solo: boolean
+    is_solo: boolean;
+    /**
+     * 詳細ページ向け
+     **/
+    about?: string;
+    background?: string;
+    architecture?: string;
   }
   
-  export type MicroCMSClient = Pick<ReturnType<typeof createClient>, 'get'>
+  export type MicroCMSClient = Pick<ReturnType<typeof createClient>, 'get' | 'getAllContents'>

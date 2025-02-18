@@ -7,13 +7,7 @@ import cloudflare from "@astrojs/cloudflare";
 // https://astro.build/config
 export default defineConfig({
   site: 'https://hidetaka.dev',
-  integrations: [sitemap(), tailwind(), {
-    name: 'ssr-debug',
-    hooks: {
-      'astro:build:setup': (options) => {
-      }
-    }
-  }],
+  integrations: [sitemap(), tailwind()],
   output: "server",
   adapter: cloudflare()
 });
