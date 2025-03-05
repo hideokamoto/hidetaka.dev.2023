@@ -8,6 +8,7 @@ import CardEyebrow from "../../components/tailwindui/Cards/CardEyebrow.astro";
 import CardCta from "../../components/tailwindui/Cards/CardCta.astro";
 import { MicroCMSAPI } from "../../libs/microCMS/apis";
 import { createCFMicroCMSClient } from "../../libs/microCMS/cloudflare";
+import { removeHtmlTags } from "../../libs/sanitize";
 const {
     lang = 'en'
 } = Astro.props
@@ -16,12 +17,8 @@ const {
 const microCMS = new MicroCMSAPI(createCFMicroCMSClient((Astro.locals as any).runtime))
 
 // postsを取得
-const allPosts = await microCMS.listPosts();
-const posts = allPosts.filter(post => {
-  // 言語フィルタリング（jaパターンが含まれていれば日本語、それ以外は英語）
-  return /ja/.test(lang) ? 
-    post.lang.some(l => l.toLowerCase() === 'japanese') : 
-    post.lang.some(l => l.toLowerCase() === 'english');
+const posts = await microCMS.listPosts({
+    lang: lang === 'ja' ? 'japanese' : 'english'
 });
 
 export function formatDate(dateString: string, lang: string = 'en'): string {
@@ -41,6 +38,13 @@ const intro = /ja/.test(lang) ?
 // ニュース詳細ページへのURLを生成
 function getNewsDetailUrl(postId: string): string {
   return /ja/.test(lang) ? `/ja-JP/news/${postId}` : `/news/${postId}`;
+}
+
+// 先頭140文字を抽出する関数を追加
+function truncateContent(content: string, maxLength: number = 140): string {
+  const plainText = removeHtmlTags(content);
+  if (plainText.length <= maxLength) return plainText;
+  return plainText.slice(0, maxLength) + '...';
 }
 ---
 
@@ -72,7 +76,7 @@ function getNewsDetailUrl(postId: string): string {
                             {post.tags.join(', ')}
                           </CardEyebrow>
                         )}
-                        <CardDescription set:html={post.content} />
+                        <CardDescription set:html={truncateContent(post.content)} />
                         <CardCta href={getNewsDetailUrl(post.id)}>
                           {/ja/.test(lang) ? '詳細を見る' : 'Read more'}
                         </CardCta>

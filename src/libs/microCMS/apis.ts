@@ -130,20 +130,26 @@ export class MicroCMSAPI {
       }),
     ]
   }
-  public async listPosts(): Promise<MicroCMSPostsRecord[]> {
+  public async listPosts(query?: {
+    lang?: 'japanese' | 'english'
+  }): Promise<MicroCMSPostsRecord[]> {
     if (!this.client) {
       if (process.env.MICROCMS_API_MODE === 'mock') {
         return MICROCMS_MOCK_POSTs
       }
       return []
     }
+    const lang = query?.lang ?? null
     const { contents: posts } = await this.client.get<{
       contents: MicroCMSPostsRecord[]
     }>({
       endpoint: 'posts',
       queries: {
         orders: '-publishedAt',
-      },
+        filters: [
+          lang ? `lang[contains]${query?.lang}` : undefined
+        ].filter(Boolean).join('[and]')
+      }
     })
     return posts
   }
