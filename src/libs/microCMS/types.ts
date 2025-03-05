@@ -28,7 +28,6 @@ export type MicroCMSRecord = {
     | 'owned_oss'
     | 'oss_contribution'
     | 'community_activities'
-    | 'applications'
   
   export type MicroCMSProjectsRecord = MicroCMSRecord & {
     title: string
