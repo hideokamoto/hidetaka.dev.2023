@@ -1,0 +1,94 @@
+---
+import Card from "../../components/tailwindui/Card.astro";
+import CardDescription from "../../components/tailwindui/Cards/CardDescription.astro";
+import Layout from "../../components/tailwindui/Layout.astro";
+import SimpleLayout from "../../components/tailwindui/SimpleLayout.astro";
+import CardTitle from "../../components/tailwindui/Cards/CardTitle.astro";
+import CardEyebrow from "../../components/tailwindui/Cards/CardEyebrow.astro";
+import CardCta from "../../components/tailwindui/Cards/CardCta.astro";
+import { createClient } from "microcms-js-sdk";
+import { MicroCMSAPI } from "../../libs/microCMS/apis";
+import { removeHtmlTags } from "../../libs/sanitize";
+import type { MicroCMSPostsRecord } from "../../libs/microCMS/types";
+
+const {
+    lang = 'en'
+} = Astro.props
+
+// MicroCMSクライアントを初期化
+const client = createClient({
+  serviceDomain: import.meta.env.MICROCMS_SERVICE_DOMAIN,
+  apiKey: import.meta.env.MICROCMS_API_KEY,
+});
+const api = new MicroCMSAPI(client);
+
+// postsを取得
+const allPosts = await api.listPosts();
+const posts = allPosts.filter(post => {
+  // 言語フィルタリング（jaパターンが含まれていれば日本語、それ以外は英語）
+  return /ja/.test(lang) ? 
+    post.lang.some(l => l.toLowerCase() === 'japanese') : 
+    post.lang.some(l => l.toLowerCase() === 'english');
+});
+
+export function formatDate(dateString: string, lang: string = 'en'): string {
+  return new Date(`${dateString}`).toLocaleDateString(/ja/.test(lang) ? 'ja-JP' : 'en-US', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  })
+}
+
+const title = /ja/.test(lang) ? 'お知らせ' : 'News';
+const intro = /ja/.test(lang) ? 
+  '最近のお知らせやリリース情報をお届けします。' : 
+  'Recent news and release information.';
+---
+
+<Layout title={title} >
+    <SimpleLayout
+        title={title}
+        intro={intro}
+    >
+        <div class="md:border-l md:border-zinc-100 md:pl-6 md:dark:border-zinc-700/40">
+            <div class="flex max-w-3xl flex-col space-y-16">
+                {posts.map((post) => (
+                    <article class="md:grid md:grid-cols-4 md:items-baseline">
+                      <Card class="md:col-span-3">
+                        <CardTitle href={post.related_project?.[0]?.url || '#'}>
+                          {post.title}
+                        </CardTitle>
+                        <CardEyebrow
+                          as="time"
+                          dateTime={post.publishedAt}
+                          class="md:hidden"
+                          decorate
+                        >
+                          {formatDate(post.publishedAt, lang)}
+                        </CardEyebrow>
+                        {post.tags && post.tags.length > 0 && (
+                          <CardEyebrow
+                            decorate
+                          >
+                            {post.tags.join(', ')}
+                          </CardEyebrow>
+                        )}
+                        <CardDescription set:html={post.content} />
+                        {post.related_project?.[0]?.url && (
+                          <CardCta>{/ja/.test(lang) ? 'プロジェクトを見る' : 'View project'}</CardCta>
+                        )}
+                      </Card>
+                      <CardEyebrow
+                        as="time"
+                        dateTime={post.publishedAt}
+                        class="mt-1 hidden md:block"
+                      >
+                          {formatDate(post.publishedAt, lang)}
+                      </CardEyebrow>
+                    </article>
+                ))}
+            </div>
+        </div>
+    </SimpleLayout>
+</Layout> 
