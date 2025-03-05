@@ -3,7 +3,6 @@ import Layout from "../../components/tailwindui/Layout.astro";
 import SimpleLayout from "../../components/tailwindui/SimpleLayout.astro";
 import { MicroCMSAPI } from "../../libs/microCMS/apis";
 import { createCFMicroCMSClient } from "../../libs/microCMS/cloudflare";
-import type { MicroCMSPostsRecord } from "../../libs/microCMS/types";
 
 const {
     lang = 'en',
@@ -99,6 +98,11 @@ const backLinkText = /ja/.test(lang) ? 'お知らせ一覧に戻る' : 'Back to 
                       {project.about && (
                         <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2" set:html={project.about}></p>
                       )}
+                      <p class="relative z-10 mt-4 flex items-center text-sm font-medium text-teal-500">
+                        <a href={/ja/.test(lang) ? `/ja-JP/projects/${project.id}` : `/projects/${project.id}`} class="hover:underline">
+                          {/ja/.test(lang) ? '詳細を見る' : 'View Project detail'}
+                        </a>
+                      </p>
                     </div>
                   </li>
                 ))}
