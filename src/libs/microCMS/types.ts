@@ -28,6 +28,7 @@ export type MicroCMSRecord = {
     | 'owned_oss'
     | 'oss_contribution'
     | 'community_activities'
+    | 'applications'
   
   export type MicroCMSProjectsRecord = MicroCMSRecord & {
     title: string
@@ -45,6 +46,14 @@ export type MicroCMSRecord = {
     about?: string;
     background?: string;
     architecture?: string;
+  }
+
+  export type MicroCMSPostsRecord = MicroCMSRecord & {
+    title: string
+    content: string
+    tags: string[]
+    related_project?: MicroCMSProjectsRecord[]
+    lang: string[]
   }
   
   export type MicroCMSClient = Pick<ReturnType<typeof createClient>, 'get' | 'getAllContents'>

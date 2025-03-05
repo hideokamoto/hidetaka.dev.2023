@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
-import { MICROCMS_MOCK_BOOKs, MICROCMS_MOCK_EVENTs } from './mocks'
-import type { MicroCMSClient, MicroCMSEventsRecord, MicroCMSProjectsRecord } from './types'
+import { MICROCMS_MOCK_BOOKs, MICROCMS_MOCK_EVENTs, MICROCMS_MOCK_POSTs } from './mocks'
+import type { MicroCMSClient, MicroCMSEventsRecord, MicroCMSProjectsRecord, MicroCMSPostsRecord } from './types'
 
 export class MicroCMSAPI {
   private readonly client: MicroCMSClient
@@ -129,5 +129,22 @@ export class MicroCMSAPI {
         contentId: 'iutgcn7l3ad',
       }),
     ]
+  }
+  public async listPosts(): Promise<MicroCMSPostsRecord[]> {
+    if (!this.client) {
+      if (process.env.MICROCMS_API_MODE === 'mock') {
+        return MICROCMS_MOCK_POSTs
+      }
+      return []
+    }
+    const { contents: posts } = await this.client.get<{
+      contents: MicroCMSPostsRecord[]
+    }>({
+      endpoint: 'posts',
+      queries: {
+        orders: '-publishedAt',
+      },
+    })
+    return posts
   }
 }
