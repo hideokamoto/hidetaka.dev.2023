@@ -1,0 +1,12 @@
+---
+import { getLanguageFromURL } from "../../../libs/urlUtils/lang.util"
+import NewsDetailPage from "../../../containers/pages/NewsDetailPage.astro";
+
+const currentPage = new URL(Astro.request.url).pathname;
+const lang = getLanguageFromURL(currentPage);
+
+const { id: postId } = Astro.params;
+  
+---
+
+<NewsDetailPage lang={lang} id={postId} />

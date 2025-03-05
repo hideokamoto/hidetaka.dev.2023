@@ -1,0 +1,98 @@
+---
+import Card from "../../components/tailwindui/Card.astro";
+import CardDescription from "../../components/tailwindui/Cards/CardDescription.astro";
+import Layout from "../../components/tailwindui/Layout.astro";
+import SimpleLayout from "../../components/tailwindui/SimpleLayout.astro";
+import CardTitle from "../../components/tailwindui/Cards/CardTitle.astro";
+import CardEyebrow from "../../components/tailwindui/Cards/CardEyebrow.astro";
+import CardCta from "../../components/tailwindui/Cards/CardCta.astro";
+import { MicroCMSAPI } from "../../libs/microCMS/apis";
+import { createCFMicroCMSClient } from "../../libs/microCMS/cloudflare";
+import { removeHtmlTags } from "../../libs/sanitize";
+const {
+    lang = 'en'
+} = Astro.props
+
+// MicroCMSクライアントを初期化
+const microCMS = new MicroCMSAPI(createCFMicroCMSClient((Astro.locals as any).runtime))
+
+// postsを取得
+const posts = await microCMS.listPosts({
+    lang: lang === 'ja' ? 'japanese' : 'english'
+});
+
+export function formatDate(dateString: string, lang: string = 'en'): string {
+  return new Date(`${dateString}`).toLocaleDateString(/ja/.test(lang) ? 'ja-JP' : 'en-US', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  })
+}
+
+// 先頭140文字を抽出する関数
+function truncateContent(content: string, maxLength: number = 140): string {
+  const plainText = removeHtmlTags(content);
+  if (plainText.length <= maxLength) return plainText;
+  return plainText.slice(0, maxLength) + '...';
+}
+
+const title = /ja/.test(lang) ? 'お知らせ' : 'News';
+const intro = /ja/.test(lang) ? 
+  '最近のお知らせやリリース情報をお届けします。' : 
+  'Recent news and release information.';
+
+// ニュース詳細ページへのURLを生成
+function getNewsDetailUrl(postId: string): string {
+  return /ja/.test(lang) ? `/ja/news/${postId}` : `/news/${postId}`;
+}
+---
+
+<Layout title={title} >
+    <SimpleLayout
+        title={title}
+        intro={intro}
+    >
+        <div class="md:border-l md:border-zinc-100 md:pl-6 md:dark:border-zinc-700/40">
+            <div class="flex max-w-3xl flex-col space-y-16">
+                {posts.map((post) => (
+                    <article class="md:grid md:grid-cols-4 md:items-baseline">
+                      <Card class="md:col-span-3">
+                        <CardTitle href={getNewsDetailUrl(post.id)}>
+                          {post.title}
+                        </CardTitle>
+                        <CardEyebrow
+                          as="time"
+                          dateTime={post.publishedAt}
+                          class="md:hidden"
+                          decorate
+                        >
+                          {formatDate(post.publishedAt, lang)}
+                        </CardEyebrow>
+                        {post.tags && post.tags.length > 0 && (
+                          <CardEyebrow
+                            decorate
+                          >
+                            {post.tags.join(', ')}
+                          </CardEyebrow>
+                        )}
+                        <CardDescription>
+                          {truncateContent(post.content)}
+                        </CardDescription>
+                        <CardCta href={getNewsDetailUrl(post.id)}>
+                          {/ja/.test(lang) ? '詳細を見る' : 'Read more'}
+                        </CardCta>
+                      </Card>
+                      <CardEyebrow
+                        as="time"
+                        dateTime={post.publishedAt}
+                        class="mt-1 hidden md:block"
+                      >
+                          {formatDate(post.publishedAt, lang)}
+                      </CardEyebrow>
+                    </article>
+                ))}
+            </div>
+        </div>
+    </SimpleLayout>
+</Layout> 

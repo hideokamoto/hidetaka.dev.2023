@@ -46,5 +46,13 @@ export type MicroCMSRecord = {
     background?: string;
     architecture?: string;
   }
+
+  export type MicroCMSPostsRecord = MicroCMSRecord & {
+    title: string
+    content: string
+    tags: string[]
+    related_project?: MicroCMSProjectsRecord[]
+    lang: string[]
+  }
   
   export type MicroCMSClient = Pick<ReturnType<typeof createClient>, 'get' | 'getAllContents'>

@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   repository_dispatch:
-    types: [update_post, update_projects, update_events]
+    types: [update_news, update_projects, update_events]
   push:
     branches:
       - main
