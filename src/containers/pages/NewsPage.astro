@@ -17,12 +17,8 @@ const {
 const microCMS = new MicroCMSAPI(createCFMicroCMSClient((Astro.locals as any).runtime))
 
 // postsを取得
-const allPosts = await microCMS.listPosts();
-const posts = allPosts.filter(post => {
-  // 言語フィルタリング（jaパターンが含まれていれば日本語、それ以外は英語）
-  return /ja/.test(lang) ? 
-    post.lang.some(l => l.toLowerCase() === 'japanese') : 
-    post.lang.some(l => l.toLowerCase() === 'english');
+const posts = await microCMS.listPosts({
+    lang: lang === 'ja' ? 'japanese' : 'english'
 });
 
 export function formatDate(dateString: string, lang: string = 'en'): string {
