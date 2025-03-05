@@ -61,5 +61,44 @@ const speakerProfilePage = await microCMS.getPageById('speaker-profile', /ja/.te
             </ul>
           </div>
         </div>
+        <section class="mt-16">
+          <h2 class="text-2xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-3xl">
+            Certifications
+          </h2>
+          <div class="mt-6 flex gap-6">
+            {[
+              {
+                title: 'Stripe Certified Fundamentals',
+                link: 'https://stripecertifications.credential.net/07672459-235c-4d15-93ac-09924b3e497e#gs.2entq2',
+                src: 'https://api.accredible.com/v1/frontend/credential_website_embed_image/badge/75763824',
+              },
+              {
+                title: 'Stripe Certified Associate Architect',
+                link: 'https://stripecertifications.credential.net/aaddbb97-48a8-485b-b8fe-762f0755a983?record_view=true#gs.4ueaj3',
+                src: 'https://api.accredible.com/v1/frontend/credential_website_embed_image/badge/81675136',
+              },
+              {
+                title: 'Stripe Certified Associate Developer',
+                link: 'https://stripecertifications.credential.net/a7068cdb-95a4-4c87-86ab-32a5029adf21#gs.2ekxxs',
+                src: 'https://api.accredible.com/v1/frontend/credential_website_embed_image/badge/76718344',
+              },
+              {
+                title: 'Stripe Certified Professional Developer',
+                link: '',
+                src: 'https://api.accredible.com/v1/frontend/credential_website_embed_image/badge/80541441',
+              },
+            ].map((badge) => (
+              <a href={badge.link} target="_blank">
+              <img 
+                src={badge.src} 
+                width="100" 
+                class="group flex text-sm font-medium text-zinc-800 transition hover:text-teal-500 dark:text-zinc-200 dark:hover:text-teal-500"
+                alt={badge.title}
+            />
+            </a>
+            ))}
+
+          </div>
+        </section>
 	</Container>
 </Layout>
