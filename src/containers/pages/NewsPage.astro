@@ -17,8 +17,12 @@ const {
 const microCMS = new MicroCMSAPI(createCFMicroCMSClient((Astro.locals as any).runtime))
 
 // postsを取得
-const posts = await microCMS.listPosts({
-    lang: lang === 'ja' ? 'japanese' : 'english'
+const allPosts = await microCMS.listPosts();
+const posts = allPosts.filter(post => {
+  // 言語フィルタリング（jaパターンが含まれていれば日本語、それ以外は英語）
+  return /ja/.test(lang) ? 
+    post.lang.some(l => l.toLowerCase() === 'japanese') : 
+    post.lang.some(l => l.toLowerCase() === 'english');
 });
 
 export function formatDate(dateString: string, lang: string = 'en'): string {
@@ -30,6 +34,13 @@ export function formatDate(dateString: string, lang: string = 'en'): string {
   })
 }
 
+// 先頭140文字を抽出する関数
+function truncateContent(content: string, maxLength: number = 140): string {
+  const plainText = removeHtmlTags(content);
+  if (plainText.length <= maxLength) return plainText;
+  return plainText.slice(0, maxLength) + '...';
+}
+
 const title = /ja/.test(lang) ? 'お知らせ' : 'News';
 const intro = /ja/.test(lang) ? 
   '最近のお知らせやリリース情報をお届けします。' : 
@@ -37,14 +48,7 @@ const intro = /ja/.test(lang) ?
 
 // ニュース詳細ページへのURLを生成
 function getNewsDetailUrl(postId: string): string {
-  return /ja/.test(lang) ? `/ja-JP/news/${postId}` : `/news/${postId}`;
-}
-
-// 先頭140文字を抽出する関数を追加
-function truncateContent(content: string, maxLength: number = 140): string {
-  const plainText = removeHtmlTags(content);
-  if (plainText.length <= maxLength) return plainText;
-  return plainText.slice(0, maxLength) + '...';
+  return /ja/.test(lang) ? `/ja/news/${postId}` : `/news/${postId}`;
 }
 ---
 
@@ -76,7 +80,9 @@ function truncateContent(content: string, maxLength: number = 140): string {
                             {post.tags.join(', ')}
                           </CardEyebrow>
                         )}
-                        <CardDescription set:html={truncateContent(post.content)} />
+                        <CardDescription>
+                          {truncateContent(post.content)}
+                        </CardDescription>
                         <CardCta href={getNewsDetailUrl(post.id)}>
                           {/ja/.test(lang) ? '詳細を見る' : 'Read more'}
                         </CardCta>
