@@ -27,21 +27,6 @@ export class MicroCMSAPI {
     })
     return events
   }
-  public async getPageById (id: string, lang: 'ja' | 'en' = 'ja') {
-    const result = await this.client.get({
-      endpoint: 'pages',
-      contentId: id,
-    })
-    return {
-      id: result.id,
-      createdAt: result.createdAt,
-      updatedAt: result.updatedAt,
-      publishedAt: result.publishedAt,
-      revisedAt: result.revisedAt,
-      title: lang === 'ja' ? result.title : result['title-en'],
-      content: lang === 'ja' ? result.content : result['content-en']
-    }
-  }
   public async listUpcomingEvents () {
     const thisMonth = dayjs().format('YYYY-MM')
     if (!this.client) {
