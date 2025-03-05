@@ -6,24 +6,17 @@ import SimpleLayout from "../../components/tailwindui/SimpleLayout.astro";
 import CardTitle from "../../components/tailwindui/Cards/CardTitle.astro";
 import CardEyebrow from "../../components/tailwindui/Cards/CardEyebrow.astro";
 import CardCta from "../../components/tailwindui/Cards/CardCta.astro";
-import { createClient } from "microcms-js-sdk";
 import { MicroCMSAPI } from "../../libs/microCMS/apis";
-import { removeHtmlTags } from "../../libs/sanitize";
-import type { MicroCMSPostsRecord } from "../../libs/microCMS/types";
-
+import { createCFMicroCMSClient } from "../../libs/microCMS/cloudflare";
 const {
     lang = 'en'
 } = Astro.props
 
 // MicroCMSクライアントを初期化
-const client = createClient({
-  serviceDomain: import.meta.env.MICROCMS_SERVICE_DOMAIN,
-  apiKey: import.meta.env.MICROCMS_API_KEY,
-});
-const api = new MicroCMSAPI(client);
+const microCMS = new MicroCMSAPI(createCFMicroCMSClient((Astro.locals as any).runtime))
 
 // postsを取得
-const allPosts = await api.listPosts();
+const allPosts = await microCMS.listPosts();
 const posts = allPosts.filter(post => {
   // 言語フィルタリング（jaパターンが含まれていれば日本語、それ以外は英語）
   return /ja/.test(lang) ? 
@@ -44,6 +37,11 @@ const title = /ja/.test(lang) ? 'お知らせ' : 'News';
 const intro = /ja/.test(lang) ? 
   '最近のお知らせやリリース情報をお届けします。' : 
   'Recent news and release information.';
+
+// ニュース詳細ページへのURLを生成
+function getNewsDetailUrl(postId: string): string {
+  return /ja/.test(lang) ? `/ja/news/${postId}` : `/news/${postId}`;
+}
 ---
 
 <Layout title={title} >
@@ -56,7 +54,7 @@ const intro = /ja/.test(lang) ?
                 {posts.map((post) => (
                     <article class="md:grid md:grid-cols-4 md:items-baseline">
                       <Card class="md:col-span-3">
-                        <CardTitle href={post.related_project?.[0]?.url || '#'}>
+                        <CardTitle href={getNewsDetailUrl(post.id)}>
                           {post.title}
                         </CardTitle>
                         <CardEyebrow
@@ -75,9 +73,9 @@ const intro = /ja/.test(lang) ?
                           </CardEyebrow>
                         )}
                         <CardDescription set:html={post.content} />
-                        {post.related_project?.[0]?.url && (
-                          <CardCta>{/ja/.test(lang) ? 'プロジェクトを見る' : 'View project'}</CardCta>
-                        )}
+                        <CardCta href={getNewsDetailUrl(post.id)}>
+                          {/ja/.test(lang) ? '詳細を見る' : 'Read more'}
+                        </CardCta>
                       </Card>
                       <CardEyebrow
                         as="time"

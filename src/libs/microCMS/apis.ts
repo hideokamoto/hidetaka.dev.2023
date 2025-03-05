@@ -147,4 +147,24 @@ export class MicroCMSAPI {
     })
     return posts
   }
+
+  public async getPost(id: string): Promise<MicroCMSPostsRecord | null> {
+    if (!this.client) {
+      if (process.env.MICROCMS_API_MODE === 'mock') {
+        const post = MICROCMS_MOCK_POSTs.find(post => post.id === id)
+        return post || null
+      }
+      return null
+    }
+    try {
+      const post = await this.client.get<MicroCMSPostsRecord>({
+        endpoint: 'posts',
+        contentId: id,
+      })
+      return post
+    } catch (error) {
+      console.error('Error fetching post:', error)
+      return null
+    }
+  }
 }
