@@ -90,6 +90,7 @@ export class MicroCMSAPI {
       queries: {
         orders: '-published_at',
         filters: `project_type[contains]applications`,
+        limit: 50
       },
     })
     return events
@@ -108,6 +109,7 @@ export class MicroCMSAPI {
       queries: {
         orders: '-published_at',
         filters: `project_type[contains]books`,
+        limit: 50
       },
     })
     return events
@@ -148,7 +150,8 @@ export class MicroCMSAPI {
         orders: '-publishedAt',
         filters: [
           lang ? `lang[contains]${query?.lang}` : undefined
-        ].filter(Boolean).join('[and]')
+        ].filter(Boolean).join('[and]'),
+        limit: 50
       }
     })
     return posts
