@@ -40,7 +40,7 @@ const intro = /ja/.test(lang) ?
 
 // ニュース詳細ページへのURLを生成
 function getNewsDetailUrl(postId: string): string {
-  return /ja/.test(lang) ? `/ja/news/${postId}` : `/news/${postId}`;
+  return /ja/.test(lang) ? `/ja-JP/news/${postId}` : `/news/${postId}`;
 }
 ---
 
