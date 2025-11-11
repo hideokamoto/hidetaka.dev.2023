@@ -2,7 +2,16 @@ export const listMyNPMPackages = async () => {
     const { objects: packages } = await searchNPMPackages('text=author:hideokamoto')
     const { objects: wpkyotoPackages } = await searchNPMPackages('text=@wpkyoto')
     const { objects: talkyjsPackages } = await searchNPMPackages('text=@talkyjs')
-    return [...packages, ...wpkyotoPackages, ...talkyjsPackages]
+    const allPackages = [...packages, ...wpkyotoPackages, ...talkyjsPackages]
+    // パッケージ名で重複を除去
+    const uniquePackages = new Map<string, NPMRegistrySearchResult>()
+    for (const pkg of allPackages) {
+      const packageName = pkg.package.name
+      if (!uniquePackages.has(packageName)) {
+        uniquePackages.set(packageName, pkg)
+      }
+    }
+    return Array.from(uniquePackages.values())
   }
   export type NPMPackageDetail = {
     name: string
