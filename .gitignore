@@ -2,6 +2,7 @@
 .next/
 out/
 .vercel/
+.open-next/
 
 # Dependencies
 node_modules/

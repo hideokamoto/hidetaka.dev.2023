@@ -7,20 +7,21 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "cf:build": "npx @cloudflare/next-on-pages",
-    "cf:dev": "npm run cf:build && wrangler pages dev .vercel/output/static",
-    "cf:deploy": "npm run cf:build && wrangler pages deploy .vercel/output/static"
+    "cf:build": "npx opennextjs-cloudflare build",
+    "cf:preview": "npm run cf:build && npx wrangler dev",
+    "cf:dev": "npm run cf:build && npx opennextjs-cloudflare preview",
+    "cf:deploy": "npm run cf:build && npx opennextjs-cloudflare deploy"
   },
   "dependencies": {
-    "next": "^16.0.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
     "dayjs": "^1.11.7",
     "fast-xml-parser": "^4.2.4",
-    "microcms-js-sdk": "^2.3.2"
+    "microcms-js-sdk": "^2.3.2",
+    "next": "^16.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@cloudflare/next-on-pages": "^1.13.0",
+    "@opennextjs/cloudflare": "^1.12.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
