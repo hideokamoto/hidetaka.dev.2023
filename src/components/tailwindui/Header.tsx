@@ -81,9 +81,9 @@ export default function Header() {
     >
       <div
         className="top-0 z-10 h-16 pt-6"
-        style={{ position: 'var(--header-position)' }}
+        style={{ position: 'var(--header-position)' as any }}
       >
-        <Container className="top-[var(--header-top,theme(spacing.6))] w-full" style={{ position: 'var(--header-inner-position)' }}>
+        <Container className="top-[var(--header-top,theme(spacing.6))] w-full" style={{ position: 'var(--header-inner-position)' as any }}>
           <div className="relative flex gap-4">
             <div className="flex flex-1">
               <Link href="/" className="relative block px-3 py-2 transition pointer-events-auto">

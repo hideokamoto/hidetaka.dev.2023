@@ -31,14 +31,14 @@ function CardTitle({ href, children }: { href?: string; children: React.ReactNod
   )
 }
 
-function CardEyebrow({ 
-  as: Component = 'p', 
-  children, 
-  className = '', 
+function CardEyebrow({
+  as: Component = 'p',
+  children,
+  className = '',
   decorate,
-  ...props 
-}: { 
-  as?: keyof JSX.IntrinsicElements
+  ...props
+}: {
+  as?: keyof React.JSX.IntrinsicElements
   children: React.ReactNode
   className?: string
   decorate?: boolean

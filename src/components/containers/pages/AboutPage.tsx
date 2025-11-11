@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { ReactNode } from 'react'
+import Container from '@/components/tailwindui/Container'
 
 function TwitterIcon({ className }: { className?: string }) {
   return (

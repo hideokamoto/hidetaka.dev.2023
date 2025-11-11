@@ -2,13 +2,15 @@ import { ReactNode } from 'react'
 
 export default function Container({ 
   children, 
-  className = '' 
+  className = '',
+  style
 }: { 
   children: ReactNode
-  className?: string 
+  className?: string
+  style?: React.CSSProperties
 }) {
   return (
-    <div className={`mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 ${className}`}>
+    <div className={`mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 ${className}`} style={style}>
       {children}
     </div>
   )

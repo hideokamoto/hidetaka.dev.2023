@@ -24,7 +24,10 @@ export default async function NewsDetailPage({ params }: { params: { id: string 
         <h1 className="text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-5xl">
           {post.title}
         </h1>
-        <div className="mt-6 prose prose-zinc dark:prose-invert" dangerouslySetInnerHTML={{ __html: post.content }} />
+        <div 
+          className="mt-6 prose prose-zinc dark:prose-invert" 
+          dangerouslySetInnerHTML={{ __html: typeof post.content === 'string' ? post.content : String(post.content || '') }} 
+        />
       </article>
     </Container>
   )

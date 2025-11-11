@@ -36,17 +36,23 @@ export default function Hero({ lang }: { lang: string }) {
                 href="https://twitter.com/hidetaka_dev"
                 aria-label="Follow on Twitter"
                 icon={TwitterIcon}
-              />
+              >
+                <span className="sr-only">Follow on Twitter</span>
+              </SocialLink>
               <SocialLink
                 href="https://github.com/hideokamoto"
                 aria-label="Follow on GitHub"
                 icon={GitHubIcon}
-              />
+              >
+                <span className="sr-only">Follow on GitHub</span>
+              </SocialLink>
               <SocialLink
                 href="https://www.linkedin.com/in/hideokamoto/"
                 aria-label="Follow on LinkedIn"
                 icon={LinkedInIcon}
-              />
+              >
+                <span className="sr-only">Follow on LinkedIn</span>
+              </SocialLink>
             </div>
           </div>
           <div className="mt-12 relative sm:max-w-lg sm:mx-auto lg:mt-0 lg:max-w-none lg:mx-0 lg:col-span-6 lg:flex lg:items-center">
