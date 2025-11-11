@@ -15,3 +15,7 @@ binding = "ASSETS"
 [env.production]
 vars = { MICROCMS_API_KEY = "" }
 
+# 非本番環境（例: staging）
+[env.staging]
+vars = { MICROCMS_API_KEY = "" }
+

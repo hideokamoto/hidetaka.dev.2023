@@ -85,33 +85,55 @@ npm run cf:preview
 1. **本番環境へのデプロイ**
    ```bash
    npm run cf:deploy
+   # または明示的に
+   npm run cf:deploy:production
    ```
    このコマンドは以下を実行します:
    - `npm run cf:build`でビルド
-   - `opennextjs-cloudflare deploy`でCloudflare Workersにデプロイ
+   - `opennextjs-cloudflare deploy --env production`でCloudflare Workersにデプロイ
 
-2. **デプロイ後の確認**
+2. **非本番環境（staging）へのデプロイ**
+   ```bash
+   npm run cf:deploy:staging
+   ```
+   このコマンドは以下を実行します:
+   - `npm run cf:build`でビルド
+   - `opennextjs-cloudflare deploy --env staging`でCloudflare Workersにデプロイ
+
+   **注意**: `wrangler.toml`に`[env.staging]`セクションが設定されている必要があります。
+
+3. **デプロイ後の確認**
    - Cloudflareダッシュボードでデプロイ状況を確認
    - デプロイされたURLでサイトにアクセスして動作確認
 
 #### 環境変数の設定
 
-本番環境の環境変数は以下のいずれかの方法で設定できます:
+各環境の環境変数は以下のいずれかの方法で設定できます:
 
 **方法1: wrangler.tomlで設定**
 ```toml
+# 本番環境
 [env.production]
-vars = { MICROCMS_API_KEY = "your-api-key-here" }
+vars = { MICROCMS_API_KEY = "your-production-api-key" }
+
+# 非本番環境（例: staging）
+[env.staging]
+vars = { MICROCMS_API_KEY = "your-staging-api-key" }
 ```
 
 **方法2: Cloudflareダッシュボードで設定**
 1. Cloudflareダッシュボードにログイン
 2. Workers & Pages > hidetaka-dev を選択
 3. Settings > Variables で環境変数を設定
+4. 環境ごとに異なる値を設定できます
 
 **方法3: Wrangler CLIで設定**
 ```bash
-npx wrangler secret put MICROCMS_API_KEY
+# 本番環境のシークレットを設定
+npx wrangler secret put MICROCMS_API_KEY --env production
+
+# 非本番環境のシークレットを設定
+npx wrangler secret put MICROCMS_API_KEY --env staging
 ```
 
 #### 利用可能なスクリプト
@@ -119,7 +141,9 @@ npx wrangler secret put MICROCMS_API_KEY
 - `npm run cf:build` - Cloudflare Workers用にビルド
 - `npm run cf:preview` - ビルド後、ローカルでプレビュー（`wrangler dev`）
 - `npm run cf:dev` - ビルド後、`opennextjs-cloudflare preview`でプレビュー
-- `npm run cf:deploy` - ビルド後、Cloudflare Workersにデプロイ
+- `npm run cf:deploy` - ビルド後、本番環境にデプロイ（デフォルト）
+- `npm run cf:deploy:production` - ビルド後、本番環境にデプロイ（明示的）
+- `npm run cf:deploy:staging` - ビルド後、非本番環境（staging）にデプロイ
 
 ## プロジェクト構造
 

@@ -10,7 +10,9 @@
     "cf:build": "npx opennextjs-cloudflare build",
     "cf:preview": "npm run cf:build && npx wrangler dev",
     "cf:dev": "npm run cf:build && npx opennextjs-cloudflare preview",
-    "cf:deploy": "npm run cf:build && npx opennextjs-cloudflare deploy"
+    "cf:deploy": "npm run cf:build && npx opennextjs-cloudflare deploy",
+    "cf:deploy:staging": "npm run cf:build && npx opennextjs-cloudflare deploy --env staging",
+    "cf:deploy:production": "npm run cf:build && npx opennextjs-cloudflare deploy --env production"
   },
   "dependencies": {
     "dayjs": "^1.11.7",
