@@ -1,10 +1,10 @@
 import ArticlesPageContent from '@/components/containers/pages/ArticlesPage'
 
 export const metadata = {
-  title: 'Articles',
+  title: '記事',
 }
 
 export default function ArticlesPage() {
-  return <ArticlesPageContent lang="en" />
+  return <ArticlesPageContent lang="ja" />
 }
 

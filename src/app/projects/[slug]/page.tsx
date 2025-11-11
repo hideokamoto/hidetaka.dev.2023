@@ -11,10 +11,11 @@ export async function generateStaticParams() {
   }))
 }
 
-export default async function ProjectDetailPage({ params }: { params: { slug: string } }) {
+export default async function ProjectDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
   const microCMS = new MicroCMSAPI(createMicroCMSClient())
   const project = await microCMS.listAllProjects().then(projects => 
-    projects.find(p => p.id === params.slug)
+    projects.find(p => p.id === slug)
   )
 
   if (!project) {
@@ -130,13 +131,13 @@ export default async function ProjectDetailPage({ params }: { params: { slug: st
       {project.background && (
         <div className="mx-auto max-w-2xl px-4 pb-16 sm:px-6 sm:pb-24 lg:max-w-7xl">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-3xl my-4">Background</h2>
-          <div dangerouslySetInnerHTML={{ __html: project.background }} />
+          <div dangerouslySetInnerHTML={{ __html: typeof project.background === 'string' ? project.background : String(project.background || '') }} />
         </div>
       )}
       {project.architecture && (
         <div className="mx-auto max-w-2xl px-4 pb-16 sm:px-6 sm:pb-24 lg:max-w-7xl">
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-3xl my-4">Architecture</h2>
-          <div dangerouslySetInnerHTML={{ __html: project.architecture }} />
+          <div dangerouslySetInnerHTML={{ __html: typeof project.architecture === 'string' ? project.architecture : String(project.architecture || '') }} />
         </div>
       )}
     </Container>

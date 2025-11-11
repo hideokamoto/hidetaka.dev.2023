@@ -6,24 +6,27 @@ import Container from './Container'
 import ModeToggle from './Headers/ModeToggle'
 
 function getLanguageFromURL(pathname: string) {
-  const langCodeMatch = pathname.match(/^\/(\w{2})/)
-  return langCodeMatch ? langCodeMatch[1] : 'en'
+  if (pathname.startsWith('/ja/') || pathname === '/ja') {
+    return 'ja'
+  }
+  return 'en'
 }
 
 function getPathnameWithLangType(targetPath: string, lang: string): string {
-  if (/en/.test(lang)) return `/${targetPath}`
-  if (/ja/.test(lang)) return `/ja/${targetPath}`
+  if (lang === 'en' || !lang || lang === '') return `/${targetPath}`
+  if (lang === 'ja') return `/ja/${targetPath}`
   return `/${lang}/${targetPath}`
 }
 
 function changeLanguageURL(pathname: string, targetLang: 'en' | 'ja' = 'en'): string {
   const lang = getLanguageFromURL(pathname)
   if (lang === targetLang) return pathname
-  if (lang === 'en') {
-    return `/${targetLang}${pathname}`
+  
+  if (targetLang === 'en') {
+    return pathname.replace(/^\/ja/, '') || '/'
+  } else {
+    return `/ja${pathname}`
   }
-  const replaceTarget = targetLang === 'en' ? '' : `/${targetLang}`
-  return pathname.replace(/^\/(\w{2})/, replaceTarget)
 }
 
 function NavItem({ href, children }: { href: string; children: React.ReactNode }) {

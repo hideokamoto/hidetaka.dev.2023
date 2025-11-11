@@ -1,5 +1,8 @@
 import Container from '@/components/tailwindui/Container'
 import SimpleLayout from '@/components/tailwindui/SimpleLayout'
+import GuestContent from '@/components/projects/GuestContent'
+import Applications from '@/components/projects/Applications'
+import Books from '@/components/projects/Books'
 
 export default function ProjectsPageContent({ lang }: { lang: string }) {
   const title = /ja/.test(lang) ? '個人開発・プロジェクト' : 'My projects'
@@ -18,7 +21,7 @@ export default function ProjectsPageContent({ lang }: { lang: string }) {
         <div className="md:grid md:grid-cols-8 md:items-baseline">
           <div />
           <div className="md:col-span-7">
-            {/* GuestContent component will be added here */}
+            <GuestContent lang={lang} />
           </div>
         </div>
       </section>
@@ -34,7 +37,7 @@ export default function ProjectsPageContent({ lang }: { lang: string }) {
         <div className="md:grid md:grid-cols-8 md:items-baseline">
           <div />
           <div className="md:col-span-7">
-            {/* Applications component will be added here */}
+            <Applications lang={lang} />
           </div>
         </div>
       </section>
@@ -50,7 +53,7 @@ export default function ProjectsPageContent({ lang }: { lang: string }) {
         <div className="md:grid md:grid-cols-8 md:items-baseline">
           <div />
           <div className="md:col-span-7">
-            {/* Books component will be added here */}
+            <Books lang={lang} />
           </div>
         </div>
       </section>

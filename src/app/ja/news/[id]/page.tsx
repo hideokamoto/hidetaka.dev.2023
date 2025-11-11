@@ -10,9 +10,10 @@ export async function generateStaticParams() {
   }))
 }
 
-export default async function NewsDetailPage({ params }: { params: { id: string } }) {
+export default async function NewsDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const microCMS = new MicroCMSAPI(createMicroCMSClient())
-  const post = await microCMS.getPost(params.id)
+  const post = await microCMS.getPost(id)
 
   if (!post) {
     return <div>Post not found</div>
