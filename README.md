@@ -1,69 +1,83 @@
-# Astro Starter Kit: Blog
+# Hidetaka.dev - Next.js Portfolio Website
 
-```
-npm create astro@latest -- --template blog
-```
+ポートフォリオサイトです。Next.js 16とCloudflare Workersを使用して構築されています。
 
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/astro/tree/latest/examples/blog)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/astro/tree/latest/examples/blog)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/withastro/astro?devcontainer_path=.devcontainer/blog/devcontainer.json)
+## 技術スタック
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+- **Framework**: Next.js 16 (App Router)
+- **Runtime**: Cloudflare Workers
+- **Styling**: Tailwind CSS
+- **CMS**: microCMS
+- **Language**: TypeScript
 
+## セットアップ
 
-![blog](https://user-images.githubusercontent.com/4677417/186189140-4ef17aac-c3c9-4918-a8c2-ce86ba1bb394.png)
-
-Features:
-
-- ✅ Minimal styling (make it your own!)
-- ✅ 100/100 Lighthouse performance
-- ✅ SEO-friendly with canonical URLs and OpenGraph data
-- ✅ Sitemap support
-- ✅ RSS Feed support
-- ✅ Markdown & MDX support
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```
-├── public/
-├── src/
-│   ├── components/
-│   ├── content/
-│   ├── layouts/
-│   └── pages/
-├── astro.config.mjs
-├── README.md
-├── package.json
-└── tsconfig.json
+1. 依存関係のインストール:
+```bash
+npm install
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+2. 環境変数の設定:
+```bash
+cp .env.example .env.local
+# .env.localにMICROCMS_API_KEYを設定
+```
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+3. 開発サーバーの起動:
+```bash
+npm run dev
+```
 
-The `src/content/` directory contains "collections" of related Markdown and MDX documents. Use `getCollection()` to retrieve posts from `src/content/blog/`, and type-check your frontmatter using an optional schema. See [Astro's Content Collections docs](https://docs.astro.build/en/guides/content-collections/) to learn more.
+## ビルドとデプロイ
 
-Any static assets, like images, can be placed in the `public/` directory.
+### ローカルビルド
+```bash
+npm run build
+```
 
-## 🧞 Commands
+### Cloudflare Workersへのデプロイ
 
-All commands are run from the root of the project, from a terminal:
+1. Cloudflare用のビルド:
+```bash
+npm run cf:build
+```
 
-| Command                | Action                                           |
-| :--------------------- | :----------------------------------------------- |
-| `npm install`          | Installs dependencies                            |
-| `npm run dev`          | Starts local dev server at `localhost:3000`      |
-| `npm run build`        | Build your production site to `./dist/`          |
-| `npm run preview`      | Preview your build locally, before deploying     |
-| `npm run astro ...`    | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro --help` | Get help using the Astro CLI                     |
+2. ローカルでのテスト:
+```bash
+npm run cf:dev
+```
 
-## 👀 Want to learn more?
+3. デプロイ:
+```bash
+npm run cf:deploy
+```
 
-Check out [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## プロジェクト構造
 
-## Credit
+```
+src/
+├── app/              # Next.js App Router pages
+│   ├── page.tsx     # トップページ（英語）
+│   ├── about/       # Aboutページ
+│   ├── projects/    # Projectsページ
+│   ├── news/        # Newsページ
+│   └── ja/          # 日本語版ページ
+├── components/       # Reactコンポーネント
+├── lib/             # ユーティリティとライブラリ
+│   ├── microCMS/    # microCMS統合
+│   └── sanitize.ts  # HTMLサニタイズ
+└── libs/            # データソース（既存のAstroコードから移行）
+    └── dataSources/ # ブログ投稿のデータソース
+```
 
-This theme is based off of the lovely [Bear Blog](https://github.com/HermanMartinus/bearblog/).
+## 多言語対応
+
+- 英語版: `/` から始まるパス
+- 日本語版: `/ja/` から始まるパス
+- 既存の `/ja-JP/*` パスは自動的に `/ja/*` にリダイレクトされます（middleware.tsで実装）
+
+## 注意事項
+
+- Cloudflare Workersにデプロイする場合は、`@cloudflare/next-on-pages`を使用してビルドする必要があります
+- 静的アセットは `public/` ディレクトリに配置してください
+- 環境変数はCloudflare Pagesのダッシュボードで設定してください

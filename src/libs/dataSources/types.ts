@@ -1,4 +1,3 @@
-
 export type FeedDataSource = {
     href: string
     name: string
