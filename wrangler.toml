@@ -1,4 +1,4 @@
-name = "hidetaka-dev"
+name = "hidetaka-dev-workers"
 main = ".open-next/worker.js"
 compatibility_date = "2024-12-30"
 compatibility_flags = ["nodejs_compat", "global_fetch_strictly_public"]
