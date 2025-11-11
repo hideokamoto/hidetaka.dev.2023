@@ -37,20 +37,89 @@ npm run build
 
 ### Cloudflare Workersへのデプロイ
 
-1. Cloudflare用のビルド:
+このプロジェクトは`@opennextjs/cloudflare`を使用してCloudflare Workersにデプロイします。
+
+#### 前提条件
+
+1. **Cloudflareアカウントの準備**
+   - [Cloudflare](https://dash.cloudflare.com/)でアカウントを作成
+   - Workers & Pages の有効化
+
+2. **Wrangler CLIの認証**
+   ```bash
+   npx wrangler login
+   ```
+   ブラウザが開き、Cloudflareアカウントでログインして認証を完了します。
+
+3. **環境変数の設定**
+   - Cloudflare Workersダッシュボードで環境変数を設定するか、`wrangler.toml`の`[env.production]`セクションで設定
+   - 必要な環境変数: `MICROCMS_API_KEY`
+
+#### ビルド手順
+
+1. **Cloudflare用のビルド**
+   ```bash
+   npm run cf:build
+   ```
+   このコマンドは以下を実行します:
+   - Next.jsアプリケーションをビルド
+   - OpenNextを使用してCloudflare Workers用にアダプト
+   - `.open-next/`ディレクトリにビルド成果物を生成
+
+#### プレビュー（ローカルテスト）
+
+ビルド後、ローカルでプレビューできます:
+
 ```bash
-npm run cf:build
+npm run cf:preview
 ```
 
-2. ローカルでのテスト:
-```bash
-npm run cf:dev
+このコマンドは以下を実行します:
+- `npm run cf:build`でビルド
+- `wrangler dev`でローカルプレビューサーバーを起動（`http://localhost:8787`）
+
+**注意**: R2バケットは不要です。R2はISR（Incremental Static Regeneration）のキャッシュが必要な場合のみオプションで使用します。
+
+#### デプロイ手順
+
+1. **本番環境へのデプロイ**
+   ```bash
+   npm run cf:deploy
+   ```
+   このコマンドは以下を実行します:
+   - `npm run cf:build`でビルド
+   - `opennextjs-cloudflare deploy`でCloudflare Workersにデプロイ
+
+2. **デプロイ後の確認**
+   - Cloudflareダッシュボードでデプロイ状況を確認
+   - デプロイされたURLでサイトにアクセスして動作確認
+
+#### 環境変数の設定
+
+本番環境の環境変数は以下のいずれかの方法で設定できます:
+
+**方法1: wrangler.tomlで設定**
+```toml
+[env.production]
+vars = { MICROCMS_API_KEY = "your-api-key-here" }
 ```
 
-3. デプロイ:
+**方法2: Cloudflareダッシュボードで設定**
+1. Cloudflareダッシュボードにログイン
+2. Workers & Pages > hidetaka-dev を選択
+3. Settings > Variables で環境変数を設定
+
+**方法3: Wrangler CLIで設定**
 ```bash
-npm run cf:deploy
+npx wrangler secret put MICROCMS_API_KEY
 ```
+
+#### 利用可能なスクリプト
+
+- `npm run cf:build` - Cloudflare Workers用にビルド
+- `npm run cf:preview` - ビルド後、ローカルでプレビュー（`wrangler dev`）
+- `npm run cf:dev` - ビルド後、`opennextjs-cloudflare preview`でプレビュー
+- `npm run cf:deploy` - ビルド後、Cloudflare Workersにデプロイ
 
 ## プロジェクト構造
 
@@ -78,6 +147,8 @@ src/
 
 ## 注意事項
 
-- Cloudflare Workersにデプロイする場合は、`@cloudflare/next-on-pages`を使用してビルドする必要があります
+- Cloudflare Workersにデプロイする場合は、`@opennextjs/cloudflare`を使用してビルドする必要があります
 - 静的アセットは `public/` ディレクトリに配置してください
-- 環境変数はCloudflare Pagesのダッシュボードで設定してください
+- 環境変数は`wrangler.toml`またはCloudflare Workersのダッシュボードで設定してください
+- R2バケットはオプションです。ISR（Incremental Static Regeneration）のキャッシュが必要な場合のみ使用します
+- ビルド成果物は`.open-next/`ディレクトリに生成されます（`.gitignore`に含まれています）
