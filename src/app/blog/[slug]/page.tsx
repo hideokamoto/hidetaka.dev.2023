@@ -8,7 +8,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const thought = await getThoughtBySlug(slug)
+  const thought = await getThoughtBySlug(slug, 'en')
 
   if (!thought) {
     return {
@@ -27,7 +27,7 @@ export default async function BlogDetailPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const thought = await getThoughtBySlug(slug)
+  const thought = await getThoughtBySlug(slug, 'en')
 
   if (!thought) {
     notFound()
