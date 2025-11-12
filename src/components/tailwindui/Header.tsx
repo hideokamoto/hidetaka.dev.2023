@@ -113,10 +113,11 @@ function MobileMenu({
   const currentLang = lang
 
   const navItems = [
-    { path: 'about', label: 'About' },
-    { path: 'work', label: 'Work' },
-    { path: 'writing', label: 'Writing' },
-    { path: 'speaking', label: 'Speaking' },
+    { path: 'about', label: lang === 'ja' ? 'About' : 'About' },
+    { path: 'work', label: lang === 'ja' ? '制作物' : 'Work' },
+    { path: 'writing', label: lang === 'ja' ? 'Writing' : 'Writing' },
+    { path: 'blog', label: lang === 'ja' ? 'ブログ' : 'Blog' },
+    { path: 'speaking', label: lang === 'ja' ? 'Speaking' : 'Speaking' },
   ]
 
   useEffect(() => {
@@ -216,10 +217,11 @@ function DesktopNavigation() {
   const lang = getLanguageFromURL(pathname)
 
   const navItems = [
-    { path: 'about', label: 'About' },
-    { path: 'work', label: 'Work' },
-    { path: 'writing', label: 'Writing' },
-    { path: 'speaking', label: 'Speaking' },
+    { path: 'about', label: lang === 'ja' ? 'About' : 'About' },
+    { path: 'work', label: lang === 'ja' ? '制作物' : 'Work' },
+    { path: 'writing', label: lang === 'ja' ? 'Writing' : 'Writing' },
+    { path: 'blog', label: lang === 'ja' ? 'ブログ' : 'Blog' },
+    { path: 'speaking', label: lang === 'ja' ? 'Speaking' : 'Speaking' },
   ]
 
   return (

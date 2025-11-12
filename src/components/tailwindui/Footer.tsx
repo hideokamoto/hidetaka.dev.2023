@@ -85,6 +85,7 @@ export default function Footer() {
                     <NavLink href={getPathnameWithLangType("about", lang)}>About</NavLink>
                     <NavLink href={getPathnameWithLangType("work", lang)}>Work</NavLink>
                     <NavLink href={getPathnameWithLangType("writing", lang)}>Writing</NavLink>
+                    <NavLink href={getPathnameWithLangType("blog", lang)}>{lang === 'ja' ? 'ブログ' : 'Blog'}</NavLink>
                     <NavLink href={getPathnameWithLangType("speaking", lang)}>Speaking</NavLink>
                   </nav>
                 </div>

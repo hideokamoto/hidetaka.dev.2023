@@ -12,6 +12,13 @@ export type FeedDataSource = {
     dataSource: FeedDataSource
     image?: string
   }
+  export type BlogItem = {
+    id?: string
+    title: string
+    href: string
+    description: string
+    datetime: string
+  }
   type Feed = {
     title: string
     link: string
@@ -45,4 +52,22 @@ export type WPPost = {
         }
         link: string
         id: string
+      }
+export type WPThought = {
+        id: number
+        title: {
+          rendered: string
+        }
+        date: string
+        date_gmt: string
+        excerpt: {
+          rendered: string
+        }
+        content: {
+          rendered: string
+        }
+        link: string
+        slug: string
+        featured_media?: number
+        categories?: number[]
       }
