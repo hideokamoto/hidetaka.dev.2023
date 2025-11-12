@@ -1,5 +1,5 @@
 import BlogPageContent from '@/components/containers/pages/BlogPage'
-import { loadThoughtsByCategory } from '@/libs/dataSources/thoughts'
+import { loadThoughtsByCategory, loadAllCategories } from '@/libs/dataSources/thoughts'
 import { notFound } from 'next/navigation'
 
 export const metadata = {
@@ -16,7 +16,10 @@ export default async function BlogCategoryPage({
   // ただし、URLエンコードされた文字列がそのまま渡される場合もあるので、両方試す
   const decodedName = name.includes('%') ? decodeURIComponent(name) : name
   
-  const result = await loadThoughtsByCategory(decodedName, 1, 20, 'en')
+  const [result, categories] = await Promise.all([
+    loadThoughtsByCategory(decodedName, 1, 20, 'en'),
+    loadAllCategories('en'),
+  ])
 
   if (result.items.length === 0) {
     notFound()
@@ -25,14 +28,18 @@ export default async function BlogCategoryPage({
   // カテゴリ名を取得（最初の記事のカテゴリから）
   const categoryName = result.items[0]?.categories?.find(cat => cat.slug === decodedName)?.name || decodedName
 
+  // basePathにはエンコードされたslugを使用（Next.jsのparamsはデコード済みなので再エンコード）
+  const encodedSlug = encodeURIComponent(decodedName)
+
   return (
     <BlogPageContent
       lang="en"
       thoughts={result.items}
       currentPage={result.currentPage}
       totalPages={result.totalPages}
-      basePath={`/blog/category/${name}`}
+      basePath={`/blog/category/${encodedSlug}`}
       categoryName={categoryName}
+      categories={categories}
     />
   )
 }

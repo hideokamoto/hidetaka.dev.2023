@@ -1,5 +1,5 @@
 import BlogPageContent from '@/components/containers/pages/BlogPage'
-import { loadThoughts } from '@/libs/dataSources/thoughts'
+import { loadThoughts, loadAllCategories } from '@/libs/dataSources/thoughts'
 import { notFound } from 'next/navigation'
 
 export const metadata = {
@@ -18,7 +18,10 @@ export default async function BlogPageNumber({
     notFound()
   }
 
-  const result = await loadThoughts(pageNumber, 20, 'en')
+  const [result, categories] = await Promise.all([
+    loadThoughts(pageNumber, 20, 'en'),
+    loadAllCategories('en'),
+  ])
 
   if (result.items.length === 0 && result.currentPage > result.totalPages) {
     notFound()
@@ -31,6 +34,7 @@ export default async function BlogPageNumber({
       currentPage={result.currentPage}
       totalPages={result.totalPages}
       basePath="/blog"
+      categories={categories}
     />
   )
 }

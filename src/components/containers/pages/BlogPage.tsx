@@ -4,7 +4,9 @@ import PageHeader from '@/components/ui/PageHeader'
 import DateDisplay from '@/components/ui/DateDisplay'
 import Pagination from '@/components/ui/Pagination'
 import Tag from '@/components/ui/Tag'
+import SidebarLayout from '@/components/ui/SidebarLayout'
 import type { BlogItem } from '@/libs/dataSources/types'
+import type { CategoryWithCount } from '@/libs/dataSources/thoughts'
 
 type BlogPageProps = {
   lang: string
@@ -13,6 +15,7 @@ type BlogPageProps = {
   totalPages: number
   basePath: string
   categoryName?: string
+  categories?: CategoryWithCount[]
 }
 
 // ブログ記事カードコンポーネント
@@ -80,6 +83,79 @@ function BlogCard({ item, lang }: { item: BlogItem; lang: string }) {
   )
 }
 
+// サイドバーコンポーネント
+function BlogSidebar({
+  categories,
+  basePath,
+  lang,
+  currentCategorySlug,
+}: {
+  categories: CategoryWithCount[]
+  basePath: string
+  lang: string
+  currentCategorySlug?: string
+}) {
+  const categoryTitle = lang === 'ja' ? 'カテゴリ' : 'Categories'
+  const allText = lang === 'ja' ? 'すべて' : 'All'
+
+  // basePathからカテゴリ部分を除去して、ブログのベースパスを取得
+  // basePathが `/ja/blog/category/xxx` の場合は `/ja/blog` に
+  // basePathが `/ja/blog` の場合はそのまま
+  const blogBasePath = basePath.includes('/category/') 
+    ? basePath.split('/category/')[0]
+    : basePath
+
+  return (
+    <div className="hidden lg:block space-y-6">
+      <div>
+        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
+          {categoryTitle}
+        </h3>
+        <nav className="space-y-1">
+          <Link
+            href={blogBasePath}
+            className={`w-full flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${
+              !currentCategorySlug
+                ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'
+                : 'text-slate-700 hover:bg-zinc-50 dark:text-slate-300 dark:hover:bg-zinc-800'
+            }`}
+          >
+            <span>{allText}</span>
+          </Link>
+          {categories.map((category) => {
+            // category.slugが既にエンコードされている可能性があるので、一度デコードしてからエンコード
+            const normalizedSlug = category.slug.includes('%') 
+              ? decodeURIComponent(category.slug) 
+              : category.slug
+            const categoryUrl = `${blogBasePath}/category/${encodeURIComponent(normalizedSlug)}`
+            const isActive = currentCategorySlug === category.slug || currentCategorySlug === normalizedSlug
+            return (
+              <Link
+                key={category.id}
+                href={categoryUrl}
+                className={`w-full flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'
+                    : 'text-slate-700 hover:bg-zinc-50 dark:text-slate-300 dark:hover:bg-zinc-800'
+                }`}
+              >
+                <span>{category.name}</span>
+                <span className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
+                  isActive
+                    ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300'
+                    : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400'
+                }`}>
+                  {category.count > 20 ? '20+' : category.count}
+                </span>
+              </Link>
+            )
+          })}
+        </nav>
+      </div>
+    </div>
+  )
+}
+
 export default function BlogPageContent({
   lang,
   thoughts,
@@ -87,6 +163,7 @@ export default function BlogPageContent({
   totalPages,
   basePath,
   categoryName,
+  categories = [],
 }: BlogPageProps) {
   const title = categoryName 
     ? (lang === 'ja' ? `カテゴリ: ${categoryName}` : `Category: ${categoryName}`)
@@ -99,34 +176,80 @@ export default function BlogPageContent({
         ? '技術的ではないトピックを中心としたブログ記事を掲載しています。'
         : 'A collection of blog posts focusing on non-technical topics.')
 
+  // 現在のカテゴリslugを取得（URLから）
+  const currentCategorySlug = categoryName 
+    ? categories.find(cat => cat.name === categoryName)?.slug
+    : undefined
+
   return (
     <section className="pt-12 sm:pt-16 pb-8 sm:pb-12 bg-white dark:bg-zinc-900">
       <Container>
         <PageHeader title={title} description={description} />
 
-        {/* 記事グリッド */}
-        {thoughts.length > 0 ? (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-              {thoughts.map((item) => (
-                <BlogCard key={item.id || item.href} item={item} lang={lang} />
-              ))}
-            </div>
+        {/* サイドバーとメインコンテンツ */}
+        {categories.length > 0 ? (
+          <SidebarLayout
+            sidebar={
+              <BlogSidebar
+                categories={categories}
+                basePath={basePath}
+                lang={lang}
+                currentCategorySlug={currentCategorySlug}
+              />
+            }
+          >
+            {/* 記事グリッド */}
+            {thoughts.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+                  {thoughts.map((item) => (
+                    <BlogCard key={item.id || item.href} item={item} lang={lang} />
+                  ))}
+                </div>
 
-            {/* ページネーション */}
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              basePath={basePath}
-              lang={lang}
-            />
-          </>
+                {/* ページネーション */}
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  basePath={basePath}
+                  lang={lang}
+                />
+              </>
+            ) : (
+              <div className="py-12 text-center">
+                <p className="text-slate-600 dark:text-slate-400">
+                  {lang === 'ja' ? '記事が見つかりませんでした。' : 'No articles found.'}
+                </p>
+              </div>
+            )}
+          </SidebarLayout>
         ) : (
-          <div className="py-12 text-center">
-            <p className="text-slate-600 dark:text-slate-400">
-              {lang === 'ja' ? '記事が見つかりませんでした。' : 'No articles found.'}
-            </p>
-          </div>
+          <>
+            {/* 記事グリッド */}
+            {thoughts.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+                  {thoughts.map((item) => (
+                    <BlogCard key={item.id || item.href} item={item} lang={lang} />
+                  ))}
+                </div>
+
+                {/* ページネーション */}
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  basePath={basePath}
+                  lang={lang}
+                />
+              </>
+            ) : (
+              <div className="py-12 text-center">
+                <p className="text-slate-600 dark:text-slate-400">
+                  {lang === 'ja' ? '記事が見つかりませんでした。' : 'No articles found.'}
+                </p>
+              </div>
+            )}
+          </>
         )}
       </Container>
     </section>
