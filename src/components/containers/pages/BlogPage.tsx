@@ -12,6 +12,7 @@ type BlogPageProps = {
   currentPage: number
   totalPages: number
   basePath: string
+  categoryName?: string
 }
 
 // ブログ記事カードコンポーネント
@@ -85,12 +86,18 @@ export default function BlogPageContent({
   currentPage,
   totalPages,
   basePath,
+  categoryName,
 }: BlogPageProps) {
-  const title = lang === 'ja' ? 'ブログ' : 'Blog'
-  const description =
-    lang === 'ja'
-      ? '技術的ではないトピックを中心としたブログ記事を掲載しています。'
-      : 'A collection of blog posts focusing on non-technical topics.'
+  const title = categoryName 
+    ? (lang === 'ja' ? `カテゴリ: ${categoryName}` : `Category: ${categoryName}`)
+    : (lang === 'ja' ? 'ブログ' : 'Blog')
+  const description = categoryName
+    ? (lang === 'ja' 
+        ? `「${categoryName}」カテゴリのブログ記事一覧です。`
+        : `Blog posts in the "${categoryName}" category.`)
+    : (lang === 'ja'
+        ? '技術的ではないトピックを中心としたブログ記事を掲載しています。'
+        : 'A collection of blog posts focusing on non-technical topics.')
 
   return (
     <section className="pt-12 sm:pt-16 pb-8 sm:pb-12 bg-white dark:bg-zinc-900">
