@@ -46,15 +46,22 @@ const stripeDotDevPosts: Array<FeedItem> = [{
 }]
   
 export const loadBlogPosts = async (locale: 'ja' | 'en' = 'ja') => {
-    const wp = await loadWPPosts(isJapanese(locale) ? 'ja' : 'en')
-    const devto =  isJapanese(locale) ? [] : await loadDevToPosts()
-    const zenn = isJapanese(locale) ? await loadZennPosts() : []
-    const qiita = isJapanese(locale) ? await loadQiitaPosts() : []
-    const stripePosts = isJapanese(locale) ? [] : stripeDotDevPosts
+    try {
+      const wp = await loadWPPosts(isJapanese(locale) ? 'ja' : 'en').catch(() => [])
+      const devto = isJapanese(locale) ? [] : await loadDevToPosts().catch(() => [])
+      const zenn = isJapanese(locale) ? await loadZennPosts().catch(() => []) : []
+      const qiita = isJapanese(locale) ? await loadQiitaPosts().catch(() => []) : []
+      const stripePosts = isJapanese(locale) ? [] : stripeDotDevPosts
 
-    return [...wp, ...devto, ...zenn, ...qiita, ...stripePosts].sort((a: FeedItem, b: FeedItem) => {
-          const bDate = new Date(b.datetime)
-          const aDate = new Date(a.datetime)
-          return bDate.getTime() - aDate.getTime()
-    })
+      const allPosts = [...wp, ...devto, ...zenn, ...qiita, ...stripePosts]
+      
+      return allPosts.sort((a: FeedItem, b: FeedItem) => {
+        const bDate = new Date(b.datetime)
+        const aDate = new Date(a.datetime)
+        return bDate.getTime() - aDate.getTime()
+      })
+    } catch (error) {
+      console.error('Error loading blog posts:', error)
+      return []
+    }
 }

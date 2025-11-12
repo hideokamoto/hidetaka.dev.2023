@@ -50,10 +50,8 @@ function DesktopNavigation({ className }: { className?: string }) {
     <nav className={className}>
       <ul className="flex rounded-full bg-white/90 px-3 text-sm font-medium text-zinc-800 shadow-lg shadow-zinc-800/5 ring-1 ring-zinc-900/5 backdrop-blur dark:bg-zinc-800/90 dark:text-zinc-200 dark:ring-white/10">
         <NavItem href={getPathnameWithLangType("about", lang)}>About</NavItem>
-        <NavItem href={getPathnameWithLangType("news", lang)}>News</NavItem>
-        <NavItem href={getPathnameWithLangType("articles", lang)}>Articles</NavItem>
-        <NavItem href={getPathnameWithLangType("projects", lang)}>Projects</NavItem>
-        <NavItem href={getPathnameWithLangType("oss", lang)}>OSS</NavItem>
+        <NavItem href={getPathnameWithLangType("work", lang)}>Work</NavItem>
+        <NavItem href={getPathnameWithLangType("writing", lang)}>Writing</NavItem>
         <NavItem href={getPathnameWithLangType("speaking", lang)}>Speaking</NavItem>
       </ul>
     </nav>

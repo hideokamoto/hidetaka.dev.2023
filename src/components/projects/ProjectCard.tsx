@@ -86,7 +86,7 @@ function CardCta({ children }: { children: React.ReactNode }) {
 }
 
 export default function ProjectCard({ project, lang }: { project: MicroCMSProjectsRecord; lang: string }) {
-  const href = lang === 'ja' ? `/ja/projects/${project.id}` : `/projects/${project.id}`
+  const href = lang === 'ja' ? `/ja/work/${project.id}` : `/work/${project.id}`
   
   return (
     <article className="md:grid md:grid-cols-4 md:items-baseline">

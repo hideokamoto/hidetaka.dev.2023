@@ -63,9 +63,9 @@ export default function Footer() {
             <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
               <div className="flex gap-6 text-sm font-medium text-zinc-800 dark:text-zinc-200">
                 <NavLink href={getPathnameWithLangType("about", lang)}>About</NavLink>
-                <NavLink href={getPathnameWithLangType("projects", lang)}>Projects</NavLink>
+                <NavLink href={getPathnameWithLangType("work", lang)}>Work</NavLink>
+                <NavLink href={getPathnameWithLangType("writing", lang)}>Writing</NavLink>
                 <NavLink href={getPathnameWithLangType("speaking", lang)}>Speaking</NavLink>
-                <NavLink href={getPathnameWithLangType("oss", lang)}>Open Source</NavLink>
               </div>
               <div className="flex gap-6 text-sm font-medium text-zinc-800 dark:text-zinc-200">
                 <NavLink href={changeLanguageURL(pathname, 'ja')}>Japanese</NavLink>

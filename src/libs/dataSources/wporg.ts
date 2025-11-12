@@ -1,8 +1,13 @@
 export const listMyWordPressPlugins = async () => {
-    const packages = await searchWordPressPlugins('request[author]=hideokamoto')
-    return packages.plugins.filter((plugin) => {
-      return plugin.author_profile === 'https://profiles.wordpress.org/hideokamoto/'
-    })
+    try {
+      const packages = await searchWordPressPlugins('request[author]=hideokamoto').catch(() => ({ plugins: [] }))
+      return packages.plugins.filter((plugin) => {
+        return plugin.author_profile === 'https://profiles.wordpress.org/hideokamoto/'
+      })
+    } catch (error) {
+      console.error('Error loading WordPress plugins:', error)
+      return []
+    }
   }
   export type WordPressPluginDetail = {
     name: string
