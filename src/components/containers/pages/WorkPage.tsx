@@ -6,6 +6,10 @@ import Image from 'next/image'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import Tag from '@/components/ui/Tag'
+import SearchBar from '@/components/ui/SearchBar'
+import FilterItem from '@/components/ui/FilterItem'
+import PageHeader from '@/components/ui/PageHeader'
+import SidebarLayout from '@/components/ui/SidebarLayout'
 import type { MicroCMSProjectsRecord } from '@/lib/microCMS/types'
 import type { NPMRegistrySearchResult } from '@/libs/dataSources/npmjs'
 import type { WordPressPluginDetail } from '@/libs/dataSources/wporg'
@@ -181,74 +185,6 @@ function OSSContributionLink({ project, lang }: { project: MicroCMSProjectsRecor
   )
 }
 
-// 検索バーコンポーネント
-function SearchBar({ 
-  value, 
-  onChange, 
-  placeholder 
-}: { 
-  value: string
-  onChange: (value: string) => void
-  placeholder: string 
-}) {
-  return (
-    <div className="relative">
-      <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-        <svg
-          className="h-5 w-5 text-slate-400"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-        </svg>
-      </div>
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="block w-full rounded-lg border border-zinc-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:placeholder-slate-500 dark:focus:border-indigo-400 dark:focus:ring-indigo-400"
-      />
-    </div>
-  )
-}
-
-// フィルター項目コンポーネント
-function FilterItem({ 
-  active, 
-  onClick, 
-  children,
-  count 
-}: { 
-  active: boolean
-  onClick: () => void
-  children: React.ReactNode
-  count?: number
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`w-full flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${
-        active
-          ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'
-          : 'text-slate-700 hover:bg-zinc-50 dark:text-slate-300 dark:hover:bg-zinc-800'
-      }`}
-    >
-      <span>{children}</span>
-      {count !== undefined && (
-        <span className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
-          active
-            ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300'
-            : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400'
-        }`}>
-          {count}
-        </span>
-      )}
-    </button>
-  )
-}
-
 // サイドバーコンポーネント
 function Sidebar({
   searchQuery,
@@ -280,62 +216,60 @@ function Sidebar({
   const ossContributionText = lang === 'ja' ? 'OSS貢献' : 'OSS Contributions'
 
   return (
-    <aside className="lg:sticky lg:top-8 h-fit">
-      <div className="space-y-6">
-        {/* 検索バー */}
-        <div>
-          <SearchBar 
-            value={searchQuery}
-            onChange={onSearchChange}
-            placeholder={searchPlaceholder}
-          />
-        </div>
-
-        {/* フィルター */}
-        <div>
-          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
-            {filterTitle}
-          </h3>
-          <nav className="space-y-1">
-            <FilterItem 
-              active={filterCategory === 'all'} 
-              onClick={() => onFilterChange('all')}
-              count={counts.all}
-            >
-              {allText}
-            </FilterItem>
-            <FilterItem 
-              active={filterCategory === 'projects'} 
-              onClick={() => onFilterChange('projects')}
-              count={counts.projects}
-            >
-              {projectsText}
-            </FilterItem>
-            <FilterItem 
-              active={filterCategory === 'open-source'} 
-              onClick={() => onFilterChange('open-source')}
-              count={counts['open-source']}
-            >
-              {openSourceText}
-            </FilterItem>
-            <FilterItem 
-              active={filterCategory === 'books'} 
-              onClick={() => onFilterChange('books')}
-              count={counts.books}
-            >
-              {booksText}
-            </FilterItem>
-            <FilterItem 
-              active={filterCategory === 'oss-contribution'} 
-              onClick={() => onFilterChange('oss-contribution')}
-              count={counts['oss-contribution']}
-            >
-              {ossContributionText}
-            </FilterItem>
-          </nav>
-        </div>
+    <div className="space-y-6">
+      {/* 検索バー */}
+      <div>
+        <SearchBar 
+          value={searchQuery}
+          onChange={onSearchChange}
+          placeholder={searchPlaceholder}
+        />
       </div>
-    </aside>
+
+      {/* フィルター */}
+      <div>
+        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
+          {filterTitle}
+        </h3>
+        <nav className="space-y-1">
+          <FilterItem 
+            active={filterCategory === 'all'} 
+            onClick={() => onFilterChange('all')}
+            count={counts.all}
+          >
+            {allText}
+          </FilterItem>
+          <FilterItem 
+            active={filterCategory === 'projects'} 
+            onClick={() => onFilterChange('projects')}
+            count={counts.projects}
+          >
+            {projectsText}
+          </FilterItem>
+          <FilterItem 
+            active={filterCategory === 'open-source'} 
+            onClick={() => onFilterChange('open-source')}
+            count={counts['open-source']}
+          >
+            {openSourceText}
+          </FilterItem>
+          <FilterItem 
+            active={filterCategory === 'books'} 
+            onClick={() => onFilterChange('books')}
+            count={counts.books}
+          >
+            {booksText}
+          </FilterItem>
+          <FilterItem 
+            active={filterCategory === 'oss-contribution'} 
+            onClick={() => onFilterChange('oss-contribution')}
+            count={counts['oss-contribution']}
+          >
+            {ossContributionText}
+          </FilterItem>
+        </nav>
+      </div>
+    </div>
   )
 }
 
@@ -489,20 +423,10 @@ export default function WorkPageContent({
       {/* Heroセクション + メインコンテンツ */}
       <section className="pt-12 sm:pt-16 pb-8 sm:pb-12 bg-white dark:bg-zinc-900">
         <Container>
-          <header className="max-w-3xl mb-8">
-            <h1 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-5xl">
-              {title}
-            </h1>
-            {description && (
-              <p className="mt-3 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
-                {description}
-              </p>
-            )}
-          </header>
+          <PageHeader title={title} description={description} />
 
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
-            {/* サイドバー */}
-            <div className="lg:col-span-1">
+          <SidebarLayout
+            sidebar={
               <Sidebar
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
@@ -511,10 +435,8 @@ export default function WorkPageContent({
                 counts={counts}
                 lang={lang}
               />
-            </div>
-
-            {/* メインコンテンツエリア */}
-            <div className="lg:col-span-3">
+            }
+          >
               {/* プロジェクトセクション */}
               {(filterCategory === 'all' || filterCategory === 'projects') && filteredProjects.length > 0 && (
                 <div className="mb-12">
@@ -597,8 +519,7 @@ export default function WorkPageContent({
                   </p>
                 </div>
               )}
-            </div>
-          </div>
+          </SidebarLayout>
         </Container>
       </section>
     </>
