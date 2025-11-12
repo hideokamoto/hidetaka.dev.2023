@@ -29,7 +29,7 @@ export default function FilterItem({
             ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300'
             : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400'
         }`}>
-          {count}
+          {count > 20 ? '20+' : count}
         </span>
       )}
     </button>

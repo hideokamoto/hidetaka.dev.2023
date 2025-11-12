@@ -4,7 +4,7 @@ import { loadBlogPosts } from '@/libs/dataSources/blogs'
 import BlogPosts from '@/components/BlogPosts/BlogPosts'
 
 export default async function ArticlesPageContent({ lang }: { lang: string }) {
-  const posts = await loadBlogPosts(lang === 'ja' ? 'ja' : 'en')
+  const { items: posts } = await loadBlogPosts(lang === 'ja' ? 'ja' : 'en')
   const title = lang === 'ja' ? '記事' : 'Articles'
 
   return (

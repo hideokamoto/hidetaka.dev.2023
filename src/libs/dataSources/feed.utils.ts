@@ -8,9 +8,11 @@ export const loadFeedPosts = async <T extends any>(url: string): Promise<T> => {
       const parsedItem = parser.parse(feedData)
       if (parsedItem.rss) {
         const { title, link, item, lastBuildDate } = parsedItem.rss.channel
+        // itemが配列でない場合（単一アイテム）やundefined/nullの場合に対応
+        const items = Array.isArray(item) ? item : (item ? [item] : [])
         return {
           lastBuildDate,
-          items: item.map((d: any) => {
+          items: items.map((d: any) => {
             return {
               title: d.title,
               content: d.description,
@@ -24,9 +26,11 @@ export const loadFeedPosts = async <T extends any>(url: string): Promise<T> => {
         } as T
       } else if (parsedItem.feed) {
         const { updated, link, title, entry } = parsedItem.feed
+        // entryが配列でない場合（単一エントリ）やundefined/nullの場合に対応
+        const entries = Array.isArray(entry) ? entry : (entry ? [entry] : [])
         return {
           lastBuildDate: updated,
-          items: entry.map((e: any) => {
+          items: entries.map((e: any) => {
             return {
               title: e.title,
               content: e.content,

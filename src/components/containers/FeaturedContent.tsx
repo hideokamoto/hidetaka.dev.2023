@@ -319,7 +319,7 @@ export default async function FeaturedContent({ lang }: { lang: string }) {
   const microCMS = new MicroCMSAPI(createMicroCMSClient())
   
   // Fetch all content
-  const externalPosts = await loadBlogPosts(lang === 'ja' ? 'ja' : 'en')
+  const { items: externalPosts } = await loadBlogPosts(lang === 'ja' ? 'ja' : 'en')
   const newsPosts = await microCMS.listPosts({ lang: lang === 'ja' ? 'japanese' : 'english' })
   const allProjects = await microCMS.listAllProjects()
   const allEvents = await microCMS.listEndedEvents()

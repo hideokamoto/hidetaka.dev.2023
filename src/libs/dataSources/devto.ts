@@ -1,6 +1,6 @@
 import type { FeedDataSource, FeedItem } from './types'
 
-export const loadDevToPosts = async (): Promise<FeedItem[]> => {
+export const loadDevToPosts = async (): Promise<{ items: FeedItem[], hasMore: boolean }> => {
     const dataSource: FeedDataSource = {
       href: 'https://dev.to',
       name: 'Dev.to',
@@ -14,7 +14,9 @@ export const loadDevToPosts = async (): Promise<FeedItem[]> => {
       if (data.ok) return data.json()
       return []
     })
-    return [...personal, ...stripe].map((data): FeedItem => {
+    const allItems = [...personal, ...stripe]
+    const hasMore = allItems.length > 20
+    const items = allItems.slice(0, 20).map((data): FeedItem => {
       return {
         id: data.id,
         title: data.title,
@@ -28,4 +30,5 @@ export const loadDevToPosts = async (): Promise<FeedItem[]> => {
         },
       }
     })
+    return { items, hasMore }
   }

@@ -2,15 +2,20 @@ import type { FeedDataSource, FeedItem, ZennFeed } from './types'
 import { loadFeedPosts } from './feed.utils'
 
 
-export const loadZennPosts = async (): Promise<FeedItem[]> => {
+export const loadZennPosts = async (): Promise<{ items: FeedItem[], hasMore: boolean }> => {
     const dataSource: FeedDataSource = {
-      href: 'https://zenn.dev',
+      href: 'https://zenn.dev/hideokamoto',
       name: 'Zenn',
       color: 'bg-indigo-300 text-indigo-600',
     }
     const personal = await loadFeedPosts<ZennFeed>('https://zenn.dev/hideokamoto/feed')
     const stripe = await loadFeedPosts<ZennFeed>('https://zenn.dev/stripe/feed')
-    return [...personal.items, ...stripe.items].map((data): FeedItem => {
+    // ソートして、21件取得（20件以上あるかどうかを判定するため）
+    const sortedItems = [...personal.items, ...stripe.items]
+      .sort((a, b) => new Date(b.isoDate).getTime() - new Date(a.isoDate).getTime())
+    
+    const hasMore = sortedItems.length > 20
+    const items = sortedItems.slice(0, 20).map((data): FeedItem => {
       // Ensure datetime is properly formatted
       // Zenn RSS feeds use RFC 822 format (e.g., "Mon, 10 Nov 2025 10:14:00 GMT")
       // which should be parseable by new Date(), but we'll ensure it's valid
@@ -35,4 +40,6 @@ export const loadZennPosts = async (): Promise<FeedItem[]> => {
         dataSource,
       }
     })
+    
+    return { items, hasMore }
   }

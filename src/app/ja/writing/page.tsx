@@ -9,9 +9,9 @@ export const metadata = {
 
 export default async function WritingPage() {
   const microCMS = new MicroCMSAPI(createMicroCMSClient())
-  const externalArticles = await loadBlogPosts('ja')
+  const { items: externalArticles, hasMoreBySource } = await loadBlogPosts('ja')
   const newsArticles = await microCMS.listPosts({ lang: 'japanese' })
 
-  return <WritingPageContent lang="ja" externalArticles={externalArticles} newsArticles={newsArticles} />
+  return <WritingPageContent lang="ja" externalArticles={externalArticles} hasMoreBySource={hasMoreBySource} newsArticles={newsArticles} />
 }
 

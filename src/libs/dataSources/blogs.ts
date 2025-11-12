@@ -45,23 +45,32 @@ const stripeDotDevPosts: Array<FeedItem> = [{
   dataSource: sourceStripeDotDev,
 }]
   
-export const loadBlogPosts = async (locale: 'ja' | 'en' = 'ja') => {
+export const loadBlogPosts = async (locale: 'ja' | 'en' = 'ja'): Promise<{ items: FeedItem[], hasMoreBySource: Record<string, boolean> }> => {
     try {
-      const wp = await loadWPPosts(isJapanese(locale) ? 'ja' : 'en').catch(() => [])
-      const devto = isJapanese(locale) ? [] : await loadDevToPosts().catch(() => [])
-      const zenn = isJapanese(locale) ? await loadZennPosts().catch(() => []) : []
-      const qiita = isJapanese(locale) ? await loadQiitaPosts().catch(() => []) : []
+      const wp = await loadWPPosts(isJapanese(locale) ? 'ja' : 'en').catch(() => ({ items: [], hasMore: false }))
+      const devto = isJapanese(locale) ? { items: [], hasMore: false } : await loadDevToPosts().catch(() => ({ items: [], hasMore: false }))
+      const zenn = isJapanese(locale) ? await loadZennPosts().catch(() => ({ items: [], hasMore: false })) : { items: [], hasMore: false }
+      const qiita = isJapanese(locale) ? await loadQiitaPosts().catch(() => ({ items: [], hasMore: false })) : { items: [], hasMore: false }
       const stripePosts = isJapanese(locale) ? [] : stripeDotDevPosts
 
-      const allPosts = [...wp, ...devto, ...zenn, ...qiita, ...stripePosts]
+      // hasMore情報をデータソース名でマッピング
+      const hasMoreBySource: Record<string, boolean> = {}
+      if (wp.hasMore) hasMoreBySource['WP Kyoto Blog'] = true
+      if (zenn.hasMore) hasMoreBySource['Zenn'] = true
+      if (qiita.hasMore) hasMoreBySource['Qiita'] = true
+      if (devto.hasMore) hasMoreBySource['Dev.to'] = true
+
+      const allPosts = [...wp.items, ...devto.items, ...zenn.items, ...qiita.items, ...stripePosts]
       
-      return allPosts.sort((a: FeedItem, b: FeedItem) => {
+      const sortedPosts = allPosts.sort((a: FeedItem, b: FeedItem) => {
         const bDate = new Date(b.datetime)
         const aDate = new Date(a.datetime)
         return bDate.getTime() - aDate.getTime()
       })
+      
+      return { items: sortedPosts, hasMoreBySource }
     } catch (error) {
       console.error('Error loading blog posts:', error)
-      return []
+      return { items: [], hasMoreBySource: {} }
     }
 }
