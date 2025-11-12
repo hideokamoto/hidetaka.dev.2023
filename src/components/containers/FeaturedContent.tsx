@@ -38,11 +38,11 @@ function ArticleCard({ article, lang }: { article: FeedItem | MicroCMSPostsRecor
     <article className="group relative flex flex-col items-start">
       <h3 className="text-base font-semibold tracking-tight text-zinc-800 dark:text-zinc-100">
         {isFeedItem ? (
-          <a href={href} target="_blank" rel="noopener noreferrer">
+          <a href={href} target="_blank" rel="noopener noreferrer" className="hover:text-indigo-600 dark:hover:text-indigo-400">
             {title}
           </a>
         ) : (
-          <Link href={href}>{title}</Link>
+          <Link href={href} className="hover:text-indigo-600 dark:hover:text-indigo-400">{title}</Link>
         )}
       </h3>
       <time
@@ -57,7 +57,7 @@ function ArticleCard({ article, lang }: { article: FeedItem | MicroCMSPostsRecor
       </p>
       {isFeedItem && article.dataSource && (
         <div className="relative z-10 mt-2 text-xs text-zinc-500 dark:text-zinc-400">
-          <a href={article.dataSource.href} target="_blank" rel="noopener noreferrer">
+          <a href={article.dataSource.href} target="_blank" rel="noopener noreferrer" className="hover:text-zinc-700 dark:hover:text-zinc-300">
             {article.dataSource.name}
           </a>
         </div>
@@ -72,7 +72,7 @@ function ProjectCard({ project, lang }: { project: MicroCMSProjectsRecord; lang:
   return (
     <article className="group relative flex flex-col items-start">
       <h3 className="text-base font-semibold tracking-tight text-zinc-800 dark:text-zinc-100">
-        <Link href={href}>{project.title}</Link>
+        <Link href={href} className="hover:text-indigo-600 dark:hover:text-indigo-400">{project.title}</Link>
       </h3>
       {project.published_at && (
         <time
@@ -102,7 +102,7 @@ function EventCard({ event, lang }: { event: MicroCMSEventsRecord; lang: string 
   return (
     <article className="group relative flex flex-col items-start">
       <h3 className="text-base font-semibold tracking-tight text-zinc-800 dark:text-zinc-100">
-        <a href={event.url} target="_blank" rel="noopener noreferrer">
+        <a href={event.url} target="_blank" rel="noopener noreferrer" className="hover:text-indigo-600 dark:hover:text-indigo-400">
           {event.title}
         </a>
       </h3>
@@ -232,4 +232,3 @@ export default async function FeaturedContent({ lang }: { lang: string }) {
     </Container>
   )
 }
-
