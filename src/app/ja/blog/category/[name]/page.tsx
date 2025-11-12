@@ -1,6 +1,7 @@
 import BlogPageContent from '@/components/containers/pages/BlogPage'
 import { loadThoughtsByCategory, loadAllCategories } from '@/libs/dataSources/thoughts'
 import { notFound } from 'next/navigation'
+import { generateBlogListJsonLd } from '@/libs/jsonLd'
 
 export const metadata = {
   title: 'ブログカテゴリ',
@@ -15,7 +16,7 @@ export default async function BlogCategoryPage({
   // Next.jsのApp Routerでは、URLパラメータは自動的にデコードされる
   // ただし、URLエンコードされた文字列がそのまま渡される場合もあるので、両方試す
   const decodedName = name.includes('%') ? decodeURIComponent(name) : name
-  
+
   const [result, categories] = await Promise.all([
     loadThoughtsByCategory(decodedName, 1, 20, 'ja'),
     loadAllCategories('ja'),
@@ -30,17 +31,33 @@ export default async function BlogCategoryPage({
 
   // basePathにはエンコードされたslugを使用（Next.jsのparamsはデコード済みなので再エンコード）
   const encodedSlug = encodeURIComponent(decodedName)
+  const basePath = `/ja/blog/category/${encodedSlug}`
+
+  const jsonLd = generateBlogListJsonLd(
+    result.items,
+    'ja',
+    basePath,
+    result.currentPage,
+    result.totalPages,
+    categoryName
+  )
 
   return (
-    <BlogPageContent
-      lang="ja"
-      thoughts={result.items}
-      currentPage={result.currentPage}
-      totalPages={result.totalPages}
-      basePath={`/ja/blog/category/${encodedSlug}`}
-      categoryName={categoryName}
-      categories={categories}
-    />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <BlogPageContent
+        lang="ja"
+        thoughts={result.items}
+        currentPage={result.currentPage}
+        totalPages={result.totalPages}
+        basePath={basePath}
+        categoryName={categoryName}
+        categories={categories}
+      />
+    </>
   )
 }
 
