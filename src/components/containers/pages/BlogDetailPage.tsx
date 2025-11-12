@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
+import Tag from '@/components/ui/Tag'
 import type { WPThought } from '@/libs/dataSources/types'
 
 type BlogDetailPageProps = {
@@ -58,14 +59,26 @@ export default function BlogDetailPage({
           </h1>
         </header>
 
-        {/* 日付 */}
-        <div className="mb-10">
+        {/* 日付とカテゴリ */}
+        <div className="mb-10 flex flex-col gap-4">
           <DateDisplay
             date={date}
             lang={lang}
             format="long"
             className="text-sm font-medium text-slate-600 dark:text-slate-400"
           />
+          {thought._embedded?.['wp:term'] && (
+            <div className="flex flex-wrap gap-2">
+              {thought._embedded['wp:term']
+                .flat()
+                .filter((term) => term.taxonomy === 'category')
+                .map((category) => (
+                  <Tag key={category.id} variant="indigo" size="sm">
+                    {category.name}
+                  </Tag>
+                ))}
+            </div>
+          )}
         </div>
 
         {/* コンテンツ */}

@@ -1,4 +1,4 @@
-import type { BlogItem, WPThought } from './types'
+import type { BlogItem, Category, WPThought } from './types'
 
 export type ThoughtsResult = {
   items: BlogItem[]
@@ -23,8 +23,9 @@ export const loadThoughts = async (
     // thoughsエンドポイントはfilter[lang]をサポートしていないため、
     // より多くの記事を取得してクライアント側でフィルタリングする
     const fetchPerPage = Math.max(perPage * 3, 60) // 言語フィルタリングのため多めに取得
+    // _embedと_fieldsを組み合わせてカテゴリ情報を取得
     const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?page=${page}&per_page=${fetchPerPage}`
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?page=${page}&per_page=${fetchPerPage}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`
     )
 
     if (!response.ok) {
@@ -43,6 +44,30 @@ export const loadThoughts = async (
     // 指定された件数に制限
     const paginatedThoughts = filteredThoughts.slice(0, perPage)
 
+    // カテゴリ情報を抽出するヘルパー関数
+    const extractCategories = (thought: WPThought): Category[] => {
+      if (!thought._embedded?.['wp:term']) {
+        return []
+      }
+      
+      // wp:termは配列の配列で、各配列には異なるタクソノミーのタームが含まれる
+      // taxonomyが'category'のものを抽出
+      const categories: Category[] = []
+      for (const termArray of thought._embedded['wp:term']) {
+        for (const term of termArray) {
+          if (term.taxonomy === 'category') {
+            categories.push({
+              id: term.id,
+              name: term.name,
+              slug: term.slug,
+              taxonomy: term.taxonomy,
+            })
+          }
+        }
+      }
+      return categories
+    }
+
     // BlogItem型に変換（このサイトの記事として扱う）
     const items: BlogItem[] = paginatedThoughts.map((thought: WPThought): BlogItem => {
       // slugを使用してこのサイトのパスに変換
@@ -55,6 +80,7 @@ export const loadThoughts = async (
         description: thought.excerpt.rendered.replace(/<[^>]*>/g, '').substring(0, 150),
         datetime: thought.date,
         href,
+        categories: extractCategories(thought),
       }
     })
 
@@ -83,8 +109,9 @@ export const loadThoughts = async (
 
 export const getThoughtBySlug = async (slug: string, lang: 'en' | 'ja' = 'en'): Promise<WPThought | null> => {
   try {
+    // _embedと_fieldsを組み合わせてカテゴリ情報を取得
     const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?slug=${encodeURIComponent(slug)}`
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?slug=${encodeURIComponent(slug)}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,content,slug,link,categories`
     )
 
     if (!response.ok) {

@@ -12,12 +12,20 @@ export type FeedDataSource = {
     dataSource: FeedDataSource
     image?: string
   }
+  export type Category = {
+    id: number
+    name: string
+    slug: string
+    taxonomy: string
+  }
+
   export type BlogItem = {
     id?: string
     title: string
     href: string
     description: string
     datetime: string
+    categories?: Category[]
   }
   type Feed = {
     title: string
@@ -70,4 +78,12 @@ export type WPThought = {
         slug: string
         featured_media?: number
         categories?: number[]
+        _embedded?: {
+          'wp:term'?: Array<Array<{
+            id: number
+            name: string
+            slug: string
+            taxonomy: string
+          }>>
+        }
       }

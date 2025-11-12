@@ -3,6 +3,7 @@ import Container from '@/components/tailwindui/Container'
 import PageHeader from '@/components/ui/PageHeader'
 import DateDisplay from '@/components/ui/DateDisplay'
 import Pagination from '@/components/ui/Pagination'
+import Tag from '@/components/ui/Tag'
 import type { BlogItem } from '@/libs/dataSources/types'
 
 type BlogPageProps = {
@@ -22,7 +23,7 @@ function BlogCard({ item, lang }: { item: BlogItem; lang: string }) {
       <article className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all hover:border-indigo-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700">
         <div className="p-5 lg:p-6">
           <div className="flex flex-col gap-3">
-            {/* Date */}
+            {/* Date and Categories */}
             <div className="flex items-center gap-3 flex-wrap">
               <DateDisplay
                 date={date}
@@ -30,6 +31,15 @@ function BlogCard({ item, lang }: { item: BlogItem; lang: string }) {
                 format="short"
                 className="text-xs font-semibold text-slate-500 dark:text-slate-400"
               />
+              {item.categories && item.categories.length > 0 && (
+                <>
+                  {item.categories.map((category) => (
+                    <Tag key={category.id} variant="indigo" size="sm">
+                      {category.name}
+                    </Tag>
+                  ))}
+                </>
+              )}
             </div>
 
             {/* Title */}
