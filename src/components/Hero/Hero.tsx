@@ -20,7 +20,7 @@ export default function Hero({ lang }: { lang: string }) {
   const ctaHref = lang === 'ja' ? '/ja/work' : '/work'
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-white via-indigo-50/40 to-purple-50/30">
+    <section className="relative overflow-hidden bg-gradient-to-br from-white via-indigo-50/30 to-purple-50/20 dark:from-zinc-900 dark:via-indigo-950/30 dark:to-purple-950/20 -mt-[var(--header-height)] pt-[var(--header-height)]">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute right-0 top-0 h-[600px] w-[600px] rounded-full bg-indigo-200/50 blur-3xl dark:bg-indigo-900/20" />
