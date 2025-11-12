@@ -7,7 +7,7 @@ export const metadata = {
 }
 
 export default async function BlogPage() {
-  const result = await loadThoughts(1, 20)
+  const result = await loadThoughts(1, 20, 'en')
 
   if (result.items.length === 0 && result.currentPage > 1) {
     notFound()

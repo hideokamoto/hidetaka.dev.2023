@@ -9,7 +9,8 @@ export type ThoughtsResult = {
 
 export const loadThoughts = async (
   page: number = 1,
-  perPage: number = 20
+  perPage: number = 20,
+  lang: 'en' | 'ja' = 'en'
 ): Promise<ThoughtsResult> => {
   try {
     const response = await fetch(
@@ -28,9 +29,9 @@ export const loadThoughts = async (
 
     // BlogItem型に変換（このサイトの記事として扱う）
     const items: BlogItem[] = thoughts.map((thought: WPThought): BlogItem => {
-      // リンクからドメイン部分を削除して、このサイトのパスに変換
-      // 記事詳細ページは未実装のため、一旦リンクをそのまま使用
-      const href = thought.link.replace(/wp-api\./, '')
+      // slugを使用してこのサイトのパスに変換
+      const basePath = lang === 'ja' ? '/ja/blog' : '/blog'
+      const href = `${basePath}/${thought.slug}`
 
       return {
         id: thought.id.toString(),
@@ -55,6 +56,29 @@ export const loadThoughts = async (
       totalItems: 0,
       currentPage: page,
     }
+  }
+}
+
+export const getThoughtBySlug = async (slug: string): Promise<WPThought | null> => {
+  try {
+    const response = await fetch(
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?slug=${encodeURIComponent(slug)}`
+    )
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch thought by slug: ${response.status}`)
+    }
+
+    const thoughts: WPThought[] = await response.json()
+
+    if (thoughts.length === 0) {
+      return null
+    }
+
+    return thoughts[0]
+  } catch (error) {
+    console.error('Error loading thought by slug:', error)
+    return null
   }
 }
 

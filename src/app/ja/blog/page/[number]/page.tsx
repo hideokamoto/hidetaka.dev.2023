@@ -18,7 +18,7 @@ export default async function BlogPageNumber({
     notFound()
   }
 
-  const result = await loadThoughts(pageNumber, 20)
+  const result = await loadThoughts(pageNumber, 20, 'ja')
 
   if (result.items.length === 0 && result.currentPage > result.totalPages) {
     notFound()

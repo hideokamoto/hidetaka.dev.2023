@@ -2,3 +2,103 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+/* Blog content styling */
+.blog-content {
+  @apply text-base sm:text-lg;
+}
+
+.blog-content h1,
+.blog-content h2,
+.blog-content h3,
+.blog-content h4,
+.blog-content h5,
+.blog-content h6 {
+  @apply font-bold text-zinc-900 dark:text-zinc-100 mt-8 mb-4;
+}
+
+.blog-content h1 {
+  @apply text-3xl sm:text-4xl;
+}
+
+.blog-content h2 {
+  @apply text-2xl sm:text-3xl;
+}
+
+.blog-content h3 {
+  @apply text-xl sm:text-2xl;
+}
+
+.blog-content h4 {
+  @apply text-lg sm:text-xl;
+}
+
+.blog-content p {
+  @apply mb-6 text-zinc-700 dark:text-zinc-300 leading-relaxed;
+}
+
+.blog-content a {
+  @apply text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 underline;
+}
+
+.blog-content strong {
+  @apply font-bold text-zinc-900 dark:text-zinc-100;
+}
+
+.blog-content em {
+  @apply italic;
+}
+
+.blog-content ul,
+.blog-content ol {
+  @apply mb-6 ml-6 space-y-2;
+}
+
+.blog-content ul {
+  @apply list-disc;
+}
+
+.blog-content ol {
+  @apply list-decimal;
+}
+
+.blog-content li {
+  @apply text-zinc-700 dark:text-zinc-300;
+}
+
+.blog-content blockquote {
+  @apply border-l-4 border-indigo-600 dark:border-indigo-400 pl-4 italic my-6 text-zinc-600 dark:text-zinc-400;
+}
+
+.blog-content code {
+  @apply bg-zinc-100 dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded text-sm font-mono;
+}
+
+.blog-content pre {
+  @apply bg-zinc-900 dark:bg-zinc-800 p-4 rounded-lg overflow-x-auto mb-6;
+}
+
+.blog-content pre code {
+  @apply bg-transparent text-zinc-100 dark:text-zinc-200 p-0;
+}
+
+.blog-content img {
+  @apply rounded-lg my-6 max-w-full h-auto;
+}
+
+.blog-content hr {
+  @apply my-8 border-zinc-200 dark:border-zinc-700;
+}
+
+.blog-content table {
+  @apply w-full border-collapse mb-6;
+}
+
+.blog-content th,
+.blog-content td {
+  @apply border border-zinc-200 dark:border-zinc-700 px-4 py-2 text-left;
+}
+
+.blog-content th {
+  @apply bg-zinc-100 dark:bg-zinc-800 font-bold text-zinc-900 dark:text-zinc-100;
+}
+
