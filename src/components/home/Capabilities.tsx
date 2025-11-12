@@ -61,11 +61,11 @@ export default function Capabilities({ lang }: { lang: string }) {
           {
             title: 'WordPressでマーケ&コンテンツを加速',
             description:
-              'グローバルに展開可能なWordPressテーマ・Headless構成を設計。リード獲得やコミュニティ施策と連携し、開発とマーケが並走できる仕組みを整えます。',
+              'WordPressサイトやHeadlessサイトを設計。リード獲得やコミュニティ施策と連携し、開発とマーケが並走できる仕組みを整えます。',
             highlights: [
-              'WordPress VIP / Headless / Cloudflare Pagesの運用',
+              'WordPress / Headless WordPress / Cloudflare Pagesの運用',
               'MicroCMSや外部SaaSとのハイブリッドな連携',
-              '編集体験と高速表示を両立するデザインシステム',
+              '編集体験と高速表示を両立するユーザー体験',
             ],
           },
         ]
@@ -93,11 +93,11 @@ export default function Capabilities({ lang }: { lang: string }) {
           {
             title: 'Accelerate content with WordPress',
             description:
-              'Architect WordPress themes and headless stacks that integrate with modern SaaS tooling. Empower marketing teams while maintaining engineering standards and blazing performance.',
+              'Design WordPress sites and headless sites. Integrate with lead generation and community initiatives, enabling development and marketing to work in parallel.',
             highlights: [
-              'WordPress VIP, headless frontends, Cloudflare Pages',
+              'WordPress / Headless WordPress / Cloudflare Pages operations',
               'Hybrid integrations with MicroCMS and existing SaaS',
-              'Design systems balancing editing UX and speed',
+              'User experience balancing editing UX and speed',
             ],
           },
         ]
