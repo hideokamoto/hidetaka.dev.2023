@@ -6,6 +6,9 @@ import { MicroCMSAPI } from '@/lib/microCMS/apis'
 import { createMicroCMSClient } from '@/lib/microCMS/client'
 import type { FeedItem } from '@/libs/dataSources/types'
 import type { MicroCMSProjectsRecord, MicroCMSPostsRecord, MicroCMSEventsRecord } from '@/lib/microCMS/types'
+import DateDisplay from '@/components/ui/DateDisplay'
+import Tag from '@/components/ui/Tag'
+import BackgroundDecoration from '@/components/ui/BackgroundDecoration'
 
 // ============================================================================
 // Unified Content Types & Helpers
@@ -27,31 +30,6 @@ function getContentDate(item: UnifiedContentItem): Date {
     case 'event':
       return new Date(item.data.date)
   }
-}
-
-function formatDateShort(date: Date | string, lang: string): string {
-  // Handle string dates (from RSS feeds)
-  const dateObj = typeof date === 'string' ? new Date(date) : date
-  
-  // Check if date is valid
-  if (isNaN(dateObj.getTime())) {
-    console.warn('Invalid date:', date)
-    return ''
-  }
-  
-  return dateObj.toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  })
-}
-
-function formatMonthYear(date: Date, lang: string): string {
-  return date.toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', {
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'UTC',
-  })
 }
 
 // ============================================================================
@@ -117,13 +95,16 @@ function ArticleCard({
         <article className="relative h-full overflow-hidden rounded-3xl border border-zinc-200 bg-gradient-to-br from-white via-indigo-50/50 to-purple-50/30 p-10 transition-all hover:border-indigo-300 hover:shadow-2xl dark:border-zinc-800 dark:from-zinc-900 dark:via-indigo-950/30 dark:to-purple-950/20 dark:hover:border-indigo-700">
           <div className="flex flex-col gap-6">
             <div className="flex items-center justify-between">
-              <time className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
-                {formatDateShort(date, lang)}
-              </time>
+              <DateDisplay 
+                date={date} 
+                lang={lang} 
+                format="short"
+                className="text-sm font-bold text-indigo-600 dark:text-indigo-400"
+              />
               {isFeedItem && article.dataSource && (
-                <span className="rounded-full bg-indigo-100 px-4 py-1.5 text-xs font-bold text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400">
+                <Tag variant="indigo" size="md" className="px-4 py-1.5 font-bold">
                   {article.dataSource.name}
-                </span>
+                </Tag>
               )}
             </div>
             
@@ -150,13 +131,16 @@ function ArticleCard({
     <CardWrapper>
       <article className="flex h-full flex-col rounded-xl border border-zinc-200 bg-white p-6 transition-all hover:border-indigo-300 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700">
         <div className="flex items-center justify-between mb-3">
-          <time className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-            {formatDateShort(date, lang)}
-          </time>
+          <DateDisplay 
+            date={date} 
+            lang={lang} 
+            format="short"
+            className="text-xs font-semibold text-slate-500 dark:text-slate-400"
+          />
           {isFeedItem && article.dataSource && (
-            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+            <Tag variant="default" size="sm" className="text-[10px]">
               {article.dataSource.name}
-            </span>
+            </Tag>
           )}
         </div>
         
@@ -208,9 +192,12 @@ function ProjectCard({
           <div className="p-8 lg:p-10">
             <div className="flex flex-col gap-4">
               {date && (
-                <time className="text-sm font-semibold text-purple-600 dark:text-purple-400">
-                  {formatDateShort(date, lang)}
-                </time>
+                <DateDisplay 
+                  date={date} 
+                  lang={lang} 
+                  format="short"
+                  className="text-sm font-semibold text-purple-600 dark:text-purple-400"
+                />
               )}
               
               <h3 className="text-2xl font-bold leading-tight tracking-tight text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors lg:text-3xl">
@@ -220,12 +207,9 @@ function ProjectCard({
               {project.tags && project.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {project.tags.slice(0, 4).map((tag) => (
-                    <span
-                      key={tag}
-                      className="inline-flex items-center rounded-lg bg-purple-100 px-3 py-1.5 text-xs font-semibold text-purple-700 dark:bg-purple-500/20 dark:text-purple-400"
-                    >
+                    <Tag key={tag} variant="purple" size="md">
                       {tag}
-                    </span>
+                    </Tag>
                   ))}
                 </div>
               )}
@@ -261,9 +245,12 @@ function ProjectCard({
         <div className="p-5 lg:p-6">
           <div className="flex flex-col gap-3">
             {date && (
-              <time className="text-xs font-semibold text-slate-500 dark:text-slate-400">
-                {formatDateShort(date, lang)}
-              </time>
+              <DateDisplay 
+                date={date} 
+                lang={lang} 
+                format="short"
+                className="text-xs font-semibold text-slate-500 dark:text-slate-400"
+              />
             )}
             
             <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
@@ -273,12 +260,9 @@ function ProjectCard({
             {project.tags && project.tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {project.tags.slice(0, 3).map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center rounded-md bg-purple-50 px-2.5 py-1 text-xs font-semibold text-purple-700 dark:bg-purple-500/10 dark:text-purple-400"
-                  >
+                  <Tag key={tag} variant="purple" size="sm">
                     {tag}
-                  </span>
+                  </Tag>
                 ))}
               </div>
             )}
@@ -300,9 +284,12 @@ function EventCard({ event, lang }: { event: MicroCMSEventsRecord; lang: string 
       className="group block h-full"
     >
       <article className="flex h-full flex-col rounded-xl border border-zinc-200 bg-white p-6 transition-all hover:border-cyan-300 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-cyan-700">
-        <time className="mb-3 text-xs font-semibold uppercase tracking-wider text-cyan-600 dark:text-cyan-400">
-          {formatDateShort(date, lang)}
-        </time>
+        <DateDisplay 
+          date={date} 
+          lang={lang} 
+          format="short"
+          className="mb-3 text-xs font-semibold uppercase tracking-wider text-cyan-600 dark:text-cyan-400"
+        />
         
         <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors mb-3">
           {event.title}
@@ -370,11 +357,7 @@ export default async function FeaturedContent({ lang }: { lang: string }) {
 
   return (
     <section className="relative py-24 sm:py-32">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-1/4 h-[500px] w-[500px] rounded-full bg-indigo-100/30 blur-3xl dark:bg-indigo-900/10" />
-        <div className="absolute bottom-0 left-1/4 h-[500px] w-[500px] rounded-full bg-purple-100/30 blur-3xl dark:bg-purple-900/10" />
-      </div>
+      <BackgroundDecoration variant="section" />
 
       <Container>
         <div className="relative space-y-32">

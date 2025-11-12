@@ -1,4 +1,5 @@
 import Container from '@/components/tailwindui/Container'
+import SectionHeader from '@/components/ui/SectionHeader'
 
 type Capability = {
   title: string
@@ -105,12 +106,7 @@ export default function Capabilities({ lang }: { lang: string }) {
   return (
     <section className="relative py-24 sm:py-32">
       <Container>
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-            {sectionTitle}
-          </h2>
-          <p className="mt-6 text-lg leading-relaxed text-slate-700 dark:text-slate-400">{sectionDescription}</p>
-        </div>
+        <SectionHeader title={sectionTitle} description={sectionDescription} align="center" />
 
         <div className="mt-20 grid gap-10 lg:grid-cols-3 lg:gap-12">
           {capabilities.map((capability) => (
