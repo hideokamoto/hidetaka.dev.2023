@@ -4,8 +4,6 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import Container from '@/components/tailwindui/Container'
-import SectionHeader from '@/components/ui/SectionHeader'
-import BackgroundDecoration from '@/components/ui/BackgroundDecoration'
 import DateDisplay from '@/components/ui/DateDisplay'
 import Tag from '@/components/ui/Tag'
 import type { MicroCMSProjectsRecord } from '@/lib/microCMS/types'
@@ -488,23 +486,21 @@ export default function WorkPageContent({
 
   return (
     <>
-      {/* Heroセクション */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-white via-indigo-50/40 to-purple-50/30 py-24 sm:py-32 lg:py-40">
-        <BackgroundDecoration variant="hero" />
+      {/* Heroセクション + メインコンテンツ */}
+      <section className="pt-12 sm:pt-16 pb-8 sm:pb-12 bg-white dark:bg-zinc-900">
         <Container>
-          <SectionHeader 
-            title={title}
-            description={description}
-            align="center"
-            className="relative z-10"
-          />
-        </Container>
-      </section>
+          <header className="max-w-3xl mb-8">
+            <h1 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-5xl">
+              {title}
+            </h1>
+            {description && (
+              <p className="mt-3 text-lg leading-relaxed text-slate-600 dark:text-slate-400">
+                {description}
+              </p>
+            )}
+          </header>
 
-      {/* メインコンテンツ */}
-      <section className="py-24 sm:py-32 bg-white dark:bg-zinc-900">
-        <Container>
-          <div className="grid grid-cols-1 gap-12 lg:grid-cols-4">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-4">
             {/* サイドバー */}
             <div className="lg:col-span-1">
               <Sidebar
@@ -521,8 +517,8 @@ export default function WorkPageContent({
             <div className="lg:col-span-3">
               {/* プロジェクトセクション */}
               {(filterCategory === 'all' || filterCategory === 'projects') && filteredProjects.length > 0 && (
-                <div className="mb-16">
-                  <h2 className="mb-8 text-2xl font-bold text-slate-900 dark:text-white">
+                <div className="mb-12">
+                  <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
                     {lang === 'ja' ? 'プロジェクト' : 'Projects'}
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
@@ -535,8 +531,8 @@ export default function WorkPageContent({
 
               {/* 書籍セクション */}
               {(filterCategory === 'all' || filterCategory === 'books') && filteredBooks.length > 0 && (
-                <div className="mb-16">
-                  <h2 className="mb-8 text-2xl font-bold text-slate-900 dark:text-white">
+                <div className="mb-12">
+                  <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
                     {lang === 'ja' ? '書籍' : 'Books'}
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
@@ -549,8 +545,8 @@ export default function WorkPageContent({
 
               {/* オープンソースセクション */}
               {(filterCategory === 'all' || filterCategory === 'open-source') && filteredOSS.length > 0 && (
-                <div className="mb-16">
-                  <h2 className="mb-8 text-2xl font-bold text-slate-900 dark:text-white">
+                <div className="mb-12">
+                  <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
                     {lang === 'ja' ? 'オープンソース' : 'Open Source'}
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
@@ -582,7 +578,7 @@ export default function WorkPageContent({
               {/* OSS Contributionセクション */}
               {(filterCategory === 'all' || filterCategory === 'oss-contribution') && filteredOSSContributions.length > 0 && (
                 <div>
-                  <h2 className="mb-8 text-2xl font-bold text-slate-900 dark:text-white">
+                  <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
                     {lang === 'ja' ? 'OSS貢献' : 'OSS Contributions'}
                   </h2>
                   <div className="space-y-3">
