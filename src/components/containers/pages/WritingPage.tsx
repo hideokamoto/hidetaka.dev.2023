@@ -10,6 +10,8 @@ import SearchBar from '@/components/ui/SearchBar'
 import FilterItem from '@/components/ui/FilterItem'
 import PageHeader from '@/components/ui/PageHeader'
 import SidebarLayout from '@/components/ui/SidebarLayout'
+import MobileFilterDrawer, { type FilterGroup } from '@/components/ui/MobileFilterDrawer'
+import MobileFilterButton from '@/components/ui/MobileFilterButton'
 import type { FeedItem } from '@/libs/dataSources/types'
 import type { MicroCMSPostsRecord } from '@/lib/microCMS/types'
 
@@ -127,7 +129,8 @@ function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string })
   )
 }
 
-// サイドバーコンポーネント
+
+// サイドバーコンポーネント（デスクトップ用）
 function Sidebar({
   searchQuery,
   onSearchChange,
@@ -168,10 +171,9 @@ function Sidebar({
   const allText = lang === 'ja' ? 'すべて' : 'All'
   const externalText = lang === 'ja' ? '外部記事' : 'External Articles'
   const newsText = lang === 'ja' ? 'ニュース' : 'News'
-  const noTagText = lang === 'ja' ? 'タグなし' : 'No Tag'
 
   return (
-    <div className="space-y-6">
+    <div className="hidden lg:block space-y-6">
       {/* 検索バー */}
       <div>
         <SearchBar 
@@ -295,6 +297,7 @@ export default function WritingPageContent({
   const [filterType, setFilterType] = useState<FilterType>('all')
   const [filterTag, setFilterTag] = useState<FilterTag>(null)
   const [filterDataSource, setFilterDataSource] = useState<FilterDataSource>(null)
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
 
   // 全記事を統合
   const allItems: WritingItem[] = [
@@ -404,13 +407,147 @@ export default function WritingPageContent({
   const description = lang === 'ja' 
     ? '技術記事、ブログ投稿、ニュースなどの執筆活動を紹介しています。'
     : 'A collection of technical articles, blog posts, news, and other writing I\'ve published.'
+  const filterButtonText = lang === 'ja' ? 'フィルター' : 'Filter'
+
+  // アクティブなフィルターの数を計算
+  const activeFilterCount = useMemo(() => {
+    let count = 0
+    if (filterType !== 'all') count++
+    if (filterTag !== null) count++
+    if (filterDataSource !== null) count++
+    return count
+  }, [filterType, filterTag, filterDataSource])
+
+  // フィルターグループを構築
+  const filterGroups = useMemo<FilterGroup[]>(() => {
+    const allText = lang === 'ja' ? 'すべて' : 'All'
+    const typeTitle = lang === 'ja' ? 'タイプ' : 'Type'
+    const tagTitle = lang === 'ja' ? 'タグ' : 'Tag'
+    const sourceTitle = lang === 'ja' ? 'データソース' : 'Source'
+    const externalText = lang === 'ja' ? '外部記事' : 'External Articles'
+    const newsText = lang === 'ja' ? 'ニュース' : 'News'
+
+    const groups: FilterGroup[] = [
+      {
+        title: typeTitle,
+        items: [
+          {
+            id: 'all',
+            label: allText,
+            active: filterType === 'all',
+            count: counts.all,
+            onClick: () => {
+              setFilterType('all')
+              setFilterTag(null)
+              setFilterDataSource(null)
+            }
+          },
+          {
+            id: 'external',
+            label: externalText,
+            active: filterType === 'external',
+            count: counts.external,
+            onClick: () => {
+              setFilterType('external')
+              setFilterTag(null)
+              setFilterDataSource(null)
+            }
+          },
+          {
+            id: 'news',
+            label: newsText,
+            active: filterType === 'news',
+            count: counts.news,
+            onClick: () => {
+              setFilterType('news')
+              setFilterTag(null)
+              setFilterDataSource(null)
+            }
+          }
+        ]
+      }
+    ]
+
+    // タグフィルター
+    if (availableTags.length > 0) {
+      groups.push({
+        title: tagTitle,
+        items: [
+          {
+            id: 'tag-all',
+            label: allText,
+            active: filterTag === null,
+            count: counts.all,
+            onClick: () => setFilterTag(null)
+          },
+          ...availableTags.map(tag => ({
+            id: `tag-${tag}`,
+            label: tag,
+            active: filterTag === tag,
+            count: counts.byTag[tag] || 0,
+            onClick: () => setFilterTag(tag)
+          }))
+        ]
+      })
+    }
+
+    // データソースフィルター
+    if (availableDataSources.length > 0) {
+      groups.push({
+        title: sourceTitle,
+        items: [
+          {
+            id: 'source-all',
+            label: allText,
+            active: filterDataSource === null,
+            count: counts.all,
+            onClick: () => setFilterDataSource(null)
+          },
+          ...availableDataSources.map(source => ({
+            id: `source-${source}`,
+            label: source,
+            active: filterDataSource === source,
+            count: counts.byDataSource[source] || 0,
+            onClick: () => setFilterDataSource(source)
+          }))
+        ]
+      })
+    }
+
+    return groups
+  }, [lang, filterType, filterTag, filterDataSource, availableTags, availableDataSources, counts])
 
   return (
     <>
+      {/* モバイル用フィルタードロワー */}
+      <MobileFilterDrawer
+        isOpen={isMobileFilterOpen}
+        onClose={() => setIsMobileFilterOpen(false)}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder={lang === 'ja' ? '検索...' : 'Search...'}
+        filterGroups={filterGroups}
+        title={filterButtonText}
+      />
+
       {/* Heroセクション + メインコンテンツ */}
       <section className="pt-12 sm:pt-16 pb-8 sm:pb-12 bg-white dark:bg-zinc-900">
         <Container>
           <PageHeader title={title} description={description} />
+
+          {/* モバイル用検索バーとフィルターボタン */}
+          <div className="lg:hidden mb-6 space-y-4">
+            <SearchBar 
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder={lang === 'ja' ? '検索...' : 'Search...'}
+            />
+            <MobileFilterButton
+              onClick={() => setIsMobileFilterOpen(true)}
+              activeFilterCount={activeFilterCount}
+              label={filterButtonText}
+            />
+          </div>
 
           <SidebarLayout
             sidebar={

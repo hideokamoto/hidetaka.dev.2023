@@ -10,6 +10,8 @@ import SearchBar from '@/components/ui/SearchBar'
 import FilterItem from '@/components/ui/FilterItem'
 import PageHeader from '@/components/ui/PageHeader'
 import SidebarLayout from '@/components/ui/SidebarLayout'
+import MobileFilterDrawer, { type FilterGroup } from '@/components/ui/MobileFilterDrawer'
+import MobileFilterButton from '@/components/ui/MobileFilterButton'
 import type { MicroCMSProjectsRecord } from '@/lib/microCMS/types'
 import type { NPMRegistrySearchResult } from '@/libs/dataSources/npmjs'
 import type { WordPressPluginDetail } from '@/libs/dataSources/wporg'
@@ -216,7 +218,7 @@ function Sidebar({
   const ossContributionText = lang === 'ja' ? 'OSS貢献' : 'OSS Contributions'
 
   return (
-    <div className="space-y-6">
+    <div className="hidden lg:block space-y-6">
       {/* 検索バー */}
       <div>
         <SearchBar 
@@ -286,6 +288,7 @@ export default function WorkPageContent({
 }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [filterCategory, setFilterCategory] = useState<FilterCategory>('all')
+  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
 
   // プロジェクトをタイプ別に分類
   const booksProjects = projects.filter(p => p.project_type?.includes('books'))
@@ -417,13 +420,97 @@ export default function WorkPageContent({
   const description = lang === 'ja' 
     ? 'これまでに開発・制作したプロジェクト、オープンソースプロジェクト、書籍などを紹介しています。'
     : 'A collection of projects, open source contributions, books, and other work I\'ve created.'
+  const filterButtonText = lang === 'ja' ? 'フィルター' : 'Filter'
+
+  // アクティブなフィルターの数を計算
+  const activeFilterCount = useMemo(() => {
+    return filterCategory !== 'all' ? 1 : 0
+  }, [filterCategory])
+
+  // フィルターグループを構築
+  const filterGroups = useMemo<FilterGroup[]>(() => {
+    const filterTitle = lang === 'ja' ? 'カテゴリ' : 'Category'
+    const allText = lang === 'ja' ? 'すべて' : 'All'
+    const projectsText = lang === 'ja' ? 'プロジェクト' : 'Projects'
+    const openSourceText = lang === 'ja' ? 'オープンソース' : 'Open Source'
+    const booksText = lang === 'ja' ? '書籍' : 'Books'
+    const ossContributionText = lang === 'ja' ? 'OSS貢献' : 'OSS Contributions'
+
+    return [
+      {
+        title: filterTitle,
+        items: [
+          {
+            id: 'all',
+            label: allText,
+            active: filterCategory === 'all',
+            count: counts.all,
+            onClick: () => setFilterCategory('all')
+          },
+          {
+            id: 'projects',
+            label: projectsText,
+            active: filterCategory === 'projects',
+            count: counts.projects,
+            onClick: () => setFilterCategory('projects')
+          },
+          {
+            id: 'open-source',
+            label: openSourceText,
+            active: filterCategory === 'open-source',
+            count: counts['open-source'],
+            onClick: () => setFilterCategory('open-source')
+          },
+          {
+            id: 'books',
+            label: booksText,
+            active: filterCategory === 'books',
+            count: counts.books,
+            onClick: () => setFilterCategory('books')
+          },
+          {
+            id: 'oss-contribution',
+            label: ossContributionText,
+            active: filterCategory === 'oss-contribution',
+            count: counts['oss-contribution'],
+            onClick: () => setFilterCategory('oss-contribution')
+          }
+        ]
+      }
+    ]
+  }, [lang, filterCategory, counts])
 
   return (
     <>
+      {/* モバイル用フィルタードロワー */}
+      <MobileFilterDrawer
+        isOpen={isMobileFilterOpen}
+        onClose={() => setIsMobileFilterOpen(false)}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        searchPlaceholder={lang === 'ja' ? '検索...' : 'Search...'}
+        filterGroups={filterGroups}
+        title={filterButtonText}
+      />
+
       {/* Heroセクション + メインコンテンツ */}
       <section className="pt-12 sm:pt-16 pb-8 sm:pb-12 bg-white dark:bg-zinc-900">
         <Container>
           <PageHeader title={title} description={description} />
+
+          {/* モバイル用検索バーとフィルターボタン */}
+          <div className="lg:hidden mb-6 space-y-4">
+            <SearchBar 
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder={lang === 'ja' ? '検索...' : 'Search...'}
+            />
+            <MobileFilterButton
+              onClick={() => setIsMobileFilterOpen(true)}
+              activeFilterCount={activeFilterCount}
+              label={filterButtonText}
+            />
+          </div>
 
           <SidebarLayout
             sidebar={
