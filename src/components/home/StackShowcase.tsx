@@ -43,30 +43,30 @@ export default function StackShowcase({ lang }: { lang: string }) {
       : 'Built for collaborative ecosystems—seamless from development to operations.'
 
   return (
-    <section className="relative py-20 sm:py-24">
+    <section className="relative py-24 sm:py-32">
       <Container>
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-4xl">
+        <div className="mx-auto max-w-3xl text-center">
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
             {title}
           </h2>
-          <p className="mt-4 text-base text-zinc-600 dark:text-zinc-400">{subtitle}</p>
+          <p className="mt-6 text-lg leading-relaxed text-slate-700 dark:text-slate-400">{subtitle}</p>
         </div>
 
-        <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="mt-20 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
           {items.map((item) => (
             <div
               key={item.name}
-              className="group flex flex-col items-center justify-center rounded-lg border border-zinc-200 bg-white p-6 text-center transition-shadow hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
+              className="group flex flex-col items-center justify-center rounded-2xl border border-zinc-200 bg-white p-8 text-center transition-all hover:shadow-lg hover:border-indigo-200 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-800"
             >
               <div
-                className={`inline-flex items-center justify-center rounded-full bg-gradient-to-r ${item.gradient} px-4 py-2 text-sm font-semibold text-white shadow-sm`}
+                className={`inline-flex items-center justify-center rounded-full bg-gradient-to-r ${item.gradient} px-5 py-2.5 text-sm font-semibold text-white shadow-md`}
               >
                 {item.name}
               </div>
-              <p className="mt-4 text-xs font-medium uppercase tracking-wider text-zinc-500 dark:text-zinc-400">
+              <p className="mt-6 text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                 {lang === 'ja' ? '専門領域' : 'Focus'}
               </p>
-              <p className="mt-2 text-sm font-medium text-zinc-600 dark:text-zinc-300">{item.description}</p>
+              <p className="mt-3 text-sm font-medium leading-relaxed text-slate-700 dark:text-slate-300">{item.description}</p>
             </div>
           ))}
         </div>

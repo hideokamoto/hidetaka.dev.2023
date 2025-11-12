@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import Container from '@/components/tailwindui/Container'
 import { loadBlogPosts } from '@/libs/dataSources/blogs'
 import { MicroCMSAPI } from '@/lib/microCMS/apis'
@@ -6,135 +7,338 @@ import { createMicroCMSClient } from '@/lib/microCMS/client'
 import type { FeedItem } from '@/libs/dataSources/types'
 import type { MicroCMSProjectsRecord, MicroCMSPostsRecord, MicroCMSEventsRecord } from '@/lib/microCMS/types'
 
-function formatDate(dateString: string, lang: string): string {
-  return new Date(dateString).toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', {
+// ============================================================================
+// Unified Content Types & Helpers
+// ============================================================================
+
+type UnifiedContentItem = 
+  | { type: 'article'; data: FeedItem | MicroCMSPostsRecord }
+  | { type: 'project'; data: MicroCMSProjectsRecord }
+  | { type: 'event'; data: MicroCMSEventsRecord }
+
+function getContentDate(item: UnifiedContentItem): Date {
+  switch (item.type) {
+    case 'article':
+      const article = item.data
+      const dateStr = 'datetime' in article ? article.datetime : article.publishedAt
+      return new Date(dateStr)
+    case 'project':
+      return item.data.published_at ? new Date(item.data.published_at) : new Date(0)
+    case 'event':
+      return new Date(item.data.date)
+  }
+}
+
+function formatDateShort(date: Date | string, lang: string): string {
+  // Handle string dates (from RSS feeds)
+  const dateObj = typeof date === 'string' ? new Date(date) : date
+  
+  // Check if date is valid
+  if (isNaN(dateObj.getTime())) {
+    console.warn('Invalid date:', date)
+    return ''
+  }
+  
+  return dateObj.toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', {
     day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+}
+
+function formatMonthYear(date: Date, lang: string): string {
+  return date.toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', {
     month: 'long',
     year: 'numeric',
     timeZone: 'UTC',
   })
 }
 
-function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <h2 className="text-2xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-3xl">
-      {children}
-    </h2>
-  )
-}
+// ============================================================================
+// Content Cards
+// ============================================================================
 
-function ArticleCard({ article, lang }: { article: FeedItem | MicroCMSPostsRecord; lang: string }) {
+function ArticleCard({ 
+  article, 
+  lang, 
+  variant = 'default' 
+}: { 
+  article: FeedItem | MicroCMSPostsRecord
+  lang: string
+  variant?: 'featured' | 'default'
+}) {
   const isFeedItem = 'dataSource' in article
   const href = isFeedItem 
     ? article.href 
     : (lang === 'ja' ? `/ja/writing/${article.id}` : `/writing/${article.id}`)
-  const title = isFeedItem ? article.title : article.title
+  const title = article.title
   const description = isFeedItem 
     ? article.description 
-    : article.content.replace(/<[^>]*>/g, '').substring(0, 150)
+    : article.content.replace(/<[^>]*>/g, '').substring(0, variant === 'featured' ? 200 : 120)
   const datetime = isFeedItem ? article.datetime : article.publishedAt
+  
+  // Parse date properly - handle RFC 822 format from RSS feeds
+  let date: Date
+  try {
+    date = new Date(datetime)
+    // Validate date
+    if (isNaN(date.getTime())) {
+      console.warn('Invalid date string:', datetime, 'for article:', title)
+      date = new Date() // Fallback to current date
+    }
+  } catch (e) {
+    console.warn('Date parsing error:', e, 'for article:', title)
+    date = new Date() // Fallback to current date
+  }
+
+  const CardWrapper = ({ children }: { children: React.ReactNode }) => {
+    if (isFeedItem) {
+      return (
+        <a 
+          href={href} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="group block h-full"
+        >
+          {children}
+        </a>
+      )
+    }
+    return (
+      <Link href={href} className="group block h-full">
+        {children}
+      </Link>
+    )
+  }
+
+  if (variant === 'featured') {
+    return (
+      <CardWrapper>
+        <article className="relative h-full overflow-hidden rounded-3xl border border-zinc-200 bg-gradient-to-br from-white via-indigo-50/50 to-purple-50/30 p-10 transition-all hover:border-indigo-300 hover:shadow-2xl dark:border-zinc-800 dark:from-zinc-900 dark:via-indigo-950/30 dark:to-purple-950/20 dark:hover:border-indigo-700">
+          <div className="flex flex-col gap-6">
+            <div className="flex items-center justify-between">
+              <time className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                {formatDateShort(date, lang)}
+              </time>
+              {isFeedItem && article.dataSource && (
+                <span className="rounded-full bg-indigo-100 px-4 py-1.5 text-xs font-bold text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400">
+                  {article.dataSource.name}
+                </span>
+              )}
+            </div>
+            
+            <h3 className="text-3xl font-extrabold leading-tight tracking-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+              {title}
+            </h3>
+            
+            <p className="text-base leading-relaxed text-slate-700 dark:text-slate-300 line-clamp-4">
+              {description}
+              {description.length >= 200 ? '...' : ''}
+            </p>
+
+            <div className="mt-auto flex items-center gap-2 text-sm font-bold text-indigo-600 dark:text-indigo-400">
+              <span>{lang === 'ja' ? '続きを読む' : 'Read article'}</span>
+              <span className="transition-transform group-hover:translate-x-1">→</span>
+            </div>
+          </div>
+        </article>
+      </CardWrapper>
+    )
+  }
 
   return (
-    <article className="group relative flex flex-col items-start">
-      <h3 className="text-base font-semibold tracking-tight text-zinc-800 dark:text-zinc-100">
-        {isFeedItem ? (
-          <a href={href} target="_blank" rel="noopener noreferrer" className="hover:text-indigo-600 dark:hover:text-indigo-400">
-            {title}
-          </a>
-        ) : (
-          <Link href={href} className="hover:text-indigo-600 dark:hover:text-indigo-400">{title}</Link>
-        )}
-      </h3>
-      <time
-        dateTime={datetime}
-        className="relative z-10 order-first mb-3 flex items-center text-sm text-zinc-400 dark:text-zinc-500"
-      >
-        {formatDate(datetime, lang)}
-      </time>
-      <p className="relative z-10 mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-        {description}
-        {description.length >= 150 ? '...' : ''}
-      </p>
-      {isFeedItem && article.dataSource && (
-        <div className="relative z-10 mt-2 text-xs text-zinc-500 dark:text-zinc-400">
-          <a href={article.dataSource.href} target="_blank" rel="noopener noreferrer" className="hover:text-zinc-700 dark:hover:text-zinc-300">
-            {article.dataSource.name}
-          </a>
+    <CardWrapper>
+      <article className="flex h-full flex-col rounded-xl border border-zinc-200 bg-white p-6 transition-all hover:border-indigo-300 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700">
+        <div className="flex items-center justify-between mb-3">
+          <time className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+            {formatDateShort(date, lang)}
+          </time>
+          {isFeedItem && article.dataSource && (
+            <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-400">
+              {article.dataSource.name}
+            </span>
+          )}
         </div>
-      )}
-    </article>
+        
+        <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors mb-3">
+          {title}
+        </h3>
+        
+        <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-2 flex-1">
+          {description}
+          {description.length >= 120 ? '...' : ''}
+        </p>
+      </article>
+    </CardWrapper>
   )
 }
 
-function ProjectCard({ project, lang }: { project: MicroCMSProjectsRecord; lang: string }) {
+function ProjectCard({ 
+  project, 
+  lang, 
+  variant = 'default' 
+}: { 
+  project: MicroCMSProjectsRecord
+  lang: string
+  variant?: 'featured' | 'default'
+}) {
   const href = lang === 'ja' ? `/ja/work/${project.id}` : `/work/${project.id}`
+  const date = project.published_at ? new Date(project.published_at) : null
+
+  if (variant === 'featured') {
+    return (
+      <Link href={href} className="group block">
+        <article className="relative overflow-hidden rounded-3xl border border-zinc-200 bg-white transition-all hover:border-purple-300 hover:shadow-2xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-purple-700">
+          {/* Large Image - Top */}
+          {project.image && (
+            <div className="relative aspect-video w-full overflow-hidden">
+              <Image
+                src={project.image.url}
+                alt={project.title}
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-110"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 50vw"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+            </div>
+          )}
+          
+          {/* Content - Bottom */}
+          <div className="p-8 lg:p-10">
+            <div className="flex flex-col gap-4">
+              {date && (
+                <time className="text-sm font-semibold text-purple-600 dark:text-purple-400">
+                  {formatDateShort(date, lang)}
+                </time>
+              )}
+              
+              <h3 className="text-2xl font-bold leading-tight tracking-tight text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors lg:text-3xl">
+                {project.title}
+              </h3>
+
+              {project.tags && project.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {project.tags.slice(0, 4).map((tag) => (
+                    <span
+                      key={tag}
+                      className="inline-flex items-center rounded-lg bg-purple-100 px-3 py-1.5 text-xs font-semibold text-purple-700 dark:bg-purple-500/20 dark:text-purple-400"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+
+              <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-purple-600 dark:text-purple-400">
+                <span>{lang === 'ja' ? '詳細を見る' : 'View project'}</span>
+                <span className="transition-transform group-hover:translate-x-1">→</span>
+              </div>
+            </div>
+          </div>
+        </article>
+      </Link>
+    )
+  }
 
   return (
-    <article className="group relative flex flex-col items-start">
-      <h3 className="text-base font-semibold tracking-tight text-zinc-800 dark:text-zinc-100">
-        <Link href={href} className="hover:text-indigo-600 dark:hover:text-indigo-400">{project.title}</Link>
-      </h3>
-      {project.published_at && (
-        <time
-          dateTime={project.published_at}
-          className="relative z-10 order-first mb-3 flex items-center text-sm text-zinc-400 dark:text-zinc-500"
-        >
-          {formatDate(project.published_at, lang)}
-        </time>
-      )}
-      {project.tags && project.tags.length > 0 && (
-        <div className="relative z-10 mb-2 flex flex-wrap gap-2">
-          {project.tags.slice(0, 3).map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full bg-zinc-100 px-2 py-1 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
-            >
-              {tag}
-            </span>
-          ))}
+    <Link href={href} className="group block">
+      <article className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all hover:border-purple-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-purple-700">
+        {/* Image - Top, larger */}
+        {project.image && (
+          <div className="relative aspect-[4/3] w-full overflow-hidden">
+            <Image
+              src={project.image.url}
+              alt={project.title}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-110"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            />
+          </div>
+        )}
+        
+        {/* Content - Bottom */}
+        <div className="p-5 lg:p-6">
+          <div className="flex flex-col gap-3">
+            {date && (
+              <time className="text-xs font-semibold text-slate-500 dark:text-slate-400">
+                {formatDateShort(date, lang)}
+              </time>
+            )}
+            
+            <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+              {project.title}
+            </h3>
+
+            {project.tags && project.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {project.tags.slice(0, 3).map((tag) => (
+                  <span
+                    key={tag}
+                    className="inline-flex items-center rounded-md bg-purple-50 px-2.5 py-1 text-xs font-semibold text-purple-700 dark:bg-purple-500/10 dark:text-purple-400"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      )}
-    </article>
+      </article>
+    </Link>
   )
 }
 
 function EventCard({ event, lang }: { event: MicroCMSEventsRecord; lang: string }) {
+  const date = new Date(event.date)
+
   return (
-    <article className="group relative flex flex-col items-start">
-      <h3 className="text-base font-semibold tracking-tight text-zinc-800 dark:text-zinc-100">
-        <a href={event.url} target="_blank" rel="noopener noreferrer" className="hover:text-indigo-600 dark:hover:text-indigo-400">
+    <a 
+      href={event.url} 
+      target="_blank" 
+      rel="noopener noreferrer"
+      className="group block h-full"
+    >
+      <article className="flex h-full flex-col rounded-xl border border-zinc-200 bg-white p-6 transition-all hover:border-cyan-300 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-cyan-700">
+        <time className="mb-3 text-xs font-semibold uppercase tracking-wider text-cyan-600 dark:text-cyan-400">
+          {formatDateShort(date, lang)}
+        </time>
+        
+        <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors mb-3">
           {event.title}
-        </a>
-      </h3>
-      <time
-        dateTime={event.date}
-        className="relative z-10 order-first mb-3 flex items-center text-sm text-zinc-400 dark:text-zinc-500"
-      >
-        {formatDate(event.date, lang)}
-      </time>
-      {event.place && (
-        <p className="relative z-10 mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-          {event.place}
-        </p>
-      )}
-      {event.session_title && (
-        <p className="relative z-10 mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-          {event.session_title}
-        </p>
-      )}
-    </article>
+        </h3>
+        
+        {event.place && (
+          <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+            {event.place}
+          </p>
+        )}
+        
+        {event.session_title && (
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            {event.session_title}
+          </p>
+        )}
+      </article>
+    </a>
   )
 }
+
+// ============================================================================
+// Main Section - Unified Content Stream
+// ============================================================================
 
 export default async function FeaturedContent({ lang }: { lang: string }) {
   const microCMS = new MicroCMSAPI(createMicroCMSClient())
   
-  // 最新記事を取得（外部記事と独自記事から）
+  // Fetch all content
   const externalPosts = await loadBlogPosts(lang === 'ja' ? 'ja' : 'en')
   const newsPosts = await microCMS.listPosts({ lang: lang === 'ja' ? 'japanese' : 'english' })
-  
-  // 全記事を統合して日付順にソート
-  const allArticles: Array<FeedItem | MicroCMSPostsRecord> = [
+  const allProjects = await microCMS.listAllProjects()
+  const allEvents = await microCMS.listEndedEvents()
+
+  // Prepare unified content
+  const articles: Array<FeedItem | MicroCMSPostsRecord> = [
     ...externalPosts,
     ...newsPosts,
   ].sort((a, b) => {
@@ -142,23 +346,22 @@ export default async function FeaturedContent({ lang }: { lang: string }) {
     const dateB = 'datetime' in b ? b.datetime : b.publishedAt
     return new Date(dateB).getTime() - new Date(dateA).getTime()
   })
-  
-  const latestArticles = allArticles.slice(0, 5)
-  
-  // 注目プロジェクトを取得
-  const allProjects = await microCMS.listAllProjects()
-  const featuredProjects = allProjects
+
+  const projects = allProjects
     .filter((p) => p.published_at)
     .sort((a, b) => {
       const dateA = a.published_at || ''
       const dateB = b.published_at || ''
       return new Date(dateB).getTime() - new Date(dateA).getTime()
     })
-    .slice(0, 5)
-  
-  // 最新登壇情報を取得
-  const recentEvents = await microCMS.listEndedEvents()
-  const latestEvents = recentEvents.slice(0, 3)
+
+  const events = allEvents.slice(0, 3)
+
+  // Get featured items (most recent)
+  const featuredArticle = articles[0]
+  const featuredProject = projects[0]
+  const otherArticles = articles.slice(1, 4)
+  const otherProjects = projects.slice(1, 4)
 
   const viewAllText = lang === 'ja' ? 'すべて見る' : 'View All'
   const latestArticlesText = lang === 'ja' ? '最新記事' : 'Latest Articles'
@@ -166,69 +369,106 @@ export default async function FeaturedContent({ lang }: { lang: string }) {
   const latestEventsText = lang === 'ja' ? '最新登壇' : 'Latest Speaking'
 
   return (
-    <Container className="mt-24 md:mt-28">
-      <div className="mx-auto grid max-w-xl grid-cols-1 gap-y-20 lg:max-w-none lg:grid-cols-2 lg:gap-x-8 lg:gap-y-32">
-        {/* 最新記事 */}
-        <div className="flex flex-col gap-16">
-          <div className="flex items-center justify-between">
-            <SectionTitle>{latestArticlesText}</SectionTitle>
-            <Link
-              href={lang === 'ja' ? '/ja/writing' : '/writing'}
-              className="text-sm font-medium text-teal-500 hover:text-teal-600 dark:text-teal-400 dark:hover:text-teal-300"
-            >
-              {viewAllText} →
-            </Link>
-          </div>
-          <div className="flex flex-col gap-16">
-            {latestArticles.map((article, index) => (
-              <ArticleCard key={index} article={article} lang={lang} />
-            ))}
-          </div>
-        </div>
+    <section className="relative py-24 sm:py-32">
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-1/4 h-[500px] w-[500px] rounded-full bg-indigo-100/30 blur-3xl dark:bg-indigo-900/10" />
+        <div className="absolute bottom-0 left-1/4 h-[500px] w-[500px] rounded-full bg-purple-100/30 blur-3xl dark:bg-purple-900/10" />
+      </div>
 
-        {/* 右カラム */}
-        <div className="space-y-20 lg:pl-16 xl:pl-24">
-          {/* 注目プロジェクト */}
-          {featuredProjects.length > 0 && (
-            <div className="flex flex-col gap-8">
-              <div className="flex items-center justify-between">
-                <SectionTitle>{featuredProjectsText}</SectionTitle>
+      <Container>
+        <div className="relative space-y-32">
+          {/* Latest Articles Section */}
+          {articles.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-12">
+                <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+                  {latestArticlesText}
+                </h2>
                 <Link
-                  href={lang === 'ja' ? '/ja/work' : '/work'}
-                  className="text-sm font-medium text-teal-500 hover:text-teal-600 dark:text-teal-400 dark:hover:text-teal-300"
+                  href={lang === 'ja' ? '/ja/writing' : '/writing'}
+                  className="group flex items-center gap-1.5 text-sm font-semibold text-indigo-600 transition-all hover:text-indigo-700 hover:gap-2 dark:text-indigo-400 dark:hover:text-indigo-300"
                 >
-                  {viewAllText} →
+                  <span>{viewAllText}</span>
+                  <span className="transition-transform group-hover:translate-x-0.5">→</span>
                 </Link>
               </div>
-              <div className="flex flex-col gap-8">
-                {featuredProjects.map((project) => (
+
+              <div className="grid gap-8 lg:grid-cols-3">
+                {/* Featured Article */}
+                {featuredArticle && (
+                  <div className="lg:col-span-2">
+                    <ArticleCard article={featuredArticle} lang={lang} variant="featured" />
+                  </div>
+                )}
+
+                {/* Other Articles */}
+                <div className="grid gap-6 lg:grid-cols-1">
+                  {otherArticles.map((article, index) => (
+                    <ArticleCard key={index} article={article} lang={lang} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Featured Projects Section */}
+          {projects.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-12">
+                <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+                  {featuredProjectsText}
+                </h2>
+                <Link
+                  href={lang === 'ja' ? '/ja/work' : '/work'}
+                  className="group flex items-center gap-1.5 text-sm font-semibold text-indigo-600 transition-all hover:text-indigo-700 hover:gap-2 dark:text-indigo-400 dark:hover:text-indigo-300"
+                >
+                  <span>{viewAllText}</span>
+                  <span className="transition-transform group-hover:translate-x-0.5">→</span>
+                </Link>
+              </div>
+
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {/* Featured Project - Full width on mobile, spans 2 columns on desktop */}
+                {featuredProject && (
+                  <div className="sm:col-span-2 lg:col-span-2">
+                    <ProjectCard project={featuredProject} lang={lang} variant="featured" />
+                  </div>
+                )}
+
+                {/* Other Projects - Compact cards */}
+                {otherProjects.map((project) => (
                   <ProjectCard key={project.id} project={project} lang={lang} />
                 ))}
               </div>
             </div>
           )}
 
-          {/* 最新登壇情報 */}
-          {latestEvents.length > 0 && (
-            <div className="flex flex-col gap-8">
-              <div className="flex items-center justify-between">
-                <SectionTitle>{latestEventsText}</SectionTitle>
+          {/* Latest Speaking Section */}
+          {events.length > 0 && (
+            <div>
+              <div className="flex items-center justify-between mb-12">
+                <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+                  {latestEventsText}
+                </h2>
                 <Link
                   href={lang === 'ja' ? '/ja/speaking' : '/speaking'}
-                  className="text-sm font-medium text-teal-500 hover:text-teal-600 dark:text-teal-400 dark:hover:text-teal-300"
+                  className="group flex items-center gap-1.5 text-sm font-semibold text-indigo-600 transition-all hover:text-indigo-700 hover:gap-2 dark:text-indigo-400 dark:hover:text-indigo-300"
                 >
-                  {viewAllText} →
+                  <span>{viewAllText}</span>
+                  <span className="transition-transform group-hover:translate-x-0.5">→</span>
                 </Link>
               </div>
-              <div className="flex flex-col gap-8">
-                {latestEvents.map((event) => (
+
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {events.map((event) => (
                   <EventCard key={event.id} event={event} lang={lang} />
                 ))}
               </div>
             </div>
           )}
         </div>
-      </div>
-    </Container>
+      </Container>
+    </section>
   )
 }

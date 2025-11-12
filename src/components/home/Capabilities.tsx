@@ -8,15 +8,15 @@ type Capability = {
 
 function CapabilityCard({ capability }: { capability: Capability }) {
   return (
-    <article className="group relative flex h-full flex-col border-t-4 border-zinc-200 bg-white p-8 transition-shadow hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900">
-      <h3 className="text-xl font-semibold tracking-tight text-zinc-800 dark:text-zinc-100">
+    <article className="group relative flex h-full flex-col rounded-2xl border border-zinc-200 bg-white p-10 transition-all hover:shadow-lg hover:border-indigo-200 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-800">
+      <h3 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
         {capability.title}
       </h3>
-      <p className="mt-4 text-sm leading-6 text-zinc-600 dark:text-zinc-400">{capability.description}</p>
-      <ul className="mt-6 space-y-3 text-sm text-zinc-500 dark:text-zinc-400">
+      <p className="mt-6 text-base leading-relaxed text-slate-700 dark:text-slate-400">{capability.description}</p>
+      <ul className="mt-8 space-y-4 text-sm leading-6 text-slate-600 dark:text-slate-400">
         {capability.highlights.map((highlight) => (
-          <li key={highlight} className="flex items-start gap-3">
-            <span className="mt-1 h-2 w-2 rounded-full bg-teal-500 dark:bg-teal-400" />
+          <li key={highlight} className="flex items-start gap-4">
+            <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-indigo-600 dark:bg-indigo-400" />
             <span>{highlight}</span>
           </li>
         ))}
@@ -106,13 +106,13 @@ export default function Capabilities({ lang }: { lang: string }) {
     <section className="relative py-24 sm:py-32">
       <Container>
         <div className="mx-auto max-w-3xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-4xl">
+          <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
             {sectionTitle}
           </h2>
-          <p className="mt-6 text-base leading-7 text-zinc-600 dark:text-zinc-400">{sectionDescription}</p>
+          <p className="mt-6 text-lg leading-relaxed text-slate-700 dark:text-slate-400">{sectionDescription}</p>
         </div>
 
-        <div className="mt-16 grid gap-8 lg:grid-cols-3">
+        <div className="mt-20 grid gap-10 lg:grid-cols-3 lg:gap-12">
           {capabilities.map((capability) => (
             <CapabilityCard key={capability.title} capability={capability} />
           ))}

@@ -50,7 +50,7 @@ export default function Hero({ lang }: { lang: string }) {
               </p>
             </div>
 
-            <p className="text-lg leading-relaxed text-slate-700 dark:text-slate-400">
+            <p className="text-lg leading-relaxed text-slate-600 dark:text-slate-400">
               {description}
             </p>
 
