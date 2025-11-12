@@ -2,6 +2,7 @@ import BlogPageContent from '@/components/containers/pages/BlogPage'
 import { loadThoughts, loadAllCategories } from '@/libs/dataSources/thoughts'
 import { notFound } from 'next/navigation'
 import { generateBlogListJsonLd } from '@/libs/jsonLd'
+import JsonLd from '@/components/JsonLd'
 
 export const metadata = {
   title: 'Blog',
@@ -27,10 +28,7 @@ export default async function BlogPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
       <BlogPageContent
         lang="en"
         thoughts={result.items}

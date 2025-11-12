@@ -2,6 +2,7 @@ import BlogDetailPageContent from '@/components/containers/pages/BlogDetailPage'
 import { getThoughtBySlug } from '@/libs/dataSources/thoughts'
 import { notFound } from 'next/navigation'
 import { generateBlogPostingJsonLd, generateBlogBreadcrumbJsonLd } from '@/libs/jsonLd'
+import JsonLd from '@/components/JsonLd'
 
 export async function generateMetadata({
   params,
@@ -39,14 +40,8 @@ export default async function BlogDetailPage({
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogPostingJsonLd) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
-      />
+      <JsonLd data={blogPostingJsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
       <BlogDetailPageContent
         thought={thought}
         lang="en"
