@@ -16,8 +16,26 @@ export async function generateMetadata({
     }
   }
 
+  const description = thought.excerpt.rendered
+    .replace(/<[^>]*>/g, '')
+    .substring(0, 160)
+
   return {
     title: thought.title.rendered,
+    description,
+    openGraph: {
+      title: thought.title.rendered,
+      description,
+      type: 'article',
+      publishedTime: thought.date,
+      url: `https://hidetaka.dev/ja/blog/${slug}`,
+      siteName: 'Hidetaka.dev',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: thought.title.rendered,
+      description,
+    },
   }
 }
 

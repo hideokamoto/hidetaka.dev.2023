@@ -15,6 +15,7 @@
     "cf:deploy:production": "npm run cf:build && npx opennextjs-cloudflare deploy --env production"
   },
   "dependencies": {
+    "@vercel/og": "^0.8.5",
     "dayjs": "^1.11.7",
     "fast-xml-parser": "^4.2.4",
     "microcms-js-sdk": "^2.3.2",
