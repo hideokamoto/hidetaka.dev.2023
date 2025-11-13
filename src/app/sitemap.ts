@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 import { MicroCMSAPI } from '@/lib/microCMS/apis'
 import { createMicroCMSClient } from '@/lib/microCMS/client'
-import { loadThoughts } from '@/libs/dataSources/thoughts'
+import { loadAllThoughts } from '@/libs/dataSources/thoughts'
 import { SITE_CONFIG } from '@/config'
 
 type SitemapEntry = {
@@ -78,8 +78,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // ブログ記事（WordPress API、日本語のみ）
   let blogPages: MetadataRoute.Sitemap = []
   try {
-    const thoughtsResult = await loadThoughts(1, 100, 'ja')
-    blogPages = thoughtsResult.items.map((item) => ({
+    const allThoughts = await loadAllThoughts('ja')
+    blogPages = allThoughts.map((item) => ({
       url: `${SITE_CONFIG.url}${item.href}`,
       lastModified: new Date(item.datetime),
       changeFrequency: 'monthly' as const,
@@ -111,8 +111,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let postPages: MetadataRoute.Sitemap = []
   try {
     const [enPosts, jaPosts] = await Promise.all([
-      microCMS.listPosts({ lang: 'english' }),
-      microCMS.listPosts({ lang: 'japanese' }),
+      microCMS.listAllPosts({ lang: 'english' }),
+      microCMS.listAllPosts({ lang: 'japanese' }),
     ])
 
     postPages = [
@@ -132,12 +132,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // イベント
   let eventPages: MetadataRoute.Sitemap = []
   try {
-    const [upcomingEvents, endedEvents] = await Promise.all([
-      microCMS.listUpcomingEvents(),
-      microCMS.listEndedEvents(),
-    ])
-
-    const allEvents = [...upcomingEvents, ...endedEvents]
+    const allEvents = await microCMS.listAllEvents()
     eventPages = allEvents.flatMap((event) => {
       const lastModified = event.updatedAt ? new Date(event.updatedAt) : undefined
       return createEntriesForPaths(['/news', '/ja/news'], event.id, lastModified, 'monthly', 0.6)

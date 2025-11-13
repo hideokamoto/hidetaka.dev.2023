@@ -332,3 +332,38 @@ export const getAdjacentThoughts = async (
   }
 }
 
+/**
+ * すべてのブログ記事を取得（sitemap用）
+ */
+export const loadAllThoughts = async (
+  lang: 'en' | 'ja' = 'en'
+): Promise<BlogItem[]> => {
+  // 英語の記事は存在しないため、英語が指定された場合は即座に空の配列を返す
+  if (lang === 'en') {
+    return []
+  }
+
+  try {
+    const allItems: BlogItem[] = []
+    let currentPage = 1
+    let totalPages = 1
+
+    // 最初のページを取得して総ページ数を確認
+    const firstResult = await loadThoughts(currentPage, 100, lang)
+    allItems.push(...firstResult.items)
+    totalPages = firstResult.totalPages
+
+    // 残りのページを取得
+    while (currentPage < totalPages) {
+      currentPage++
+      const result = await loadThoughts(currentPage, 100, lang)
+      allItems.push(...result.items)
+    }
+
+    return allItems
+  } catch (error) {
+    console.error('Error loading all thoughts:', error)
+    return []
+  }
+}
+
