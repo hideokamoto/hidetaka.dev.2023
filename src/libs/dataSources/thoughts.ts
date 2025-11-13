@@ -272,3 +272,56 @@ export const getThoughtBySlug = async (slug: string, lang: 'en' | 'ja' = 'en'): 
   }
 }
 
+export type AdjacentThoughts = {
+  previous: WPThought | null
+  next: WPThought | null
+}
+
+// 前後の記事を取得
+export const getAdjacentThoughts = async (
+  currentThought: WPThought,
+  lang: 'en' | 'ja' = 'en'
+): Promise<AdjacentThoughts> => {
+  // 英語の記事は存在しないため、英語が指定された場合は即座に空の結果を返す
+  if (lang === 'en') {
+    return {
+      previous: null,
+      next: null,
+    }
+  }
+
+  try {
+    // 前の記事を取得（現在の記事より前の日付で最も新しいもの）
+    const previousPromise = fetch(
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?before=${encodeURIComponent(currentThought.date)}&per_page=1&orderby=date&order=desc&_fields=id,title,slug`
+    ).then(async (response) => {
+      if (!response.ok) return null
+      const thoughts: WPThought[] = await response.json()
+      return thoughts.length > 0 ? thoughts[0] : null
+    }).catch(() => null)
+
+    // 次の記事を取得（現在の記事より後の日付で最も古いもの）
+    const nextPromise = fetch(
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?after=${encodeURIComponent(currentThought.date)}&per_page=1&orderby=date&order=asc&_fields=id,title,slug`
+    ).then(async (response) => {
+      if (!response.ok) return null
+      const thoughts: WPThought[] = await response.json()
+      return thoughts.length > 0 ? thoughts[0] : null
+    }).catch(() => null)
+
+    // 並列で実行
+    const [previous, next] = await Promise.all([previousPromise, nextPromise])
+
+    return {
+      previous,
+      next,
+    }
+  } catch (error) {
+    console.error('Error loading adjacent thoughts:', error)
+    return {
+      previous: null,
+      next: null,
+    }
+  }
+}
+

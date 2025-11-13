@@ -1,5 +1,5 @@
 import BlogDetailPageContent from '@/components/containers/pages/BlogDetailPage'
-import { getThoughtBySlug } from '@/libs/dataSources/thoughts'
+import { getThoughtBySlug, getAdjacentThoughts } from '@/libs/dataSources/thoughts'
 import { notFound } from 'next/navigation'
 
 export async function generateMetadata({
@@ -33,11 +33,16 @@ export default async function BlogDetailPage({
     notFound()
   }
 
+  // 前後の記事を取得
+  const adjacentThoughts = await getAdjacentThoughts(thought, 'ja')
+
   return (
     <BlogDetailPageContent
       thought={thought}
       lang="ja"
       basePath="/ja/blog"
+      previousThought={adjacentThoughts.previous}
+      nextThought={adjacentThoughts.next}
     />
   )
 }

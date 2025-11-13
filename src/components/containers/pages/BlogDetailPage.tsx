@@ -8,15 +8,21 @@ type BlogDetailPageProps = {
   thought: WPThought
   lang: string
   basePath: string
+  previousThought?: WPThought | null
+  nextThought?: WPThought | null
 }
 
 export default function BlogDetailPage({
   thought,
   lang,
   basePath,
+  previousThought,
+  nextThought,
 }: BlogDetailPageProps) {
   const date = new Date(thought.date)
   const blogLabel = lang === 'ja' ? 'ブログ' : 'Blog'
+  const previousLabel = lang === 'ja' ? '前の記事' : 'Previous'
+  const nextLabel = lang === 'ja' ? '次の記事' : 'Next'
 
   return (
     <Container className="mt-16 sm:mt-32">
@@ -95,6 +101,50 @@ export default function BlogDetailPage({
           className="blog-content text-zinc-700 dark:text-zinc-300 leading-relaxed"
           dangerouslySetInnerHTML={{ __html: thought.content.rendered }}
         />
+
+        {/* 前後の記事へのナビゲーション */}
+        {(previousThought || nextThought) && (
+          <nav
+            aria-label="記事ナビゲーション"
+            className="mt-16 pt-8 border-t border-zinc-200 dark:border-zinc-700"
+          >
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {/* 前の記事 */}
+              <div className="flex">
+                {previousThought && (
+                  <Link
+                    href={`${basePath}/${previousThought.slug}`}
+                    className="group flex flex-col w-full p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                  >
+                    <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">
+                      ← {previousLabel}
+                    </span>
+                    <span className="text-base font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2">
+                      {previousThought.title.rendered}
+                    </span>
+                  </Link>
+                )}
+              </div>
+
+              {/* 次の記事 */}
+              <div className="flex">
+                {nextThought && (
+                  <Link
+                    href={`${basePath}/${nextThought.slug}`}
+                    className="group flex flex-col w-full p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors text-right sm:ml-auto"
+                  >
+                    <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">
+                      {nextLabel} →
+                    </span>
+                    <span className="text-base font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2">
+                      {nextThought.title.rendered}
+                    </span>
+                  </Link>
+                )}
+              </div>
+            </div>
+          </nav>
+        )}
       </article>
     </Container>
   )
