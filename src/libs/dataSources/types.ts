@@ -68,6 +68,8 @@ export type WPThought = {
         }
         date: string
         date_gmt: string
+        modified: string
+        modified_gmt: string
         excerpt: {
           rendered: string
         }
