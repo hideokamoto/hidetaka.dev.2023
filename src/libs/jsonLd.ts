@@ -1,8 +1,5 @@
 import type { WPThought, BlogItem } from './dataSources/types'
-
-const SITE_URL = 'https://hidetaka.dev'
-const AUTHOR_NAME = 'Hidetaka Okamoto'
-const SITE_NAME = 'Hidetaka.dev'
+import { SITE_CONFIG } from '@/config'
 
 /**
  * ブログ詳細ページ用のBlogPosting JSON-LDを生成
@@ -12,7 +9,7 @@ export function generateBlogPostingJsonLd(
   lang: string,
   basePath: string
 ) {
-  const fullUrl = `${SITE_URL}${basePath}/${thought.slug}`
+  const fullUrl = `${SITE_CONFIG.url}${basePath}/${thought.slug}`
 
   // HTMLタグを除去してプレーンテキストに変換
   const stripHtml = (html: string) => {
@@ -34,16 +31,16 @@ export function generateBlogPostingJsonLd(
     description: description,
     url: fullUrl,
     datePublished: thought.date,
-    dateModified: thought.date,
+    dateModified: thought.modified,
     author: {
       '@type': 'Person',
-      name: AUTHOR_NAME,
-      url: SITE_URL,
+      name: SITE_CONFIG.author.name,
+      url: SITE_CONFIG.url,
     },
     publisher: {
-      '@type': 'Person',
-      name: AUTHOR_NAME,
-      url: SITE_URL,
+      '@type': 'Organization',
+      name: SITE_CONFIG.name,
+      url: SITE_CONFIG.url,
     },
     mainEntityOfPage: {
       '@type': 'WebPage',
@@ -68,8 +65,8 @@ export function generateBlogBreadcrumbJsonLd(
   basePath: string
 ) {
   const blogLabel = lang === 'ja' ? 'ブログ' : 'Blog'
-  const fullUrl = `${SITE_URL}${basePath}/${thought.slug}`
-  const blogUrl = `${SITE_URL}${basePath}`
+  const fullUrl = `${SITE_CONFIG.url}${basePath}/${thought.slug}`
+  const blogUrl = `${SITE_CONFIG.url}${basePath}`
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -122,13 +119,13 @@ export function generateBlogListJsonLd(
 
   const fullUrl =
     currentPage > 1
-      ? `${SITE_URL}${basePath}/page/${currentPage}`
-      : `${SITE_URL}${basePath}`
+      ? `${SITE_CONFIG.url}${basePath}/page/${currentPage}`
+      : `${SITE_CONFIG.url}${basePath}`
 
   const itemListElements = thoughts.map((item, index) => ({
     '@type': 'ListItem' as const,
     position: index + 1,
-    url: `${SITE_URL}${item.href}`,
+    url: `${SITE_CONFIG.url}${item.href}`,
     name: item.title,
   }))
 
@@ -141,8 +138,8 @@ export function generateBlogListJsonLd(
     inLanguage: lang === 'ja' ? 'ja-JP' : 'en-US',
     isPartOf: {
       '@type': 'WebSite',
-      name: SITE_NAME,
-      url: SITE_URL,
+      name: SITE_CONFIG.name,
+      url: SITE_CONFIG.url,
     },
     mainEntity: {
       '@type': 'ItemList',
