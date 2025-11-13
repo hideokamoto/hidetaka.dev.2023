@@ -82,7 +82,14 @@
 }
 
 .blog-content img {
-  @apply rounded-lg my-6 max-w-full h-auto;
+  @apply block rounded-lg my-6 max-w-full h-auto w-auto;
+}
+
+.blog-content iframe,
+.blog-content embed,
+.blog-content object,
+.blog-content video {
+  @apply my-6 max-w-full h-auto;
 }
 
 .blog-content hr {

@@ -1,6 +1,8 @@
 import BlogPageContent from '@/components/containers/pages/BlogPage'
 import { loadThoughts, loadAllCategories } from '@/libs/dataSources/thoughts'
 import { notFound } from 'next/navigation'
+import { generateBlogListJsonLd } from '@/libs/jsonLd'
+import JsonLd from '@/components/JsonLd'
 
 export const metadata = {
   title: 'ブログ',
@@ -27,15 +29,26 @@ export default async function BlogPageNumber({
     notFound()
   }
 
+  const jsonLd = generateBlogListJsonLd(
+    result.items,
+    'ja',
+    '/ja/blog',
+    result.currentPage,
+    result.totalPages
+  )
+
   return (
-    <BlogPageContent
-      lang="ja"
-      thoughts={result.items}
-      currentPage={result.currentPage}
-      totalPages={result.totalPages}
-      basePath="/ja/blog"
-      categories={categories}
-    />
+    <>
+      <JsonLd data={jsonLd} />
+      <BlogPageContent
+        lang="ja"
+        thoughts={result.items}
+        currentPage={result.currentPage}
+        totalPages={result.totalPages}
+        basePath="/ja/blog"
+        categories={categories}
+      />
+    </>
   )
 }
 
