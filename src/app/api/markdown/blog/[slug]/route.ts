@@ -9,16 +9,19 @@ export async function GET(
   try {
     const { slug } = await params
 
-    // URLから言語を判定（/ja/blog か /blog か）
-    const url = new URL(request.url)
-    const isJapanese = url.searchParams.get('lang') === 'ja'
-    const lang = isJapanese ? 'ja' : 'en'
+    // middlewareから渡されたカスタムヘッダーから言語を判定
+    const blogLang = request.headers.get('x-blog-lang')
+    const lang = blogLang === 'ja' ? 'ja' : 'en'
 
     console.log('[Markdown API] Request:', {
       slug,
       lang,
+      blogLang,
       url: request.url,
-      searchParams: Object.fromEntries(url.searchParams),
+      headers: {
+        'x-blog-lang': request.headers.get('x-blog-lang'),
+        'Accept': request.headers.get('Accept'),
+      },
     })
 
     const thought = await getThoughtBySlug(slug, lang)

@@ -61,8 +61,9 @@ export function middleware(request: NextRequest) {
       const slug = blogMatch[1]
       const url = request.nextUrl.clone()
       url.pathname = `/api/markdown/blog/${slug}`
-      url.searchParams.set('lang', 'en')
-      return NextResponse.rewrite(url)
+      const response = NextResponse.rewrite(url)
+      response.headers.set('x-blog-lang', 'en')
+      return response
     }
 
     // /ja/blog/[slug] のパターン
@@ -71,8 +72,9 @@ export function middleware(request: NextRequest) {
       const slug = jaBlogMatch[1]
       const url = request.nextUrl.clone()
       url.pathname = `/api/markdown/blog/${slug}`
-      url.searchParams.set('lang', 'ja')
-      return NextResponse.rewrite(url)
+      const response = NextResponse.rewrite(url)
+      response.headers.set('x-blog-lang', 'ja')
+      return response
     }
   }
 
