@@ -1,6 +1,6 @@
 import { getThoughtBySlug } from '@/libs/dataSources/thoughts'
 import { convertThoughtToMarkdown } from '@/libs/markdown/htmlToMarkdown'
-import { notFound } from 'next/navigation'
+import { NextResponse } from 'next/server'
 
 export async function GET(
   request: Request,
@@ -22,7 +22,7 @@ export async function GET(
 
   if (!thought) {
     console.log('[Markdown API] Thought not found:', slug)
-    notFound()
+    return new Response('Not Found', { status: 404 })
   }
 
   console.log('[Markdown API] Converting to markdown:', thought.title.rendered)
