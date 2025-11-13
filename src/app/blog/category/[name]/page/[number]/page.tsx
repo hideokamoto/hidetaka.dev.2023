@@ -1,6 +1,8 @@
 import BlogPageContent from '@/components/containers/pages/BlogPage'
 import { loadThoughtsByCategory, loadAllCategories } from '@/libs/dataSources/thoughts'
 import { notFound } from 'next/navigation'
+import { generateBlogListJsonLd } from '@/libs/jsonLd'
+import JsonLd from '@/components/JsonLd'
 
 export const metadata = {
   title: 'Blog Category',
@@ -35,17 +37,30 @@ export default async function BlogCategoryPageNumber({
 
   // basePathにはエンコードされたslugを使用（Next.jsのparamsはデコード済みなので再エンコード）
   const encodedSlug = encodeURIComponent(decodedName)
+  const basePath = `/blog/category/${encodedSlug}`
+
+  const jsonLd = generateBlogListJsonLd(
+    result.items,
+    'en',
+    basePath,
+    result.currentPage,
+    result.totalPages,
+    categoryName
+  )
 
   return (
-    <BlogPageContent
-      lang="en"
-      thoughts={result.items}
-      currentPage={result.currentPage}
-      totalPages={result.totalPages}
-      basePath={`/blog/category/${encodedSlug}`}
-      categoryName={categoryName}
-      categories={categories}
-    />
+    <>
+      <JsonLd data={jsonLd} />
+      <BlogPageContent
+        lang="en"
+        thoughts={result.items}
+        currentPage={result.currentPage}
+        totalPages={result.totalPages}
+        basePath={basePath}
+        categoryName={categoryName}
+        categories={categories}
+      />
+    </>
   )
 }
 
