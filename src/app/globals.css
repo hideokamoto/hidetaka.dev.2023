@@ -82,7 +82,7 @@
 }
 
 .blog-content img {
-  @apply rounded-lg my-6 max-w-full h-auto;
+  @apply block rounded-lg my-6 max-w-full h-auto w-auto;
 }
 
 .blog-content hr {
