@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const acceptHeader = request.headers.get('Accept')
 
   // /ja-JP/* を /ja/* にリダイレクト
   if (pathname.startsWith('/ja-JP')) {
@@ -50,6 +51,29 @@ export function middleware(request: NextRequest) {
   if (pathname === '/ja/news' || pathname.startsWith('/ja/news/')) {
     const newPath = pathname.replace('/ja/news', '/ja/writing')
     return NextResponse.redirect(new URL(newPath, request.url))
+  }
+
+  // Acceptヘッダーにtext/markdownが含まれる場合、ブログ記事をMarkdown APIにリライト
+  if (acceptHeader?.includes('text/markdown')) {
+    // /blog/[slug] のパターン
+    const blogMatch = pathname.match(/^\/blog\/([^/]+)$/)
+    if (blogMatch) {
+      const slug = blogMatch[1]
+      const url = request.nextUrl.clone()
+      url.pathname = `/api/markdown/blog/${slug}`
+      url.searchParams.set('lang', 'en')
+      return NextResponse.rewrite(url)
+    }
+
+    // /ja/blog/[slug] のパターン
+    const jaBlogMatch = pathname.match(/^\/ja\/blog\/([^/]+)$/)
+    if (jaBlogMatch) {
+      const slug = jaBlogMatch[1]
+      const url = request.nextUrl.clone()
+      url.pathname = `/api/markdown/blog/${slug}`
+      url.searchParams.set('lang', 'ja')
+      return NextResponse.rewrite(url)
+    }
   }
 
   return NextResponse.next()
