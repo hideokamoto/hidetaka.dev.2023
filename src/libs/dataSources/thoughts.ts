@@ -277,6 +277,22 @@ export type AdjacentThoughts = {
   next: WPThought | null
 }
 
+// WordPress APIから記事を取得するヘルパー関数
+const fetchThought = async (url: string): Promise<WPThought | null> => {
+  try {
+    const response = await fetch(url)
+    if (!response.ok) {
+      console.error(`Failed to fetch thought: ${response.status}`)
+      return null
+    }
+    const thoughts: WPThought[] = await response.json()
+    return thoughts.length > 0 ? thoughts[0] : null
+  } catch (error) {
+    console.error('Error fetching thought:', error)
+    return null
+  }
+}
+
 // 前後の記事を取得
 export const getAdjacentThoughts = async (
   currentThought: WPThought,
@@ -292,25 +308,16 @@ export const getAdjacentThoughts = async (
 
   try {
     // 前の記事を取得（現在の記事より前の日付で最も新しいもの）
-    const previousPromise = fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?before=${encodeURIComponent(currentThought.date)}&per_page=1&orderby=date&order=desc&_fields=id,title,slug`
-    ).then(async (response) => {
-      if (!response.ok) return null
-      const thoughts: WPThought[] = await response.json()
-      return thoughts.length > 0 ? thoughts[0] : null
-    }).catch(() => null)
+    const previousUrl = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?before=${encodeURIComponent(currentThought.date)}&per_page=1&orderby=date&order=desc&_fields=id,title,slug`
 
     // 次の記事を取得（現在の記事より後の日付で最も古いもの）
-    const nextPromise = fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?after=${encodeURIComponent(currentThought.date)}&per_page=1&orderby=date&order=asc&_fields=id,title,slug`
-    ).then(async (response) => {
-      if (!response.ok) return null
-      const thoughts: WPThought[] = await response.json()
-      return thoughts.length > 0 ? thoughts[0] : null
-    }).catch(() => null)
+    const nextUrl = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?after=${encodeURIComponent(currentThought.date)}&per_page=1&orderby=date&order=asc&_fields=id,title,slug`
 
     // 並列で実行
-    const [previous, next] = await Promise.all([previousPromise, nextPromise])
+    const [previous, next] = await Promise.all([
+      fetchThought(previousUrl),
+      fetchThought(nextUrl),
+    ])
 
     return {
       previous,
