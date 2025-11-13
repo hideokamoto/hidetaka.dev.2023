@@ -12,11 +12,20 @@ export async function GET(
   const url = new URL(request.url)
   const isJapanese = url.searchParams.get('lang') === 'ja'
 
+  console.log('[Markdown API] Request:', {
+    slug,
+    lang: isJapanese ? 'ja' : 'en',
+    url: request.url,
+  })
+
   const thought = await getThoughtBySlug(slug, isJapanese ? 'ja' : 'en')
 
   if (!thought) {
+    console.log('[Markdown API] Thought not found:', slug)
     notFound()
   }
+
+  console.log('[Markdown API] Converting to markdown:', thought.title.rendered)
 
   const markdown = convertThoughtToMarkdown(thought)
 
