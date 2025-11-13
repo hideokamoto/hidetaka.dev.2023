@@ -1,5 +1,6 @@
 import BlogDetailPageContent from '@/components/containers/pages/BlogDetailPage'
 import { getThoughtBySlug, getAdjacentThoughts } from '@/libs/dataSources/thoughts'
+import { generateBlogPostMetadata } from '@/libs/metadata'
 import { notFound } from 'next/navigation'
 import { generateBlogPostingJsonLd, generateBlogBreadcrumbJsonLd } from '@/libs/jsonLd'
 import JsonLd from '@/components/JsonLd'
@@ -18,9 +19,7 @@ export async function generateMetadata({
     }
   }
 
-  return {
-    title: thought.title.rendered,
-  }
+  return generateBlogPostMetadata(thought)
 }
 
 export default async function BlogDetailPage({
