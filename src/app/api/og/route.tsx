@@ -7,7 +7,28 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const title = searchParams.get('title') || 'Blog Post'
-    const date = searchParams.get('date')
+    const dateParam = searchParams.get('date')
+
+    // Validate and format date
+    let formattedDate = ''
+    if (dateParam) {
+      const parsedDate = new Date(dateParam)
+      if (!isNaN(parsedDate.getTime())) {
+        formattedDate = parsedDate.toLocaleDateString('ja-JP', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })
+      }
+    }
+
+    // Fetch Noto Sans JP font from Google Fonts
+    const fontData = await fetch(
+      'https://fonts.gstatic.com/s/notosansjp/v53/-F6jfjtqLzI2JPCgQBnw7HFyzSD-AsregP8VFBEi75vY0rw-oME.woff',
+      {
+        cache: 'force-cache',
+      }
+    ).then((res) => res.arrayBuffer())
 
     return new ImageResponse(
       (
@@ -38,22 +59,20 @@ export async function GET(request: NextRequest) {
                 lineHeight: 1.2,
                 marginBottom: '20px',
                 maxWidth: '1000px',
+                fontFamily: '"Noto Sans JP"',
               }}
             >
               {title}
             </h1>
-            {date && (
+            {formattedDate && (
               <p
                 style={{
                   fontSize: '32px',
                   color: '#a0a0a0',
+                  fontFamily: '"Noto Sans JP"',
                 }}
               >
-                {new Date(date).toLocaleDateString('ja-JP', {
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
+                {formattedDate}
               </p>
             )}
           </div>
@@ -70,6 +89,7 @@ export async function GET(request: NextRequest) {
                 fontSize: '36px',
                 color: '#ffffff',
                 fontWeight: 'bold',
+                fontFamily: '"Noto Sans JP"',
               }}
             >
               hidetaka.dev
@@ -88,6 +108,14 @@ export async function GET(request: NextRequest) {
       {
         width: 1200,
         height: 630,
+        fonts: [
+          {
+            name: 'Noto Sans JP',
+            data: fontData,
+            style: 'normal',
+            weight: 700,
+          },
+        ],
       }
     )
   } catch (error) {
