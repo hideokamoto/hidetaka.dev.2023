@@ -2,8 +2,32 @@ import { MetadataRoute } from 'next'
 import { MicroCMSAPI } from '@/lib/microCMS/apis'
 import { createMicroCMSClient } from '@/lib/microCMS/client'
 import { loadThoughts } from '@/libs/dataSources/thoughts'
+import { SITE_CONFIG } from '@/config'
 
-const SITE_URL = 'https://hidetaka.dev'
+type SitemapEntry = {
+  url: string
+  lastModified?: Date
+  changeFrequency?: 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never'
+  priority?: number
+}
+
+/**
+ * 複数のベースパスに対して同じコンテンツのsitemapエントリを生成するヘルパー関数
+ */
+const createEntriesForPaths = (
+  basePaths: string[],
+  id: string,
+  lastModified?: Date,
+  changeFrequency: SitemapEntry['changeFrequency'] = 'monthly',
+  priority: number = 0.7
+): SitemapEntry[] => {
+  return basePaths.map((basePath) => ({
+    url: `${SITE_CONFIG.url}${basePath}/${id}`,
+    lastModified,
+    changeFrequency,
+    priority,
+  }))
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const microCMS = new MicroCMSAPI(createMicroCMSClient())
@@ -37,16 +61,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]
 
   // 静的ページのsitemapエントリ
+  // lastModifiedは省略（ビルドごとに日付が変わらないようにする）
   const staticPages: MetadataRoute.Sitemap = [
     ...staticRoutes.map((route) => ({
-      url: `${SITE_URL}${route}`,
-      lastModified: new Date(),
+      url: `${SITE_CONFIG.url}${route}`,
       changeFrequency: 'weekly' as const,
       priority: route === '' ? 1 : 0.8,
     })),
     ...jaStaticRoutes.map((route) => ({
-      url: `${SITE_URL}${route}`,
-      lastModified: new Date(),
+      url: `${SITE_CONFIG.url}${route}`,
       changeFrequency: 'weekly' as const,
       priority: route === '/ja' ? 1 : 0.8,
     })),
@@ -57,7 +80,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     const thoughtsResult = await loadThoughts(1, 100, 'ja')
     blogPages = thoughtsResult.items.map((item) => ({
-      url: `${SITE_URL}${item.href}`,
+      url: `${SITE_CONFIG.url}${item.href}`,
       lastModified: new Date(item.datetime),
       changeFrequency: 'monthly' as const,
       priority: 0.7,
@@ -70,32 +93,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let projectPages: MetadataRoute.Sitemap = []
   try {
     const projects = await microCMS.listAllProjects()
-    projectPages = projects.flatMap((project) => [
-      {
-        url: `${SITE_URL}/projects/${project.id}`,
-        lastModified: project.updatedAt ? new Date(project.updatedAt) : new Date(),
-        changeFrequency: 'monthly' as const,
-        priority: 0.7,
-      },
-      {
-        url: `${SITE_URL}/ja/projects/${project.id}`,
-        lastModified: project.updatedAt ? new Date(project.updatedAt) : new Date(),
-        changeFrequency: 'monthly' as const,
-        priority: 0.7,
-      },
-      {
-        url: `${SITE_URL}/work/${project.id}`,
-        lastModified: project.updatedAt ? new Date(project.updatedAt) : new Date(),
-        changeFrequency: 'monthly' as const,
-        priority: 0.7,
-      },
-      {
-        url: `${SITE_URL}/ja/work/${project.id}`,
-        lastModified: project.updatedAt ? new Date(project.updatedAt) : new Date(),
-        changeFrequency: 'monthly' as const,
-        priority: 0.7,
-      },
-    ])
+    projectPages = projects.flatMap((project) => {
+      const lastModified = project.updatedAt ? new Date(project.updatedAt) : undefined
+      return createEntriesForPaths(
+        ['/projects', '/ja/projects', '/work', '/ja/work'],
+        project.id,
+        lastModified,
+        'monthly',
+        0.7
+      )
+    })
   } catch (error) {
     console.error('Error loading projects for sitemap:', error)
   }
@@ -109,18 +116,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ])
 
     postPages = [
-      ...enPosts.map((post) => ({
-        url: `${SITE_URL}/writing/${post.id}`,
-        lastModified: post.updatedAt ? new Date(post.updatedAt) : new Date(),
-        changeFrequency: 'monthly' as const,
-        priority: 0.7,
-      })),
-      ...jaPosts.map((post) => ({
-        url: `${SITE_URL}/ja/writing/${post.id}`,
-        lastModified: post.updatedAt ? new Date(post.updatedAt) : new Date(),
-        changeFrequency: 'monthly' as const,
-        priority: 0.7,
-      })),
+      ...enPosts.flatMap((post) => {
+        const lastModified = post.updatedAt ? new Date(post.updatedAt) : undefined
+        return createEntriesForPaths(['/writing'], post.id, lastModified, 'monthly', 0.7)
+      }),
+      ...jaPosts.flatMap((post) => {
+        const lastModified = post.updatedAt ? new Date(post.updatedAt) : undefined
+        return createEntriesForPaths(['/ja/writing'], post.id, lastModified, 'monthly', 0.7)
+      }),
     ]
   } catch (error) {
     console.error('Error loading posts for sitemap:', error)
@@ -135,20 +138,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ])
 
     const allEvents = [...upcomingEvents, ...endedEvents]
-    eventPages = allEvents.flatMap((event) => [
-      {
-        url: `${SITE_URL}/news/${event.id}`,
-        lastModified: event.updatedAt ? new Date(event.updatedAt) : new Date(),
-        changeFrequency: 'monthly' as const,
-        priority: 0.6,
-      },
-      {
-        url: `${SITE_URL}/ja/news/${event.id}`,
-        lastModified: event.updatedAt ? new Date(event.updatedAt) : new Date(),
-        changeFrequency: 'monthly' as const,
-        priority: 0.6,
-      },
-    ])
+    eventPages = allEvents.flatMap((event) => {
+      const lastModified = event.updatedAt ? new Date(event.updatedAt) : undefined
+      return createEntriesForPaths(['/news', '/ja/news'], event.id, lastModified, 'monthly', 0.6)
+    })
   } catch (error) {
     console.error('Error loading events for sitemap:', error)
   }
