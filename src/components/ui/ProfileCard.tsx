@@ -1,3 +1,4 @@
+import { ReactNode } from 'react'
 import ProfileImage from './ProfileImage'
 import Profile from '../content/Profile'
 import TwitterIcon from '../tailwindui/SocialIcons/Twitter'
@@ -57,7 +58,7 @@ function SocialLink({
   ariaLabel,
 }: {
   href: string
-  icon: ({ className }: { className?: string }) => JSX.Element
+  icon: ({ className }: { className?: string }) => ReactNode
   label: string
   ariaLabel: string
 }) {
