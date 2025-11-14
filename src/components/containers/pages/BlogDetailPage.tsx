@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import Tag from '@/components/ui/Tag'
@@ -23,6 +24,11 @@ export default function BlogDetailPage({
   const blogLabel = lang === 'ja' ? 'ブログ' : 'Blog'
   const previousLabel = lang === 'ja' ? '前の記事' : 'Previous'
   const nextLabel = lang === 'ja' ? '次の記事' : 'Next'
+
+  // OG画像のURLを生成
+  const ogImageUrl = `/api/thumbnail/thoughts/${thought.id}`
+  const OG_IMAGE_WIDTH = 1200
+  const OG_IMAGE_HEIGHT = 630
 
   return (
     <Container className="mt-16 sm:mt-32">
@@ -57,6 +63,18 @@ export default function BlogDetailPage({
             </li>
           </ol>
         </nav>
+
+        {/* サムネイル画像 (OG画像) */}
+        <div className="mb-8 overflow-hidden rounded-lg">
+          <Image
+            src={ogImageUrl}
+            alt={thought.title.rendered}
+            width={OG_IMAGE_WIDTH}
+            height={OG_IMAGE_HEIGHT}
+            className="w-full h-auto"
+            priority
+          />
+        </div>
 
         {/* タイトル */}
         <header className="mb-6">
