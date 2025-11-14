@@ -11,10 +11,10 @@
     "cf:preview": "npm run cf:build && npx wrangler dev",
     "cf:dev": "npm run cf:build && npx opennextjs-cloudflare preview",
     "cf:deploy": "npm run cf:build && npx opennextjs-cloudflare deploy",
-    "cf:deploy:branch": "npm run cf:build && npx wrangler versions deploy -y"
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
   "dependencies": {
-    "@vercel/og": "^0.6.3",
+    "@opennextjs/cloudflare": "^1.12.0",
     "dayjs": "^1.11.7",
     "fast-xml-parser": "^4.2.4",
     "microcms-js-sdk": "^2.3.2",
@@ -23,7 +23,6 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
-    "@opennextjs/cloudflare": "^1.12.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
