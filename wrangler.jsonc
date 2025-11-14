@@ -36,6 +36,15 @@
         "class_name": "DOQueueHandler"
       }
     ]
-  }
+  },
+  // Durable Objects migrations
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_classes": [
+        "DOQueueHandler"
+      ]
+    }
+  ]
 }
 
