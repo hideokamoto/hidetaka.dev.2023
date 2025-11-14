@@ -1,6 +1,6 @@
-import { MicroCMSAPI } from '@/lib/microCMS/apis'
-import { createMicroCMSClient } from '@/lib/microCMS/client'
-import { sortByEventDate } from '@/lib/microCMS/utils'
+import { MicroCMSAPI } from '@/libs/microCMS/apis'
+import { createMicroCMSClient } from '@/libs/microCMS/client'
+import { sortByEventDate } from '@/libs/microCMS/utils'
 import BriefcaseIcon from '@/components/tailwindui/Icons/BriefcaseIcon'
 
 export default async function Resume() {

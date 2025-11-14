@@ -1,6 +1,6 @@
 import WorkPageContent from '@/components/containers/pages/WorkPage'
-import { MicroCMSAPI } from '@/lib/microCMS/apis'
-import { createMicroCMSClient } from '@/lib/microCMS/client'
+import { MicroCMSAPI } from '@/libs/microCMS/apis'
+import { createMicroCMSClient } from '@/libs/microCMS/client'
 import { listMyNPMPackages } from '@/libs/dataSources/npmjs'
 import { listMyWordPressPlugins } from '@/libs/dataSources/wporg'
 

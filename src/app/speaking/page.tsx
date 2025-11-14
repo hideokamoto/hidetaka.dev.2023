@@ -1,6 +1,6 @@
 import SpeakingPageContent from '@/components/containers/pages/SpeakingPage'
-import { MicroCMSAPI } from '@/lib/microCMS/apis'
-import { createMicroCMSClient } from '@/lib/microCMS/client'
+import { MicroCMSAPI } from '@/libs/microCMS/apis'
+import { createMicroCMSClient } from '@/libs/microCMS/client'
 
 export const metadata = {
   title: 'Speaking',
