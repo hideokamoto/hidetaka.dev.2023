@@ -2,12 +2,12 @@ import type { Metadata } from 'next'
 import type { WPThought } from './dataSources/types'
 
 export function generateBlogPostMetadata(thought: WPThought): Metadata {
+  // セキュリティ強化: post_idからWordPress APIで記事を取得してタイトルを使用
+  // これにより、任意の文字列で画像を生成することを防止
   const ogImageUrl = new URL(
-    '/api/og',
+    `/api/thumbnail/thoughts/${thought.id}`,
     process.env.NEXT_PUBLIC_SITE_URL || 'https://hidetaka.dev'
   )
-  ogImageUrl.searchParams.set('title', thought.title.rendered)
-  ogImageUrl.searchParams.set('date', thought.date)
 
   return {
     title: thought.title.rendered,

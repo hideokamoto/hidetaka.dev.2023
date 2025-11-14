@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server'
 import { SITE_CONFIG } from '@/config'
+import type { WPThought } from '@/libs/dataSources/types'
 
 // @see https://opennext.js.org/cloudflare/get-started#9-remove-any-export-const-runtime--edge-if-present
 // export const runtime = 'edge'
@@ -25,14 +26,52 @@ async function getCloudflareContext(options: { async: true } | { async?: false }
   }
 }
 
-export async function GET(request: NextRequest) {
+/**
+ * WordPressのthoughts投稿タイプ用のサムネイル画像生成API
+ * 
+ * セキュリティ: post_idからWordPress APIで記事を取得し、存在する記事のタイトルのみを使用
+ * これにより、任意の文字列で画像を生成することを防止
+ * 
+ * 将来的に他のコンテンツタイプ用のルートを追加する場合:
+ * - /api/thumbnail/posts/[id]/route.tsx - MicroCMSのposts用
+ * - /api/thumbnail/projects/[id]/route.tsx - MicroCMSのprojects用
+ * - /api/thumbnail/events/[id]/route.tsx - MicroCMSのevents用
+ */
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const { searchParams } = new URL(request.url)
-    const title = searchParams.get('title') || 'Blog Post'
-    console.log('title', title)
-    // dateパラメータは受け取るが新しいWorkerには渡さない（保持のみ）
-    const dateParam = searchParams.get('date')
-    console.log('dateParam', dateParam)
+    const { id } = await params
+    const postId = parseInt(id, 10)
+
+    // IDが有効な数値でない場合は404を返す
+    if (isNaN(postId) || postId <= 0) {
+      return new Response('Invalid post ID', { status: 404 })
+    }
+
+    // WordPress REST APIから記事を取得
+    const wpResponse = await fetch(
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs/${postId}?_fields=id,title`
+    )
+
+    if (!wpResponse.ok) {
+      if (wpResponse.status === 404) {
+        return new Response('Post not found', { status: 404 })
+      }
+      console.error('WordPress API error:', wpResponse.status, wpResponse.statusText)
+      return new Response('Failed to fetch post', { status: wpResponse.status })
+    }
+
+    const thought: WPThought = await wpResponse.json()
+
+    // タイトルが存在しない場合はエラー
+    if (!thought.title?.rendered) {
+      return new Response('Post title not found', { status: 500 })
+    }
+
+    const title = thought.title.rendered
+    console.log('Generating thumbnail for post:', postId, 'title:', title)
 
     // OpenNextのCloudflareアダプターでは、getCloudflareContext()経由でbindingsにアクセス
     // async: trueを指定することで、SSGや開発環境でも動作する
@@ -74,7 +113,8 @@ export async function GET(request: NextRequest) {
     // 新しいWorkerからのレスポンスをそのまま返す
     return response
   } catch (error) {
-    console.error('Error generating OG image:', error)
+    console.error('Error generating thumbnail image:', error)
     return new Response('Failed to generate image', { status: 500 })
   }
 }
+
