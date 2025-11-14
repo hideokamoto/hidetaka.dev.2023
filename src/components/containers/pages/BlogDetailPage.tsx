@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import Tag from '@/components/ui/Tag'
+import ProfileCard from '@/components/ui/ProfileCard'
 import type { WPThought } from '@/libs/dataSources/types'
 
 type BlogDetailPageProps = {
@@ -119,6 +120,9 @@ export default function BlogDetailPage({
           className="blog-content text-zinc-700 dark:text-zinc-300 leading-relaxed"
           dangerouslySetInnerHTML={{ __html: thought.content.rendered }}
         />
+
+        {/* プロフィールカード */}
+        <ProfileCard lang={lang} imageSrc="/images/profile.jpg" className="mt-12" />
 
         {/* 前後の記事へのナビゲーション */}
         {(previousThought || nextThought) && (

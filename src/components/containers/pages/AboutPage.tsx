@@ -5,21 +5,8 @@ import SectionHeader from '@/components/ui/SectionHeader'
 import ProfileImage from '@/components/ui/ProfileImage'
 import BackgroundDecoration from '@/components/ui/BackgroundDecoration'
 import SocialLink, { TwitterIcon, GitHubIcon, LinkedInIcon } from '@/components/tailwindui/SocialLink'
-
-function Profile({ lang }: { lang: string }) {
-  if (lang.startsWith('ja')) {
-    return (
-      <>
-        DigitalCubeのBizDev。EC ASPの開発やStripeのDeveloper Advocateとしての経験を元に、SaaSやECサイトの収益を増やすための方法・生成AIを使った効率化や新しい事業モデルの模索などに挑戦する。
-      </>
-    )
-  }
-  return (
-    <>
-      I&apos;m a Business Development professional at DigitalCube. Based on my experience in EC ASP development and as a Developer Advocate at Stripe, I&apos;m working on methods to increase revenue for SaaS and EC sites, exploring efficiency improvements using generative AI, and developing new business models.
-    </>
-  )
-}
+import Profile from '@/components/content/Profile'
+import { SITE_CONFIG } from '@/config'
 
 function SpeakerProfile({ lang }: { lang: string }) {
   if (lang.startsWith('ja')) {
@@ -295,24 +282,24 @@ export default function AboutPageContent({ lang }: { lang: string }) {
 
           <div className="mt-16 flex justify-center">
             <ul role="list" className="space-y-6">
-              <SocialLink 
-                href="https://twitter.com/hidetaka_dev" 
+              <SocialLink
+                href={SITE_CONFIG.social.twitter.url}
                 icon={TwitterIcon}
-                aria-label="Follow on Twitter"
+                aria-label={SITE_CONFIG.social.twitter.ariaLabel}
               >
                 {isJa ? 'Twitterでフォロー' : 'Follow on Twitter'}
               </SocialLink>
-              <SocialLink 
-                href="https://github.com/hideokamoto" 
+              <SocialLink
+                href={SITE_CONFIG.social.github.url}
                 icon={GitHubIcon}
-                aria-label="Follow on GitHub"
+                aria-label={SITE_CONFIG.social.github.ariaLabel}
               >
                 {isJa ? 'GitHubでフォロー' : 'Follow on GitHub'}
               </SocialLink>
-              <SocialLink 
-                href="https://www.linkedin.com/in/hideokamoto/" 
+              <SocialLink
+                href={SITE_CONFIG.social.linkedin.url}
                 icon={LinkedInIcon}
-                aria-label="Follow on LinkedIn"
+                aria-label={SITE_CONFIG.social.linkedin.ariaLabel}
               >
                 {isJa ? 'LinkedInでフォロー' : 'Follow on LinkedIn'}
               </SocialLink>

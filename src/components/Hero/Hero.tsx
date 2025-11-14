@@ -6,9 +6,10 @@ import Badge from '@/components/ui/Badge'
 import CTAButton from '@/components/ui/CTAButton'
 import ProfileImage from '@/components/ui/ProfileImage'
 import BackgroundDecoration from '@/components/ui/BackgroundDecoration'
+import { SITE_CONFIG } from '@/config'
 
 export default function Hero({ lang }: { lang: string }) {
-  const name = 'Hidetaka Okamoto'
+  const name = SITE_CONFIG.author.name
   const role = lang === 'ja' ? '開発者' : 'Developer'
   const tagline = lang === 'ja'
     ? 'SaaSの収益を最大化するエンジニアリング'
@@ -49,25 +50,25 @@ export default function Hero({ lang }: { lang: string }) {
               </CTAButton>
               <div className="flex items-center gap-5">
                 <SocialLink
-                  href="https://twitter.com/hidetaka_dev"
-                  aria-label="Follow on Twitter"
+                  href={SITE_CONFIG.social.twitter.url}
+                  aria-label={SITE_CONFIG.social.twitter.ariaLabel}
                   icon={TwitterIcon}
                 >
-                  <span className="sr-only">Follow on Twitter</span>
+                  <span className="sr-only">{SITE_CONFIG.social.twitter.ariaLabel}</span>
                 </SocialLink>
                 <SocialLink
-                  href="https://github.com/hideokamoto"
-                  aria-label="Follow on GitHub"
+                  href={SITE_CONFIG.social.github.url}
+                  aria-label={SITE_CONFIG.social.github.ariaLabel}
                   icon={GitHubIcon}
                 >
-                  <span className="sr-only">Follow on GitHub</span>
+                  <span className="sr-only">{SITE_CONFIG.social.github.ariaLabel}</span>
                 </SocialLink>
                 <SocialLink
-                  href="https://www.linkedin.com/in/hideokamoto/"
-                  aria-label="Follow on LinkedIn"
+                  href={SITE_CONFIG.social.linkedin.url}
+                  aria-label={SITE_CONFIG.social.linkedin.ariaLabel}
                   icon={LinkedInIcon}
                 >
-                  <span className="sr-only">Follow on LinkedIn</span>
+                  <span className="sr-only">{SITE_CONFIG.social.linkedin.ariaLabel}</span>
                 </SocialLink>
               </div>
             </div>

@@ -6,6 +6,7 @@ import SocialLink from './SocialLink'
 import TwitterIcon from './SocialIcons/Twitter'
 import GitHubIcon from './SocialIcons/GitHub'
 import LinkedInIcon from './SocialIcons/LinkedIn'
+import { SITE_CONFIG } from '@/config'
 
 function getLanguageFromURL(pathname: string) {
   if (pathname.startsWith('/ja/') || pathname === '/ja') {
@@ -109,32 +110,32 @@ export default function Footer() {
                   <ul className="flex flex-col gap-4">
                     <li>
                       <a
-                        href="https://twitter.com/hidetaka_dev"
-                        aria-label="Follow on Twitter"
+                        href={SITE_CONFIG.social.twitter.url}
+                        aria-label={SITE_CONFIG.social.twitter.ariaLabel}
                         className="group flex items-center gap-3 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
                       >
                         <TwitterIcon className="h-5 w-5 flex-none fill-slate-500 transition-colors group-hover:fill-indigo-600 dark:fill-slate-400 dark:group-hover:fill-indigo-400" />
-                        <span>Twitter</span>
+                        <span>{SITE_CONFIG.social.twitter.label}</span>
                       </a>
                     </li>
                     <li>
                       <a
-                        href="https://github.com/hideokamoto"
-                        aria-label="Follow on GitHub"
+                        href={SITE_CONFIG.social.github.url}
+                        aria-label={SITE_CONFIG.social.github.ariaLabel}
                         className="group flex items-center gap-3 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
                       >
                         <GitHubIcon className="h-5 w-5 flex-none fill-slate-500 transition-colors group-hover:fill-indigo-600 dark:fill-slate-400 dark:group-hover:fill-indigo-400" />
-                        <span>GitHub</span>
+                        <span>{SITE_CONFIG.social.github.label}</span>
                       </a>
                     </li>
                     <li>
                       <a
-                        href="https://www.linkedin.com/in/hideokamoto/"
-                        aria-label="Follow on LinkedIn"
+                        href={SITE_CONFIG.social.linkedin.url}
+                        aria-label={SITE_CONFIG.social.linkedin.ariaLabel}
                         className="group flex items-center gap-3 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
                       >
                         <LinkedInIcon className="h-5 w-5 flex-none fill-slate-500 transition-colors group-hover:fill-indigo-600 dark:fill-slate-400 dark:group-hover:fill-indigo-400" />
-                        <span>LinkedIn</span>
+                        <span>{SITE_CONFIG.social.linkedin.label}</span>
                       </a>
                     </li>
                   </ul>
@@ -144,7 +145,7 @@ export default function Footer() {
               {/* Bottom section: Copyright */}
               <div className="border-t border-zinc-200 dark:border-zinc-800 pt-8">
                 <p className="text-sm text-slate-600 dark:text-slate-400 text-center sm:text-left">
-                  &copy; {new Date().getFullYear()} Hidetaka Okamoto. All rights reserved.
+                  &copy; {new Date().getFullYear()} {SITE_CONFIG.author.name}. All rights reserved.
                 </p>
               </div>
             </div>
