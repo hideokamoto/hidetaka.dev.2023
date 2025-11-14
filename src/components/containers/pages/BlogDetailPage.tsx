@@ -27,6 +27,8 @@ export default function BlogDetailPage({
 
   // OG画像のURLを生成
   const ogImageUrl = `/api/thumbnail/thoughts/${thought.id}`
+  const OG_IMAGE_WIDTH = 1200
+  const OG_IMAGE_HEIGHT = 630
 
   return (
     <Container className="mt-16 sm:mt-32">
@@ -62,24 +64,24 @@ export default function BlogDetailPage({
           </ol>
         </nav>
 
+        {/* サムネイル画像 (OG画像) */}
+        <div className="mb-8 overflow-hidden rounded-lg">
+          <Image
+            src={ogImageUrl}
+            alt={thought.title.rendered}
+            width={OG_IMAGE_WIDTH}
+            height={OG_IMAGE_HEIGHT}
+            className="w-full h-auto"
+            priority
+          />
+        </div>
+
         {/* タイトル */}
         <header className="mb-6">
           <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-5xl">
             {thought.title.rendered}
           </h1>
         </header>
-
-        {/* サムネイル画像 (OG画像) */}
-        <div className="mb-8 overflow-hidden rounded-lg">
-          <Image
-            src={ogImageUrl}
-            alt={thought.title.rendered}
-            width={1200}
-            height={630}
-            className="w-full h-auto"
-            priority
-          />
-        </div>
 
         {/* 日付とカテゴリ */}
         <div className="mb-10 flex flex-col gap-4">
