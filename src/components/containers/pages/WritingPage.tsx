@@ -13,7 +13,7 @@ import SidebarLayout from '@/components/ui/SidebarLayout'
 import MobileFilterDrawer, { type FilterGroup } from '@/components/ui/MobileFilterDrawer'
 import MobileFilterButton from '@/components/ui/MobileFilterButton'
 import type { FeedItem } from '@/libs/dataSources/types'
-import type { MicroCMSPostsRecord } from '@/lib/microCMS/types'
+import type { MicroCMSPostsRecord } from '@/libs/microCMS/types'
 
 type WritingItem = FeedItem | MicroCMSPostsRecord
 type FilterType = 'all' | 'external' | 'news'

@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import type { MicroCMSProjectsRecord } from '@/lib/microCMS/types'
+import type { MicroCMSProjectsRecord } from '@/libs/microCMS/types'
 
 function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (

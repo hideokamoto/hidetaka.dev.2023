@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { removeHtmlTags } from '@/lib/sanitize'
+import { removeHtmlTags } from '@/libs/sanitize'
 import type { FeedItem } from '@/libs/dataSources/types'
 
 function formatDate(dateString: string, lang: string): string {

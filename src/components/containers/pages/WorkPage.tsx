@@ -12,7 +12,7 @@ import PageHeader from '@/components/ui/PageHeader'
 import SidebarLayout from '@/components/ui/SidebarLayout'
 import MobileFilterDrawer, { type FilterGroup } from '@/components/ui/MobileFilterDrawer'
 import MobileFilterButton from '@/components/ui/MobileFilterButton'
-import type { MicroCMSProjectsRecord } from '@/lib/microCMS/types'
+import type { MicroCMSProjectsRecord } from '@/libs/microCMS/types'
 import type { NPMRegistrySearchResult } from '@/libs/dataSources/npmjs'
 import type { WordPressPluginDetail } from '@/libs/dataSources/wporg'
 

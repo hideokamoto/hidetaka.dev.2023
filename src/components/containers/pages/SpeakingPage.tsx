@@ -10,7 +10,7 @@ import PageHeader from '@/components/ui/PageHeader'
 import SidebarLayout from '@/components/ui/SidebarLayout'
 import MobileFilterDrawer, { type FilterGroup } from '@/components/ui/MobileFilterDrawer'
 import MobileFilterButton from '@/components/ui/MobileFilterButton'
-import type { MicroCMSEventsRecord } from '@/lib/microCMS/types'
+import type { MicroCMSEventsRecord } from '@/libs/microCMS/types'
 
 type FilterPlace = string | null
 type FilterYear = string | null

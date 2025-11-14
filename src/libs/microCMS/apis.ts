@@ -176,4 +176,48 @@ export class MicroCMSAPI {
       return null
     }
   }
+
+  /**
+   * すべての投稿記事を取得（sitemap用）
+   */
+  public async listAllPosts(query?: {
+    lang?: 'japanese' | 'english'
+  }): Promise<MicroCMSPostsRecord[]> {
+    if (!this.client) {
+      if (process.env.MICROCMS_API_MODE === 'mock') {
+        return MICROCMS_MOCK_POSTs
+      }
+      return []
+    }
+    const lang = query?.lang ?? null
+    const posts = await this.client.getAllContents<MicroCMSPostsRecord>({
+      endpoint: 'posts',
+      queries: {
+        orders: '-publishedAt',
+        filters: [
+          lang ? `lang[contains]${query?.lang}` : undefined
+        ].filter(Boolean).join('[and]'),
+      }
+    })
+    return posts
+  }
+
+  /**
+   * すべてのイベントを取得（sitemap用）
+   */
+  public async listAllEvents(): Promise<MicroCMSEventsRecord[]> {
+    if (!this.client) {
+      if (process.env.MICROCMS_API_MODE === 'mock') {
+        return MICROCMS_MOCK_EVENTs
+      }
+      return []
+    }
+    const events = await this.client.getAllContents<MicroCMSEventsRecord>({
+      endpoint: 'events',
+      queries: {
+        orders: '-date',
+      }
+    })
+    return events
+  }
 }

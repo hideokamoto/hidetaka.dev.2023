@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next'
-import { MicroCMSAPI } from '@/lib/microCMS/apis'
-import { createMicroCMSClient } from '@/lib/microCMS/client'
+import { MicroCMSAPI } from '@/libs/microCMS/apis'
+import { createMicroCMSClient } from '@/libs/microCMS/client'
 import { loadAllThoughts } from '@/libs/dataSources/thoughts'
 import { SITE_CONFIG } from '@/config'
 

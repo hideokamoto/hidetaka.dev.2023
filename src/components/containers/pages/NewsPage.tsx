@@ -1,8 +1,8 @@
 import Container from '@/components/tailwindui/Container'
 import SimpleLayout from '@/components/tailwindui/SimpleLayout'
 import Link from 'next/link'
-import { MicroCMSAPI } from '@/lib/microCMS/apis'
-import { createMicroCMSClient } from '@/lib/microCMS/client'
+import { MicroCMSAPI } from '@/libs/microCMS/apis'
+import { createMicroCMSClient } from '@/libs/microCMS/client'
 
 function formatDate(dateString: string, lang: string): string {
   return new Date(dateString).toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', {
