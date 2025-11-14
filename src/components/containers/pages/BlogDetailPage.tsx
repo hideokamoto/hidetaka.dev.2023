@@ -104,7 +104,7 @@ export default function BlogDetailPage({
         />
 
         {/* プロフィールカード */}
-        <ProfileCard lang={lang} className="mt-12" />
+        <ProfileCard lang={lang} imageSrc="/images/profile.jpg" className="mt-12" />
 
         {/* 前後の記事へのナビゲーション */}
         {(previousThought || nextThought) && (
