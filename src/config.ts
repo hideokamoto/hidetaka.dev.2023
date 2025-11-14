@@ -12,4 +12,23 @@ export const SITE_CONFIG = {
   author: {
     name: 'Hidetaka Okamoto',
   },
+
+  // ソーシャルリンク（全サイトで共通）
+  social: {
+    twitter: {
+      url: 'https://twitter.com/hidetaka_dev',
+      label: 'Twitter',
+      ariaLabel: 'Follow on Twitter',
+    },
+    github: {
+      url: 'https://github.com/hideokamoto',
+      label: 'GitHub',
+      ariaLabel: 'Follow on GitHub',
+    },
+    linkedin: {
+      url: 'https://www.linkedin.com/in/hideokamoto/',
+      label: 'LinkedIn',
+      ariaLabel: 'Follow on LinkedIn',
+    },
+  },
 } as const

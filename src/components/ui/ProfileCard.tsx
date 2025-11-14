@@ -25,26 +25,26 @@ type ProfileCardProps = {
 }
 
 /**
- * ソーシャルリンク情報の定義
+ * ソーシャルリンク情報の定義（config.tsから取得）
  */
 const SOCIAL_LINKS = [
   {
-    href: 'https://twitter.com/hidetaka_dev',
+    href: SITE_CONFIG.social.twitter.url,
     icon: TwitterIcon,
-    label: 'Twitter',
-    ariaLabel: 'Follow on Twitter',
+    label: SITE_CONFIG.social.twitter.label,
+    ariaLabel: SITE_CONFIG.social.twitter.ariaLabel,
   },
   {
-    href: 'https://github.com/hideokamoto',
+    href: SITE_CONFIG.social.github.url,
     icon: GitHubIcon,
-    label: 'GitHub',
-    ariaLabel: 'Follow on GitHub',
+    label: SITE_CONFIG.social.github.label,
+    ariaLabel: SITE_CONFIG.social.github.ariaLabel,
   },
   {
-    href: 'https://www.linkedin.com/in/hideokamoto/',
+    href: SITE_CONFIG.social.linkedin.url,
     icon: LinkedInIcon,
-    label: 'LinkedIn',
-    ariaLabel: 'Follow on LinkedIn',
+    label: SITE_CONFIG.social.linkedin.label,
+    ariaLabel: SITE_CONFIG.social.linkedin.ariaLabel,
   },
 ] as const
 
