@@ -1,123 +1,78 @@
-import { ImageResponse } from '@vercel/og'
 import { NextRequest } from 'next/server'
+import { SITE_CONFIG } from '@/config'
 
-export const runtime = 'edge'
+// @see https://opennext.js.org/cloudflare/get-started#9-remove-any-export-const-runtime--edge-if-present
+// export const runtime = 'edge'
+
+// getCloudflareContextを動的インポートで取得（OpenNextのビルドプロセスで正しく解決されるように）
+async function getCloudflareContext(options: { async: true } | { async?: false } = { async: false }) {
+  try {
+    const { getCloudflareContext: getContext } = await import('@opennextjs/cloudflare')
+    // 型アサーションでオーバーロードを解決
+    if (options.async === true) {
+      return getContext({ async: true })
+    } else {
+      return getContext({ async: false })
+    }
+  } catch (error) {
+    // フォールバック: グローバルスコープから直接取得
+    const cloudflareContextSymbol = Symbol.for('__cloudflare-context__')
+    const context = (globalThis as any)[cloudflareContextSymbol]
+    if (context) {
+      return options.async === true ? Promise.resolve(context) : context
+    }
+    throw new Error('Cloudflare context is not available')
+  }
+}
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const title = searchParams.get('title') || 'Blog Post'
+    console.log('title', title)
+    // dateパラメータは受け取るが新しいWorkerには渡さない（保持のみ）
     const dateParam = searchParams.get('date')
+    console.log('dateParam', dateParam)
 
-    // Validate and format date
-    let formattedDate = ''
-    if (dateParam) {
-      const parsedDate = new Date(dateParam)
-      if (!isNaN(parsedDate.getTime())) {
-        formattedDate = parsedDate.toLocaleDateString('ja-JP', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-        })
-      }
+    // OpenNextのCloudflareアダプターでは、getCloudflareContext()経由でbindingsにアクセス
+    // async: trueを指定することで、SSGや開発環境でも動作する
+    const { env } = await getCloudflareContext({ async: true })
+    // 型定義は npm run cf-typegen で生成されるが、ここでは型アサーションを使用
+    const typedEnv = env as {
+      OG_IMAGE_GENERATOR?: { fetch: typeof fetch }
+      OG_IMAGE_GEN_AUTH_TOKEN?: string
+    }
+    const ogImageGenerator = typedEnv.OG_IMAGE_GENERATOR
+    console.log('ogImageGenerator', ogImageGenerator)
+    if (!ogImageGenerator) {
+      console.error('OG_IMAGE_GENERATOR Service Binding is not available')
+      return new Response('Service Binding not available', { status: 500 })
     }
 
-    // Fetch Noto Sans JP font from Google Fonts
-    const fontData = await fetch(
-      'https://fonts.gstatic.com/s/notosansjp/v53/-F6jfjtqLzI2JPCgQBnw7HFyzSD-AsregP8VFBEi75vY0rw-oME.woff',
-      {
-        cache: 'force-cache',
-      }
-    ).then((res) => res.arrayBuffer())
+    // 新しいWorkerのエンドポイントURLを構築
+    const ogImageUrl = new URL('https://cf-ogp-image-gen-worker.wp-kyoto.workers.dev/generate')
+    ogImageUrl.searchParams.set('title', title)
+    ogImageUrl.searchParams.set('siteUrl', SITE_CONFIG.url)
 
-    return new ImageResponse(
-      (
-        <div
-          style={{
-            height: '100%',
-            width: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-            justifyContent: 'space-between',
-            backgroundColor: '#1a1a1a',
-            padding: '80px',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-            }}
-          >
-            <h1
-              style={{
-                fontSize: '72px',
-                fontWeight: 'bold',
-                color: '#ffffff',
-                lineHeight: 1.2,
-                marginBottom: '20px',
-                maxWidth: '1000px',
-                fontFamily: '"Noto Sans JP"',
-              }}
-            >
-              {title}
-            </h1>
-            {formattedDate && (
-              <p
-                style={{
-                  fontSize: '32px',
-                  color: '#a0a0a0',
-                  fontFamily: '"Noto Sans JP"',
-                }}
-              >
-                {formattedDate}
-              </p>
-            )}
-          </div>
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              width: '100%',
-            }}
-          >
-            <p
-              style={{
-                fontSize: '36px',
-                color: '#ffffff',
-                fontWeight: 'bold',
-                fontFamily: '"Noto Sans JP"',
-              }}
-            >
-              hidetaka.dev
-            </p>
-            <div
-              style={{
-                width: '80px',
-                height: '80px',
-                backgroundColor: '#3b82f6',
-                borderRadius: '50%',
-              }}
-            />
-          </div>
-        </div>
-      ),
-      {
-        width: 1200,
-        height: 630,
-        fonts: [
-          {
-            name: 'Noto Sans JP',
-            data: fontData,
-            style: 'normal',
-            weight: 700,
-          },
-        ],
-      }
-    )
+    // 認証トークンをヘッダーに追加
+    const headers = new Headers()
+    const authToken = typedEnv.OG_IMAGE_GEN_AUTH_TOKEN || process.env.OG_IMAGE_GEN_AUTH_TOKEN
+    if (authToken) {
+      headers.set('Authorization', `Bearer ${authToken}`)
+    }
+
+    // Service Binding経由でOG画像生成Workerを呼び出す
+    // @ts-ignore
+    const response = await ogImageGenerator.fetch(ogImageUrl, { headers })
+
+    // エラーハンドリング
+    if (!response.ok) {
+      console.error('OG image generation failed:', response.status, response.statusText)
+      return new Response('Failed to generate image', { status: response.status })
+    }
+
+    // 新しいWorkerからのレスポンスをそのまま返す
+    return response
   } catch (error) {
     console.error('Error generating OG image:', error)
     return new Response('Failed to generate image', { status: 500 })
