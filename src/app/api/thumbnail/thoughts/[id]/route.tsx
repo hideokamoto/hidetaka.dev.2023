@@ -110,8 +110,21 @@ export async function GET(
       return new Response('Failed to generate image', { status: response.status })
     }
 
-    // 新しいWorkerからのレスポンスをそのまま返す
-    return response
+    // 新しいWorkerからのレスポンスにキャッシュヘッダーを追加して返す
+    const responseHeaders = new Headers(response.headers)
+
+    // ブラウザとCDNの両方で1日間キャッシュ
+    // OG画像は記事IDベースで生成されるため、長期キャッシュが有効
+    responseHeaders.set('Cache-Control', 'public, max-age=86400, s-maxage=86400')
+
+    // Cloudflare CDNのキャッシュを明示的に設定（1日間）
+    responseHeaders.set('CDN-Cache-Control', 'public, max-age=86400')
+
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: responseHeaders,
+    })
   } catch (error) {
     console.error('Error generating thumbnail image:', error)
     return new Response('Failed to generate image', { status: 500 })
