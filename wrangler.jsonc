@@ -27,6 +27,24 @@
       "binding": "NEXT_INC_CACHE_R2_BUCKET",
       "bucket_name": "hidetaka-dev-cache"
     }
-  ]
+  ],
+  // Queue for ISR background revalidation
+  "queues": {
+    "producers": [
+      {
+        "binding": "NEXT_REVALIDATION_QUEUE",
+        "queue": "hidetaka-dev-revalidation"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "hidetaka-dev-revalidation",
+        "max_batch_size": 10,
+        "max_batch_timeout": 30,
+        "max_retries": 3,
+        "dead_letter_queue": "hidetaka-dev-revalidation-dlq"
+      }
+    ]
+  }
 }
 
