@@ -1,0 +1,54 @@
+name: Test
+
+on:
+  push:
+    branches: [main, claude/**]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    strategy:
+      matrix:
+        node-version: [20.x, 22.x]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # - name: Run linter
+      #   run: npm run lint
+
+      - name: Run unit tests
+        run: npm run test
+
+      - name: Run tests with coverage
+        run: npm run test:coverage
+
+      - name: Upload coverage reports
+        if: matrix.node-version == '20.x'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+
+      - name: Build Next.js
+        run: npm run build
+        env:
+          MICROCMS_API_MODE: mock
+
+      - name: Build for Cloudflare
+        run: npm run cf:build
+        env:
+          MICROCMS_API_MODE: mock
