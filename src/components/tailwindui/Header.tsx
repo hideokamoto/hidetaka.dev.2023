@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
 import Container from './Container'
 import ModeToggle from './Headers/ModeToggle'
 
@@ -22,7 +22,7 @@ function getPathnameWithLangType(targetPath: string, lang: string): string {
 function changeLanguageURL(pathname: string, targetLang: 'en' | 'ja' = 'en'): string {
   const lang = getLanguageFromURL(pathname)
   if (lang === targetLang) return pathname
-  
+
   if (targetLang === 'en') {
     return pathname.replace(/^\/ja/, '') || '/'
   } else {
@@ -43,18 +43,22 @@ function MenuIcon({ isOpen }: { isOpen: boolean }) {
       {isOpen ? (
         <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
       ) : (
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+        />
       )}
     </svg>
   )
 }
 
-function MobileNavItem({ 
-  href, 
-  children, 
-  isActive, 
-  onClick 
-}: { 
+function MobileNavItem({
+  href,
+  children,
+  isActive,
+  onClick,
+}: {
   href: string
   children: React.ReactNode
   isActive?: boolean
@@ -75,11 +79,11 @@ function MobileNavItem({
   )
 }
 
-function DesktopNavItem({ 
-  href, 
-  children, 
-  isActive 
-}: { 
+function DesktopNavItem({
+  href,
+  children,
+  isActive,
+}: {
   href: string
   children: React.ReactNode
   isActive?: boolean
@@ -101,13 +105,7 @@ function DesktopNavItem({
   )
 }
 
-function MobileMenu({ 
-  isOpen, 
-  onClose 
-}: { 
-  isOpen: boolean
-  onClose: () => void
-}) {
+function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const pathname = usePathname()
   const lang = getLanguageFromURL(pathname)
   const currentLang = lang
@@ -137,10 +135,18 @@ function MobileMenu({
     <>
       {/* Backdrop */}
       <div
+        role="button"
+        tabIndex={0}
         className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
         onClick={onClose}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            onClose()
+          }
+        }}
       />
-      
+
       {/* Menu Panel */}
       <div className="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-white/95 backdrop-blur-md shadow-2xl ring-1 ring-zinc-900/5 dark:bg-zinc-900/95 dark:ring-white/10 lg:hidden">
         <div className="flex flex-col h-full">
@@ -148,6 +154,7 @@ function MobileMenu({
           <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white">Menu</h2>
             <button
+              type="button"
               onClick={onClose}
               className="rounded-lg p-2 text-slate-700 dark:text-slate-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
               aria-label="Close menu"
@@ -291,13 +298,13 @@ export default function Header() {
           className="relative top-0 z-10 h-20 pt-6"
           style={{ position: 'var(--header-position)' as any }}
         >
-          <Container className="top-[var(--header-top,theme(spacing.6))] w-full" style={{ position: 'var(--header-inner-position)' as any }}>
+          <Container
+            className="top-[var(--header-top,theme(spacing.6))] w-full"
+            style={{ position: 'var(--header-inner-position)' as any }}
+          >
             <div className="flex items-center justify-between gap-4">
               {/* Logo */}
-              <Link 
-                href="/" 
-                className="group relative flex-shrink-0"
-              >
+              <Link href="/" className="group relative flex-shrink-0">
                 <span className="sr-only">Hidetaka.dev</span>
                 <div className="relative">
                   <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white transition-colors group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
@@ -315,7 +322,7 @@ export default function Header() {
               {/* Right side: Language Switcher & Dark Mode Toggle */}
               <div className="flex items-center gap-3 flex-shrink-0">
                 <DesktopLangSwitcher />
-                
+
                 <div className="hidden lg:block">
                   <ModeToggle />
                 </div>

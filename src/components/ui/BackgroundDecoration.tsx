@@ -3,9 +3,9 @@ type BackgroundDecorationProps = {
   className?: string
 }
 
-export default function BackgroundDecoration({ 
+export default function BackgroundDecoration({
   variant = 'hero',
-  className = '' 
+  className = '',
 }: BackgroundDecorationProps) {
   if (variant === 'hero') {
     return (
@@ -35,4 +35,3 @@ export default function BackgroundDecoration({
   // custom variant - no default decoration
   return null
 }
-

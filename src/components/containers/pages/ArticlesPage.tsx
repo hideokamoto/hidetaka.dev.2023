@@ -1,7 +1,6 @@
-import Container from '@/components/tailwindui/Container'
+import BlogPosts from '@/components/BlogPosts/BlogPosts'
 import SimpleLayout from '@/components/tailwindui/SimpleLayout'
 import { loadBlogPosts } from '@/libs/dataSources/blogs'
-import BlogPosts from '@/components/BlogPosts/BlogPosts'
 
 export default async function ArticlesPageContent({ lang }: { lang: string }) {
   const { items: posts } = await loadBlogPosts(lang === 'ja' ? 'ja' : 'en')
@@ -13,4 +12,3 @@ export default async function ArticlesPageContent({ lang }: { lang: string }) {
     </SimpleLayout>
   )
 }
-

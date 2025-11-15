@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { removeHtmlTags } from './sanitize'
 
 describe('removeHtmlTags', () => {
@@ -7,8 +7,7 @@ describe('removeHtmlTags', () => {
   })
 
   it('should remove multiple tags', () => {
-    expect(removeHtmlTags('<div><strong>Bold</strong> text</div>'))
-      .toBe('Bold text')
+    expect(removeHtmlTags('<div><strong>Bold</strong> text</div>')).toBe('Bold text')
   })
 
   it('should remove self-closing tags', () => {
@@ -16,18 +15,15 @@ describe('removeHtmlTags', () => {
   })
 
   it('should remove tags with attributes', () => {
-    expect(removeHtmlTags('<a href="https://example.com">Link</a>'))
-      .toBe('Link')
+    expect(removeHtmlTags('<a href="https://example.com">Link</a>')).toBe('Link')
   })
 
   it('should remove nested tags', () => {
-    expect(removeHtmlTags('<div><span><em>Nested</em></span></div>'))
-      .toBe('Nested')
+    expect(removeHtmlTags('<div><span><em>Nested</em></span></div>')).toBe('Nested')
   })
 
   it('should replace [&hellip;] with ...', () => {
-    expect(removeHtmlTags('Read more [&hellip;]'))
-      .toBe('Read more...')
+    expect(removeHtmlTags('Read more [&hellip;]')).toBe('Read more...')
   })
 
   it('should handle text with no HTML tags', () => {
@@ -43,8 +39,7 @@ describe('removeHtmlTags', () => {
   })
 
   it('should preserve spaces between words', () => {
-    expect(removeHtmlTags('<p>Hello</p> <p>World</p>'))
-      .toBe('Hello World')
+    expect(removeHtmlTags('<p>Hello</p> <p>World</p>')).toBe('Hello World')
   })
 
   it('should handle complex HTML structure', () => {

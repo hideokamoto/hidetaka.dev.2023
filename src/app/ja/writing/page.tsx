@@ -12,6 +12,12 @@ export default async function WritingPage() {
   const { items: externalArticles, hasMoreBySource } = await loadBlogPosts('ja')
   const newsArticles = await microCMS.listPosts({ lang: 'japanese' })
 
-  return <WritingPageContent lang="ja" externalArticles={externalArticles} hasMoreBySource={hasMoreBySource} newsArticles={newsArticles} />
+  return (
+    <WritingPageContent
+      lang="ja"
+      externalArticles={externalArticles}
+      hasMoreBySource={hasMoreBySource}
+      newsArticles={newsArticles}
+    />
+  )
 }
-

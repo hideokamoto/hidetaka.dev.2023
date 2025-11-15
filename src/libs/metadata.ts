@@ -6,7 +6,7 @@ export function generateBlogPostMetadata(thought: WPThought): Metadata {
   // これにより、任意の文字列で画像を生成することを防止
   const ogImageUrl = new URL(
     `/api/thumbnail/thoughts/${thought.id}`,
-    process.env.NEXT_PUBLIC_SITE_URL || 'https://hidetaka.dev'
+    process.env.NEXT_PUBLIC_SITE_URL || 'https://hidetaka.dev',
   )
 
   return {

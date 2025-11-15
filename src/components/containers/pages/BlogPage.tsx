@@ -1,12 +1,12 @@
 import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
-import PageHeader from '@/components/ui/PageHeader'
 import DateDisplay from '@/components/ui/DateDisplay'
+import PageHeader from '@/components/ui/PageHeader'
 import Pagination from '@/components/ui/Pagination'
-import Tag from '@/components/ui/Tag'
 import SidebarLayout from '@/components/ui/SidebarLayout'
-import type { BlogItem } from '@/libs/dataSources/types'
+import Tag from '@/components/ui/Tag'
 import type { CategoryWithCount } from '@/libs/dataSources/thoughts'
+import type { BlogItem } from '@/libs/dataSources/types'
 
 type BlogPageProps = {
   lang: string
@@ -35,15 +35,13 @@ function BlogCard({ item, lang }: { item: BlogItem; lang: string }) {
                 format="short"
                 className="text-xs font-semibold text-slate-500 dark:text-slate-400"
               />
-              {item.categories && item.categories.length > 0 && (
-                <>
-                  {item.categories.map((category) => (
-                    <Tag key={category.id} variant="indigo" size="sm">
-                      {category.name}
-                    </Tag>
-                  ))}
-                </>
-              )}
+              {item.categories &&
+                item.categories.length > 0 &&
+                item.categories.map((category) => (
+                  <Tag key={category.id} variant="indigo" size="sm">
+                    {category.name}
+                  </Tag>
+                ))}
             </div>
 
             {/* Title */}
@@ -62,12 +60,7 @@ function BlogCard({ item, lang }: { item: BlogItem; lang: string }) {
             {/* Read more indicator */}
             <div className="flex items-center text-sm font-medium text-indigo-600 dark:text-indigo-400 mt-1">
               {lang === 'ja' ? '続きを読む' : 'Read more'}
-              <svg
-                className="ml-1 h-4 w-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
+              <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -101,9 +94,7 @@ function BlogSidebar({
   // basePathからカテゴリ部分を除去して、ブログのベースパスを取得
   // basePathが `/ja/blog/category/xxx` の場合は `/ja/blog` に
   // basePathが `/ja/blog` の場合はそのまま
-  const blogBasePath = basePath.includes('/category/') 
-    ? basePath.split('/category/')[0]
-    : basePath
+  const blogBasePath = basePath.includes('/category/') ? basePath.split('/category/')[0] : basePath
 
   return (
     <div className="hidden lg:block space-y-6">
@@ -124,11 +115,12 @@ function BlogSidebar({
           </Link>
           {categories.map((category) => {
             // category.slugが既にエンコードされている可能性があるので、一度デコードしてからエンコード
-            const normalizedSlug = category.slug.includes('%') 
-              ? decodeURIComponent(category.slug) 
+            const normalizedSlug = category.slug.includes('%')
+              ? decodeURIComponent(category.slug)
               : category.slug
             const categoryUrl = `${blogBasePath}/category/${encodeURIComponent(normalizedSlug)}`
-            const isActive = currentCategorySlug === category.slug || currentCategorySlug === normalizedSlug
+            const isActive =
+              currentCategorySlug === category.slug || currentCategorySlug === normalizedSlug
             return (
               <Link
                 key={category.id}
@@ -140,11 +132,13 @@ function BlogSidebar({
                 }`}
               >
                 <span>{category.name}</span>
-                <span className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
-                  isActive
-                    ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300'
-                    : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400'
-                }`}>
+                <span
+                  className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
+                    isActive
+                      ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300'
+                      : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400'
+                  }`}
+                >
                   {category.count > 20 ? '20+' : category.count}
                 </span>
               </Link>
@@ -165,20 +159,24 @@ export default function BlogPageContent({
   categoryName,
   categories = [],
 }: BlogPageProps) {
-  const title = categoryName 
-    ? (lang === 'ja' ? `カテゴリ: ${categoryName}` : `Category: ${categoryName}`)
-    : (lang === 'ja' ? 'ブログ' : 'Blog')
+  const title = categoryName
+    ? lang === 'ja'
+      ? `カテゴリ: ${categoryName}`
+      : `Category: ${categoryName}`
+    : lang === 'ja'
+      ? 'ブログ'
+      : 'Blog'
   const description = categoryName
-    ? (lang === 'ja' 
-        ? `「${categoryName}」カテゴリのブログ記事一覧です。`
-        : `Blog posts in the "${categoryName}" category.`)
-    : (lang === 'ja'
-        ? '技術的ではないトピックを中心としたブログ記事を掲載しています。'
-        : 'A collection of blog posts focusing on non-technical topics.')
+    ? lang === 'ja'
+      ? `「${categoryName}」カテゴリのブログ記事一覧です。`
+      : `Blog posts in the "${categoryName}" category.`
+    : lang === 'ja'
+      ? '技術的ではないトピックを中心としたブログ記事を掲載しています。'
+      : 'A collection of blog posts focusing on non-technical topics.'
 
   // 現在のカテゴリslugを取得（URLから）
-  const currentCategorySlug = categoryName 
-    ? categories.find(cat => cat.name === categoryName)?.slug
+  const currentCategorySlug = categoryName
+    ? categories.find((cat) => cat.name === categoryName)?.slug
     : undefined
 
   return (
@@ -255,4 +253,3 @@ export default function BlogPageContent({
     </section>
   )
 }
-

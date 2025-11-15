@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest'
-import { getLanguageFromURL, changeLanguageURL, getPathnameWithLangType } from './lang.util'
+import { describe, expect, it } from 'vitest'
+import { changeLanguageURL, getLanguageFromURL, getPathnameWithLangType } from './lang.util'
 
 describe('getLanguageFromURL', () => {
   it('should extract ja from ja-JP URL', () => {

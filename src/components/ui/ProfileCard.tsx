@@ -1,10 +1,10 @@
-import { ReactNode } from 'react'
-import ProfileImage from './ProfileImage'
+import type { ReactNode } from 'react'
+import { SITE_CONFIG } from '@/config'
 import Profile from '../content/Profile'
-import TwitterIcon from '../tailwindui/SocialIcons/Twitter'
 import GitHubIcon from '../tailwindui/SocialIcons/GitHub'
 import LinkedInIcon from '../tailwindui/SocialIcons/LinkedIn'
-import { SITE_CONFIG } from '@/config'
+import TwitterIcon from '../tailwindui/SocialIcons/Twitter'
+import ProfileImage from './ProfileImage'
 
 /**
  * プロフィールカードのプロパティ型定義
@@ -126,9 +126,7 @@ export default function ProfileCard({
         <div className="flex-1 space-y-4">
           {/* 名前 */}
           <div>
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-              {authorName}
-            </h3>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white">{authorName}</h3>
             {!isCompact && (
               <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
                 {lang.startsWith('ja') ? 'ビジネスデベロップメント' : 'Business Development'}

@@ -1,9 +1,9 @@
-import Link from 'next/link'
 import Image from 'next/image'
+import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
-import Tag from '@/components/ui/Tag'
 import ProfileCard from '@/components/ui/ProfileCard'
+import Tag from '@/components/ui/Tag'
 import type { WPEvent } from '@/libs/dataSources/types'
 
 type SpeakingDetailPageProps = {
@@ -37,7 +37,7 @@ export default function SpeakingDetailPage({
       <article className="max-w-3xl mx-auto">
         {/* パンくずリスト */}
         <nav aria-label="Breadcrumb" className="mb-8">
-          <ol role="list" className="flex items-center space-x-2">
+          <ol className="flex items-center space-x-2">
             <li>
               <div className="flex items-center text-sm">
                 <Link
@@ -152,4 +152,3 @@ export default function SpeakingDetailPage({
     </Container>
   )
 }
-

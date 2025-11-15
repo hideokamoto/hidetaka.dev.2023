@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { removeHtmlTags } from '@/libs/sanitize'
 import type { FeedItem } from '@/libs/dataSources/types'
+import { removeHtmlTags } from '@/libs/sanitize'
 
 function formatDate(dateString: string, lang: string): string {
   return new Date(`${dateString}`).toLocaleDateString(lang, {
@@ -12,11 +12,7 @@ function formatDate(dateString: string, lang: string): string {
 }
 
 function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return (
-    <div className={`group relative flex flex-col items-start ${className}`}>
-      {children}
-    </div>
-  )
+  return <div className={`group relative flex flex-col items-start ${className}`}>{children}</div>
 }
 
 function CardTitle({ href, children }: { href?: string; children: React.ReactNode }) {
@@ -62,11 +58,7 @@ function CardEyebrow({
 }
 
 function CardDescription({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="relative z-10 mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-      {children}
-    </p>
-  )
+  return <p className="relative z-10 mt-2 text-sm text-zinc-600 dark:text-zinc-400">{children}</p>
 }
 
 function ChevronRightIcon({ className }: { className?: string }) {
@@ -103,12 +95,7 @@ export default function BlogPosts({ lang, posts }: { lang: string; posts: FeedIt
             <article key={article.href} className="md:grid md:grid-cols-4 md:items-baseline">
               <Card className="md:col-span-3">
                 <CardTitle href={article.href}>{article.title}</CardTitle>
-                <CardEyebrow
-                  as="time"
-                  dateTime={article.datetime}
-                  className="md:hidden"
-                  decorate
-                >
+                <CardEyebrow as="time" dateTime={article.datetime} className="md:hidden" decorate>
                   {formatDate(article.datetime, lang)}
                 </CardEyebrow>
                 <CardEyebrow decorate>
@@ -119,11 +106,7 @@ export default function BlogPosts({ lang, posts }: { lang: string; posts: FeedIt
                 <CardDescription>{removeHtmlTags(article.description)}</CardDescription>
                 <CardCta>Read article</CardCta>
               </Card>
-              <CardEyebrow
-                as="time"
-                dateTime={article.datetime}
-                className="mt-1 hidden md:block"
-              >
+              <CardEyebrow as="time" dateTime={article.datetime} className="mt-1 hidden md:block">
                 {formatDate(article.datetime, lang)}
               </CardEyebrow>
             </article>

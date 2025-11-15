@@ -1,15 +1,11 @@
-import BlogDetailPageContent from '@/components/containers/pages/BlogDetailPage'
-import { getThoughtBySlug } from '@/libs/dataSources/thoughts'
-import { generateBlogPostMetadata } from '@/libs/metadata'
 import { notFound } from 'next/navigation'
-import { generateBlogPostingJsonLd, generateBlogBreadcrumbJsonLd } from '@/libs/jsonLd'
+import BlogDetailPageContent from '@/components/containers/pages/BlogDetailPage'
 import JsonLd from '@/components/JsonLd'
+import { getThoughtBySlug } from '@/libs/dataSources/thoughts'
+import { generateBlogBreadcrumbJsonLd, generateBlogPostingJsonLd } from '@/libs/jsonLd'
+import { generateBlogPostMetadata } from '@/libs/metadata'
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>
-}) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const thought = await getThoughtBySlug(slug, 'en')
 
@@ -22,11 +18,7 @@ export async function generateMetadata({
   return generateBlogPostMetadata(thought)
 }
 
-export default async function BlogDetailPage({
-  params,
-}: {
-  params: Promise<{ slug: string }>
-}) {
+export default async function BlogDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const thought = await getThoughtBySlug(slug, 'en')
 
@@ -41,12 +33,7 @@ export default async function BlogDetailPage({
     <>
       <JsonLd data={blogPostingJsonLd} />
       <JsonLd data={breadcrumbJsonLd} />
-      <BlogDetailPageContent
-        thought={thought}
-        lang="en"
-        basePath="/blog"
-      />
+      <BlogDetailPageContent thought={thought} lang="en" basePath="/blog" />
     </>
   )
 }
-

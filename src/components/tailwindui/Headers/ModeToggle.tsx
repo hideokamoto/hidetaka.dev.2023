@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 function SunIcon({ className }: { className?: string }) {
   return (
@@ -51,9 +51,9 @@ export default function ModeToggle() {
   function toggleMode() {
     disableTransitionsTemporarily()
 
-    let darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    let isSystemDarkMode = darkModeMediaQuery.matches
-    let isDarkMode = document.documentElement.classList.toggle('dark')
+    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+    const isSystemDarkMode = darkModeMediaQuery.matches
+    const isDarkMode = document.documentElement.classList.toggle('dark')
 
     if (isDarkMode === isSystemDarkMode) {
       delete window.localStorage.isDarkMode
@@ -78,4 +78,3 @@ export default function ModeToggle() {
     </button>
   )
 }
-

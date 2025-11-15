@@ -3,7 +3,7 @@ import type { WPEvent } from './types'
 export const loadWPEvents = async (): Promise<WPEvent[]> => {
   try {
     const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?per_page=100&orderby=date&order=desc`
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?per_page=100&orderby=date&order=desc`,
     )
 
     if (!response.ok) {
@@ -21,7 +21,7 @@ export const loadWPEvents = async (): Promise<WPEvent[]> => {
 export const getWPEventBySlug = async (slug: string): Promise<WPEvent | null> => {
   try {
     const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?slug=${encodeURIComponent(slug)}&_fields=id,title,date,date_gmt,modified,modified_gmt,excerpt,content,link,slug,status,type,guid,featured_media`
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?slug=${encodeURIComponent(slug)}&_fields=id,title,date,date_gmt,modified,modified_gmt,excerpt,content,link,slug,status,type,guid,featured_media`,
     )
 
     if (!response.ok) {
@@ -68,9 +68,7 @@ const fetchEvent = async (url: string): Promise<WPEvent | null> => {
   }
 }
 
-export const getAdjacentEvents = async (
-  currentEvent: WPEvent
-): Promise<AdjacentEvents> => {
+export const getAdjacentEvents = async (currentEvent: WPEvent): Promise<AdjacentEvents> => {
   try {
     // 前の記事を取得（現在の記事より前の日付で最も新しいもの）
     const previousUrl = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?before=${encodeURIComponent(currentEvent.date)}&per_page=1&orderby=date&order=desc&_fields=id,title,slug`
@@ -79,10 +77,7 @@ export const getAdjacentEvents = async (
     const nextUrl = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?after=${encodeURIComponent(currentEvent.date)}&per_page=1&orderby=date&order=asc&_fields=id,title,slug`
 
     // 並列で実行
-    const [previous, next] = await Promise.all([
-      fetchEvent(previousUrl),
-      fetchEvent(nextUrl),
-    ])
+    const [previous, next] = await Promise.all([fetchEvent(previousUrl), fetchEvent(nextUrl)])
 
     return {
       previous,
@@ -96,4 +91,3 @@ export const getAdjacentEvents = async (
     }
   }
 }
-

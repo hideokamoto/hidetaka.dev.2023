@@ -1,8 +1,8 @@
-import BlogPageContent from '@/components/containers/pages/BlogPage'
-import { loadThoughtsByCategory, loadAllCategories } from '@/libs/dataSources/thoughts'
 import { notFound } from 'next/navigation'
-import { generateBlogListJsonLd } from '@/libs/jsonLd'
+import BlogPageContent from '@/components/containers/pages/BlogPage'
 import JsonLd from '@/components/JsonLd'
+import { loadAllCategories, loadThoughtsByCategory } from '@/libs/dataSources/thoughts'
+import { generateBlogListJsonLd } from '@/libs/jsonLd'
 
 export const metadata = {
   title: 'ブログカテゴリ',
@@ -29,14 +29,14 @@ export default async function BlogCategoryPageNumber({
       // これは、Next.jsが既にデコードしている場合のフォールバック
       decodedName = name
     }
-  } catch (e) {
+  } catch (_e) {
     // デコードに失敗した場合はそのまま使用
     decodedName = name
   }
 
   const pageNumber = parseInt(number, 10)
 
-  if (isNaN(pageNumber) || pageNumber < 1) {
+  if (Number.isNaN(pageNumber) || pageNumber < 1) {
     notFound()
   }
 
@@ -54,7 +54,8 @@ export default async function BlogCategoryPageNumber({
   }
 
   // カテゴリ名を取得（最初の記事のカテゴリから）
-  const categoryName = result.items[0]?.categories?.find(cat => cat.slug === decodedName)?.name || decodedName
+  const categoryName =
+    result.items[0]?.categories?.find((cat) => cat.slug === decodedName)?.name || decodedName
 
   // basePathにはエンコードされたslugを使用（Next.jsのparamsはデコード済みなので再エンコード）
   const encodedSlug = encodeURIComponent(decodedName)
@@ -66,7 +67,7 @@ export default async function BlogCategoryPageNumber({
     basePath,
     result.currentPage,
     result.totalPages,
-    categoryName
+    categoryName,
   )
 
   return (
@@ -84,4 +85,3 @@ export default async function BlogCategoryPageNumber({
     </>
   )
 }
-

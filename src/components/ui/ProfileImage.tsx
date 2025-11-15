@@ -7,12 +7,7 @@ type ProfileImageProps = {
   className?: string
 }
 
-export default function ProfileImage({ 
-  src, 
-  alt, 
-  size = 'lg',
-  className = '' 
-}: ProfileImageProps) {
+export default function ProfileImage({ src, alt, size = 'lg', className = '' }: ProfileImageProps) {
   const sizeStyles = {
     sm: 'lg:w-64 max-w-xs',
     md: 'lg:w-80 max-w-sm',
@@ -28,16 +23,9 @@ export default function ProfileImage({
         <div className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-indigo-300/60 via-purple-300/50 to-cyan-300/40 blur-xl opacity-60" />
         {/* Image container */}
         <div className="relative h-full w-full rounded-3xl overflow-hidden border-4 border-white/90 shadow-2xl backdrop-blur-sm dark:border-white/10">
-          <Image
-            src={src}
-            alt={alt}
-            fill
-            className="object-cover"
-            priority
-          />
+          <Image src={src} alt={alt} fill className="object-cover" priority />
         </div>
       </div>
     </div>
   )
 }
-

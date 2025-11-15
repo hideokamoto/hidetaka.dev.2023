@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server'
+import type { NextRequest } from 'next/server'
 import { SITE_CONFIG } from '@/config'
 import type { WPEvent } from '@/libs/dataSources/types'
 
@@ -6,7 +6,9 @@ import type { WPEvent } from '@/libs/dataSources/types'
 // export const runtime = 'edge'
 
 // getCloudflareContextを動的インポートで取得（OpenNextのビルドプロセスで正しく解決されるように）
-async function getCloudflareContext(options: { async: true } | { async?: false } = { async: false }) {
+async function getCloudflareContext(
+  options: { async: true } | { async?: false } = { async: false },
+) {
   try {
     const { getCloudflareContext: getContext } = await import('@opennextjs/cloudflare')
     // 型アサーションでオーバーロードを解決
@@ -15,7 +17,7 @@ async function getCloudflareContext(options: { async: true } | { async?: false }
     } else {
       return getContext({ async: false })
     }
-  } catch (error) {
+  } catch (_error) {
     // フォールバック: グローバルスコープから直接取得
     const cloudflareContextSymbol = Symbol.for('__cloudflare-context__')
     const context = (globalThis as any)[cloudflareContextSymbol]
@@ -28,26 +30,23 @@ async function getCloudflareContext(options: { async: true } | { async?: false }
 
 /**
  * WordPressのevents投稿タイプ用のサムネイル画像生成API
- * 
+ *
  * セキュリティ: post_idからWordPress APIで記事を取得し、存在する記事のタイトルのみを使用
  * これにより、任意の文字列で画像を生成することを防止
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const postId = parseInt(id, 10)
 
     // IDが有効な数値でない場合は404を返す
-    if (isNaN(postId) || postId <= 0) {
+    if (Number.isNaN(postId) || postId <= 0) {
       return new Response('Invalid post ID', { status: 404 })
     }
 
     // WordPress REST APIから記事を取得
     const wpResponse = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events/${postId}?_fields=id,title`
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events/${postId}?_fields=id,title`,
     )
 
     if (!wpResponse.ok) {
@@ -96,7 +95,7 @@ export async function GET(
     }
 
     // Service Binding経由でOG画像生成Workerを呼び出す
-    // @ts-ignore
+    // @ts-expect-error
     const response = await ogImageGenerator.fetch(ogImageUrl, { headers })
 
     // エラーハンドリング
@@ -125,4 +124,3 @@ export async function GET(
     return new Response('Failed to generate image', { status: 500 })
   }
 }
-

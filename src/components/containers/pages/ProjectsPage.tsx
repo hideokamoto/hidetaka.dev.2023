@@ -1,8 +1,7 @@
-import Container from '@/components/tailwindui/Container'
-import SimpleLayout from '@/components/tailwindui/SimpleLayout'
-import GuestContent from '@/components/projects/GuestContent'
 import Applications from '@/components/projects/Applications'
 import Books from '@/components/projects/Books'
+import GuestContent from '@/components/projects/GuestContent'
+import SimpleLayout from '@/components/tailwindui/SimpleLayout'
 
 export default function ProjectsPageContent({ lang }: { lang: string }) {
   const title = /ja/.test(lang) ? '個人開発・プロジェクト' : 'My projects'
@@ -60,4 +59,3 @@ export default function ProjectsPageContent({ lang }: { lang: string }) {
     </SimpleLayout>
   )
 }
-
