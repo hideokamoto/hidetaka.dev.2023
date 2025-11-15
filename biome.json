@@ -20,7 +20,8 @@
       "!**/*.config.js",
       "!**/*.config.cjs",
       "!**/*.config.mjs",
-      "!**/globals.css"
+      "!**/globals.css",
+      "!**/next-env.d.ts"
     ]
   },
   "formatter": {
