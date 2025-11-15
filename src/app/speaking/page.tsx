@@ -39,6 +39,6 @@ export default async function SpeakingPage() {
     return dateB - dateA
   })
 
-  return <SpeakingPageContent lang="en" events={unifiedEvents} />
+  return <SpeakingPageContent lang="en" events={unifiedEvents} basePath="/speaking" />
 }
 

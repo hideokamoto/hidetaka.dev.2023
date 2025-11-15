@@ -111,4 +111,5 @@ export type WPEvent = {
         guid: {
           rendered: string
         }
+        featured_media?: number
       }

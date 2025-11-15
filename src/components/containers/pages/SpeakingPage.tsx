@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import Tag from '@/components/ui/Tag'
@@ -23,7 +24,7 @@ export type UnifiedEvent =
   | (WPEvent & { type: 'report'; source: 'wordpress' })
 
 // 統一されたSpeakingカードコンポーネント
-function UnifiedSpeakingCard({ event, lang }: { event: UnifiedEvent; lang: string }) {
+function UnifiedSpeakingCard({ event, lang, basePath }: { event: UnifiedEvent; lang: string; basePath: string }) {
   const isAnnouncement = event.type === 'announcement'
   const isReport = event.type === 'report'
   
@@ -43,8 +44,9 @@ function UnifiedSpeakingCard({ event, lang }: { event: UnifiedEvent; lang: strin
     ? event.description
     : event.excerpt.rendered.replace(/<[^>]*>/g, '').substring(0, 150)
   
-  // リンクの取得
-  const link = isAnnouncement ? event.url : event.link
+  // リンクの取得（レポートの場合は内部リンク、告知の場合は外部リンク）
+  const link = isAnnouncement ? event.url : `${basePath}/${event.slug}`
+  const isInternalLink = isReport
   
   // 場所の取得（告知のみ）
   const place = isAnnouncement ? event.place : undefined
@@ -101,12 +103,24 @@ function UnifiedSpeakingCard({ event, lang }: { event: UnifiedEvent; lang: strin
 
           {/* Links */}
           <div className="flex items-center gap-4 mt-2">
-            {link && (
+            {link && isInternalLink ? (
+              <Link
+                href={link}
+                className="flex items-center text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {lang === 'ja' ? '記事を読む' : 'Read Article'}
+                <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              </Link>
+            ) : link && (
               <a
                 href={link}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
+                onClick={(e) => e.stopPropagation()}
               >
                 {isAnnouncement 
                   ? (lang === 'ja' ? 'イベントページ' : 'Event Page')
@@ -147,6 +161,14 @@ function UnifiedSpeakingCard({ event, lang }: { event: UnifiedEvent; lang: strin
       </div>
     </article>
   )
+
+  if (isInternalLink) {
+    return (
+      <Link href={link} className="group block">
+        {CardContent}
+      </Link>
+    )
+  }
 
   return (
     <a href={link} target="_blank" rel="noopener noreferrer" className="group block">
@@ -298,10 +320,12 @@ function Sidebar({
 
 export default function SpeakingPageContent({ 
   lang,
-  events
+  events,
+  basePath
 }: { 
   lang: string
   events: UnifiedEvent[]
+  basePath: string
 }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [filterType, setFilterType] = useState<FilterType>(null)
@@ -579,7 +603,7 @@ export default function SpeakingPageContent({
             {filteredEvents.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                 {filteredEvents.map((event) => (
-                  <UnifiedSpeakingCard key={`${event.source}-${event.id}`} event={event} lang={lang} />
+                  <UnifiedSpeakingCard key={`${event.source}-${event.id}`} event={event} lang={lang} basePath={basePath} />
                 ))}
               </div>
             ) : (
