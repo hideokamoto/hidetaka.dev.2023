@@ -38,7 +38,7 @@ export default async function SpeakingDetailPage({
     <SpeakingDetailPageContent
       event={event}
       lang="ja"
-      basePath="/ja/speaking"
+      basePath="/ja/event-reports"
     />
   )
 }
