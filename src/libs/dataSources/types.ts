@@ -89,3 +89,26 @@ export type WPThought = {
           }>>
         }
       }
+export type WPEvent = {
+        id: number
+        title: {
+          rendered: string
+        }
+        date: string
+        date_gmt: string
+        modified: string
+        modified_gmt: string
+        excerpt: {
+          rendered: string
+        }
+        content: {
+          rendered: string
+        }
+        link: string
+        slug: string
+        status: string
+        type: string
+        guid: {
+          rendered: string
+        }
+      }

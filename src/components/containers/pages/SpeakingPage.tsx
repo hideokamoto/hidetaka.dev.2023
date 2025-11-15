@@ -11,14 +11,46 @@ import SidebarLayout from '@/components/ui/SidebarLayout'
 import MobileFilterDrawer, { type FilterGroup } from '@/components/ui/MobileFilterDrawer'
 import MobileFilterButton from '@/components/ui/MobileFilterButton'
 import type { MicroCMSEventsRecord } from '@/libs/microCMS/types'
+import type { WPEvent } from '@/libs/dataSources/types'
 
 type FilterPlace = string | null
 type FilterYear = string | null
+type FilterType = 'announcement' | 'report' | null
+
+// 統合イベント型
+export type UnifiedEvent = 
+  | (MicroCMSEventsRecord & { type: 'announcement'; source: 'microcms' })
+  | (WPEvent & { type: 'report'; source: 'wordpress' })
 
 // 統一されたSpeakingカードコンポーネント
-function UnifiedSpeakingCard({ event, lang }: { event: MicroCMSEventsRecord; lang: string }) {
-  const date = new Date(event.date)
+function UnifiedSpeakingCard({ event, lang }: { event: UnifiedEvent; lang: string }) {
+  const isAnnouncement = event.type === 'announcement'
+  const isReport = event.type === 'report'
+  
+  // 日付の取得
+  const date = isAnnouncement 
+    ? new Date(event.date) 
+    : new Date(event.date)
   const year = date.getFullYear().toString()
+  
+  // タイトルの取得
+  const title = isAnnouncement 
+    ? event.title 
+    : event.title.rendered
+  
+  // 説明の取得
+  const description = isAnnouncement
+    ? event.description
+    : event.excerpt.rendered.replace(/<[^>]*>/g, '').substring(0, 150)
+  
+  // リンクの取得
+  const link = isAnnouncement ? event.url : event.link
+  
+  // 場所の取得（告知のみ）
+  const place = isAnnouncement ? event.place : undefined
+  
+  // セッションタイトル（告知のみ）
+  const sessionTitle = isAnnouncement ? event.session_title : undefined
 
   const CardContent = (
     <article className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all hover:border-indigo-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700">
@@ -33,9 +65,15 @@ function UnifiedSpeakingCard({ event, lang }: { event: MicroCMSEventsRecord; lan
               format="short"
               className="text-xs font-semibold text-slate-500 dark:text-slate-400"
             />
-            <Tag variant="purple" size="sm">
-              {event.place}
+            {/* タイプバッジ */}
+            <Tag variant={isAnnouncement ? "indigo" : "purple"} size="sm">
+              {isAnnouncement ? (lang === 'ja' ? '告知' : 'Announcement') : (lang === 'ja' ? 'レポート' : 'Report')}
             </Tag>
+            {place && (
+              <Tag variant="purple" size="sm">
+                {place}
+              </Tag>
+            )}
             <Tag variant="default" size="sm">
               {year}
             </Tag>
@@ -43,40 +81,42 @@ function UnifiedSpeakingCard({ event, lang }: { event: MicroCMSEventsRecord; lan
           
           {/* Title */}
           <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-            {event.title}
+            {title}
           </h3>
 
           {/* Session Title */}
-          {event.session_title && (
+          {sessionTitle && (
             <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              {event.session_title}
+              {sessionTitle}
             </p>
           )}
 
           {/* Description */}
-          {event.description && (
+          {description && (
             <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-3">
-              {event.description.substring(0, 150)}
-              {event.description.length > 150 ? '...' : ''}
+              {description}
+              {description.length > 150 ? '...' : ''}
             </p>
           )}
 
           {/* Links */}
           <div className="flex items-center gap-4 mt-2">
-            {event.url && (
+            {link && (
               <a
-                href={event.url}
+                href={link}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
               >
-                {lang === 'ja' ? 'イベントページ' : 'Event Page'}
+                {isAnnouncement 
+                  ? (lang === 'ja' ? 'イベントページ' : 'Event Page')
+                  : (lang === 'ja' ? '記事を読む' : 'Read Article')}
                 <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
               </a>
             )}
-            {event.slide_url && (
+            {isAnnouncement && event.slide_url && (
               <a
                 href={event.slide_url}
                 target="_blank"
@@ -89,7 +129,7 @@ function UnifiedSpeakingCard({ event, lang }: { event: MicroCMSEventsRecord; lan
                 </svg>
               </a>
             )}
-            {event.blog_url && (
+            {isAnnouncement && event.blog_url && (
               <a
                 href={event.blog_url}
                 target="_blank"
@@ -109,7 +149,7 @@ function UnifiedSpeakingCard({ event, lang }: { event: MicroCMSEventsRecord; lan
   )
 
   return (
-    <a href={event.url} target="_blank" rel="noopener noreferrer" className="group block">
+    <a href={link} target="_blank" rel="noopener noreferrer" className="group block">
       {CardContent}
     </a>
   )
@@ -119,6 +159,8 @@ function UnifiedSpeakingCard({ event, lang }: { event: MicroCMSEventsRecord; lan
 function Sidebar({
   searchQuery,
   onSearchChange,
+  filterType,
+  onFilterTypeChange,
   filterPlace,
   onFilterPlaceChange,
   filterYear,
@@ -130,6 +172,8 @@ function Sidebar({
 }: {
   searchQuery: string
   onSearchChange: (value: string) => void
+  filterType: FilterType
+  onFilterTypeChange: (type: FilterType) => void
   filterPlace: FilterPlace
   onFilterPlaceChange: (place: FilterPlace) => void
   filterYear: FilterYear
@@ -138,15 +182,19 @@ function Sidebar({
   availableYears: string[]
   counts: {
     all: number
+    byType: Record<string, number>
     byPlace: Record<string, number>
     byYear: Record<string, number>
   }
   lang: string
 }) {
   const searchPlaceholder = lang === 'ja' ? '検索...' : 'Search...'
+  const typeTitle = lang === 'ja' ? 'タイプ' : 'Type'
   const placeTitle = lang === 'ja' ? '場所' : 'Place'
   const yearTitle = lang === 'ja' ? '年' : 'Year'
   const allText = lang === 'ja' ? 'すべて' : 'All'
+  const announcementText = lang === 'ja' ? '告知' : 'Announcement'
+  const reportText = lang === 'ja' ? 'レポート' : 'Report'
 
   return (
     <div className="hidden lg:block space-y-6">
@@ -157,6 +205,36 @@ function Sidebar({
           onChange={onSearchChange}
           placeholder={searchPlaceholder}
         />
+      </div>
+
+      {/* タイプフィルター */}
+      <div>
+        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
+          {typeTitle}
+        </h3>
+        <nav className="space-y-1">
+          <FilterItem 
+            active={filterType === null} 
+            onClick={() => onFilterTypeChange(null)}
+            count={counts.all}
+          >
+            {allText}
+          </FilterItem>
+          <FilterItem 
+            active={filterType === 'announcement'} 
+            onClick={() => onFilterTypeChange('announcement')}
+            count={counts.byType.announcement || 0}
+          >
+            {announcementText}
+          </FilterItem>
+          <FilterItem 
+            active={filterType === 'report'} 
+            onClick={() => onFilterTypeChange('report')}
+            count={counts.byType.report || 0}
+          >
+            {reportText}
+          </FilterItem>
+        </nav>
       </div>
 
       {/* 場所フィルター */}
@@ -223,9 +301,10 @@ export default function SpeakingPageContent({
   events
 }: { 
   lang: string
-  events: MicroCMSEventsRecord[]
+  events: UnifiedEvent[]
 }) {
   const [searchQuery, setSearchQuery] = useState('')
+  const [filterType, setFilterType] = useState<FilterType>(null)
   const [filterPlace, setFilterPlace] = useState<FilterPlace>(null)
   const [filterYear, setFilterYear] = useState<FilterYear>(null)
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
@@ -234,7 +313,7 @@ export default function SpeakingPageContent({
   const availablePlaces = useMemo(() => {
     const placeSet = new Set<string>()
     events.forEach(event => {
-      if (event.place) {
+      if (event.type === 'announcement' && event.place) {
         placeSet.add(event.place)
       }
     })
@@ -253,13 +332,21 @@ export default function SpeakingPageContent({
   }, [events])
 
   // 検索フィルター関数
-  const matchesSearch = (event: MicroCMSEventsRecord): boolean => {
+  const matchesSearch = (event: UnifiedEvent): boolean => {
     if (!searchQuery.trim()) return true
     const query = searchQuery.toLowerCase()
-    const title = event.title.toLowerCase()
-    const description = (event.description || '').toLowerCase()
-    const sessionTitle = (event.session_title || '').toLowerCase()
-    const place = (event.place || '').toLowerCase()
+    const title = event.type === 'announcement' 
+      ? event.title.toLowerCase()
+      : event.title.rendered.toLowerCase()
+    const description = event.type === 'announcement'
+      ? (event.description || '').toLowerCase()
+      : (event.excerpt.rendered || '').toLowerCase()
+    const sessionTitle = event.type === 'announcement' 
+      ? (event.session_title || '').toLowerCase()
+      : ''
+    const place = event.type === 'announcement' 
+      ? (event.place || '').toLowerCase()
+      : ''
     
     return title.includes(query) || description.includes(query) || sessionTitle.includes(query) || place.includes(query)
   }
@@ -267,8 +354,13 @@ export default function SpeakingPageContent({
   // フィルターと検索を適用
   const filteredEvents = useMemo(() => {
     let items = events.filter(event => {
-      // 場所フィルター
-      if (filterPlace !== null && event.place !== filterPlace) return false
+      // タイプフィルター
+      if (filterType !== null && event.type !== filterType) return false
+
+      // 場所フィルター（告知のみ）
+      if (filterPlace !== null) {
+        if (event.type !== 'announcement' || event.place !== filterPlace) return false
+      }
 
       // 年フィルター
       if (filterYear !== null) {
@@ -290,16 +382,27 @@ export default function SpeakingPageContent({
     })
 
     return items
-  }, [events, filterPlace, filterYear, searchQuery])
+  }, [events, filterType, filterPlace, filterYear, searchQuery])
 
   // カウント計算
   const counts = useMemo(() => {
+    const byType: Record<string, number> = {
+      announcement: 0,
+      report: 0,
+    }
     const byPlace: Record<string, number> = {}
     const byYear: Record<string, number> = {}
 
-    // 場所別カウント
+    // タイプ別カウント
+    events.forEach(event => {
+      byType[event.type] = (byType[event.type] || 0) + 1
+    })
+
+    // 場所別カウント（告知のみ）
     availablePlaces.forEach(place => {
-      byPlace[place] = events.filter(event => event.place === place).length
+      byPlace[place] = events.filter(event => 
+        event.type === 'announcement' && event.place === place
+      ).length
     })
 
     // 年別カウント
@@ -312,6 +415,7 @@ export default function SpeakingPageContent({
 
     return {
       all: events.length,
+      byType,
       byPlace,
       byYear,
     }
@@ -327,18 +431,50 @@ export default function SpeakingPageContent({
   // アクティブなフィルターの数を計算
   const activeFilterCount = useMemo(() => {
     let count = 0
+    if (filterType !== null) count++
     if (filterPlace !== null) count++
     if (filterYear !== null) count++
     return count
-  }, [filterPlace, filterYear])
+  }, [filterType, filterPlace, filterYear])
 
   // フィルターグループを構築
   const filterGroups = useMemo<FilterGroup[]>(() => {
+    const typeTitle = lang === 'ja' ? 'タイプ' : 'Type'
     const placeTitle = lang === 'ja' ? '場所' : 'Place'
     const yearTitle = lang === 'ja' ? '年' : 'Year'
     const allText = lang === 'ja' ? 'すべて' : 'All'
+    const announcementText = lang === 'ja' ? '告知' : 'Announcement'
+    const reportText = lang === 'ja' ? 'レポート' : 'Report'
 
     const groups: FilterGroup[] = []
+
+    // タイプフィルター
+    groups.push({
+      title: typeTitle,
+      items: [
+        {
+          id: 'type-all',
+          label: allText,
+          active: filterType === null,
+          count: counts.all,
+          onClick: () => setFilterType(null)
+        },
+        {
+          id: 'type-announcement',
+          label: announcementText,
+          active: filterType === 'announcement',
+          count: counts.byType.announcement || 0,
+          onClick: () => setFilterType('announcement')
+        },
+        {
+          id: 'type-report',
+          label: reportText,
+          active: filterType === 'report',
+          count: counts.byType.report || 0,
+          onClick: () => setFilterType('report')
+        }
+      ]
+    })
 
     // 場所フィルター
     if (availablePlaces.length > 0) {
@@ -387,7 +523,7 @@ export default function SpeakingPageContent({
     }
 
     return groups
-  }, [lang, filterPlace, filterYear, availablePlaces, availableYears, counts])
+  }, [lang, filterType, filterPlace, filterYear, availablePlaces, availableYears, counts])
 
   return (
     <>
@@ -426,6 +562,8 @@ export default function SpeakingPageContent({
               <Sidebar
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
+                filterType={filterType}
+                onFilterTypeChange={setFilterType}
                 filterPlace={filterPlace}
                 onFilterPlaceChange={setFilterPlace}
                 filterYear={filterYear}
@@ -441,7 +579,7 @@ export default function SpeakingPageContent({
             {filteredEvents.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                 {filteredEvents.map((event) => (
-                  <UnifiedSpeakingCard key={event.id} event={event} lang={lang} />
+                  <UnifiedSpeakingCard key={`${event.source}-${event.id}`} event={event} lang={lang} />
                 ))}
               </div>
             ) : (
