@@ -1,5 +1,5 @@
 import SpeakingDetailPageContent from '@/components/containers/pages/SpeakingDetailPage'
-import { getWPEventBySlug } from '@/libs/dataSources/events'
+import { getWPEventBySlug, getAdjacentEvents } from '@/libs/dataSources/events'
 import { notFound } from 'next/navigation'
 
 export async function generateMetadata({
@@ -34,11 +34,16 @@ export default async function SpeakingDetailPage({
     notFound()
   }
 
+  // 前後の記事を取得
+  const { previous, next } = await getAdjacentEvents(event)
+
   return (
     <SpeakingDetailPageContent
       event={event}
       lang="ja"
       basePath="/ja/event-reports"
+      previousEvent={previous}
+      nextEvent={next}
     />
   )
 }

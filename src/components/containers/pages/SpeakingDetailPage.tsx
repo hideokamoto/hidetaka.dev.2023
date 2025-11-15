@@ -10,16 +10,22 @@ type SpeakingDetailPageProps = {
   event: WPEvent
   lang: string
   basePath: string
+  previousEvent?: WPEvent | null
+  nextEvent?: WPEvent | null
 }
 
 export default function SpeakingDetailPage({
   event,
   lang,
   basePath,
+  previousEvent,
+  nextEvent,
 }: SpeakingDetailPageProps) {
   const date = new Date(event.date)
   const speakingLabel = lang === 'ja' ? '登壇・講演' : 'Speaking'
   const reportLabel = lang === 'ja' ? 'レポート' : 'Report'
+  const previousLabel = lang === 'ja' ? '前の記事' : 'Previous'
+  const nextLabel = lang === 'ja' ? '次の記事' : 'Next'
 
   // OG画像のURLを生成
   const ogImageUrl = `/api/thumbnail/events/${event.id}`
@@ -102,6 +108,46 @@ export default function SpeakingDetailPage({
 
         {/* プロフィールカード */}
         <ProfileCard lang={lang} imageSrc="/images/profile.jpg" className="mt-12" />
+
+        {/* 前後の記事へのナビゲーション */}
+        {(previousEvent || nextEvent) && (
+          <nav
+            aria-label="記事ナビゲーション"
+            className="mt-16 pt-8 border-t border-zinc-200 dark:border-zinc-700"
+          >
+            <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
+              {/* 次の記事 */}
+              {nextEvent && (
+                <Link
+                  href={`${basePath}/${nextEvent.slug}`}
+                  className="group flex flex-col flex-1 p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                >
+                  <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">
+                    ← {nextLabel}
+                  </span>
+                  <span className="text-base font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2">
+                    {nextEvent.title.rendered}
+                  </span>
+                </Link>
+              )}
+
+              {/* 前の記事 */}
+              {previousEvent && (
+                <Link
+                  href={`${basePath}/${previousEvent.slug}`}
+                  className="group flex flex-col flex-1 p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors text-right"
+                >
+                  <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">
+                    {previousLabel} →
+                  </span>
+                  <span className="text-base font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2">
+                    {previousEvent.title.rendered}
+                  </span>
+                </Link>
+              )}
+            </div>
+          </nav>
+        )}
       </article>
     </Container>
   )
