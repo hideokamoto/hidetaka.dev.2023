@@ -1,8 +1,8 @@
-import { MetadataRoute } from 'next'
+import type { MetadataRoute } from 'next'
+import { SITE_CONFIG } from '@/config'
+import { loadAllThoughts } from '@/libs/dataSources/thoughts'
 import { MicroCMSAPI } from '@/libs/microCMS/apis'
 import { createMicroCMSClient } from '@/libs/microCMS/client'
-import { loadAllThoughts } from '@/libs/dataSources/thoughts'
-import { SITE_CONFIG } from '@/config'
 
 type SitemapEntry = {
   url: string
@@ -19,7 +19,7 @@ const createEntriesForPaths = (
   id: string,
   lastModified?: Date,
   changeFrequency: SitemapEntry['changeFrequency'] = 'monthly',
-  priority: number = 0.7
+  priority: number = 0.7,
 ): SitemapEntry[] => {
   return basePaths.map((basePath) => ({
     url: `${SITE_CONFIG.url}${basePath}/${id}`,
@@ -100,7 +100,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         project.id,
         lastModified,
         'monthly',
-        0.7
+        0.7,
       )
     })
   } catch (error) {
@@ -141,11 +141,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('Error loading events for sitemap:', error)
   }
 
-  return [
-    ...staticPages,
-    ...blogPages,
-    ...projectPages,
-    ...postPages,
-    ...eventPages,
-  ]
+  return [...staticPages, ...blogPages, ...projectPages, ...postPages, ...eventPages]
 }

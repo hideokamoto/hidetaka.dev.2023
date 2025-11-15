@@ -1,6 +1,11 @@
 import dayjs from 'dayjs'
 import { MICROCMS_MOCK_BOOKs, MICROCMS_MOCK_EVENTs, MICROCMS_MOCK_POSTs } from './mocks'
-import type { MicroCMSClient, MicroCMSEventsRecord, MicroCMSProjectsRecord, MicroCMSPostsRecord } from './types'
+import type {
+  MicroCMSClient,
+  MicroCMSEventsRecord,
+  MicroCMSPostsRecord,
+  MicroCMSProjectsRecord,
+} from './types'
 
 export class MicroCMSAPI {
   private readonly client: MicroCMSClient
@@ -27,7 +32,7 @@ export class MicroCMSAPI {
     })
     return events
   }
-  public async listUpcomingEvents () {
+  public async listUpcomingEvents() {
     const thisMonth = dayjs().format('YYYY-MM')
     if (!this.client) {
       if (process.env.MICROCMS_API_MODE === 'mock') {
@@ -46,7 +51,7 @@ export class MicroCMSAPI {
     })
     return events
   }
-  public async listGuestPosts (): Promise<MicroCMSProjectsRecord[]> {
+  public async listGuestPosts(): Promise<MicroCMSProjectsRecord[]> {
     if (!this.client) {
       if (process.env.MICROCMS_API_MODE === 'mock') {
         return MICROCMS_MOCK_BOOKs
@@ -64,7 +69,7 @@ export class MicroCMSAPI {
     })
     return events
   }
-  public async listAllProjects (): Promise<MicroCMSProjectsRecord[]> {
+  public async listAllProjects(): Promise<MicroCMSProjectsRecord[]> {
     if (!this.client) {
       if (process.env.MICROCMS_API_MODE === 'mock') {
         return MICROCMS_MOCK_BOOKs
@@ -76,7 +81,7 @@ export class MicroCMSAPI {
     })
     return projects
   }
-  public async listApps (): Promise<MicroCMSProjectsRecord[]> {
+  public async listApps(): Promise<MicroCMSProjectsRecord[]> {
     if (!this.client) {
       if (process.env.MICROCMS_API_MODE === 'mock') {
         return MICROCMS_MOCK_BOOKs
@@ -90,12 +95,12 @@ export class MicroCMSAPI {
       queries: {
         orders: '-published_at',
         filters: `project_type[contains]applications`,
-        limit: 50
+        limit: 50,
       },
     })
     return events
   }
-  public async listBooks (): Promise<MicroCMSProjectsRecord[]> {
+  public async listBooks(): Promise<MicroCMSProjectsRecord[]> {
     if (!this.client) {
       if (process.env.MICROCMS_API_MODE === 'mock') {
         return MICROCMS_MOCK_BOOKs
@@ -109,12 +114,12 @@ export class MicroCMSAPI {
       queries: {
         orders: '-published_at',
         filters: `project_type[contains]books`,
-        limit: 50
+        limit: 50,
       },
     })
     return events
   }
-  public async listFeaturedBooks () {
+  public async listFeaturedBooks() {
     if (!this.client) {
       if (process.env.MICROCMS_API_MODE === 'mock') {
         return MICROCMS_MOCK_BOOKs
@@ -148,11 +153,9 @@ export class MicroCMSAPI {
       endpoint: 'posts',
       queries: {
         orders: '-publishedAt',
-        filters: [
-          lang ? `lang[contains]${query?.lang}` : undefined
-        ].filter(Boolean).join('[and]'),
-        limit: 50
-      }
+        filters: [lang ? `lang[contains]${query?.lang}` : undefined].filter(Boolean).join('[and]'),
+        limit: 50,
+      },
     })
     return posts
   }
@@ -160,7 +163,7 @@ export class MicroCMSAPI {
   public async getPost(id: string): Promise<MicroCMSPostsRecord | null> {
     if (!this.client) {
       if (process.env.MICROCMS_API_MODE === 'mock') {
-        const post = MICROCMS_MOCK_POSTs.find(post => post.id === id)
+        const post = MICROCMS_MOCK_POSTs.find((post) => post.id === id)
         return post || null
       }
       return null
@@ -194,10 +197,8 @@ export class MicroCMSAPI {
       endpoint: 'posts',
       queries: {
         orders: '-publishedAt',
-        filters: [
-          lang ? `lang[contains]${query?.lang}` : undefined
-        ].filter(Boolean).join('[and]'),
-      }
+        filters: [lang ? `lang[contains]${query?.lang}` : undefined].filter(Boolean).join('[and]'),
+      },
     })
     return posts
   }
@@ -216,7 +217,7 @@ export class MicroCMSAPI {
       endpoint: 'events',
       queries: {
         orders: '-date',
-      }
+      },
     })
     return events
   }

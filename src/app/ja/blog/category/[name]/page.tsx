@@ -1,18 +1,14 @@
-import BlogPageContent from '@/components/containers/pages/BlogPage'
-import { loadThoughtsByCategory, loadAllCategories } from '@/libs/dataSources/thoughts'
 import { notFound } from 'next/navigation'
-import { generateBlogListJsonLd } from '@/libs/jsonLd'
+import BlogPageContent from '@/components/containers/pages/BlogPage'
 import JsonLd from '@/components/JsonLd'
+import { loadAllCategories, loadThoughtsByCategory } from '@/libs/dataSources/thoughts'
+import { generateBlogListJsonLd } from '@/libs/jsonLd'
 
 export const metadata = {
   title: 'ブログカテゴリ',
 }
 
-export default async function BlogCategoryPage({
-  params,
-}: {
-  params: Promise<{ name: string }>
-}) {
+export default async function BlogCategoryPage({ params }: { params: Promise<{ name: string }> }) {
   const { name } = await params
   // Next.jsのApp Routerでは、URLパラメータは自動的にデコードされる
   // ただし、URLエンコードされた文字列がそのまま渡される場合もあるので、両方試す
@@ -28,7 +24,8 @@ export default async function BlogCategoryPage({
   }
 
   // カテゴリ名を取得（最初の記事のカテゴリから）
-  const categoryName = result.items[0]?.categories?.find(cat => cat.slug === decodedName)?.name || decodedName
+  const categoryName =
+    result.items[0]?.categories?.find((cat) => cat.slug === decodedName)?.name || decodedName
 
   // basePathにはエンコードされたslugを使用（Next.jsのparamsはデコード済みなので再エンコード）
   const encodedSlug = encodeURIComponent(decodedName)
@@ -40,7 +37,7 @@ export default async function BlogCategoryPage({
     basePath,
     result.currentPage,
     result.totalPages,
-    categoryName
+    categoryName,
   )
 
   return (
@@ -58,4 +55,3 @@ export default async function BlogCategoryPage({
     </>
   )
 }
-

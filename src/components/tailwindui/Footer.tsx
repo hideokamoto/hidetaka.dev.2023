@@ -2,11 +2,10 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import SocialLink from './SocialLink'
-import TwitterIcon from './SocialIcons/Twitter'
+import { SITE_CONFIG } from '@/config'
 import GitHubIcon from './SocialIcons/GitHub'
 import LinkedInIcon from './SocialIcons/LinkedIn'
-import { SITE_CONFIG } from '@/config'
+import TwitterIcon from './SocialIcons/Twitter'
 
 function getLanguageFromURL(pathname: string) {
   if (pathname.startsWith('/ja/') || pathname === '/ja') {
@@ -24,7 +23,7 @@ function getPathnameWithLangType(targetPath: string, lang: string): string {
 function changeLanguageURL(pathname: string, targetLang: 'en' | 'ja' = 'en'): string {
   const lang = getLanguageFromURL(pathname)
   if (lang === targetLang) return pathname
-  
+
   if (targetLang === 'en') {
     return pathname.replace(/^\/ja/, '') || '/'
   } else {
@@ -34,8 +33,8 @@ function changeLanguageURL(pathname: string, targetLang: 'en' | 'ja' = 'en'): st
 
 function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <Link 
-      href={href} 
+    <Link
+      href={href}
       className="text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
     >
       {children}
@@ -43,7 +42,13 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
   )
 }
 
-function InnerContainer({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+function InnerContainer({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode
+  className?: string
+}) {
   return (
     <div className={`relative px-4 sm:px-8 lg:px-12 ${className}`}>
       <div className="mx-auto max-w-2xl lg:max-w-5xl">{children}</div>
@@ -51,7 +56,13 @@ function InnerContainer({ children, className = '' }: { children: React.ReactNod
   )
 }
 
-function OuterContainer({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+function OuterContainer({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode
+  className?: string
+}) {
   return (
     <div className={`sm:px-8 ${className}`}>
       <div className="mx-auto max-w-7xl lg:px-8">{children}</div>
@@ -83,11 +94,13 @@ export default function Footer() {
                     Navigation
                   </h3>
                   <nav className="flex flex-col gap-4">
-                    <NavLink href={getPathnameWithLangType("about", lang)}>About</NavLink>
-                    <NavLink href={getPathnameWithLangType("work", lang)}>Work</NavLink>
-                    <NavLink href={getPathnameWithLangType("writing", lang)}>Writing</NavLink>
-                    <NavLink href={getPathnameWithLangType("blog", lang)}>{lang === 'ja' ? 'ブログ' : 'Blog'}</NavLink>
-                    <NavLink href={getPathnameWithLangType("speaking", lang)}>Speaking</NavLink>
+                    <NavLink href={getPathnameWithLangType('about', lang)}>About</NavLink>
+                    <NavLink href={getPathnameWithLangType('work', lang)}>Work</NavLink>
+                    <NavLink href={getPathnameWithLangType('writing', lang)}>Writing</NavLink>
+                    <NavLink href={getPathnameWithLangType('blog', lang)}>
+                      {lang === 'ja' ? 'ブログ' : 'Blog'}
+                    </NavLink>
+                    <NavLink href={getPathnameWithLangType('speaking', lang)}>Speaking</NavLink>
                   </nav>
                 </div>
 

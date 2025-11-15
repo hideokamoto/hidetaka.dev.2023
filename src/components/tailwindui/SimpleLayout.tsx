@@ -1,11 +1,11 @@
 import Container from './Container'
 
-export default function SimpleLayout({ 
-  title, 
-  children 
-}: { 
+export default function SimpleLayout({
+  title,
+  children,
+}: {
   title: string
-  children: React.ReactNode 
+  children: React.ReactNode
 }) {
   return (
     <Container className="mt-16 sm:mt-32">
@@ -18,4 +18,3 @@ export default function SimpleLayout({
     </Container>
   )
 }
-

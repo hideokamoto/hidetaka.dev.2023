@@ -1,13 +1,8 @@
 import Link from 'next/link'
-import Image from 'next/image'
 import type { MicroCMSProjectsRecord } from '@/libs/microCMS/types'
 
 function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
-  return (
-    <div className={`group relative flex flex-col items-start ${className}`}>
-      {children}
-    </div>
-  )
+  return <div className={`group relative flex flex-col items-start ${className}`}>{children}</div>
 }
 
 function CardTitle({ href, children }: { href?: string; children: React.ReactNode }) {
@@ -53,11 +48,7 @@ function CardEyebrow({
 }
 
 function CardDescription({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="relative z-10 mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-      {children}
-    </p>
-  )
+  return <p className="relative z-10 mt-2 text-sm text-zinc-600 dark:text-zinc-400">{children}</p>
 }
 
 function ChevronRightIcon({ className }: { className?: string }) {
@@ -85,20 +76,21 @@ function CardCta({ children }: { children: React.ReactNode }) {
   )
 }
 
-export default function ProjectCard({ project, lang }: { project: MicroCMSProjectsRecord; lang: string }) {
+export default function ProjectCard({
+  project,
+  lang,
+}: {
+  project: MicroCMSProjectsRecord
+  lang: string
+}) {
   const href = lang === 'ja' ? `/ja/work/${project.id}` : `/work/${project.id}`
-  
+
   return (
     <article className="md:grid md:grid-cols-4 md:items-baseline">
       <Card className="md:col-span-3">
         <CardTitle href={href}>{project.title}</CardTitle>
         {project.published_at && (
-          <CardEyebrow
-            as="time"
-            dateTime={project.published_at}
-            className="md:hidden"
-            decorate
-          >
+          <CardEyebrow as="time" dateTime={project.published_at} className="md:hidden" decorate>
             {new Date(project.published_at).toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', {
               day: 'numeric',
               month: 'long',
@@ -116,11 +108,7 @@ export default function ProjectCard({ project, lang }: { project: MicroCMSProjec
         <CardCta>Read more</CardCta>
       </Card>
       {project.published_at && (
-        <CardEyebrow
-          as="time"
-          dateTime={project.published_at}
-          className="mt-1 hidden md:block"
-        >
+        <CardEyebrow as="time" dateTime={project.published_at} className="mt-1 hidden md:block">
           {new Date(project.published_at).toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', {
             day: 'numeric',
             month: 'long',
@@ -132,4 +120,3 @@ export default function ProjectCard({ project, lang }: { project: MicroCMSProjec
     </article>
   )
 }
-

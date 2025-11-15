@@ -20,4 +20,3 @@ export default function BriefcaseIcon({ className }: { className?: string }) {
     </svg>
   )
 }
-

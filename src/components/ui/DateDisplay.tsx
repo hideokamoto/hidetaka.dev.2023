@@ -5,17 +5,17 @@ type DateDisplayProps = {
   className?: string
 }
 
-export default function DateDisplay({ 
-  date, 
+export default function DateDisplay({
+  date,
   lang,
   format = 'short',
-  className = '' 
+  className = '',
 }: DateDisplayProps) {
   // Handle string dates (from RSS feeds)
   const dateObj = typeof date === 'string' ? new Date(date) : date
-  
+
   // Check if date is valid
-  if (isNaN(dateObj.getTime())) {
+  if (Number.isNaN(dateObj.getTime())) {
     console.warn('Invalid date:', date)
     return null
   }
@@ -43,10 +43,5 @@ export default function DateDisplay({
     })
   }
 
-  return (
-    <time className={className}>
-      {formattedDate}
-    </time>
-  )
+  return <time className={className}>{formattedDate}</time>
 }
-

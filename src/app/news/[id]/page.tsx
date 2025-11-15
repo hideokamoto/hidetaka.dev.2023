@@ -1,6 +1,6 @@
+import Container from '@/components/tailwindui/Container'
 import { MicroCMSAPI } from '@/libs/microCMS/apis'
 import { createMicroCMSClient } from '@/libs/microCMS/client'
-import Container from '@/components/tailwindui/Container'
 
 export async function generateStaticParams() {
   const microCMS = new MicroCMSAPI(createMicroCMSClient())
@@ -25,12 +25,13 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
         <h1 className="text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-5xl">
           {post.title}
         </h1>
-        <div 
-          className="mt-6 prose prose-zinc dark:prose-invert" 
-          dangerouslySetInnerHTML={{ __html: typeof post.content === 'string' ? post.content : String(post.content || '') }} 
+        <div
+          className="mt-6 prose prose-zinc dark:prose-invert"
+          dangerouslySetInnerHTML={{
+            __html: typeof post.content === 'string' ? post.content : String(post.content || ''),
+          }}
         />
       </article>
     </Container>
   )
 }
-

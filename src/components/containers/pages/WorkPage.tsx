@@ -1,20 +1,20 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import Link from 'next/link'
 import Image from 'next/image'
+import Link from 'next/link'
+import { useMemo, useState } from 'react'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
-import Tag from '@/components/ui/Tag'
-import SearchBar from '@/components/ui/SearchBar'
 import FilterItem from '@/components/ui/FilterItem'
-import PageHeader from '@/components/ui/PageHeader'
-import SidebarLayout from '@/components/ui/SidebarLayout'
-import MobileFilterDrawer, { type FilterGroup } from '@/components/ui/MobileFilterDrawer'
 import MobileFilterButton from '@/components/ui/MobileFilterButton'
-import type { MicroCMSProjectsRecord } from '@/libs/microCMS/types'
+import MobileFilterDrawer, { type FilterGroup } from '@/components/ui/MobileFilterDrawer'
+import PageHeader from '@/components/ui/PageHeader'
+import SearchBar from '@/components/ui/SearchBar'
+import SidebarLayout from '@/components/ui/SidebarLayout'
+import Tag from '@/components/ui/Tag'
 import type { NPMRegistrySearchResult } from '@/libs/dataSources/npmjs'
 import type { WordPressPluginDetail } from '@/libs/dataSources/wporg'
+import type { MicroCMSProjectsRecord } from '@/libs/microCMS/types'
 
 type FilterCategory = 'all' | 'projects' | 'open-source' | 'books' | 'oss-contribution'
 
@@ -38,19 +38,19 @@ function UnifiedProjectCard({ project, lang }: { project: MicroCMSProjectsRecord
             />
           </div>
         )}
-        
+
         {/* Content - Bottom */}
         <div className="p-5 lg:p-6">
           <div className="flex flex-col gap-3">
             {date && (
-              <DateDisplay 
-                date={date} 
-                lang={lang} 
+              <DateDisplay
+                date={date}
+                lang={lang}
                 format="short"
                 className="text-xs font-semibold text-slate-500 dark:text-slate-400"
               />
             )}
-            
+
             <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
               {project.title}
             </h3>
@@ -79,7 +79,13 @@ function UnifiedProjectCard({ project, lang }: { project: MicroCMSProjectsRecord
 }
 
 // 統一されたOSSカードコンポーネント
-function UnifiedOSSCard({ item, lang }: { item: { type: 'npm' | 'wordpress'; data: NPMRegistrySearchResult | WordPressPluginDetail }; lang: string }) {
+function UnifiedOSSCard({
+  item,
+  lang,
+}: {
+  item: { type: 'npm' | 'wordpress'; data: NPMRegistrySearchResult | WordPressPluginDetail }
+  lang: string
+}) {
   if (item.type === 'npm') {
     const pkg = (item.data as NPMRegistrySearchResult).package
     const date = new Date(pkg.date)
@@ -91,13 +97,13 @@ function UnifiedOSSCard({ item, lang }: { item: { type: 'npm' | 'wordpress'; dat
           {/* Content */}
           <div className="p-5 lg:p-6">
             <div className="flex flex-col gap-3">
-              <DateDisplay 
-                date={date} 
-                lang={lang} 
+              <DateDisplay
+                date={date}
+                lang={lang}
                 format="short"
                 className="text-xs font-semibold text-slate-500 dark:text-slate-400"
               />
-              
+
               <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                 {pkg.name}
               </h3>
@@ -127,13 +133,13 @@ function UnifiedOSSCard({ item, lang }: { item: { type: 'npm' | 'wordpress'; dat
           {/* Content */}
           <div className="p-5 lg:p-6">
             <div className="flex flex-col gap-3">
-              <DateDisplay 
-                date={date} 
-                lang={lang} 
+              <DateDisplay
+                date={date}
+                lang={lang}
                 format="short"
                 className="text-xs font-semibold text-slate-500 dark:text-slate-400"
               />
-              
+
               <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                 {plugin.name}
               </h3>
@@ -194,7 +200,7 @@ function Sidebar({
   filterCategory,
   onFilterChange,
   counts,
-  lang
+  lang,
 }: {
   searchQuery: string
   onSearchChange: (value: string) => void
@@ -221,11 +227,7 @@ function Sidebar({
     <div className="hidden lg:block space-y-6">
       {/* 検索バー */}
       <div>
-        <SearchBar 
-          value={searchQuery}
-          onChange={onSearchChange}
-          placeholder={searchPlaceholder}
-        />
+        <SearchBar value={searchQuery} onChange={onSearchChange} placeholder={searchPlaceholder} />
       </div>
 
       {/* フィルター */}
@@ -234,36 +236,36 @@ function Sidebar({
           {filterTitle}
         </h3>
         <nav className="space-y-1">
-          <FilterItem 
-            active={filterCategory === 'all'} 
+          <FilterItem
+            active={filterCategory === 'all'}
             onClick={() => onFilterChange('all')}
             count={counts.all}
           >
             {allText}
           </FilterItem>
-          <FilterItem 
-            active={filterCategory === 'projects'} 
+          <FilterItem
+            active={filterCategory === 'projects'}
             onClick={() => onFilterChange('projects')}
             count={counts.projects}
           >
             {projectsText}
           </FilterItem>
-          <FilterItem 
-            active={filterCategory === 'open-source'} 
+          <FilterItem
+            active={filterCategory === 'open-source'}
             onClick={() => onFilterChange('open-source')}
             count={counts['open-source']}
           >
             {openSourceText}
           </FilterItem>
-          <FilterItem 
-            active={filterCategory === 'books'} 
+          <FilterItem
+            active={filterCategory === 'books'}
             onClick={() => onFilterChange('books')}
             count={counts.books}
           >
             {booksText}
           </FilterItem>
-          <FilterItem 
-            active={filterCategory === 'oss-contribution'} 
+          <FilterItem
+            active={filterCategory === 'oss-contribution'}
             onClick={() => onFilterChange('oss-contribution')}
             count={counts['oss-contribution']}
           >
@@ -275,12 +277,12 @@ function Sidebar({
   )
 }
 
-export default function WorkPageContent({ 
+export default function WorkPageContent({
   lang,
   projects,
   npmPackages,
-  wpPlugins
-}: { 
+  wpPlugins,
+}: {
   lang: string
   projects: MicroCMSProjectsRecord[]
   npmPackages: NPMRegistrySearchResult[]
@@ -291,24 +293,28 @@ export default function WorkPageContent({
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
 
   // プロジェクトをタイプ別に分類
-  const booksProjects = projects.filter(p => p.project_type?.includes('books'))
-  const ownedOSSProjects = projects.filter(p => p.project_type?.includes('owned_oss'))
-  const ossContributionProjects = projects.filter(p => p.project_type?.includes('oss_contribution'))
+  const booksProjects = projects.filter((p) => p.project_type?.includes('books'))
+  const ownedOSSProjects = projects.filter((p) => p.project_type?.includes('owned_oss'))
+  const ossContributionProjects = projects.filter((p) =>
+    p.project_type?.includes('oss_contribution'),
+  )
 
   // プロジェクト（books, owned_oss, oss_contribution以外のすべて）
   // applications, guest_posts, community_activitiesなど
-  const mainProjects = projects.filter(p => {
+  const mainProjects = projects.filter((p) => {
     const types = p.project_type || []
-    return !types.includes('books') && 
-           !types.includes('owned_oss') && 
-           !types.includes('oss_contribution')
+    return (
+      !types.includes('books') &&
+      !types.includes('owned_oss') &&
+      !types.includes('oss_contribution')
+    )
   })
 
   // オープンソース（owned_oss + NPM + WordPress）
   const allOSSItems = [
-    ...ownedOSSProjects.map(p => ({ type: 'project' as const, data: p })),
-    ...npmPackages.map(p => ({ type: 'npm' as const, data: p })),
-    ...wpPlugins.map(p => ({ type: 'wordpress' as const, data: p })),
+    ...ownedOSSProjects.map((p) => ({ type: 'project' as const, data: p })),
+    ...npmPackages.map((p) => ({ type: 'npm' as const, data: p })),
+    ...wpPlugins.map((p) => ({ type: 'wordpress' as const, data: p })),
   ]
 
   // 検索フィルター関数
@@ -321,57 +327,63 @@ export default function WorkPageContent({
   // フィルターと検索を適用
   const filteredProjects = useMemo(() => {
     let items: MicroCMSProjectsRecord[] = []
-    
+
     if (filterCategory === 'all' || filterCategory === 'projects') {
       items = [...mainProjects]
     } else if (filterCategory === 'oss-contribution') {
       items = [...ossContributionProjects]
     }
 
-    return items.filter(p => 
-      matchesSearch(p.title) || 
-      (p.about && matchesSearch(p.about.replace(/<[^>]*>/g, ''))) ||
-      (p.tags && p.tags.some(tag => matchesSearch(tag)))
+    return items.filter(
+      (p) =>
+        matchesSearch(p.title) ||
+        (p.about && matchesSearch(p.about.replace(/<[^>]*>/g, ''))) ||
+        p.tags?.some((tag) => matchesSearch(tag)),
     )
-  }, [filterCategory, searchQuery, mainProjects, ossContributionProjects])
+  }, [filterCategory, mainProjects, ossContributionProjects, matchesSearch])
 
   const filteredBooks = useMemo(() => {
     if (filterCategory !== 'all' && filterCategory !== 'books') return []
-    
-    return booksProjects.filter(p => 
-      matchesSearch(p.title) || 
-      (p.about && matchesSearch(p.about.replace(/<[^>]*>/g, ''))) ||
-      (p.tags && p.tags.some(tag => matchesSearch(tag)))
+
+    return booksProjects.filter(
+      (p) =>
+        matchesSearch(p.title) ||
+        (p.about && matchesSearch(p.about.replace(/<[^>]*>/g, ''))) ||
+        p.tags?.some((tag) => matchesSearch(tag)),
     )
-  }, [filterCategory, searchQuery, booksProjects])
+  }, [filterCategory, booksProjects, matchesSearch])
 
   const filteredOSS = useMemo(() => {
     if (filterCategory !== 'all' && filterCategory !== 'open-source') return []
-    
-    return allOSSItems.filter(item => {
+
+    return allOSSItems.filter((item) => {
       if (item.type === 'project') {
         const p = item.data as MicroCMSProjectsRecord
-        return matchesSearch(p.title) || 
-               (p.about && matchesSearch(p.about.replace(/<[^>]*>/g, ''))) ||
-               (p.tags && p.tags.some(tag => matchesSearch(tag)))
+        return (
+          matchesSearch(p.title) ||
+          (p.about && matchesSearch(p.about.replace(/<[^>]*>/g, ''))) ||
+          p.tags?.some((tag) => matchesSearch(tag))
+        )
       } else if (item.type === 'npm') {
         const pkg = (item.data as NPMRegistrySearchResult).package
         return matchesSearch(pkg.name) || (pkg.description && matchesSearch(pkg.description))
       } else {
         const plugin = item.data as WordPressPluginDetail
-        return matchesSearch(plugin.name) || (plugin.short_description && matchesSearch(plugin.short_description))
+        return (
+          matchesSearch(plugin.name) ||
+          (plugin.short_description && matchesSearch(plugin.short_description))
+        )
       }
     })
-  }, [filterCategory, searchQuery, allOSSItems])
+  }, [filterCategory, allOSSItems, matchesSearch])
 
   const filteredOSSContributions = useMemo(() => {
     if (filterCategory !== 'all' && filterCategory !== 'oss-contribution') return []
-    
-    return ossContributionProjects.filter(p => 
-      matchesSearch(p.title) || 
-      (p.about && matchesSearch(p.about.replace(/<[^>]*>/g, '')))
+
+    return ossContributionProjects.filter(
+      (p) => matchesSearch(p.title) || (p.about && matchesSearch(p.about.replace(/<[^>]*>/g, ''))),
     )
-  }, [filterCategory, searchQuery, ossContributionProjects])
+  }, [filterCategory, ossContributionProjects, matchesSearch])
 
   // 日付順にソート
   filteredProjects.sort((a, b) => {
@@ -393,22 +405,28 @@ export default function WorkPageContent({
   })
 
   filteredOSS.sort((a, b) => {
-    const dateA = a.type === 'project' 
-      ? (a.data as MicroCMSProjectsRecord).published_at || ''
-      : a.type === 'npm'
-      ? (a.data as NPMRegistrySearchResult).package.date
-      : (a.data as WordPressPluginDetail).added
-    const dateB = b.type === 'project'
-      ? (b.data as MicroCMSProjectsRecord).published_at || ''
-      : b.type === 'npm'
-      ? (b.data as NPMRegistrySearchResult).package.date
-      : (b.data as WordPressPluginDetail).added
+    const dateA =
+      a.type === 'project'
+        ? (a.data as MicroCMSProjectsRecord).published_at || ''
+        : a.type === 'npm'
+          ? (a.data as NPMRegistrySearchResult).package.date
+          : (a.data as WordPressPluginDetail).added
+    const dateB =
+      b.type === 'project'
+        ? (b.data as MicroCMSProjectsRecord).published_at || ''
+        : b.type === 'npm'
+          ? (b.data as NPMRegistrySearchResult).package.date
+          : (b.data as WordPressPluginDetail).added
     return new Date(dateB).getTime() - new Date(dateA).getTime()
   })
 
   // カウント計算
   const counts = {
-    all: mainProjects.length + allOSSItems.length + ossContributionProjects.length + booksProjects.length,
+    all:
+      mainProjects.length +
+      allOSSItems.length +
+      ossContributionProjects.length +
+      booksProjects.length,
     projects: mainProjects.length,
     'open-source': allOSSItems.length,
     books: booksProjects.length,
@@ -417,9 +435,10 @@ export default function WorkPageContent({
 
   // テキスト
   const title = lang === 'ja' ? '制作物' : 'Work'
-  const description = lang === 'ja' 
-    ? 'これまでに開発・制作したプロジェクト、オープンソースプロジェクト、書籍などを紹介しています。'
-    : 'A collection of projects, open source contributions, books, and other work I\'ve created.'
+  const description =
+    lang === 'ja'
+      ? 'これまでに開発・制作したプロジェクト、オープンソースプロジェクト、書籍などを紹介しています。'
+      : "A collection of projects, open source contributions, books, and other work I've created."
   const filterButtonText = lang === 'ja' ? 'フィルター' : 'Filter'
 
   // アクティブなフィルターの数を計算
@@ -445,38 +464,38 @@ export default function WorkPageContent({
             label: allText,
             active: filterCategory === 'all',
             count: counts.all,
-            onClick: () => setFilterCategory('all')
+            onClick: () => setFilterCategory('all'),
           },
           {
             id: 'projects',
             label: projectsText,
             active: filterCategory === 'projects',
             count: counts.projects,
-            onClick: () => setFilterCategory('projects')
+            onClick: () => setFilterCategory('projects'),
           },
           {
             id: 'open-source',
             label: openSourceText,
             active: filterCategory === 'open-source',
             count: counts['open-source'],
-            onClick: () => setFilterCategory('open-source')
+            onClick: () => setFilterCategory('open-source'),
           },
           {
             id: 'books',
             label: booksText,
             active: filterCategory === 'books',
             count: counts.books,
-            onClick: () => setFilterCategory('books')
+            onClick: () => setFilterCategory('books'),
           },
           {
             id: 'oss-contribution',
             label: ossContributionText,
             active: filterCategory === 'oss-contribution',
             count: counts['oss-contribution'],
-            onClick: () => setFilterCategory('oss-contribution')
-          }
-        ]
-      }
+            onClick: () => setFilterCategory('oss-contribution'),
+          },
+        ],
+      },
     ]
   }, [lang, filterCategory, counts])
 
@@ -500,7 +519,7 @@ export default function WorkPageContent({
 
           {/* モバイル用検索バーとフィルターボタン */}
           <div className="lg:hidden mb-6 space-y-4">
-            <SearchBar 
+            <SearchBar
               value={searchQuery}
               onChange={setSearchQuery}
               placeholder={lang === 'ja' ? '検索...' : 'Search...'}
@@ -524,8 +543,9 @@ export default function WorkPageContent({
               />
             }
           >
-              {/* プロジェクトセクション */}
-              {(filterCategory === 'all' || filterCategory === 'projects') && filteredProjects.length > 0 && (
+            {/* プロジェクトセクション */}
+            {(filterCategory === 'all' || filterCategory === 'projects') &&
+              filteredProjects.length > 0 && (
                 <div className="mb-12">
                   <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
                     {lang === 'ja' ? 'プロジェクト' : 'Projects'}
@@ -538,8 +558,9 @@ export default function WorkPageContent({
                 </div>
               )}
 
-              {/* 書籍セクション */}
-              {(filterCategory === 'all' || filterCategory === 'books') && filteredBooks.length > 0 && (
+            {/* 書籍セクション */}
+            {(filterCategory === 'all' || filterCategory === 'books') &&
+              filteredBooks.length > 0 && (
                 <div className="mb-12">
                   <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
                     {lang === 'ja' ? '書籍' : 'Books'}
@@ -552,30 +573,37 @@ export default function WorkPageContent({
                 </div>
               )}
 
-              {/* オープンソースセクション */}
-              {(filterCategory === 'all' || filterCategory === 'open-source') && filteredOSS.length > 0 && (
+            {/* オープンソースセクション */}
+            {(filterCategory === 'all' || filterCategory === 'open-source') &&
+              filteredOSS.length > 0 && (
                 <div className="mb-12">
                   <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
                     {lang === 'ja' ? 'オープンソース' : 'Open Source'}
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                    {filteredOSS.map((item, index) => {
+                    {filteredOSS.map((item, _index) => {
                       if (item.type === 'project') {
-                        return <UnifiedProjectCard key={item.data.id} project={item.data as MicroCMSProjectsRecord} lang={lang} />
+                        return (
+                          <UnifiedProjectCard
+                            key={item.data.id}
+                            project={item.data as MicroCMSProjectsRecord}
+                            lang={lang}
+                          />
+                        )
                       } else if (item.type === 'npm') {
                         return (
-                          <UnifiedOSSCard 
-                            key={`npm-${(item.data as NPMRegistrySearchResult).package.name}`} 
-                            item={{ type: 'npm', data: item.data as NPMRegistrySearchResult }} 
-                            lang={lang} 
+                          <UnifiedOSSCard
+                            key={`npm-${(item.data as NPMRegistrySearchResult).package.name}`}
+                            item={{ type: 'npm', data: item.data as NPMRegistrySearchResult }}
+                            lang={lang}
                           />
                         )
                       } else {
                         return (
-                          <UnifiedOSSCard 
-                            key={`wp-${(item.data as WordPressPluginDetail).slug}`} 
-                            item={{ type: 'wordpress', data: item.data as WordPressPluginDetail }} 
-                            lang={lang} 
+                          <UnifiedOSSCard
+                            key={`wp-${(item.data as WordPressPluginDetail).slug}`}
+                            item={{ type: 'wordpress', data: item.data as WordPressPluginDetail }}
+                            lang={lang}
                           />
                         )
                       }
@@ -584,8 +612,9 @@ export default function WorkPageContent({
                 </div>
               )}
 
-              {/* OSS Contributionセクション */}
-              {(filterCategory === 'all' || filterCategory === 'oss-contribution') && filteredOSSContributions.length > 0 && (
+            {/* OSS Contributionセクション */}
+            {(filterCategory === 'all' || filterCategory === 'oss-contribution') &&
+              filteredOSSContributions.length > 0 && (
                 <div>
                   <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
                     {lang === 'ja' ? 'OSS貢献' : 'OSS Contributions'}
@@ -598,8 +627,11 @@ export default function WorkPageContent({
                 </div>
               )}
 
-              {/* 結果なし */}
-              {filteredProjects.length === 0 && filteredBooks.length === 0 && filteredOSS.length === 0 && filteredOSSContributions.length === 0 && (
+            {/* 結果なし */}
+            {filteredProjects.length === 0 &&
+              filteredBooks.length === 0 &&
+              filteredOSS.length === 0 &&
+              filteredOSSContributions.length === 0 && (
                 <div className="py-12 text-center">
                   <p className="text-slate-600 dark:text-slate-400">
                     {lang === 'ja' ? '該当する項目が見つかりませんでした。' : 'No items found.'}

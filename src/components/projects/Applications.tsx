@@ -22,4 +22,3 @@ export default async function Applications({ lang }: { lang: string }) {
     </div>
   )
 }
-

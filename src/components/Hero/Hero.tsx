@@ -1,24 +1,26 @@
-import SocialLink from '@/components/tailwindui/SocialLink'
-import TwitterIcon from '@/components/tailwindui/SocialIcons/Twitter'
 import GitHubIcon from '@/components/tailwindui/SocialIcons/GitHub'
 import LinkedInIcon from '@/components/tailwindui/SocialIcons/LinkedIn'
+import TwitterIcon from '@/components/tailwindui/SocialIcons/Twitter'
+import SocialLink from '@/components/tailwindui/SocialLink'
+import BackgroundDecoration from '@/components/ui/BackgroundDecoration'
 import Badge from '@/components/ui/Badge'
 import CTAButton from '@/components/ui/CTAButton'
 import ProfileImage from '@/components/ui/ProfileImage'
-import BackgroundDecoration from '@/components/ui/BackgroundDecoration'
 import { SITE_CONFIG } from '@/config'
 
 export default function Hero({ lang }: { lang: string }) {
   const name = SITE_CONFIG.author.name
   const role = lang === 'ja' ? '開発者' : 'Developer'
-  const tagline = lang === 'ja'
-    ? 'SaaSの収益を最大化するエンジニアリング'
-    : 'Engineering that maximizes SaaS revenue'
-  
-  const description = lang === 'ja'
-    ? 'Stripe、AWS Serverless、WordPressを専門とする開発者。EC ASP開発とStripe Developer Advocateとしての経験を活かし、SaaS・ECサイトの収益最大化を支援します。'
-    : 'Engineering partner specializing in Stripe, AWS Serverless, and WordPress. Leveraging experience in EC ASP development and as a Stripe Developer Advocate to help SaaS and e-commerce sites maximize revenue.'
-  
+  const tagline =
+    lang === 'ja'
+      ? 'SaaSの収益を最大化するエンジニアリング'
+      : 'Engineering that maximizes SaaS revenue'
+
+  const description =
+    lang === 'ja'
+      ? 'Stripe、AWS Serverless、WordPressを専門とする開発者。EC ASP開発とStripe Developer Advocateとしての経験を活かし、SaaS・ECサイトの収益最大化を支援します。'
+      : 'Engineering partner specializing in Stripe, AWS Serverless, and WordPress. Leveraging experience in EC ASP development and as a Stripe Developer Advocate to help SaaS and e-commerce sites maximize revenue.'
+
   const ctaText = lang === 'ja' ? 'プロジェクトを見る' : 'View my projects'
   const ctaHref = lang === 'ja' ? '/ja/work' : '/work'
 
@@ -45,9 +47,7 @@ export default function Hero({ lang }: { lang: string }) {
             </p>
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 pt-4">
-              <CTAButton href={ctaHref}>
-                {ctaText}
-              </CTAButton>
+              <CTAButton href={ctaHref}>{ctaText}</CTAButton>
               <div className="flex items-center gap-5">
                 <SocialLink
                   href={SITE_CONFIG.social.twitter.url}

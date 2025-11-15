@@ -17,7 +17,8 @@ export default function StackShowcase({ lang }: { lang: string }) {
     },
     {
       name: 'AWS Serverless',
-      description: lang === 'ja' ? 'Lambda / Step Functions / DynamoDB' : 'Lambda · Step Functions · DynamoDB',
+      description:
+        lang === 'ja' ? 'Lambda / Step Functions / DynamoDB' : 'Lambda · Step Functions · DynamoDB',
       gradient: 'from-[#fbbf24] via-[#f97316] to-[#ef4444]',
     },
     {
@@ -38,7 +39,9 @@ export default function StackShowcase({ lang }: { lang: string }) {
   ]
 
   const title =
-    lang === 'ja' ? '信頼するスタックで、事業のスピードを最大化' : 'Move faster on a trusted platform stack'
+    lang === 'ja'
+      ? '信頼するスタックで、事業のスピードを最大化'
+      : 'Move faster on a trusted platform stack'
   const subtitle =
     lang === 'ja'
       ? 'パートナー企業との共創やエコシステム構築を前提に、開発から運用までをシームレスに繋ぎます。'

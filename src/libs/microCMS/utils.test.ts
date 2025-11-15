@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest'
-import { sortByEventDate } from './utils'
+import { describe, expect, it } from 'vitest'
 import type { MicroCMSEventsRecord } from './types'
+import { sortByEventDate } from './utils'
 
 describe('sortByEventDate', () => {
   const createMockEvent = (id: string, date: string): MicroCMSEventsRecord => ({
@@ -106,6 +106,6 @@ describe('sortByEventDate', () => {
 
     const sorted = sortByEventDate(events)
 
-    expect(sorted.map(e => e.id)).toEqual(['dec', 'mar', 'feb', 'jan'])
+    expect(sorted.map((e) => e.id)).toEqual(['dec', 'mar', 'feb', 'jan'])
   })
 })

@@ -1,12 +1,8 @@
-import SpeakingDetailPageContent from '@/components/containers/pages/SpeakingDetailPage'
-import { getWPEventBySlug, getAdjacentEvents } from '@/libs/dataSources/events'
 import { notFound } from 'next/navigation'
+import SpeakingDetailPageContent from '@/components/containers/pages/SpeakingDetailPage'
+import { getAdjacentEvents, getWPEventBySlug } from '@/libs/dataSources/events'
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>
-}) {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const event = await getWPEventBySlug(slug)
 
@@ -47,4 +43,3 @@ export default async function SpeakingDetailPage({
     />
   )
 }
-

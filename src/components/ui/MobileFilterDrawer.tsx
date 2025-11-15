@@ -1,8 +1,8 @@
 'use client'
 
 import { useEffect } from 'react'
-import SearchBar from '@/components/ui/SearchBar'
 import FilterItem from '@/components/ui/FilterItem'
+import SearchBar from '@/components/ui/SearchBar'
 
 export type FilterGroup = {
   title: string
@@ -35,7 +35,7 @@ export default function MobileFilterDrawer({
   searchPlaceholder = 'Search...',
   filterGroups,
   title = 'Filter',
-  lang = 'ja'
+  lang = 'ja',
 }: MobileFilterDrawerProps) {
   useEffect(() => {
     if (isOpen) {
@@ -54,10 +54,18 @@ export default function MobileFilterDrawer({
     <>
       {/* Backdrop */}
       <div
+        role="button"
+        tabIndex={0}
         className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
         onClick={onClose}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            onClose()
+          }
+        }}
       />
-      
+
       {/* Drawer Panel */}
       <div className="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-white/95 backdrop-blur-md shadow-2xl ring-1 ring-zinc-900/5 dark:bg-zinc-900/95 dark:ring-white/10 lg:hidden">
         <div className="flex flex-col h-full">
@@ -65,12 +73,18 @@ export default function MobileFilterDrawer({
           <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
             <h2 className="text-lg font-bold text-slate-900 dark:text-white">{title}</h2>
             <button
+              type="button"
               onClick={onClose}
               className="rounded-lg p-2 text-slate-700 dark:text-slate-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
               aria-label="Close filter"
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -80,7 +94,7 @@ export default function MobileFilterDrawer({
             <div className="space-y-6">
               {/* 検索バー */}
               <div>
-                <SearchBar 
+                <SearchBar
                   value={searchQuery}
                   onChange={onSearchChange}
                   placeholder={searchPlaceholder}
@@ -96,11 +110,7 @@ export default function MobileFilterDrawer({
                   <nav className="space-y-1">
                     {group.items.map((item) => (
                       <div key={item.id} className="space-y-1">
-                        <FilterItem
-                          active={item.active}
-                          onClick={item.onClick}
-                          count={item.count}
-                        >
+                        <FilterItem active={item.active} onClick={item.onClick} count={item.count}>
                           {item.label}
                         </FilterItem>
                         {item.active && item.externalLink && (
@@ -112,8 +122,18 @@ export default function MobileFilterDrawer({
                             onClick={(e) => e.stopPropagation()}
                           >
                             {lang === 'ja' ? '元のサイトで見る' : 'View on original site'}
-                            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            <svg
+                              className="h-3 w-3"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                              />
                             </svg>
                           </a>
                         )}
@@ -129,4 +149,3 @@ export default function MobileFilterDrawer({
     </>
   )
 }
-

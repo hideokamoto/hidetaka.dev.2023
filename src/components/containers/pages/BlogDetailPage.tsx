@@ -1,9 +1,9 @@
-import Link from 'next/link'
 import Image from 'next/image'
+import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
-import Tag from '@/components/ui/Tag'
 import ProfileCard from '@/components/ui/ProfileCard'
+import Tag from '@/components/ui/Tag'
 import type { WPThought } from '@/libs/dataSources/types'
 
 type BlogDetailPageProps = {
@@ -36,7 +36,7 @@ export default function BlogDetailPage({
       <article className="max-w-3xl mx-auto">
         {/* パンくずリスト */}
         <nav aria-label="Breadcrumb" className="mb-8">
-          <ol role="list" className="flex items-center space-x-2">
+          <ol className="flex items-center space-x-2">
             <li>
               <div className="flex items-center text-sm">
                 <Link
@@ -99,13 +99,17 @@ export default function BlogDetailPage({
                 .filter((term) => term.taxonomy === 'category')
                 .map((category) => {
                   // category.slugが既にエンコードされている可能性があるので、一度デコードしてからエンコード
-                  const normalizedSlug = category.slug.includes('%') 
-                    ? decodeURIComponent(category.slug) 
+                  const normalizedSlug = category.slug.includes('%')
+                    ? decodeURIComponent(category.slug)
                     : category.slug
                   const categoryUrl = `${basePath}/category/${encodeURIComponent(normalizedSlug)}`
                   return (
                     <Link key={category.id} href={categoryUrl}>
-                      <Tag variant="indigo" size="sm" className="cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors">
+                      <Tag
+                        variant="indigo"
+                        size="sm"
+                        className="cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors"
+                      >
                         {category.name}
                       </Tag>
                     </Link>
@@ -167,4 +171,3 @@ export default function BlogDetailPage({
     </Container>
   )
 }
-

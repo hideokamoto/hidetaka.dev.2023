@@ -1,8 +1,8 @@
 import WorkPageContent from '@/components/containers/pages/WorkPage'
-import { MicroCMSAPI } from '@/libs/microCMS/apis'
-import { createMicroCMSClient } from '@/libs/microCMS/client'
 import { listMyNPMPackages } from '@/libs/dataSources/npmjs'
 import { listMyWordPressPlugins } from '@/libs/dataSources/wporg'
+import { MicroCMSAPI } from '@/libs/microCMS/apis'
+import { createMicroCMSClient } from '@/libs/microCMS/client'
 
 export const metadata = {
   title: 'Work',
@@ -14,6 +14,12 @@ export default async function WorkPage() {
   const npmPackages = await listMyNPMPackages()
   const wpPlugins = await listMyWordPressPlugins()
 
-  return <WorkPageContent lang="en" projects={projects} npmPackages={npmPackages} wpPlugins={wpPlugins} />
+  return (
+    <WorkPageContent
+      lang="en"
+      projects={projects}
+      npmPackages={npmPackages}
+      wpPlugins={wpPlugins}
+    />
+  )
 }
-

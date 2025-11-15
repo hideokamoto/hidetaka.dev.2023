@@ -1,8 +1,8 @@
-import BlogPageContent from '@/components/containers/pages/BlogPage'
-import { loadThoughts, loadAllCategories } from '@/libs/dataSources/thoughts'
 import { notFound } from 'next/navigation'
-import { generateBlogListJsonLd } from '@/libs/jsonLd'
+import BlogPageContent from '@/components/containers/pages/BlogPage'
 import JsonLd from '@/components/JsonLd'
+import { loadAllCategories, loadThoughts } from '@/libs/dataSources/thoughts'
+import { generateBlogListJsonLd } from '@/libs/jsonLd'
 
 export const metadata = {
   title: 'Blog',
@@ -23,7 +23,7 @@ export default async function BlogPage() {
     'en',
     '/blog',
     result.currentPage,
-    result.totalPages
+    result.totalPages,
   )
 
   return (
@@ -40,4 +40,3 @@ export default async function BlogPage() {
     </>
   )
 }
-

@@ -5,14 +5,14 @@ type TagProps = {
   className?: string
 }
 
-export default function Tag({ 
-  children, 
+export default function Tag({
+  children,
   variant = 'default',
   size = 'md',
-  className = '' 
+  className = '',
 }: TagProps) {
   const baseStyles = 'inline-flex items-center rounded-lg font-semibold'
-  
+
   const sizeStyles = {
     sm: 'px-2.5 py-1 text-xs',
     md: 'px-3 py-1.5 text-xs',
@@ -30,4 +30,3 @@ export default function Tag({
     </span>
   )
 }
-

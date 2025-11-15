@@ -1,14 +1,10 @@
-import type { WPThought, BlogItem } from './dataSources/types'
 import { SITE_CONFIG } from '@/config'
+import type { BlogItem, WPThought } from './dataSources/types'
 
 /**
  * ブログ詳細ページ用のBlogPosting JSON-LDを生成
  */
-export function generateBlogPostingJsonLd(
-  thought: WPThought,
-  lang: string,
-  basePath: string
-) {
+export function generateBlogPostingJsonLd(thought: WPThought, lang: string, basePath: string) {
   const fullUrl = `${SITE_CONFIG.url}${basePath}/${thought.slug}`
 
   // HTMLタグを除去してプレーンテキストに変換
@@ -19,10 +15,11 @@ export function generateBlogPostingJsonLd(
   const description = stripHtml(thought.excerpt.rendered)
 
   // カテゴリ情報を取得
-  const categories = thought._embedded?.['wp:term']
-    ?.flat()
-    .filter((term) => term.taxonomy === 'category')
-    .map((cat) => cat.name) || []
+  const categories =
+    thought._embedded?.['wp:term']
+      ?.flat()
+      .filter((term) => term.taxonomy === 'category')
+      .map((cat) => cat.name) || []
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -59,11 +56,7 @@ export function generateBlogPostingJsonLd(
 /**
  * ブログ詳細ページ用のBreadcrumbList JSON-LDを生成
  */
-export function generateBlogBreadcrumbJsonLd(
-  thought: WPThought,
-  lang: string,
-  basePath: string
-) {
+export function generateBlogBreadcrumbJsonLd(thought: WPThought, lang: string, basePath: string) {
   const blogLabel = lang === 'ja' ? 'ブログ' : 'Blog'
   const fullUrl = `${SITE_CONFIG.url}${basePath}/${thought.slug}`
   const blogUrl = `${SITE_CONFIG.url}${basePath}`
@@ -98,24 +91,24 @@ export function generateBlogListJsonLd(
   lang: string,
   basePath: string,
   currentPage: number,
-  totalPages: number,
-  categoryName?: string
+  _totalPages: number,
+  categoryName?: string,
 ) {
   const title = categoryName
     ? lang === 'ja'
       ? `カテゴリ: ${categoryName}`
       : `Category: ${categoryName}`
     : lang === 'ja'
-    ? 'ブログ'
-    : 'Blog'
+      ? 'ブログ'
+      : 'Blog'
 
   const description = categoryName
     ? lang === 'ja'
       ? `「${categoryName}」カテゴリのブログ記事一覧です。`
       : `Blog posts in the "${categoryName}" category.`
     : lang === 'ja'
-    ? '技術的ではないトピックを中心としたブログ記事を掲載しています。'
-    : 'A collection of blog posts focusing on non-technical topics.'
+      ? '技術的ではないトピックを中心としたブログ記事を掲載しています。'
+      : 'A collection of blog posts focusing on non-technical topics.'
 
   const fullUrl =
     currentPage > 1
