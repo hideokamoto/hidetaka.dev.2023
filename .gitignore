@@ -33,3 +33,7 @@ Thumbs.db
 # Astro (legacy)
 .astro/
 dist/
+
+# Testing
+coverage/
+.vitest/
