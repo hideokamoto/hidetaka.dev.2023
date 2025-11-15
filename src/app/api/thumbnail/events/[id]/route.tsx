@@ -95,7 +95,6 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     }
 
     // Service Binding経由でOG画像生成Workerを呼び出す
-    // @ts-expect-error
     const response = await ogImageGenerator.fetch(ogImageUrl, { headers })
 
     // エラーハンドリング
