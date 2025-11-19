@@ -37,3 +37,6 @@ dist/
 # Testing
 coverage/
 .vitest/
+
+# TypeScript
+*.tsbuildinfo
