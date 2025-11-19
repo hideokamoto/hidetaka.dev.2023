@@ -364,3 +364,61 @@ export const loadAllThoughts = async (lang: 'en' | 'ja' = 'en'): Promise<BlogIte
     return []
   }
 }
+
+/**
+ * 関連記事を取得（同じカテゴリの記事）
+ */
+export const getRelatedThoughts = async (
+  currentThought: WPThought,
+  limit: number = 4,
+  lang: 'en' | 'ja' = 'en',
+): Promise<BlogItem[]> => {
+  // 英語の記事は存在しないため、英語が指定された場合は即座に空の配列を返す
+  if (lang === 'en') {
+    return []
+  }
+
+  try {
+    // カテゴリを抽出
+    const categories = extractCategories(currentThought)
+
+    // カテゴリが存在しない場合は空の配列を返す
+    if (categories.length === 0) {
+      return []
+    }
+
+    // 最初のカテゴリで関連記事を取得（複数カテゴリがある場合は最初のもの）
+    const categoryId = categories[0].id
+
+    // 同じカテゴリの記事を取得（現在の記事を除外）
+    const response = await fetch(
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?categories=${categoryId}&exclude=${currentThought.id}&per_page=${limit}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
+    )
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch related thoughts: ${response.status}`)
+    }
+
+    const thoughts: WPThought[] = await response.json()
+
+    // BlogItem型に変換
+    const items: BlogItem[] = thoughts.map((thought: WPThought): BlogItem => {
+      const basePath = '/ja/blog'
+      const href = `${basePath}/${thought.slug}`
+
+      return {
+        id: thought.id.toString(),
+        title: thought.title.rendered,
+        description: thought.excerpt.rendered.replace(/<[^>]*>/g, '').substring(0, 150),
+        datetime: thought.date,
+        href,
+        categories: extractCategories(thought),
+      }
+    })
+
+    return items
+  } catch (error) {
+    console.error('Error loading related thoughts:', error)
+    return []
+  }
+}

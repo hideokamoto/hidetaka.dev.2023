@@ -3,8 +3,9 @@ import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import ProfileCard from '@/components/ui/ProfileCard'
+import RelatedArticles from '@/components/ui/RelatedArticles'
 import Tag from '@/components/ui/Tag'
-import type { WPThought } from '@/libs/dataSources/types'
+import type { BlogItem, WPThought } from '@/libs/dataSources/types'
 
 type BlogDetailPageProps = {
   thought: WPThought
@@ -12,6 +13,7 @@ type BlogDetailPageProps = {
   basePath: string
   previousThought?: WPThought | null
   nextThought?: WPThought | null
+  relatedArticles?: BlogItem[]
 }
 
 export default function BlogDetailPage({
@@ -20,6 +22,7 @@ export default function BlogDetailPage({
   basePath,
   previousThought,
   nextThought,
+  relatedArticles = [],
 }: BlogDetailPageProps) {
   const date = new Date(thought.date)
   const blogLabel = lang === 'ja' ? 'ブログ' : 'Blog'
@@ -127,6 +130,9 @@ export default function BlogDetailPage({
 
         {/* プロフィールカード */}
         <ProfileCard lang={lang} imageSrc="/images/profile.jpg" className="mt-12" />
+
+        {/* 関連記事 */}
+        <RelatedArticles articles={relatedArticles} lang={lang} />
 
         {/* 前後の記事へのナビゲーション */}
         {(previousThought || nextThought) && (

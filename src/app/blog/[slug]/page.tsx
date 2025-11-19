@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation'
 import BlogDetailPageContent from '@/components/containers/pages/BlogDetailPage'
 import JsonLd from '@/components/JsonLd'
-import { getThoughtBySlug } from '@/libs/dataSources/thoughts'
+import type { WPThought } from '@/libs/dataSources/types'
+import { getRelatedThoughts, getThoughtBySlug } from '@/libs/dataSources/thoughts'
 import { generateBlogBreadcrumbJsonLd, generateBlogPostingJsonLd } from '@/libs/jsonLd'
 import { generateBlogPostMetadata } from '@/libs/metadata'
 
@@ -26,14 +27,25 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
     notFound()
   }
 
-  const blogPostingJsonLd = generateBlogPostingJsonLd(thought, 'en', '/blog')
-  const breadcrumbJsonLd = generateBlogBreadcrumbJsonLd(thought, 'en', '/blog')
+  // notFound()の後なので、thoughtは確実にWPThought型
+  const validThought = thought as WPThought
+
+  // 関連記事を取得
+  const relatedArticles = await getRelatedThoughts(validThought, 4, 'en')
+
+  const blogPostingJsonLd = generateBlogPostingJsonLd(validThought, 'en', '/blog')
+  const breadcrumbJsonLd = generateBlogBreadcrumbJsonLd(validThought, 'en', '/blog')
 
   return (
     <>
       <JsonLd data={blogPostingJsonLd} />
       <JsonLd data={breadcrumbJsonLd} />
-      <BlogDetailPageContent thought={thought} lang="en" basePath="/blog" />
+      <BlogDetailPageContent
+        thought={validThought}
+        lang="en"
+        basePath="/blog"
+        relatedArticles={relatedArticles}
+      />
     </>
   )
 }
