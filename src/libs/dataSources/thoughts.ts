@@ -374,7 +374,7 @@ export const getRelatedThoughts = async (
   lang: 'en' | 'ja' = 'en',
 ): Promise<BlogItem[]> => {
   // 英語の記事は存在しないため、英語が指定された場合は即座に空の配列を返す
-  if (lang === 'en') {
+  if (lang !== 'ja') {
     return []
   }
 
