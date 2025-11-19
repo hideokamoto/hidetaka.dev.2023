@@ -1,7 +1,11 @@
 import { notFound } from 'next/navigation'
 import BlogDetailPageContent from '@/components/containers/pages/BlogDetailPage'
 import JsonLd from '@/components/JsonLd'
-import { getAdjacentThoughts, getRelatedThoughts, getThoughtBySlug } from '@/libs/dataSources/thoughts'
+import {
+  getAdjacentThoughts,
+  getRelatedThoughts,
+  getThoughtBySlug,
+} from '@/libs/dataSources/thoughts'
 import { generateBlogBreadcrumbJsonLd, generateBlogPostingJsonLd } from '@/libs/jsonLd'
 import { generateBlogPostMetadata } from '@/libs/metadata'
 

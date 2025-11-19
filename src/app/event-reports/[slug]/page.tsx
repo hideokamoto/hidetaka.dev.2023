@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation'
 import SpeakingDetailPageContent from '@/components/containers/pages/SpeakingDetailPage'
-import type { WPEvent } from '@/libs/dataSources/types'
 import { getAdjacentEvents, getRelatedEvents, getWPEventBySlug } from '@/libs/dataSources/events'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
@@ -31,18 +30,15 @@ export default async function SpeakingDetailPage({
     notFound()
   }
 
-  // notFound()の後なので、eventは確実にWPEvent型
-  const validEvent = event as WPEvent
-
   // 前後の記事と関連記事を取得
   const [{ previous, next }, relatedEvents] = await Promise.all([
-    getAdjacentEvents(validEvent),
-    getRelatedEvents(validEvent, 4, 'en'),
+    getAdjacentEvents(event),
+    getRelatedEvents(event, 4, 'en'),
   ])
 
   return (
     <SpeakingDetailPageContent
-      event={validEvent}
+      event={event}
       lang="en"
       basePath="/event-reports"
       previousEvent={previous}
