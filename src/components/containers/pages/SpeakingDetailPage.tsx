@@ -3,8 +3,9 @@ import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import ProfileCard from '@/components/ui/ProfileCard'
+import RelatedArticles from '@/components/ui/RelatedArticles'
 import Tag from '@/components/ui/Tag'
-import type { WPEvent } from '@/libs/dataSources/types'
+import type { BlogItem, WPEvent } from '@/libs/dataSources/types'
 
 type SpeakingDetailPageProps = {
   event: WPEvent
@@ -12,6 +13,7 @@ type SpeakingDetailPageProps = {
   basePath: string
   previousEvent?: WPEvent | null
   nextEvent?: WPEvent | null
+  relatedEvents?: BlogItem[]
 }
 
 export default function SpeakingDetailPage({
@@ -20,6 +22,7 @@ export default function SpeakingDetailPage({
   basePath,
   previousEvent,
   nextEvent,
+  relatedEvents = [],
 }: SpeakingDetailPageProps) {
   const date = new Date(event.date)
   const speakingLabel = lang === 'ja' ? '登壇・講演' : 'Speaking'
@@ -108,6 +111,9 @@ export default function SpeakingDetailPage({
 
         {/* プロフィールカード */}
         <ProfileCard lang={lang} imageSrc="/images/profile.jpg" className="mt-12" />
+
+        {/* 関連記事 */}
+        <RelatedArticles articles={relatedEvents} lang={lang} />
 
         {/* 前後の記事へのナビゲーション */}
         {(previousEvent || nextEvent) && (
