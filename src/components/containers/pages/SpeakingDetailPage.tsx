@@ -3,8 +3,9 @@ import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import ProfileCard from '@/components/ui/ProfileCard'
+import RelatedArticles from '@/components/ui/RelatedArticles'
 import Tag from '@/components/ui/Tag'
-import type { WPEvent } from '@/libs/dataSources/types'
+import type { BlogItem, WPEvent } from '@/libs/dataSources/types'
 
 type SpeakingDetailPageProps = {
   event: WPEvent
@@ -12,6 +13,7 @@ type SpeakingDetailPageProps = {
   basePath: string
   previousEvent?: WPEvent | null
   nextEvent?: WPEvent | null
+  relatedEvents?: BlogItem[]
 }
 
 export default function SpeakingDetailPage({
@@ -20,12 +22,14 @@ export default function SpeakingDetailPage({
   basePath,
   previousEvent,
   nextEvent,
+  relatedEvents = [],
 }: SpeakingDetailPageProps) {
   const date = new Date(event.date)
   const speakingLabel = lang === 'ja' ? '登壇・講演' : 'Speaking'
   const reportLabel = lang === 'ja' ? 'レポート' : 'Report'
   const previousLabel = lang === 'ja' ? '前の記事' : 'Previous'
   const nextLabel = lang === 'ja' ? '次の記事' : 'Next'
+  const relatedEventsTitle = lang === 'ja' ? '最近参加した他のイベント' : 'Other Recent Events'
 
   // OG画像のURLを生成
   const ogImageUrl = `/api/thumbnail/events/${event.id}`
@@ -108,6 +112,9 @@ export default function SpeakingDetailPage({
 
         {/* プロフィールカード */}
         <ProfileCard lang={lang} imageSrc="/images/profile.jpg" className="mt-12" />
+
+        {/* 最近参加した他のイベント */}
+        <RelatedArticles articles={relatedEvents} lang={lang} title={relatedEventsTitle} />
 
         {/* 前後の記事へのナビゲーション */}
         {(previousEvent || nextEvent) && (

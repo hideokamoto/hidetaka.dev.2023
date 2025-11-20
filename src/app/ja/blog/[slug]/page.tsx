@@ -1,7 +1,11 @@
 import { notFound } from 'next/navigation'
 import BlogDetailPageContent from '@/components/containers/pages/BlogDetailPage'
 import JsonLd from '@/components/JsonLd'
-import { getAdjacentThoughts, getThoughtBySlug } from '@/libs/dataSources/thoughts'
+import {
+  getAdjacentThoughts,
+  getRelatedThoughts,
+  getThoughtBySlug,
+} from '@/libs/dataSources/thoughts'
 import { generateBlogBreadcrumbJsonLd, generateBlogPostingJsonLd } from '@/libs/jsonLd'
 import { generateBlogPostMetadata } from '@/libs/metadata'
 
@@ -30,8 +34,11 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
   const blogPostingJsonLd = generateBlogPostingJsonLd(thought, 'ja', '/ja/blog')
   const breadcrumbJsonLd = generateBlogBreadcrumbJsonLd(thought, 'ja', '/ja/blog')
 
-  // 前後の記事を取得
-  const adjacentThoughts = await getAdjacentThoughts(thought, 'ja')
+  // 前後の記事と関連記事を取得
+  const [adjacentThoughts, relatedArticles] = await Promise.all([
+    getAdjacentThoughts(thought, 'ja'),
+    getRelatedThoughts(thought, 4, 'ja'),
+  ])
 
   return (
     <>
@@ -43,6 +50,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
         basePath="/ja/blog"
         previousThought={adjacentThoughts.previous}
         nextThought={adjacentThoughts.next}
+        relatedArticles={relatedArticles}
       />
     </>
   )

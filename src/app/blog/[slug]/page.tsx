@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import BlogDetailPageContent from '@/components/containers/pages/BlogDetailPage'
 import JsonLd from '@/components/JsonLd'
-import { getThoughtBySlug } from '@/libs/dataSources/thoughts'
+import { getRelatedThoughts, getThoughtBySlug } from '@/libs/dataSources/thoughts'
 import { generateBlogBreadcrumbJsonLd, generateBlogPostingJsonLd } from '@/libs/jsonLd'
 import { generateBlogPostMetadata } from '@/libs/metadata'
 
@@ -26,6 +26,9 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
     notFound()
   }
 
+  // 関連記事を取得
+  const relatedArticles = await getRelatedThoughts(thought, 4, 'en')
+
   const blogPostingJsonLd = generateBlogPostingJsonLd(thought, 'en', '/blog')
   const breadcrumbJsonLd = generateBlogBreadcrumbJsonLd(thought, 'en', '/blog')
 
@@ -33,7 +36,12 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
     <>
       <JsonLd data={blogPostingJsonLd} />
       <JsonLd data={breadcrumbJsonLd} />
-      <BlogDetailPageContent thought={thought} lang="en" basePath="/blog" />
+      <BlogDetailPageContent
+        thought={thought}
+        lang="en"
+        basePath="/blog"
+        relatedArticles={relatedArticles}
+      />
     </>
   )
 }

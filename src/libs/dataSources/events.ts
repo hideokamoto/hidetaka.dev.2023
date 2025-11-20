@@ -1,4 +1,4 @@
-import type { WPEvent } from './types'
+import type { BlogItem, WPEvent } from './types'
 
 export const loadWPEvents = async (): Promise<WPEvent[]> => {
   try {
@@ -89,5 +89,43 @@ export const getAdjacentEvents = async (currentEvent: WPEvent): Promise<Adjacent
       previous: null,
       next: null,
     }
+  }
+}
+
+/**
+ * 関連イベント記事を取得（同じ投稿タイプの最新記事）
+ * BlogItem型で返すため、RelatedArticlesコンポーネントで表示可能
+ */
+export const getRelatedEvents = async (
+  currentEvent: WPEvent,
+  limit: number = 4,
+  lang: 'en' | 'ja' = 'en',
+): Promise<BlogItem[]> => {
+  try {
+    // 現在の記事を除外して最新のイベント記事を取得
+    const response = await fetch(
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?exclude=${currentEvent.id}&per_page=${limit}&orderby=date&order=desc&_fields=id,title,date,date_gmt,excerpt,slug`,
+    )
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch related events: ${response.status}`)
+    }
+
+    const events: WPEvent[] = await response.json()
+
+    // BlogItem型に変換
+    const basePath = lang === 'ja' ? '/ja/event-reports' : '/event-reports'
+    const items: BlogItem[] = events.map((event) => ({
+      id: event.id.toString(),
+      title: event.title.rendered,
+      description: event.excerpt.rendered.replace(/<[^>]*>/g, '').substring(0, 150),
+      datetime: event.date,
+      href: `${basePath}/${event.slug}`,
+    }))
+
+    return items
+  } catch (error) {
+    console.error('Error loading related events:', error)
+    return []
   }
 }
