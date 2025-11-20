@@ -29,6 +29,7 @@ export default function SpeakingDetailPage({
   const reportLabel = lang === 'ja' ? 'レポート' : 'Report'
   const previousLabel = lang === 'ja' ? '前の記事' : 'Previous'
   const nextLabel = lang === 'ja' ? '次の記事' : 'Next'
+  const relatedEventsTitle = lang === 'ja' ? '最近参加した他のイベント' : 'Other Recent Events'
 
   // OG画像のURLを生成
   const ogImageUrl = `/api/thumbnail/events/${event.id}`
@@ -112,8 +113,8 @@ export default function SpeakingDetailPage({
         {/* プロフィールカード */}
         <ProfileCard lang={lang} imageSrc="/images/profile.jpg" className="mt-12" />
 
-        {/* 関連記事 */}
-        <RelatedArticles articles={relatedEvents} lang={lang} />
+        {/* 最近参加した他のイベント */}
+        <RelatedArticles articles={relatedEvents} lang={lang} title={relatedEventsTitle} />
 
         {/* 前後の記事へのナビゲーション */}
         {(previousEvent || nextEvent) && (

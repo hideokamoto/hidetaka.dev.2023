@@ -5,20 +5,27 @@ import DateDisplay from './DateDisplay'
 type RelatedArticlesProps = {
   articles: BlogItem[]
   lang: string
+  title?: string
   className?: string
 }
 
-export default function RelatedArticles({ articles, lang, className = '' }: RelatedArticlesProps) {
+export default function RelatedArticles({
+  articles,
+  lang,
+  title,
+  className = '',
+}: RelatedArticlesProps) {
   // 記事がない場合は何も表示しない
   if (articles.length === 0) {
     return null
   }
 
-  const title = lang === 'ja' ? '関連記事' : 'Related Articles'
+  const defaultTitle = lang === 'ja' ? '関連記事' : 'Related Articles'
+  const displayTitle = title || defaultTitle
 
   return (
     <section className={`mt-12 ${className}`}>
-      <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">{title}</h2>
+      <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">{displayTitle}</h2>
       <div className="grid gap-6 sm:grid-cols-2">
         {articles.map((article) => {
           const date = new Date(article.datetime)

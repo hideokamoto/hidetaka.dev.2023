@@ -366,7 +366,7 @@ export const loadAllThoughts = async (lang: 'en' | 'ja' = 'en'): Promise<BlogIte
 }
 
 /**
- * 関連記事を取得（同じカテゴリの記事）
+ * 関連記事を取得（同じカテゴリの記事からランダムに選択）
  */
 export const getRelatedThoughts = async (
   currentThought: WPThought,
@@ -390,9 +390,10 @@ export const getRelatedThoughts = async (
     // 最初のカテゴリで関連記事を取得（複数カテゴリがある場合は最初のもの）
     const categoryId = categories[0].id
 
-    // 同じカテゴリの記事を取得（現在の記事を除外）
+    // 同じカテゴリの記事を10件取得（現在の記事を除外）
+    const fetchLimit = Math.max(limit * 2.5, 10) // 最低10件、limitの2.5倍まで
     const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?categories=${categoryId}&exclude=${currentThought.id}&per_page=${limit}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?categories=${categoryId}&exclude=${currentThought.id}&per_page=${fetchLimit}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
     )
 
     if (!response.ok) {
@@ -416,7 +417,15 @@ export const getRelatedThoughts = async (
       }
     })
 
-    return items
+    // Fisher-Yatesアルゴリズムでシャッフル
+    const shuffled = [...items]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+
+    // limitの数だけ返す
+    return shuffled.slice(0, limit)
   } catch (error) {
     console.error('Error loading related thoughts:', error)
     return []
