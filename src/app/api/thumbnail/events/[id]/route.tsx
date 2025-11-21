@@ -8,15 +8,14 @@ import type { WPEvent } from '@/libs/dataSources/types'
 // getCloudflareContextを動的インポートで取得（OpenNextのビルドプロセスで正しく解決されるように）
 async function getCloudflareContext(
   options: { async: true } | { async?: false } = { async: false },
-): Promise<{ env: Record<string, unknown> }> {
+) {
   try {
     const { getCloudflareContext: getContext } = await import('@opennextjs/cloudflare')
     // 型アサーションでオーバーロードを解決
     if (options.async === true) {
-      return getContext({ async: true })
-    } else {
-      return getContext({ async: false })
+      return await getContext({ async: true })
     }
+    return getContext({ async: false })
   } catch (_error) {
     // フォールバック: グローバルスコープから直接取得
     const cloudflareContextSymbol = Symbol.for('__cloudflare-context__')
@@ -26,9 +25,7 @@ async function getCloudflareContext(
       }
     )[cloudflareContextSymbol]
     if (context) {
-      return options.async === true
-        ? Promise.resolve(context as { env: Record<string, unknown> })
-        : (context as { env: Record<string, unknown> })
+      return options.async === true ? Promise.resolve(context) : context
     }
     throw new Error('Cloudflare context is not available')
   }
@@ -75,12 +72,13 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 
     // OpenNextのCloudflareアダプターでは、getCloudflareContext()経由でbindingsにアクセス
     // async: trueを指定することで、SSGや開発環境でも動作する
-    const { env } = await getCloudflareContext({ async: true })
-    // 型定義は npm run cf-typegen で生成されるが、ここでは型アサーションを使用
-    const typedEnv = env as {
-      OG_IMAGE_GENERATOR?: { fetch: typeof fetch }
-      OG_IMAGE_GEN_AUTH_TOKEN?: string
+    const context = (await getCloudflareContext({ async: true })) as {
+      env: {
+        OG_IMAGE_GENERATOR?: { fetch: typeof fetch }
+        OG_IMAGE_GEN_AUTH_TOKEN?: string
+      }
     }
+    const typedEnv = context.env
     const ogImageGenerator = typedEnv.OG_IMAGE_GENERATOR
     console.log('ogImageGenerator', ogImageGenerator)
     if (!ogImageGenerator) {
