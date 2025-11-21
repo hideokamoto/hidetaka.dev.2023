@@ -11,6 +11,7 @@ export default function GoogleAnalytics({ gaId }: GoogleAnalyticsProps) {
         strategy="afterInteractive"
         src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
       />
+      {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Required for Google Analytics script injection */}
       <Script
         id="google-analytics"
         strategy="afterInteractive"
