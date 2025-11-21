@@ -5,8 +5,10 @@ import { useEffect } from 'react'
 
 export function ClarityAnalytics() {
   useEffect(() => {
-    // Initialize Microsoft Clarity with project ID
-    clarity.init('u9k95lfa82')
+    // Only initialize Microsoft Clarity in production environment
+    if (process.env.NODE_ENV === 'production') {
+      clarity.init('u9k95lfa82')
+    }
   }, [])
 
   return null
