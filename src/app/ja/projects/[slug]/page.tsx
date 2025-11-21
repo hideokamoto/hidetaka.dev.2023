@@ -160,8 +160,8 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-3xl my-4">
             Background
           </h2>
-          {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Content is from trusted microCMS, controlled by site owner */}
           <div
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: Content is from trusted microCMS, controlled by site owner
             dangerouslySetInnerHTML={{
               __html:
                 typeof project.background === 'string'
@@ -176,8 +176,8 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
           <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-3xl my-4">
             Architecture
           </h2>
-          {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Content is from trusted microCMS, controlled by site owner */}
           <div
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: Content is from trusted microCMS, controlled by site owner
             dangerouslySetInnerHTML={{
               __html:
                 typeof project.architecture === 'string'
