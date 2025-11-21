@@ -5,6 +5,11 @@ type GoogleAnalyticsProps = {
 }
 
 export default function GoogleAnalytics({ gaId }: GoogleAnalyticsProps) {
+  // Don't render scripts if gaId is missing or empty
+  if (!gaId) {
+    return null
+  }
+
   return (
     <>
       <Script
