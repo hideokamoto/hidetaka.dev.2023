@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
 import clarity from '@microsoft/clarity'
+import { useEffect } from 'react'
 
 export function ClarityAnalytics() {
   useEffect(() => {

@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import { SITE_DESCRIPTION, SITE_TITLE } from '@/consts'
 import './globals.css'
-import { DarkModeScript } from '@/components/DarkModeScript'
 import { ClarityAnalytics } from '@/components/ClarityAnalytics'
+import { DarkModeScript } from '@/components/DarkModeScript'
 import Footer from '@/components/tailwindui/Footer'
 import Header from '@/components/tailwindui/Header'
 
