@@ -21,6 +21,7 @@
     "cf-typegen": "wrangler types --env-interface CloudflareEnv cloudflare-env.d.ts"
   },
   "dependencies": {
+    "@microsoft/clarity": "^1.0.0",
     "@opennextjs/cloudflare": "^1.12.0",
     "dayjs": "^1.11.7",
     "fast-xml-parser": "^4.2.4",
