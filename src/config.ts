@@ -38,16 +38,14 @@ export const SITE_CONFIG = {
     publisherId: 'ca-pub-6091198629319043',
 
     // In-Article Ad (記事詳細ページ用)
-    // Google AdSense の管理画面で作成した広告ユニットのスロットIDを設定してください
     inArticleAd: {
-      slot: 'XXXXXXXXXX', // TODO: AdSense管理画面で作成した In-Article Ad のスロットIDに置き換えてください
+      slot: '4690493008',
     },
 
     // In-Feed Ad (記事一覧ページ用)
-    // Google AdSense の管理画面で作成した広告ユニットのスロットIDとレイアウトキーを設定してください
     inFeedAd: {
-      slot: 'YYYYYYYYYY', // TODO: AdSense管理画面で作成した In-Feed Ad のスロットIDに置き換えてください
-      layoutKey: '-fb+5w+4e-db+86', // TODO: AdSense管理画面から取得したレイアウトキーに置き換えてください
+      slot: '2648328180',
+      layoutKey: '-fb+5w+4e-db+86',
     },
   },
 } as const
