@@ -27,6 +27,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ id:
         </h1>
         <div
           className="mt-6 prose prose-zinc dark:prose-invert"
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: Content is from trusted microCMS, controlled by site owner
           dangerouslySetInnerHTML={{
             __html: typeof post.content === 'string' ? post.content : String(post.content || ''),
           }}

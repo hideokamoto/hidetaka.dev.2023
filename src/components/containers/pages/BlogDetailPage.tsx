@@ -126,6 +126,7 @@ export default function BlogDetailPage({
         {/* コンテンツ */}
         <div
           className="blog-content text-zinc-700 dark:text-zinc-300 leading-relaxed"
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: Content is from trusted WordPress CMS, controlled by site owner
           dangerouslySetInnerHTML={{ __html: thought.content.rendered }}
         />
 

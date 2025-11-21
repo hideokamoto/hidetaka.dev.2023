@@ -158,6 +158,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
             Background
           </h2>
           <div
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: Content is from trusted microCMS, controlled by site owner
             dangerouslySetInnerHTML={{
               __html:
                 typeof project.background === 'string'
@@ -173,6 +174,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
             Architecture
           </h2>
           <div
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: Content is from trusted microCMS, controlled by site owner
             dangerouslySetInnerHTML={{
               __html:
                 typeof project.architecture === 'string'

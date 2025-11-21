@@ -3,9 +3,9 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '@/consts'
 import './globals.css'
 import { ClarityAnalytics } from '@/components/ClarityAnalytics'
 import { DarkModeScript } from '@/components/DarkModeScript'
+import GoogleAnalytics from '@/components/GoogleAnalytics'
 import Footer from '@/components/tailwindui/Footer'
 import Header from '@/components/tailwindui/Header'
-import GoogleAnalytics from '@/components/GoogleAnalytics'
 
 export const metadata: Metadata = {
   title: SITE_TITLE,
