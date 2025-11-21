@@ -5,8 +5,11 @@ type GoogleAnalyticsProps = {
 }
 
 export default function GoogleAnalytics({ gaId }: GoogleAnalyticsProps) {
-  // Don't render scripts if gaId is missing or empty
-  if (!gaId) {
+  // Validate gaId format to prevent XSS attacks
+  if (!gaId || !/^G-[A-Z0-9]{10}$/.test(gaId)) {
+    if (process.env.NODE_ENV === 'development' && gaId) {
+      console.error('Invalid Google Analytics ID format:', gaId)
+    }
     return null
   }
 
