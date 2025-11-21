@@ -4,6 +4,7 @@ import './globals.css'
 import { DarkModeScript } from '@/components/DarkModeScript'
 import Footer from '@/components/tailwindui/Footer'
 import Header from '@/components/tailwindui/Header'
+import GoogleAnalytics from '@/components/GoogleAnalytics'
 
 export const metadata: Metadata = {
   title: SITE_TITLE,
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="alternate" type="application/rss+xml" title="RSS" href="/projects/rss.xml" />
       </head>
       <body className="flex h-full flex-col bg-zinc-50 dark:bg-black">
+        <GoogleAnalytics gaId="G-RV8PYHHYHN" />
         <DarkModeScript />
         <div className="fixed inset-0 flex justify-center sm:px-8">
           <div className="flex w-full max-w-7xl lg:px-8">
