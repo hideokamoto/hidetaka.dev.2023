@@ -20,7 +20,11 @@ async function getCloudflareContext(
   } catch (_error) {
     // フォールバック: グローバルスコープから直接取得
     const cloudflareContextSymbol = Symbol.for('__cloudflare-context__')
-    const context = (globalThis as any)[cloudflareContextSymbol]
+    const context = (
+      globalThis as typeof globalThis & {
+        [key: symbol]: unknown
+      }
+    )[cloudflareContextSymbol]
     if (context) {
       return options.async === true ? Promise.resolve(context) : context
     }
