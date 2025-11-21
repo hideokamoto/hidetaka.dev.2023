@@ -8,7 +8,7 @@ import type { WPEvent } from '@/libs/dataSources/types'
 // getCloudflareContextを動的インポートで取得（OpenNextのビルドプロセスで正しく解決されるように）
 async function getCloudflareContext(
   options: { async: true } | { async?: false } = { async: false },
-) {
+): Promise<{ env: Record<string, unknown> }> {
   try {
     const { getCloudflareContext: getContext } = await import('@opennextjs/cloudflare')
     // 型アサーションでオーバーロードを解決
@@ -26,7 +26,9 @@ async function getCloudflareContext(
       }
     )[cloudflareContextSymbol]
     if (context) {
-      return options.async === true ? Promise.resolve(context) : context
+      return options.async === true
+        ? Promise.resolve(context as { env: Record<string, unknown> })
+        : (context as { env: Record<string, unknown> })
     }
     throw new Error('Cloudflare context is not available')
   }
