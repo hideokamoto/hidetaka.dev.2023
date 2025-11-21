@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
+import { InArticleAd } from '@/components/ui/GoogleAds'
 import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
 import Tag from '@/components/ui/Tag'
@@ -128,6 +129,9 @@ export default function BlogDetailPage({
           // biome-ignore lint/security/noDangerouslySetInnerHtml: Content is from trusted WordPress CMS, controlled by site owner
           dangerouslySetInnerHTML={{ __html: thought.content.rendered }}
         />
+
+        {/* In-Article Ad */}
+        <InArticleAd />
 
         {/* プロフィールカード */}
         <ProfileCard lang={lang} imageSrc="/images/profile.jpg" className="mt-12" />
