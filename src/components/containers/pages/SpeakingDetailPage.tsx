@@ -105,9 +105,9 @@ export default function SpeakingDetailPage({
         </div>
 
         {/* コンテンツ */}
-        {/* biome-ignore lint/security/noDangerouslySetInnerHtml: Content is from trusted WordPress CMS, controlled by site owner */}
         <div
           className="blog-content text-zinc-700 dark:text-zinc-300 leading-relaxed"
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: Content is from trusted WordPress CMS, controlled by site owner
           dangerouslySetInnerHTML={{ __html: event.content.rendered }}
         />
 
