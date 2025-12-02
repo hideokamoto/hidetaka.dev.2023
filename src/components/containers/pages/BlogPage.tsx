@@ -78,6 +78,40 @@ function BlogCard({ item, lang }: { item: BlogItem; lang: string }) {
   )
 }
 
+// 記事が見つからない場合のメッセージコンポーネント
+function NoArticlesMessage({ lang }: { lang: string }) {
+  if (lang === 'ja') {
+    return (
+      <div className="py-12 text-center">
+        <p className="text-slate-600 dark:text-slate-400">記事が見つかりませんでした。</p>
+      </div>
+    )
+  }
+
+  return (
+    <div className="py-12 text-center">
+      <div className="max-w-2xl mx-auto space-y-4">
+        <p className="text-slate-600 dark:text-slate-400">No articles found in English.</p>
+        <div className="rounded-lg border border-indigo-200 bg-indigo-50 dark:border-indigo-800 dark:bg-indigo-900/20 p-6">
+          <p className="text-sm text-slate-700 dark:text-slate-300 mb-4">
+            However, we have articles available in Japanese! You can view them using a translation
+            tool if needed.
+          </p>
+          <Link
+            href="/ja/blog"
+            className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
+          >
+            View Japanese Blog
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // サイドバーコンポーネント
 function BlogSidebar({
   categories,
@@ -152,6 +186,27 @@ function BlogSidebar({
   )
 }
 
+// ページタイトルと説明文を取得するヘルパー関数
+function getPageContent(lang: string, categoryName?: string) {
+  const title = categoryName
+    ? lang === 'ja'
+      ? `カテゴリ: ${categoryName}`
+      : `Category: ${categoryName}`
+    : lang === 'ja'
+      ? 'ブログ'
+      : 'Blog'
+
+  const description = categoryName
+    ? lang === 'ja'
+      ? `「${categoryName}」カテゴリのブログ記事一覧です。`
+      : `Blog posts in the "${categoryName}" category.`
+    : lang === 'ja'
+      ? '技術的ではないトピックを中心としたブログ記事を掲載しています。'
+      : 'A collection of blog posts focusing on non-technical topics.'
+
+  return { title, description }
+}
+
 export default function BlogPageContent({
   lang,
   thoughts,
@@ -161,20 +216,7 @@ export default function BlogPageContent({
   categoryName,
   categories = [],
 }: BlogPageProps) {
-  const title = categoryName
-    ? lang === 'ja'
-      ? `カテゴリ: ${categoryName}`
-      : `Category: ${categoryName}`
-    : lang === 'ja'
-      ? 'ブログ'
-      : 'Blog'
-  const description = categoryName
-    ? lang === 'ja'
-      ? `「${categoryName}」カテゴリのブログ記事一覧です。`
-      : `Blog posts in the "${categoryName}" category.`
-    : lang === 'ja'
-      ? '技術的ではないトピックを中心としたブログ記事を掲載しています。'
-      : 'A collection of blog posts focusing on non-technical topics.'
+  const { title, description } = getPageContent(lang, categoryName)
 
   // 現在のカテゴリslugを取得（URLから）
   const currentCategorySlug = categoryName
@@ -224,36 +266,7 @@ export default function BlogPageContent({
                 />
               </>
             ) : (
-              <div className="py-12 text-center">
-                {lang === 'ja' ? (
-                  <p className="text-slate-600 dark:text-slate-400">記事が見つかりませんでした。</p>
-                ) : (
-                  <div className="max-w-2xl mx-auto space-y-4">
-                    <p className="text-slate-600 dark:text-slate-400">
-                      No articles found in English.
-                    </p>
-                    <div className="rounded-lg border border-indigo-200 bg-indigo-50 dark:border-indigo-800 dark:bg-indigo-900/20 p-6">
-                      <p className="text-sm text-slate-700 dark:text-slate-300 mb-4">
-                        However, we have articles available in Japanese! You can view them using a translation tool if needed.
-                      </p>
-                      <Link
-                        href="/ja/blog"
-                        className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
-                      >
-                        View Japanese Blog
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M9 5l7 7-7 7"
-                          />
-                        </svg>
-                      </Link>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <NoArticlesMessage lang={lang} />
             )}
           </SidebarLayout>
         ) : (
@@ -284,36 +297,7 @@ export default function BlogPageContent({
                 />
               </>
             ) : (
-              <div className="py-12 text-center">
-                {lang === 'ja' ? (
-                  <p className="text-slate-600 dark:text-slate-400">記事が見つかりませんでした。</p>
-                ) : (
-                  <div className="max-w-2xl mx-auto space-y-4">
-                    <p className="text-slate-600 dark:text-slate-400">
-                      No articles found in English.
-                    </p>
-                    <div className="rounded-lg border border-indigo-200 bg-indigo-50 dark:border-indigo-800 dark:bg-indigo-900/20 p-6">
-                      <p className="text-sm text-slate-700 dark:text-slate-300 mb-4">
-                        However, we have articles available in Japanese! You can view them using a translation tool if needed.
-                      </p>
-                      <Link
-                        href="/ja/blog"
-                        className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
-                      >
-                        View Japanese Blog
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M9 5l7 7-7 7"
-                          />
-                        </svg>
-                      </Link>
-                    </div>
-                  </div>
-                )}
-              </div>
+              <NoArticlesMessage lang={lang} />
             )}
           </>
         )}
