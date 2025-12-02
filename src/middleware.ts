@@ -4,26 +4,50 @@ import { NextResponse } from 'next/server'
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
-  // ブラウザの言語設定に応じた自動リダイレクト
-  // ルートパスへのアクセス時のみ
-  if (pathname === '/') {
-    const acceptLanguage = request.headers.get('accept-language') || ''
-    // Accept-Languageヘッダーから日本語優先かチェック
-    const preferredLanguages = acceptLanguage
-      .split(',')
-      .map((lang) => {
-        const [locale, qValue] = lang.trim().split(';q=')
-        return {
-          locale: locale.toLowerCase(),
-          quality: qValue ? parseFloat(qValue) : 1.0,
-        }
-      })
-      .sort((a, b) => b.quality - a.quality)
+  // ブラウザの言語設定に応じた自動リダイレクト（クッキーで記憶）
+  // 英語ページ（/ja/ で始まらないパス）にアクセスした場合のみチェック
+  if (!pathname.startsWith('/ja/') && pathname !== '/ja') {
+    // クッキーから言語設定を取得
+    const preferredLangCookie = request.cookies.get('preferred-lang')?.value
 
-    // 最も優先度の高い言語が日本語の場合、/ja にリダイレクト
-    const topLanguage = preferredLanguages[0]?.locale || ''
-    if (topLanguage.startsWith('ja')) {
-      return NextResponse.redirect(new URL('/ja', request.url))
+    // クッキーがない場合、Accept-Languageヘッダーから判定
+    if (!preferredLangCookie) {
+      const acceptLanguage = request.headers.get('accept-language') || ''
+      const preferredLanguages = acceptLanguage
+        .split(',')
+        .map((lang) => {
+          const [locale, qValue] = lang.trim().split(';q=')
+          return {
+            locale: locale.toLowerCase(),
+            quality: qValue ? parseFloat(qValue) : 1.0,
+          }
+        })
+        .sort((a, b) => b.quality - a.quality)
+
+      // 最も優先度の高い言語が日本語の場合、/ja/* にリダイレクトしてクッキーを設定
+      const topLanguage = preferredLanguages[0]?.locale || ''
+      if (topLanguage.startsWith('ja')) {
+        const newPath = pathname === '/' ? '/ja' : `/ja${pathname}`
+        const response = NextResponse.redirect(new URL(newPath, request.url))
+        // クッキーに言語設定を保存（30日間有効）
+        response.cookies.set('preferred-lang', 'ja', {
+          maxAge: 60 * 60 * 24 * 30, // 30 days
+          path: '/',
+        })
+        return response
+      } else {
+        // 英語が優先の場合もクッキーに保存（明示的な選択として記憶）
+        const response = NextResponse.next()
+        response.cookies.set('preferred-lang', 'en', {
+          maxAge: 60 * 60 * 24 * 30, // 30 days
+          path: '/',
+        })
+        return response
+      }
+    } else if (preferredLangCookie === 'ja') {
+      // クッキーに日本語設定がある場合、/ja/* にリダイレクト
+      const newPath = pathname === '/' ? '/ja' : `/ja${pathname}`
+      return NextResponse.redirect(new URL(newPath, request.url))
     }
   }
 
