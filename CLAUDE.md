@@ -16,6 +16,10 @@ This document provides comprehensive guidance for AI assistants working with the
 - **Styling:** TailwindCSS 3.4.14 (utility-first, class-based dark mode)
 - **CMS:** microCMS (headless CMS for content management)
 - **Deployment:** Cloudflare Workers via @opennextjs/cloudflare
+- **Linter/Formatter:** Biome 2.3.5+ (replaces ESLint and Prettier)
+- **Testing:** Vitest 4.0+ with coverage support (@vitest/ui, @vitest/coverage-v8)
+- **Analytics:** Microsoft Clarity (@microsoft/clarity)
+- **Ads:** next-google-ads (Google Ads integration)
 - **Date Handling:** dayjs
 - **Feed Parsing:** fast-xml-parser
 
@@ -64,22 +68,27 @@ This is a **bilingual portfolio and developer blog** featuring:
 │   │   │   ├── apis.ts        # API methods (MicroCMSAPI class)
 │   │   │   ├── types.ts       # TypeScript types for CMS content
 │   │   │   ├── mocks.ts       # Mock data for testing/fallback
-│   │   │   └── utils.ts       # Utility functions
+│   │   │   ├── utils.ts       # Utility functions
+│   │   │   └── *.test.ts      # Unit tests
 │   │   ├── dataSources/       # Multi-source feed integration
 │   │   │   ├── blogs.ts       # Blog aggregation
 │   │   │   ├── thoughts.ts    # WordPress blog
+│   │   │   ├── wordpress.ts   # WordPress REST API
+│   │   │   ├── events.ts      # Event data sources
 │   │   │   ├── devto.ts       # Dev.to API
 │   │   │   ├── qiita.ts       # Qiita feed
 │   │   │   ├── zenn.ts        # Zenn feed
 │   │   │   ├── npmjs.ts       # npm package data
 │   │   │   ├── wporg.ts       # WordPress.org plugins
+│   │   │   ├── feed.utils.ts  # Feed parsing utilities
 │   │   │   └── types.ts       # Shared types (FeedItem)
 │   │   ├── urlUtils/          # URL utilities
-│   │   │   └── lang.util.ts   # Language/i18n helpers
+│   │   │   ├── lang.util.ts   # Language/i18n helpers
+│   │   │   └── *.test.ts      # Unit tests
 │   │   ├── metadata.ts        # Next.js metadata helpers
 │   │   ├── jsonLd.ts          # JSON-LD schema generation
-│   │   ├── formatDate.ts      # Date formatting
-│   │   └── sanitize.ts        # HTML sanitization
+│   │   ├── formatDate.ts      # Date formatting (with tests)
+│   │   └── sanitize.ts        # HTML sanitization (with tests)
 │   │
 │   ├── styles/
 │   │   └── global.css         # TailwindCSS imports (minimal)
@@ -103,6 +112,8 @@ This is a **bilingual portfolio and developer blog** featuring:
 ├── Configuration Files:
 │   ├── package.json           # Dependencies and scripts
 │   ├── tsconfig.json          # TypeScript config (strict mode, path aliasing)
+│   ├── biome.json             # Biome linter/formatter config
+│   ├── vitest.config.ts       # Vitest testing config
 │   ├── tailwind.config.cjs    # Tailwind CSS config
 │   ├── next.config.ts         # Next.js config
 │   ├── wrangler.jsonc         # Cloudflare Workers config
@@ -328,7 +339,14 @@ npm run dev
 | `npm run dev` | Start Next.js dev server (port 3000) |
 | `npm run build` | Standard Next.js build |
 | `npm run start` | Start production server |
-| `npm run lint` | Run ESLint |
+| `npm run lint` | Run Biome check with auto-fix |
+| `npm run lint:check` | Run Biome check only (no auto-fix) |
+| `npm run format` | Format code with Biome (auto-fix) |
+| `npm run format:check` | Check formatting only (no changes) |
+| `npm run test` | Run Vitest unit tests |
+| `npm run test:watch` | Run tests in watch mode |
+| `npm run test:ui` | Run tests with UI interface |
+| `npm run test:coverage` | Run tests with coverage report |
 | `npm run cf:build` | Build for Cloudflare Workers |
 | `npm run cf:preview` | Local preview with Wrangler |
 | `npm run cf:deploy` | Deploy to Cloudflare Workers |
@@ -383,6 +401,70 @@ npm run cf:deploy:staging
 **Environment Variables on Cloudflare:**
 - Set in Cloudflare dashboard: Workers & Pages > hidetaka-dev > Settings > Variables
 - Or via CLI: `npx wrangler secret put MICROCMS_API_KEY --env production`
+
+---
+
+## ⚠️ CRITICAL: Pre-commit Requirements
+
+**MANDATORY CHECKS BEFORE EVERY COMMIT AND PUSH:**
+
+Before committing or pushing any code changes, you **MUST** run these commands and ensure they pass successfully:
+
+```bash
+# 1. Run Biome linter/formatter check
+npm run lint
+
+# 2. Build the project to verify no TypeScript errors
+npm run build
+```
+
+### Why This Is Critical
+
+1. **Lint Check (`npm run lint`):**
+   - Catches code quality issues, potential bugs, and style violations
+   - Ensures accessibility (a11y) compliance
+   - Validates TypeScript correctness
+   - **If lint fails:** Fix all issues before committing
+
+2. **Build Check (`npm run build`):**
+   - Verifies TypeScript compilation succeeds
+   - Catches type errors across the entire codebase
+   - Ensures all imports and dependencies resolve correctly
+   - Validates Next.js static generation works
+   - **If build fails:** Fix all errors before committing
+
+### Pre-commit Workflow
+
+```bash
+# 1. Make your code changes
+# ... edit files ...
+
+# 2. Run lint and fix issues
+npm run lint
+
+# 3. Build and verify
+npm run build
+
+# 4. If both pass, commit your changes
+git add .
+git commit -m "feat: your commit message"
+
+# 5. Push to remote
+git push -u origin <branch-name>
+```
+
+### For AI Assistants
+
+**NEVER commit or push code without:**
+1. ✅ Running `npm run lint` and confirming it passes
+2. ✅ Running `npm run build` and confirming it succeeds
+3. ✅ Fixing any errors or warnings that appear
+
+**If either command fails:**
+- Read the error messages carefully
+- Fix all issues in the code
+- Re-run the checks
+- Only proceed when both commands succeed
 
 ---
 
@@ -560,9 +642,25 @@ npm run dev               # Start dev server
 # Visit http://localhost:3000
 ```
 
-**Linting:**
+**Linting & Formatting:**
 ```bash
-npm run lint              # Run ESLint
+npm run lint              # Run Biome check with auto-fix
+npm run lint:check        # Check only (no changes)
+npm run format            # Format with auto-fix
+npm run format:check      # Check formatting only
+```
+
+**Testing:**
+```bash
+npm run test              # Run unit tests once
+npm run test:watch        # Run tests in watch mode
+npm run test:ui           # Run tests with UI (http://localhost:51204)
+npm run test:coverage     # Generate coverage report
+```
+
+**Build Verification:**
+```bash
+npm run build             # Verify TypeScript compilation
 ```
 
 **Cloudflare Preview:**
@@ -590,6 +688,8 @@ MICROCMS_API_MODE=mock    # Use mock data (no API calls)
 | `src/middleware.ts` | URL redirects | Legacy URL mappings |
 | `src/env.d.ts` | Environment types | TypeScript env definitions |
 | `tsconfig.json` | TypeScript config | Strict mode, path aliasing (`@/*`) |
+| `biome.json` | Biome config | Linter rules, formatter settings, VCS integration |
+| `vitest.config.ts` | Vitest config | Test setup, coverage settings |
 | `tailwind.config.cjs` | Tailwind config | Dark mode, content globs |
 | `next.config.ts` | Next.js config | `unoptimized: true` for Cloudflare |
 | `wrangler.jsonc` | Cloudflare config | Worker settings, env vars |
@@ -628,6 +728,8 @@ MICROCMS_API_MODE=mock    # Use mock data (no API calls)
 ## Best Practices for AI Assistants
 
 ### DO:
+✅ **ALWAYS run `npm run lint` and `npm run build` before committing/pushing**
+✅ Write unit tests for utility functions (use Vitest)
 ✅ Use existing UI components from `src/components/ui/` before creating new ones
 ✅ Follow the three-tier component architecture (UI → Container → Layout)
 ✅ Maintain pure components with no side effects in `ui/`
@@ -643,8 +745,10 @@ MICROCMS_API_MODE=mock    # Use mock data (no API calls)
 ✅ Test responsive design at different breakpoints
 ✅ Use mock mode for development without API keys
 ✅ Follow existing naming conventions (PascalCase components, camelCase utilities)
+✅ Follow Biome formatting rules (single quotes, trailing commas, no semicolons)
 
 ### DON'T:
+❌ **NEVER commit or push without passing `npm run lint` and `npm run build`**
 ❌ Create custom CSS files or classes (use Tailwind utilities only)
 ❌ Use inline styles
 ❌ Add side effects or data fetching to UI components
@@ -659,15 +763,22 @@ MICROCMS_API_MODE=mock    # Use mock data (no API calls)
 ❌ Commit `.env.local` (use `.env.example` as template)
 ❌ Use `"use client"` unnecessarily (prefer server components)
 ❌ Break existing component APIs (maintain backward compatibility)
+❌ Ignore Biome warnings or errors
 
 ### Code Quality Checks:
-- TypeScript compiles without errors: `npm run build`
-- ESLint passes: `npm run lint`
-- All imports resolve correctly (no missing dependencies)
-- Dark mode works (manually test)
-- Responsive design works (test at sm, md, lg breakpoints)
-- Both English and Japanese versions render correctly
-- No console errors in browser
+
+**Required Before Every Commit:**
+1. ✅ Biome lint passes: `npm run lint`
+2. ✅ TypeScript compiles without errors: `npm run build`
+3. ✅ Unit tests pass (if applicable): `npm run test`
+
+**Manual Testing Checklist:**
+- ✅ All imports resolve correctly (no missing dependencies)
+- ✅ Dark mode works (manually test)
+- ✅ Responsive design works (test at sm, md, lg breakpoints)
+- ✅ Both English and Japanese versions render correctly
+- ✅ No console errors in browser
+- ✅ Accessibility: semantic HTML, keyboard navigation works
 
 ---
 
@@ -685,10 +796,31 @@ MICROCMS_API_MODE=mock    # Use mock data (no API calls)
   - `fix: ブログ記事のProfileCardで正しいプロフィール画像パスを指定`
   - `refactor: プロフィール情報とソーシャルリンクを一元管理`
 
+**⚠️ MANDATORY Pre-commit Checks:**
+
+Before every commit and push, **you MUST run:**
+
+```bash
+# 1. Lint check (REQUIRED)
+npm run lint
+
+# 2. Build verification (REQUIRED)
+npm run build
+
+# 3. Only if both pass, proceed with commit
+git add .
+git commit -m "your message"
+git push -u origin <branch-name>
+```
+
 **Workflow:**
-- Merge-based workflow (pull requests)
-- Test locally before pushing
-- Run `npm run lint` before committing
+1. Make code changes
+2. **Run `npm run lint`** - Fix all issues
+3. **Run `npm run build`** - Fix all errors
+4. Commit changes (only if steps 2-3 pass)
+5. Push to remote
+6. Create pull request
+7. Merge after review
 
 ---
 
@@ -702,6 +834,8 @@ MICROCMS_API_MODE=mock    # Use mock data (no API calls)
 ### External References
 - Next.js 16 App Router: https://nextjs.org/docs
 - TailwindCSS: https://tailwindcss.com/docs
+- Biome (Linter/Formatter): https://biomejs.dev/
+- Vitest (Testing): https://vitest.dev/
 - microCMS SDK: https://github.com/microcmsio/microcms-js-sdk
 - OpenNextJS Cloudflare: https://opennext.js.org/cloudflare
 
@@ -735,6 +869,15 @@ MICROCMS_API_MODE=mock    # Use mock data (no API calls)
 **Issue:** 404 on Japanese pages
 **Solution:** Ensure both `/[page]/page.tsx` and `/ja/[page]/page.tsx` exist.
 
+**Issue:** Biome lint errors
+**Solution:** Run `npm run lint` to auto-fix most issues. Check `biome.json` for rule configuration. Use `npm run format` for formatting issues.
+
+**Issue:** TypeScript build fails
+**Solution:** Run `npm run build` to see specific errors. Ensure all types are properly imported and defined. Check for missing dependencies or incorrect import paths.
+
+**Issue:** Tests failing
+**Solution:** Run `npm run test` to see failures. Use `npm run test:watch` for iterative development. Check test files (*.test.ts) for assertions.
+
 ---
 
 ## Summary
@@ -752,5 +895,9 @@ When working with this codebase, prioritize **type safety, component purity, acc
 
 ---
 
-**Last Updated:** 2025-11-15
-**Document Version:** 1.0.0
+**Last Updated:** 2025-12-02
+**Document Version:** 2.0.0
+
+**Changelog:**
+- v2.0.0 (2025-12-02): Updated to reflect Biome linter/formatter, added Vitest testing, added mandatory pre-commit checks
+- v1.0.0 (2025-11-15): Initial version
