@@ -227,13 +227,6 @@ export default function PrivacyPolicyPage() {
               <li>
                 <strong>Google AdSense:</strong> Advertising service
               </li>
-              <li>
-                <strong>microCMS:</strong> Content management system
-              </li>
-              <li>
-                <strong>External Content Sources:</strong> We aggregate content from Dev.to, Qiita,
-                Zenn, and WordPress
-              </li>
             </ul>
             <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
               These third-party services have their own privacy policies. We encourage you to review

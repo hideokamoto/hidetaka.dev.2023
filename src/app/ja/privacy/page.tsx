@@ -222,13 +222,6 @@ export default function PrivacyPolicyPage() {
               <li>
                 <strong>Google AdSense:</strong> 広告配信サービス
               </li>
-              <li>
-                <strong>microCMS:</strong> コンテンツ管理システム
-              </li>
-              <li>
-                <strong>外部コンテンツソース:</strong>{' '}
-                Dev.to、Qiita、Zenn、WordPressからコンテンツを集約しています
-              </li>
             </ul>
             <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
               これらのサードパーティサービスは、独自のプライバシーポリシーを持っています。
