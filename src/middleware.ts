@@ -3,13 +3,21 @@ import { NextResponse } from 'next/server'
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const preferredLangCookie = request.cookies.get('preferred-lang')?.value
 
-  // ブラウザの言語設定に応じた自動リダイレクト（クッキーで記憶）
-  // 英語ページ（/ja/ で始まらないパス）にアクセスした場合のみチェック
-  if (!pathname.startsWith('/ja/') && pathname !== '/ja') {
-    // クッキーから言語設定を取得
-    const preferredLangCookie = request.cookies.get('preferred-lang')?.value
-
+  // 日本語ページにアクセスした場合、クッキーを更新（ユーザーの明示的な選択）
+  if (pathname.startsWith('/ja/') || pathname === '/ja') {
+    if (preferredLangCookie !== 'ja') {
+      const response = NextResponse.next()
+      response.cookies.set('preferred-lang', 'ja', {
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+        path: '/',
+      })
+      return response
+    }
+  }
+  // 英語ページにアクセスした場合
+  else {
     // クッキーがない場合、Accept-Languageヘッダーから判定
     if (!preferredLangCookie) {
       const acceptLanguage = request.headers.get('accept-language') || ''
@@ -29,14 +37,13 @@ export function middleware(request: NextRequest) {
       if (topLanguage.startsWith('ja')) {
         const newPath = pathname === '/' ? '/ja' : `/ja${pathname}`
         const response = NextResponse.redirect(new URL(newPath, request.url))
-        // クッキーに言語設定を保存（30日間有効）
         response.cookies.set('preferred-lang', 'ja', {
           maxAge: 60 * 60 * 24 * 30, // 30 days
           path: '/',
         })
         return response
       } else {
-        // 英語が優先の場合もクッキーに保存（明示的な選択として記憶）
+        // 英語が優先の場合もクッキーに保存
         const response = NextResponse.next()
         response.cookies.set('preferred-lang', 'en', {
           maxAge: 60 * 60 * 24 * 30, // 30 days
@@ -44,10 +51,20 @@ export function middleware(request: NextRequest) {
         })
         return response
       }
-    } else if (preferredLangCookie === 'ja') {
-      // クッキーに日本語設定がある場合、/ja/* にリダイレクト
+    }
+    // クッキーに日本語設定がある場合、/ja/* にリダイレクト
+    else if (preferredLangCookie === 'ja') {
       const newPath = pathname === '/' ? '/ja' : `/ja${pathname}`
       return NextResponse.redirect(new URL(newPath, request.url))
+    }
+    // クッキーに英語設定があるが、まだ設定されていない可能性があるので更新
+    else if (preferredLangCookie !== 'en') {
+      const response = NextResponse.next()
+      response.cookies.set('preferred-lang', 'en', {
+        maxAge: 60 * 60 * 24 * 30, // 30 days
+        path: '/',
+      })
+      return response
     }
   }
 
