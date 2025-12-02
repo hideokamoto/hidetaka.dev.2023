@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Container from './Container'
 import ModeToggle from './Headers/ModeToggle'
@@ -28,6 +28,11 @@ function changeLanguageURL(pathname: string, targetLang: 'en' | 'ja' = 'en'): st
   } else {
     return `/ja${pathname}`
   }
+}
+
+// クッキーを設定するヘルパー関数
+function setLanguageCookie(lang: 'en' | 'ja') {
+  document.cookie = `preferred-lang=${lang}; path=/; max-age=${60 * 60 * 24 * 30}`
 }
 
 function MenuIcon({ isOpen }: { isOpen: boolean }) {
@@ -107,6 +112,7 @@ function DesktopNavItem({
 
 function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const pathname = usePathname()
+  const router = useRouter()
   const lang = getLanguageFromURL(pathname)
   const currentLang = lang
 
@@ -117,6 +123,13 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
     { path: 'blog', label: lang === 'ja' ? 'ブログ' : 'Blog' },
     { path: 'speaking', label: lang === 'ja' ? 'Speaking' : 'Speaking' },
   ]
+
+  const handleLanguageChange = (targetLang: 'en' | 'ja') => {
+    setLanguageCookie(targetLang)
+    const newPath = changeLanguageURL(pathname, targetLang)
+    onClose()
+    router.push(newPath)
+  }
 
   useEffect(() => {
     if (isOpen) {
@@ -188,20 +201,28 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
                 Language
               </h3>
               <div className="space-y-2">
-                <MobileNavItem
-                  href={changeLanguageURL(pathname, 'ja')}
-                  isActive={currentLang === 'ja'}
-                  onClick={onClose}
+                <button
+                  type="button"
+                  onClick={() => handleLanguageChange('ja')}
+                  className={`w-full text-left block px-4 py-3 text-base font-medium rounded-lg transition-all ${
+                    currentLang === 'ja'
+                      ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-500/5'
+                  }`}
                 >
                   日本語
-                </MobileNavItem>
-                <MobileNavItem
-                  href={changeLanguageURL(pathname, 'en')}
-                  isActive={currentLang === 'en'}
-                  onClick={onClose}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleLanguageChange('en')}
+                  className={`w-full text-left block px-4 py-3 text-base font-medium rounded-lg transition-all ${
+                    currentLang === 'en'
+                      ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-500/5'
+                  }`}
                 >
                   English
-                </MobileNavItem>
+                </button>
               </div>
             </div>
           </nav>
@@ -248,12 +269,20 @@ function DesktopNavigation() {
 
 function DesktopLangSwitcher() {
   const pathname = usePathname()
+  const router = useRouter()
   const currentLang = getLanguageFromURL(pathname)
+
+  const handleLanguageChange = (targetLang: 'en' | 'ja') => {
+    setLanguageCookie(targetLang)
+    const newPath = changeLanguageURL(pathname, targetLang)
+    router.push(newPath)
+  }
 
   return (
     <div className="hidden lg:flex items-center gap-1 rounded-lg bg-white/80 backdrop-blur-md px-2 py-1.5 shadow-sm ring-1 ring-zinc-900/5 dark:bg-zinc-800/80 dark:ring-white/10">
-      <Link
-        href={changeLanguageURL(pathname, 'ja')}
+      <button
+        type="button"
+        onClick={() => handleLanguageChange('ja')}
         className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
           currentLang === 'ja'
             ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'
@@ -261,9 +290,10 @@ function DesktopLangSwitcher() {
         }`}
       >
         JA
-      </Link>
-      <Link
-        href={changeLanguageURL(pathname, 'en')}
+      </button>
+      <button
+        type="button"
+        onClick={() => handleLanguageChange('en')}
         className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
           currentLang === 'en'
             ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'
@@ -271,7 +301,7 @@ function DesktopLangSwitcher() {
         }`}
       >
         EN
-      </Link>
+      </button>
     </div>
   )
 }
