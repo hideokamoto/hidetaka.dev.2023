@@ -4,6 +4,29 @@ import { NextResponse } from 'next/server'
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // ブラウザの言語設定に応じた自動リダイレクト
+  // ルートパスへのアクセス時のみ
+  if (pathname === '/') {
+    const acceptLanguage = request.headers.get('accept-language') || ''
+    // Accept-Languageヘッダーから日本語優先かチェック
+    const preferredLanguages = acceptLanguage
+      .split(',')
+      .map((lang) => {
+        const [locale, qValue] = lang.trim().split(';q=')
+        return {
+          locale: locale.toLowerCase(),
+          quality: qValue ? parseFloat(qValue) : 1.0,
+        }
+      })
+      .sort((a, b) => b.quality - a.quality)
+
+    // 最も優先度の高い言語が日本語の場合、/ja にリダイレクト
+    const topLanguage = preferredLanguages[0]?.locale || ''
+    if (topLanguage.startsWith('ja')) {
+      return NextResponse.redirect(new URL('/ja', request.url))
+    }
+  }
+
   // /ja-JP/* を /ja/* にリダイレクト
   if (pathname.startsWith('/ja-JP')) {
     const newPath = pathname.replace('/ja-JP', '/ja')
