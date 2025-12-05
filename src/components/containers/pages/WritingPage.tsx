@@ -13,10 +13,10 @@ import PageHeader from '@/components/ui/PageHeader'
 import SearchBar from '@/components/ui/SearchBar'
 import SidebarLayout from '@/components/ui/SidebarLayout'
 import Tag from '@/components/ui/Tag'
-import type { FeedItem } from '@/libs/dataSources/types'
+import type { BlogItem, FeedItem } from '@/libs/dataSources/types'
 import type { MicroCMSPostsRecord } from '@/libs/microCMS/types'
 
-type WritingItem = FeedItem | MicroCMSPostsRecord
+type WritingItem = FeedItem | MicroCMSPostsRecord | BlogItem
 type FilterType = 'all' | 'external' | 'news'
 type FilterTag = string | null
 type FilterDataSource = string | null
@@ -24,19 +24,33 @@ type FilterDataSource = string | null
 // 統一されたWritingカードコンポーネント
 function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string }) {
   const isFeedItem = 'dataSource' in item
+  const isBlogItem = 'categories' in item && !('dataSource' in item) && !('publishedAt' in item)
+  const isMicroCMSItem = 'publishedAt' in item
+
   const href = isFeedItem
     ? item.href
-    : lang === 'ja'
-      ? `/ja/writing/${item.id}`
-      : `/writing/${item.id}`
+    : isBlogItem
+      ? item.href
+      : lang === 'ja'
+        ? `/ja/writing/${item.id}`
+        : `/writing/${item.id}`
   const title = item.title
   const description = isFeedItem
     ? item.description
-    : item.content.replace(/<[^>]*>/g, '').substring(0, 150)
-  const datetime = isFeedItem ? item.datetime : item.publishedAt
+    : isBlogItem
+      ? item.description
+      : isMicroCMSItem
+        ? (item as MicroCMSPostsRecord).content.replace(/<[^>]*>/g, '').substring(0, 150)
+        : ''
+  const datetime = isFeedItem
+    ? item.datetime
+    : isBlogItem
+      ? item.datetime
+      : (item as MicroCMSPostsRecord).publishedAt
   const date = new Date(datetime)
-  const tags = isFeedItem ? [] : item.tags || []
-  const imageUrl = isFeedItem ? item.image : undefined
+  const tags = isFeedItem ? [] : isMicroCMSItem ? (item as MicroCMSPostsRecord).tags || [] : []
+  const imageUrl = isFeedItem ? (item as FeedItem).image : undefined
+  const categories = isBlogItem ? (item as BlogItem).categories || [] : []
 
   const CardContent = (
     <article className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all hover:border-indigo-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700">
@@ -89,12 +103,21 @@ function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string })
             </p>
           )}
 
-          {/* Tags */}
+          {/* Tags and Categories */}
           {tags.length > 0 && (
             <div className="flex flex-wrap gap-2">
               {tags.slice(0, 3).map((tag) => (
                 <Tag key={tag} variant="default" size="sm">
                   {tag}
+                </Tag>
+              ))}
+            </div>
+          )}
+          {categories.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {categories.slice(0, 3).map((category) => (
+                <Tag key={category.id} variant="default" size="sm">
+                  {category.name}
                 </Tag>
               ))}
             </div>
@@ -317,11 +340,13 @@ export default function WritingPageContent({
   externalArticles,
   hasMoreBySource = {},
   newsArticles,
+  devNotes = [],
 }: {
   lang: string
   externalArticles: FeedItem[]
   hasMoreBySource?: Record<string, boolean>
   newsArticles: MicroCMSPostsRecord[]
+  devNotes?: BlogItem[]
 }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [filterType, setFilterType] = useState<FilterType>('all')
@@ -330,7 +355,7 @@ export default function WritingPageContent({
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
 
   // 全記事を統合
-  const allItems: WritingItem[] = [...externalArticles, ...newsArticles]
+  const allItems: WritingItem[] = [...externalArticles, ...newsArticles, ...devNotes]
 
   // 利用可能なタグとデータソースを抽出
   const availableTags = useMemo(() => {
@@ -371,12 +396,41 @@ export default function WritingPageContent({
     if (!searchQuery.trim()) return true
     const query = searchQuery.toLowerCase()
     const title = item.title.toLowerCase()
-    const description = (
-      'dataSource' in item ? item.description : item.content.replace(/<[^>]*>/g, '')
-    ).toLowerCase()
-    const tags = ('dataSource' in item ? [] : item.tags || []).join(' ').toLowerCase()
 
-    return title.includes(query) || description.includes(query) || tags.includes(query)
+    const isFeedItem = 'dataSource' in item
+    const isBlogItem = 'categories' in item && !('dataSource' in item) && !('publishedAt' in item)
+    const isMicroCMSItem = 'publishedAt' in item
+
+    const description = isFeedItem
+      ? (item as FeedItem).description
+      : isBlogItem
+        ? (item as BlogItem).description
+        : isMicroCMSItem
+          ? (item as MicroCMSPostsRecord).content.replace(/<[^>]*>/g, '')
+          : ''
+    const descriptionLower = description.toLowerCase()
+
+    const tags = isFeedItem
+      ? []
+      : isBlogItem
+        ? []
+        : isMicroCMSItem
+          ? (item as MicroCMSPostsRecord).tags || []
+          : []
+    const tagsText = tags.join(' ').toLowerCase()
+
+    const categories = isBlogItem ? (item as BlogItem).categories || [] : []
+    const categoriesText = categories
+      .map((c) => c.name)
+      .join(' ')
+      .toLowerCase()
+
+    return (
+      title.includes(query) ||
+      descriptionLower.includes(query) ||
+      tagsText.includes(query) ||
+      categoriesText.includes(query)
+    )
   }
 
   // フィルターと検索を適用
@@ -389,7 +443,11 @@ export default function WritingPageContent({
       // タグフィルター
       if (filterTag !== null) {
         if ('dataSource' in item) return false // 外部記事にはタグがない
-        if (!item.tags || !item.tags.includes(filterTag)) return false
+        if ('categories' in item && !('publishedAt' in item)) return false // BlogItemにはタグがない
+        if ('publishedAt' in item) {
+          const microCMSItem = item as MicroCMSPostsRecord
+          if (!microCMSItem.tags || !microCMSItem.tags.includes(filterTag)) return false
+        }
       }
 
       // データソースフィルター
@@ -436,7 +494,7 @@ export default function WritingPageContent({
     return {
       all: allItems.length,
       external: externalArticles.length,
-      news: newsArticles.length,
+      news: newsArticles.length + devNotes.length,
       byTag,
       byDataSource,
     }
@@ -444,6 +502,7 @@ export default function WritingPageContent({
     allItems,
     externalArticles,
     newsArticles,
+    devNotes,
     availableTags,
     availableDataSources,
     hasMoreBySource,

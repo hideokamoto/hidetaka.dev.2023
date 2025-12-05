@@ -1,5 +1,6 @@
 import WritingPageContent from '@/components/containers/pages/WritingPage'
 import { loadBlogPosts } from '@/libs/dataSources/blogs'
+import { loadDevNotes } from '@/libs/dataSources/devNotes'
 import { MicroCMSAPI } from '@/libs/microCMS/apis'
 import { createMicroCMSClient } from '@/libs/microCMS/client'
 
@@ -9,8 +10,12 @@ export const metadata = {
 
 export default async function WritingPage() {
   const microCMS = new MicroCMSAPI(createMicroCMSClient())
-  const { items: externalArticles, hasMoreBySource } = await loadBlogPosts('ja')
-  const newsArticles = await microCMS.listPosts({ lang: 'japanese' })
+  const [{ items: externalArticles, hasMoreBySource }, newsArticles, devNotesResult] =
+    await Promise.all([
+      loadBlogPosts('ja'),
+      microCMS.listPosts({ lang: 'japanese' }),
+      loadDevNotes(1, 20, 'ja'),
+    ])
 
   return (
     <WritingPageContent
@@ -18,6 +23,7 @@ export default async function WritingPage() {
       externalArticles={externalArticles}
       hasMoreBySource={hasMoreBySource}
       newsArticles={newsArticles}
+      devNotes={devNotesResult.items}
     />
   )
 }
