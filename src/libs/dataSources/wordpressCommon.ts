@@ -1,7 +1,4 @@
-import type { BlogItem, Category, WPDevNote, WPThought } from './types'
-
-// WPThoughtとWPDevNoteの共通型
-type WPPost = WPThought | WPDevNote
+import type { BlogItem, Category, WPPostBase } from './types'
 
 export type PostsResult = {
   items: BlogItem[]
@@ -11,7 +8,7 @@ export type PostsResult = {
 }
 
 // カテゴリ情報を抽出するヘルパー関数
-const extractCategories = (post: WPPost): Category[] => {
+const extractCategories = (post: WPPostBase): Category[] => {
   if (!post._embedded?.['wp:term']) {
     return []
   }
@@ -60,11 +57,11 @@ export const loadWordPressPosts = async (
       throw new Error(`Failed to fetch ${postType}: ${response.status}`)
     }
 
-    const posts: WPPost[] = await response.json()
+    const posts: WPPostBase[] = await response.json()
     const totalItems = parseInt(response.headers.get('X-WP-Total') || '0', 10)
     const totalPages = parseInt(response.headers.get('X-WP-TotalPages') || '0', 10)
 
-    const items: BlogItem[] = posts.map((post: WPPost): BlogItem => {
+    const items: BlogItem[] = posts.map((post: WPPostBase): BlogItem => {
       const href = `${basePath}/${post.slug}`
 
       return {
@@ -97,7 +94,7 @@ export const loadWordPressPosts = async (
 /**
  * スラグから投稿を取得する汎用関数
  */
-export const getWordPressPostBySlug = async <T extends WPPost>(
+export const getWordPressPostBySlug = async <T extends WPPostBase>(
   postType: 'thoughs' | 'dev-notes',
   slug: string,
   lang: 'en' | 'ja' = 'en',
@@ -131,7 +128,7 @@ export const getWordPressPostBySlug = async <T extends WPPost>(
 /**
  * WordPress APIから投稿を取得するヘルパー関数
  */
-const fetchWordPressPost = async <T extends WPPost>(
+const fetchWordPressPost = async <T extends WPPostBase>(
   postType: 'thoughs' | 'dev-notes',
   url: string,
 ): Promise<T | null> => {
@@ -157,7 +154,7 @@ export type AdjacentPosts<T> = {
 /**
  * 前後の投稿を取得する汎用関数
  */
-export const getAdjacentWordPressPosts = async <T extends WPPost>(
+export const getAdjacentWordPressPosts = async <T extends WPPostBase>(
   postType: 'thoughs' | 'dev-notes',
   currentPost: T,
   lang: 'en' | 'ja' = 'en',
@@ -228,7 +225,7 @@ export const loadAllWordPressPosts = async (
 /**
  * 関連投稿を取得する汎用関数（同じカテゴリの投稿からランダムに選択）
  */
-export const getRelatedWordPressPosts = async <T extends WPPost>(
+export const getRelatedWordPressPosts = async <T extends WPPostBase>(
   postType: 'thoughs' | 'dev-notes',
   currentPost: T,
   limit: number = 4,

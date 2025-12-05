@@ -20,8 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
   }
 
-  // WPDevNote を WPThought として扱う（構造は同じ）
-  return generateBlogPostMetadata(devNote as WPThought)
+  return generateBlogPostMetadata(devNote, 'dev-notes')
 }
 
 export default async function DevNoteDetailPage({ params }: { params: Promise<{ slug: string }> }) {

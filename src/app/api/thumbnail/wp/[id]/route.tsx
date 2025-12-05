@@ -1,11 +1,9 @@
 import type { NextRequest } from 'next/server'
 import { SITE_CONFIG } from '@/config'
-import type { WPDevNote, WPThought } from '@/libs/dataSources/types'
+import type { WPPostBase } from '@/libs/dataSources/types'
 
 // @see https://opennext.js.org/cloudflare/get-started#9-remove-any-export-const-runtime--edge-if-present
 // export const runtime = 'edge'
-
-type WPPost = WPThought | WPDevNote
 
 // getCloudflareContextを動的インポートで取得（OpenNextのビルドプロセスで正しく解決されるように）
 async function getCloudflareContext(
@@ -74,7 +72,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return new Response('Failed to fetch post', { status: wpResponse.status })
     }
 
-    const post: WPPost = await wpResponse.json()
+    const post: WPPostBase = await wpResponse.json()
 
     // タイトルが存在しない場合はエラー
     if (!post.title?.rendered) {

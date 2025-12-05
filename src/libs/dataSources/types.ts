@@ -61,7 +61,9 @@ export type WPPost = {
   link: string
   id: string
 }
-export type WPThought = {
+
+// WordPressの投稿の共通型
+export type WPPostBase = {
   id: number
   title: {
     rendered: string
@@ -91,36 +93,10 @@ export type WPThought = {
     >
   }
 }
-export type WPDevNote = {
-  id: number
-  title: {
-    rendered: string
-  }
-  date: string
-  date_gmt: string
-  modified: string
-  modified_gmt: string
-  excerpt: {
-    rendered: string
-  }
-  content: {
-    rendered: string
-  }
-  link: string
-  slug: string
-  featured_media?: number
-  categories?: number[]
-  _embedded?: {
-    'wp:term'?: Array<
-      Array<{
-        id: number
-        name: string
-        slug: string
-        taxonomy: string
-      }>
-    >
-  }
-}
+
+export type WPThought = WPPostBase
+export type WPDevNote = WPPostBase
+
 export type WPEvent = {
   id: number
   title: {
