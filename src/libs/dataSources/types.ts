@@ -61,7 +61,9 @@ export type WPPost = {
   link: string
   id: string
 }
-export type WPThought = {
+
+// WordPressの投稿の共通型
+export type WPPostBase = {
   id: number
   title: {
     rendered: string
@@ -91,6 +93,10 @@ export type WPThought = {
     >
   }
 }
+
+export type WPThought = WPPostBase
+export type WPDevNote = WPPostBase
+
 export type WPEvent = {
   id: number
   title: {

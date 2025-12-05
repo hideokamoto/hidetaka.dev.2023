@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server'
 import { SITE_CONFIG } from '@/config'
-import type { WPThought } from '@/libs/dataSources/types'
+import type { WPPostBase } from '@/libs/dataSources/types'
 
 // @see https://opennext.js.org/cloudflare/get-started#9-remove-any-export-const-runtime--edge-if-present
 // export const runtime = 'edge'
@@ -32,17 +32,15 @@ async function getCloudflareContext(
 }
 
 /**
- * WordPressのthoughts投稿タイプ用のサムネイル画像生成API
+ * WordPress投稿タイプ用の統合サムネイル画像生成API
  *
  * セキュリティ: post_idからWordPress APIで記事を取得し、存在する記事のタイトルのみを使用
  * これにより、任意の文字列で画像を生成することを防止
  *
- * 将来的に他のコンテンツタイプ用のルートを追加する場合:
- * - /api/thumbnail/posts/[id]/route.tsx - MicroCMSのposts用
- * - /api/thumbnail/projects/[id]/route.tsx - MicroCMSのprojects用
- * - /api/thumbnail/events/[id]/route.tsx - MicroCMSのevents用
+ * クエリパラメータ:
+ * - type: 投稿タイプ ('thoughts' | 'dev-notes')
  */
-export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const postId = parseInt(id, 10)
@@ -52,9 +50,18 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       return new Response('Invalid post ID', { status: 404 })
     }
 
+    // クエリパラメータから投稿タイプを取得（デフォルトは'thoughs'）
+    const searchParams = request.nextUrl.searchParams
+    const postType = searchParams.get('type') || 'thoughs'
+
+    // 許可された投稿タイプのみを受け付ける
+    if (postType !== 'thoughs' && postType !== 'dev-notes') {
+      return new Response('Invalid post type', { status: 400 })
+    }
+
     // WordPress REST APIから記事を取得
     const wpResponse = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs/${postId}?_fields=id,title`,
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/${postType}/${postId}?_fields=id,title`,
     )
 
     if (!wpResponse.ok) {
@@ -65,15 +72,15 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       return new Response('Failed to fetch post', { status: wpResponse.status })
     }
 
-    const thought: WPThought = await wpResponse.json()
+    const post: WPPostBase = await wpResponse.json()
 
     // タイトルが存在しない場合はエラー
-    if (!thought.title?.rendered) {
+    if (!post.title?.rendered) {
       return new Response('Post title not found', { status: 500 })
     }
 
-    const title = thought.title.rendered
-    console.log('Generating thumbnail for post:', postId, 'title:', title)
+    const title = post.title.rendered
+    console.log(`Generating thumbnail for ${postType}:`, postId, 'title:', title)
 
     // OpenNextのCloudflareアダプターでは、getCloudflareContext()経由でbindingsにアクセス
     // async: trueを指定することで、SSGや開発環境でも動作する
