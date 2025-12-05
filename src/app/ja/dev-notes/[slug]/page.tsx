@@ -53,6 +53,7 @@ export default async function DevNoteDetailPage({ params }: { params: Promise<{ 
         previousThought={adjacentDevNotes.previous as WPThought | null}
         nextThought={adjacentDevNotes.next as WPThought | null}
         relatedArticles={relatedArticles}
+        thumbnailApiPath="dev-notes"
       />
     </>
   )
