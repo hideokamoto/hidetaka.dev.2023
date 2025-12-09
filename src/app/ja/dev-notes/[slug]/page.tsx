@@ -8,7 +8,7 @@ import {
 } from '@/libs/dataSources/devNotes'
 import type { WPThought } from '@/libs/dataSources/types'
 import { generateBlogBreadcrumbJsonLd, generateBlogPostingJsonLd } from '@/libs/jsonLd'
-import { generateBlogPostMetadata } from '@/libs/metadata'
+import { generateDevNoteMetadata } from '@/libs/metadata'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
   }
 
-  return generateBlogPostMetadata(devNote, 'dev-notes')
+  return generateDevNoteMetadata(devNote)
 }
 
 export default async function DevNoteDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -52,7 +52,7 @@ export default async function DevNoteDetailPage({ params }: { params: Promise<{ 
         previousThought={adjacentDevNotes.previous as WPThought | null}
         nextThought={adjacentDevNotes.next as WPThought | null}
         relatedArticles={relatedArticles}
-        postType="dev-notes"
+        thumbnailApiPath={`/api/thumbnail/dev-notes/${devNote.id}`}
       />
     </>
   )

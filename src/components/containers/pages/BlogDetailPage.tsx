@@ -15,7 +15,7 @@ type BlogDetailPageProps = {
   previousThought?: WPThought | null
   nextThought?: WPThought | null
   relatedArticles?: BlogItem[]
-  postType?: 'thoughs' | 'dev-notes'
+  thumbnailApiPath?: string
 }
 
 export default function BlogDetailPage({
@@ -25,7 +25,7 @@ export default function BlogDetailPage({
   previousThought,
   nextThought,
   relatedArticles = [],
-  postType = 'thoughs',
+  thumbnailApiPath,
 }: BlogDetailPageProps) {
   const date = new Date(thought.date)
   const blogLabel = lang === 'ja' ? 'ブログ' : 'Blog'
@@ -33,7 +33,7 @@ export default function BlogDetailPage({
   const nextLabel = lang === 'ja' ? '次の記事' : 'Next'
 
   // OG画像のURLを生成
-  const ogImageUrl = `/api/thumbnail/wp/${thought.id}?type=${postType}`
+  const ogImageUrl = thumbnailApiPath || `/api/thumbnail/thoughts/${thought.id}`
   const OG_IMAGE_WIDTH = 1200
   const OG_IMAGE_HEIGHT = 630
 
