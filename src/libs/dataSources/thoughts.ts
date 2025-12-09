@@ -50,6 +50,9 @@ export const loadThoughts = async (
     // _embedと_fieldsを組み合わせてカテゴリ情報を取得
     const response = await fetch(
       `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?page=${page}&per_page=${perPage}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
+      {
+        next: { revalidate: 1800 }, // 30分ごとに再検証（毎日1〜2記事更新）
+      },
     )
 
     if (!response.ok) {
@@ -124,6 +127,9 @@ export const loadThoughtsByCategory = async (
     // WordPress APIのcategoriesエンドポイントでslugからIDを取得
     const categoryResponse = await fetch(
       `https://wp-api.wp-kyoto.net/wp-json/wp/v2/categories?slug=${encodeURIComponent(normalizedCategorySlug)}`,
+      {
+        next: { revalidate: 1800 }, // 30分ごとに再検証
+      },
     )
 
     if (!categoryResponse.ok) {
@@ -147,6 +153,9 @@ export const loadThoughtsByCategory = async (
     // WordPress APIのcategoriesパラメータでフィルタリング
     const response = await fetch(
       `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?categories=${categoryId}&page=${page}&per_page=${perPage}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
+      {
+        next: { revalidate: 1800 }, // 30分ごとに再検証
+      },
     )
 
     if (!response.ok) {
@@ -206,6 +215,9 @@ export const loadAllCategories = async (lang: 'en' | 'ja' = 'en'): Promise<Categ
     const fetchPerPage = 100
     const response = await fetch(
       `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?per_page=${fetchPerPage}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
+      {
+        next: { revalidate: 1800 }, // 30分ごとに再検証
+      },
     )
 
     if (!response.ok) {
@@ -256,6 +268,9 @@ export const getThoughtBySlug = async (
     // _embedと_fieldsを組み合わせてカテゴリ情報を取得
     const response = await fetch(
       `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?slug=${encodeURIComponent(slug)}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,content,slug,link,categories`,
+      {
+        next: { revalidate: 1800 }, // 30分ごとに再検証
+      },
     )
 
     if (!response.ok) {
@@ -283,7 +298,9 @@ export type AdjacentThoughts = {
 // WordPress APIから記事を取得するヘルパー関数
 const fetchThought = async (url: string): Promise<WPThought | null> => {
   try {
-    const response = await fetch(url)
+    const response = await fetch(url, {
+      next: { revalidate: 1800 }, // 30分ごとに再検証
+    })
     if (!response.ok) {
       console.error(`Failed to fetch thought: ${response.status}`)
       return null
@@ -394,6 +411,9 @@ export const getRelatedThoughts = async (
     const fetchLimit = Math.max(limit * 2.5, 10) // 最低10件、limitの2.5倍まで
     const response = await fetch(
       `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?categories=${categoryId}&exclude=${currentThought.id}&per_page=${fetchLimit}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
+      {
+        next: { revalidate: 1800 }, // 30分ごとに再検証
+      },
     )
 
     if (!response.ok) {

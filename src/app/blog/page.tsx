@@ -8,6 +8,9 @@ export const metadata = {
   title: 'Blog',
 }
 
+// ISR: 30分ごとにページを再検証（WordPressから毎日1〜2記事更新）
+export const revalidate = 1800
+
 export default async function BlogPage() {
   const [result, categories] = await Promise.all([
     loadThoughts(1, 20, 'en'),

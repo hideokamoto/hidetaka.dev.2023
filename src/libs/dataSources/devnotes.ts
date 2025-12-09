@@ -39,6 +39,9 @@ export const loadDevNotes = async (
   try {
     const response = await fetch(
       `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?page=${page}&per_page=${perPage}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
+      {
+        next: { revalidate: 1800 }, // 30分ごとに再検証（WordPress記事）
+      },
     )
 
     if (!response.ok) {
@@ -88,6 +91,9 @@ export const getDevNoteBySlug = async (slug: string): Promise<WPThought | null> 
   try {
     const response = await fetch(
       `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?slug=${encodeURIComponent(slug)}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,content,slug,link,categories`,
+      {
+        next: { revalidate: 1800 }, // 30分ごとに再検証
+      },
     )
 
     if (!response.ok) {
@@ -115,7 +121,9 @@ export type AdjacentDevNotes = {
 // WordPress APIから記事を取得するヘルパー関数
 const fetchDevNote = async (url: string): Promise<WPThought | null> => {
   try {
-    const response = await fetch(url)
+    const response = await fetch(url, {
+      next: { revalidate: 1800 }, // 30分ごとに再検証
+    })
     if (!response.ok) {
       console.error(`Failed to fetch dev-note: ${response.status}`)
       return null
@@ -170,6 +178,9 @@ export const getRelatedDevNotes = async (
 
     const response = await fetch(
       `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?categories=${categoryId}&exclude=${currentNote.id}&per_page=${fetchLimit}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
+      {
+        next: { revalidate: 1800 }, // 30分ごとに再検証
+      },
     )
 
     if (!response.ok) {
