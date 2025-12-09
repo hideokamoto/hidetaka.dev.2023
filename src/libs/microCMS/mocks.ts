@@ -1,4 +1,4 @@
-import type { MicroCMSEventsRecord, MicroCMSProjectsRecord, MicroCMSPostsRecord } from './types'
+import type { MicroCMSEventsRecord, MicroCMSPostsRecord, MicroCMSProjectsRecord } from './types'
 
 export const MICROCMS_MOCK_BOOKs: MicroCMSProjectsRecord[] = [
   {
@@ -78,12 +78,9 @@ export const MICROCMS_MOCK_POSTs: MicroCMSPostsRecord[] = [
     publishedAt: '2025-03-05T04:31:24.865Z',
     revisedAt: '2025-03-05T04:31:24.865Z',
     title: '京都地下鉄ラスト・コールをリリースしました',
-    content: '<p>2024年11月30日に、新しい個人開発アプリケーション「京都地下鉄ラスト・コール」をリリースしました。</p><p>オープンデータと生成AIを利用したアプリケーション開発の可能性を探究し、データ活用やマッシュアップの可能性を提案することを目的とし、京都市が公開しているデータを利用したアプリケーションをリリースしました。</p>',
-    tags: [
-        'アプリケーション'
-    ],
-    lang: [
-        'japanese'
-    ]
-  }
+    content:
+      '<p>2024年11月30日に、新しい個人開発アプリケーション「京都地下鉄ラスト・コール」をリリースしました。</p><p>オープンデータと生成AIを利用したアプリケーション開発の可能性を探究し、データ活用やマッシュアップの可能性を提案することを目的とし、京都市が公開しているデータを利用したアプリケーションをリリースしました。</p>',
+    tags: ['アプリケーション'],
+    lang: ['japanese'],
+  },
 ]

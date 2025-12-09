@@ -1,39 +1,64 @@
 import Image from 'next/image'
+import Profile from '@/components/content/Profile'
 import Container from '@/components/tailwindui/Container'
-import PageHeader from '@/components/ui/PageHeader'
-import SectionHeader from '@/components/ui/SectionHeader'
-import ProfileImage from '@/components/ui/ProfileImage'
+import SocialLink, {
+  GitHubIcon,
+  LinkedInIcon,
+  TwitterIcon,
+} from '@/components/tailwindui/SocialLink'
 import BackgroundDecoration from '@/components/ui/BackgroundDecoration'
-import SocialLink, { TwitterIcon, GitHubIcon, LinkedInIcon } from '@/components/tailwindui/SocialLink'
-
-function Profile({ lang }: { lang: string }) {
-  if (lang.startsWith('ja')) {
-    return (
-      <>
-        DigitalCubeのBizDev。EC ASPの開発やStripeのDeveloper Advocateとしての経験を元に、SaaSやECサイトの収益を増やすための方法・生成AIを使った効率化や新しい事業モデルの模索などに挑戦する。
-      </>
-    )
-  }
-  return (
-    <>
-      I&apos;m a Business Development professional at DigitalCube. Based on my experience in EC ASP development and as a Developer Advocate at Stripe, I&apos;m working on methods to increase revenue for SaaS and EC sites, exploring efficiency improvements using generative AI, and developing new business models.
-    </>
-  )
-}
+import PageHeader from '@/components/ui/PageHeader'
+import ProfileImage from '@/components/ui/ProfileImage'
+import SectionHeader from '@/components/ui/SectionHeader'
+import { SITE_CONFIG } from '@/config'
 
 function SpeakerProfile({ lang }: { lang: string }) {
   if (lang.startsWith('ja')) {
     return (
       <>
-        DigitalCubeのBizDevとして、SaaSやECサイトの収益を増やすための方法・生成AIを使った効率化や新しい事業モデルの模索などに挑戦している。前職では<a className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 underline" href="https://stripe.com/docs">Stripe</a>のディベロッパーアドボケイトとして、開発者・ユーザーコミュニティとの対話やコンテンツ・サンプルの提供に取り組んだ。ECサービスやSaaSサービスの開発・運用保守の経験とコミュニティとの会話を元に、サービスの収益化戦略やテクノロジー活用方法について情報発信している。複数の開発者コミュニティに参加し、WordCamp Kansai 2024やJP_Stripes Connect 2019など、ユーザーカンファレンスの実行委員長を務めた経験を持つ。 AWS Sumurai 2017, Alexa Champions, AWS Community Builders
+        DigitalCubeのBizDevとして、SaaSやECサイトの収益を増やすための方法・生成AIを使った効率化や新しい事業モデルの模索などに挑戦している。前職では
+        <a
+          className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 underline"
+          href="https://stripe.com/docs"
+        >
+          Stripe
+        </a>
+        のディベロッパーアドボケイトとして、開発者・ユーザーコミュニティとの対話やコンテンツ・サンプルの提供に取り組んだ。ECサービスやSaaSサービスの開発・運用保守の経験とコミュニティとの会話を元に、サービスの収益化戦略やテクノロジー活用方法について情報発信している。複数の開発者コミュニティに参加し、WordCamp
+        Kansai 2024やJP_Stripes Connect
+        2019など、ユーザーカンファレンスの実行委員長を務めた経験を持つ。 AWS Sumurai 2017, Alexa
+        Champions, AWS Community Builders
       </>
     )
   }
   return (
     <>
-      Hide (ひで pronounced &quot;Hee-Day&quot;) is a Business Development professional at <a className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 underline" href="https://en.digitalcube.jp/">DigitalCube</a>, where he works on increasing revenue for SaaS and EC sites, exploring efficiency improvements using generative AI, and developing new business models. Previously, he was a Developer Advocate at <a className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 underline" href="https://stripe.com/docs">Stripe</a>, where he worked on writing, coding, and teaching how to integrate online payments.
-      He has organized several community conferences including WordCamp Kansai 2024 and <a className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 underline" href="https://connect2019.jpstripes.com/" >JP_Stripes Connect 2019</a>, the first Stripe user conference in Japan.
-      Prior to Stripe, Hide was a lead Software Engineer at DigitalCube, focused on building plugins, open source, and developing SaaS application dashboards. Hide lives in Hyogo, Japan with his family and two cats.
+      Hide (ひで pronounced &quot;Hee-Day&quot;) is a Business Development professional at{' '}
+      <a
+        className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 underline"
+        href="https://en.digitalcube.jp/"
+      >
+        DigitalCube
+      </a>
+      , where he works on increasing revenue for SaaS and EC sites, exploring efficiency
+      improvements using generative AI, and developing new business models. Previously, he was a
+      Developer Advocate at{' '}
+      <a
+        className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 underline"
+        href="https://stripe.com/docs"
+      >
+        Stripe
+      </a>
+      , where he worked on writing, coding, and teaching how to integrate online payments. He has
+      organized several community conferences including WordCamp Kansai 2024 and{' '}
+      <a
+        className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 underline"
+        href="https://connect2019.jpstripes.com/"
+      >
+        JP_Stripes Connect 2019
+      </a>
+      , the first Stripe user conference in Japan. Prior to Stripe, Hide was a lead Software
+      Engineer at DigitalCube, focused on building plugins, open source, and developing SaaS
+      application dashboards. Hide lives in Hyogo, Japan with his family and two cats.
     </>
   )
 }
@@ -76,8 +101,8 @@ function ExperienceCard({ title, period, description, highlights }: ExperienceCa
 function CertificationBadge({ title, link, src }: { title: string; link?: string; src: string }) {
   const content = (
     <div className="group relative transition-transform hover:scale-105">
-      <Image 
-        src={src} 
+      <Image
+        src={src}
         width={120}
         height={120}
         alt={title}
@@ -88,13 +113,7 @@ function CertificationBadge({ title, link, src }: { title: string; link?: string
 
   if (link) {
     return (
-      <a 
-        href={link} 
-        target="_blank" 
-        rel="noopener noreferrer"
-        className="block"
-        aria-label={title}
-      >
+      <a href={link} target="_blank" rel="noopener noreferrer" className="block" aria-label={title}>
         {content}
       </a>
     )
@@ -107,7 +126,7 @@ export default function AboutPageContent({ lang }: { lang: string }) {
   const isJa = lang.startsWith('ja')
 
   const pageTitle = isJa ? 'Hidetaka Okamotoについて' : 'About Hidetaka Okamoto'
-  const pageDescription = isJa 
+  const pageDescription = isJa
     ? 'SaaSやECサイトの収益最大化を支援するエンジニア。Stripe、AWS Serverless、WordPressを専門としています。'
     : 'Engineering partner specializing in Stripe, AWS Serverless, and WordPress. Helping SaaS and e-commerce sites maximize revenue.'
 
@@ -116,7 +135,8 @@ export default function AboutPageContent({ lang }: { lang: string }) {
         {
           title: 'DigitalCube - Business Development',
           period: '2024 - 現在',
-          description: 'SaaSやECサイトの収益を増やすための方法・生成AIを使った効率化や新しい事業モデルの模索などに挑戦しています。',
+          description:
+            'SaaSやECサイトの収益を増やすための方法・生成AIを使った効率化や新しい事業モデルの模索などに挑戦しています。',
           highlights: [
             'SaaS・ECサイトの収益最大化戦略の立案と実行',
             '生成AIを活用した業務効率化と新規事業開発',
@@ -126,7 +146,8 @@ export default function AboutPageContent({ lang }: { lang: string }) {
         {
           title: 'Stripe - Developer Advocate',
           period: '2019 - 2024',
-          description: '開発者・ユーザーコミュニティとの対話やコンテンツ・サンプルの提供に取り組みました。',
+          description:
+            '開発者・ユーザーコミュニティとの対話やコンテンツ・サンプルの提供に取り組みました。',
           highlights: [
             '開発者向けドキュメントとサンプルコードの作成',
             'コミュニティカンファレンスの企画・運営',
@@ -136,7 +157,8 @@ export default function AboutPageContent({ lang }: { lang: string }) {
         {
           title: 'DigitalCube - Lead Software Engineer',
           period: '2015 - 2019',
-          description: 'プラグイン開発、オープンソースプロジェクト、SaaSアプリケーションダッシュボードの開発に従事しました。',
+          description:
+            'プラグイン開発、オープンソースプロジェクト、SaaSアプリケーションダッシュボードの開発に従事しました。',
           highlights: [
             'WordPressプラグインとSaaS製品の開発',
             'オープンソースプロジェクトへの貢献',
@@ -148,7 +170,8 @@ export default function AboutPageContent({ lang }: { lang: string }) {
         {
           title: 'DigitalCube - Business Development',
           period: '2024 - Present',
-          description: 'Working on methods to increase revenue for SaaS and EC sites, exploring efficiency improvements using generative AI, and developing new business models.',
+          description:
+            'Working on methods to increase revenue for SaaS and EC sites, exploring efficiency improvements using generative AI, and developing new business models.',
           highlights: [
             'Revenue maximization strategies for SaaS and e-commerce',
             'Generative AI integration for operational efficiency',
@@ -158,7 +181,8 @@ export default function AboutPageContent({ lang }: { lang: string }) {
         {
           title: 'Stripe - Developer Advocate',
           period: '2019 - 2024',
-          description: 'Worked on writing, coding, and teaching how to integrate online payments. Engaged with developer and user communities.',
+          description:
+            'Worked on writing, coding, and teaching how to integrate online payments. Engaged with developer and user communities.',
           highlights: [
             'Created developer documentation and sample code',
             'Organized community conferences',
@@ -168,7 +192,8 @@ export default function AboutPageContent({ lang }: { lang: string }) {
         {
           title: 'DigitalCube - Lead Software Engineer',
           period: '2015 - 2019',
-          description: 'Focused on building plugins, open source projects, and developing SaaS application dashboards.',
+          description:
+            'Focused on building plugins, open source projects, and developing SaaS application dashboards.',
           highlights: [
             'Developed WordPress plugins and SaaS products',
             'Contributed to open source projects',
@@ -209,15 +234,12 @@ export default function AboutPageContent({ lang }: { lang: string }) {
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-white via-indigo-50/40 to-purple-50/30 dark:from-zinc-900 dark:via-indigo-950/30 dark:to-purple-950/20 -mt-[var(--header-height)] pt-[var(--header-height)]">
         <BackgroundDecoration variant="hero" />
-        
+
         <Container className="relative py-24 sm:py-32 lg:py-40">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-16 lg:gap-20">
             {/* Left: Content */}
             <div className="flex-1 space-y-8 lg:max-w-2xl">
-              <PageHeader 
-                title={pageTitle}
-                description={pageDescription}
-              />
+              <PageHeader title={pageTitle} description={pageDescription} />
               <div className="space-y-6 text-base leading-relaxed text-slate-600 dark:text-slate-400">
                 <Profile lang={lang} />
               </div>
@@ -232,13 +254,10 @@ export default function AboutPageContent({ lang }: { lang: string }) {
       {/* Experience Section */}
       <section className="relative py-24 sm:py-32">
         <Container>
-          <SectionHeader 
-            title={experienceTitle} 
-            description={isJa 
-              ? 'これまでの経験と専門性'
-              : 'Professional experience and expertise'
-            } 
-            align="center" 
+          <SectionHeader
+            title={experienceTitle}
+            description={isJa ? 'これまでの経験と専門性' : 'Professional experience and expertise'}
+            align="center"
           />
 
           <div className="mt-20 grid gap-8 lg:grid-cols-3 lg:gap-10">
@@ -264,13 +283,10 @@ export default function AboutPageContent({ lang }: { lang: string }) {
       {/* Certifications Section */}
       <section className="relative py-24 sm:py-32 bg-white dark:bg-zinc-900">
         <Container>
-          <SectionHeader 
-            title={certificationsTitle} 
-            description={isJa 
-              ? 'Stripe認定資格'
-              : 'Stripe certifications'
-            } 
-            align="center" 
+          <SectionHeader
+            title={certificationsTitle}
+            description={isJa ? 'Stripe認定資格' : 'Stripe certifications'}
+            align="center"
           />
 
           <div className="mt-16 flex flex-wrap justify-center gap-8 lg:gap-10">
@@ -284,35 +300,32 @@ export default function AboutPageContent({ lang }: { lang: string }) {
       {/* Connect Section */}
       <section className="relative py-24 sm:py-32">
         <Container>
-          <SectionHeader 
-            title={connectTitle} 
-            description={isJa 
-              ? 'SNSやGitHubでフォローしてください'
-              : 'Follow me on social media'
-            } 
-            align="center" 
+          <SectionHeader
+            title={connectTitle}
+            description={isJa ? 'SNSやGitHubでフォローしてください' : 'Follow me on social media'}
+            align="center"
           />
 
           <div className="mt-16 flex justify-center">
-            <ul role="list" className="space-y-6">
-              <SocialLink 
-                href="https://twitter.com/hidetaka_dev" 
+            <ul className="space-y-6">
+              <SocialLink
+                href={SITE_CONFIG.social.twitter.url}
                 icon={TwitterIcon}
-                aria-label="Follow on Twitter"
+                aria-label={SITE_CONFIG.social.twitter.ariaLabel}
               >
                 {isJa ? 'Twitterでフォロー' : 'Follow on Twitter'}
               </SocialLink>
-              <SocialLink 
-                href="https://github.com/hideokamoto" 
+              <SocialLink
+                href={SITE_CONFIG.social.github.url}
                 icon={GitHubIcon}
-                aria-label="Follow on GitHub"
+                aria-label={SITE_CONFIG.social.github.ariaLabel}
               >
                 {isJa ? 'GitHubでフォロー' : 'Follow on GitHub'}
               </SocialLink>
-              <SocialLink 
-                href="https://www.linkedin.com/in/hideokamoto/" 
+              <SocialLink
+                href={SITE_CONFIG.social.linkedin.url}
                 icon={LinkedInIcon}
-                aria-label="Follow on LinkedIn"
+                aria-label={SITE_CONFIG.social.linkedin.ariaLabel}
               >
                 {isJa ? 'LinkedInでフォロー' : 'Follow on LinkedIn'}
               </SocialLink>
@@ -323,4 +336,3 @@ export default function AboutPageContent({ lang }: { lang: string }) {
     </>
   )
 }
-

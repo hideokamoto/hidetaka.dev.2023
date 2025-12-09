@@ -1,9 +1,11 @@
 import type { Metadata } from 'next'
-import { SITE_TITLE, SITE_DESCRIPTION } from '@/consts'
+import { SITE_DESCRIPTION, SITE_TITLE } from '@/consts'
 import './globals.css'
+import { ClarityAnalytics } from '@/components/ClarityAnalytics'
 import { DarkModeScript } from '@/components/DarkModeScript'
-import Header from '@/components/tailwindui/Header'
+import GoogleAnalytics from '@/components/GoogleAnalytics'
 import Footer from '@/components/tailwindui/Footer'
+import Header from '@/components/tailwindui/Header'
 
 export const metadata: Metadata = {
   title: SITE_TITLE,
@@ -35,18 +37,12 @@ export const metadata: Metadata = {
       { url: '/favicons/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
       { url: '/favicons/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
     ],
-    apple: [
-      { url: '/favicons/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
-    ],
+    apple: [{ url: '/favicons/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
   manifest: '/favicons/site.webmanifest',
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="h-full antialiased">
       <head>
@@ -54,7 +50,9 @@ export default function RootLayout({
         <link rel="alternate" type="application/rss+xml" title="RSS" href="/projects/rss.xml" />
       </head>
       <body className="flex h-full flex-col bg-zinc-50 dark:bg-black">
+        <GoogleAnalytics gaId="G-RV8PYHHYHN" />
         <DarkModeScript />
+        <ClarityAnalytics />
         <div className="fixed inset-0 flex justify-center sm:px-8">
           <div className="flex w-full max-w-7xl lg:px-8">
             <div className="w-full bg-white ring-1 ring-zinc-100 dark:bg-zinc-900 dark:ring-zinc-300/20" />
@@ -69,4 +67,3 @@ export default function RootLayout({
     </html>
   )
 }
-

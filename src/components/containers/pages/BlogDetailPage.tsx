@@ -1,8 +1,12 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
+import { InArticleAd } from '@/components/ui/GoogleAds'
+import ProfileCard from '@/components/ui/ProfileCard'
+import RelatedArticles from '@/components/ui/RelatedArticles'
 import Tag from '@/components/ui/Tag'
-import type { WPThought } from '@/libs/dataSources/types'
+import type { BlogItem, WPThought } from '@/libs/dataSources/types'
 
 type BlogDetailPageProps = {
   thought: WPThought
@@ -10,6 +14,7 @@ type BlogDetailPageProps = {
   basePath: string
   previousThought?: WPThought | null
   nextThought?: WPThought | null
+  relatedArticles?: BlogItem[]
 }
 
 export default function BlogDetailPage({
@@ -18,18 +23,24 @@ export default function BlogDetailPage({
   basePath,
   previousThought,
   nextThought,
+  relatedArticles = [],
 }: BlogDetailPageProps) {
   const date = new Date(thought.date)
   const blogLabel = lang === 'ja' ? 'ブログ' : 'Blog'
   const previousLabel = lang === 'ja' ? '前の記事' : 'Previous'
   const nextLabel = lang === 'ja' ? '次の記事' : 'Next'
 
+  // OG画像のURLを生成
+  const ogImageUrl = `/api/thumbnail/thoughts/${thought.id}`
+  const OG_IMAGE_WIDTH = 1200
+  const OG_IMAGE_HEIGHT = 630
+
   return (
     <Container className="mt-16 sm:mt-32">
       <article className="max-w-3xl mx-auto">
         {/* パンくずリスト */}
         <nav aria-label="Breadcrumb" className="mb-8">
-          <ol role="list" className="flex items-center space-x-2">
+          <ol className="flex items-center space-x-2">
             <li>
               <div className="flex items-center text-sm">
                 <Link
@@ -58,6 +69,18 @@ export default function BlogDetailPage({
           </ol>
         </nav>
 
+        {/* サムネイル画像 (OG画像) */}
+        <div className="mb-8 overflow-hidden rounded-lg">
+          <Image
+            src={ogImageUrl}
+            alt={thought.title.rendered}
+            width={OG_IMAGE_WIDTH}
+            height={OG_IMAGE_HEIGHT}
+            className="w-full h-auto"
+            priority
+          />
+        </div>
+
         {/* タイトル */}
         <header className="mb-6">
           <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-5xl">
@@ -80,13 +103,17 @@ export default function BlogDetailPage({
                 .filter((term) => term.taxonomy === 'category')
                 .map((category) => {
                   // category.slugが既にエンコードされている可能性があるので、一度デコードしてからエンコード
-                  const normalizedSlug = category.slug.includes('%') 
-                    ? decodeURIComponent(category.slug) 
+                  const normalizedSlug = category.slug.includes('%')
+                    ? decodeURIComponent(category.slug)
                     : category.slug
                   const categoryUrl = `${basePath}/category/${encodeURIComponent(normalizedSlug)}`
                   return (
                     <Link key={category.id} href={categoryUrl}>
-                      <Tag variant="indigo" size="sm" className="cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors">
+                      <Tag
+                        variant="indigo"
+                        size="sm"
+                        className="cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors"
+                      >
                         {category.name}
                       </Tag>
                     </Link>
@@ -99,8 +126,18 @@ export default function BlogDetailPage({
         {/* コンテンツ */}
         <div
           className="blog-content text-zinc-700 dark:text-zinc-300 leading-relaxed"
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: Content is from trusted WordPress CMS, controlled by site owner
           dangerouslySetInnerHTML={{ __html: thought.content.rendered }}
         />
+
+        {/* In-Article Ad */}
+        <InArticleAd />
+
+        {/* プロフィールカード */}
+        <ProfileCard lang={lang} imageSrc="/images/profile.jpg" className="mt-12" />
+
+        {/* 関連記事 */}
+        <RelatedArticles articles={relatedArticles} lang={lang} />
 
         {/* 前後の記事へのナビゲーション */}
         {(previousThought || nextThought) && (
@@ -145,4 +182,3 @@ export default function BlogDetailPage({
     </Container>
   )
 }
-

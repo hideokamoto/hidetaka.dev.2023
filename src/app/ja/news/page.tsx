@@ -1,4 +1,3 @@
-import Container from '@/components/tailwindui/Container'
 import NewsPageContent from '@/components/containers/pages/NewsPage'
 
 export const metadata = {
@@ -8,4 +7,3 @@ export const metadata = {
 export default function NewsPage() {
   return <NewsPageContent lang="ja" />
 }
-

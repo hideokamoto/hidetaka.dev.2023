@@ -1,19 +1,20 @@
 'use client'
 
-import { useState, useMemo } from 'react'
-import Link from 'next/link'
 import Image from 'next/image'
+import Link from 'next/link'
+import React, { useMemo, useState } from 'react'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
-import Tag from '@/components/ui/Tag'
-import SearchBar from '@/components/ui/SearchBar'
 import FilterItem from '@/components/ui/FilterItem'
-import PageHeader from '@/components/ui/PageHeader'
-import SidebarLayout from '@/components/ui/SidebarLayout'
-import MobileFilterDrawer, { type FilterGroup } from '@/components/ui/MobileFilterDrawer'
+import { InFeedAd } from '@/components/ui/GoogleAds'
 import MobileFilterButton from '@/components/ui/MobileFilterButton'
+import MobileFilterDrawer, { type FilterGroup } from '@/components/ui/MobileFilterDrawer'
+import PageHeader from '@/components/ui/PageHeader'
+import SearchBar from '@/components/ui/SearchBar'
+import SidebarLayout from '@/components/ui/SidebarLayout'
+import Tag from '@/components/ui/Tag'
 import type { FeedItem } from '@/libs/dataSources/types'
-import type { MicroCMSPostsRecord } from '@/lib/microCMS/types'
+import type { MicroCMSPostsRecord } from '@/libs/microCMS/types'
 
 type WritingItem = FeedItem | MicroCMSPostsRecord
 type FilterType = 'all' | 'external' | 'news'
@@ -23,12 +24,14 @@ type FilterDataSource = string | null
 // 統一されたWritingカードコンポーネント
 function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string }) {
   const isFeedItem = 'dataSource' in item
-  const href = isFeedItem 
-    ? item.href 
-    : (lang === 'ja' ? `/ja/writing/${item.id}` : `/writing/${item.id}`)
+  const href = isFeedItem
+    ? item.href
+    : lang === 'ja'
+      ? `/ja/writing/${item.id}`
+      : `/writing/${item.id}`
   const title = item.title
-  const description = isFeedItem 
-    ? item.description 
+  const description = isFeedItem
+    ? item.description
     : item.content.replace(/<[^>]*>/g, '').substring(0, 150)
   const datetime = isFeedItem ? item.datetime : item.publishedAt
   const date = new Date(datetime)
@@ -49,15 +52,15 @@ function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string })
           />
         </div>
       )}
-      
+
       {/* Content */}
       <div className={`p-5 lg:p-6 ${imageUrl ? '' : 'pt-6'}`}>
         <div className="flex flex-col gap-3">
           {/* Date and DataSource */}
           <div className="flex items-center gap-3 flex-wrap">
-            <DateDisplay 
-              date={date} 
-              lang={lang} 
+            <DateDisplay
+              date={date}
+              lang={lang}
               format="short"
               className="text-xs font-semibold text-slate-500 dark:text-slate-400"
             />
@@ -72,7 +75,7 @@ function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string })
               </Tag>
             )}
           </div>
-          
+
           {/* Title */}
           <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
             {title}
@@ -99,13 +102,14 @@ function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string })
 
           {/* Read more indicator */}
           <div className="flex items-center text-sm font-medium text-indigo-600 dark:text-indigo-400 mt-1">
-            {isFeedItem ? (lang === 'ja' ? '記事を読む' : 'Read article') : (lang === 'ja' ? '続きを読む' : 'Read more')}
-            <svg 
-              className="ml-1 h-4 w-4" 
-              fill="none" 
-              viewBox="0 0 24 24" 
-              stroke="currentColor"
-            >
+            {isFeedItem
+              ? lang === 'ja'
+                ? '記事を読む'
+                : 'Read article'
+              : lang === 'ja'
+                ? '続きを読む'
+                : 'Read more'}
+            <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </div>
@@ -129,7 +133,6 @@ function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string })
   )
 }
 
-
 // サイドバーコンポーネント（デスクトップ用）
 function Sidebar({
   searchQuery,
@@ -144,7 +147,7 @@ function Sidebar({
   availableDataSources,
   dataSourceMap,
   counts,
-  lang
+  lang,
 }: {
   searchQuery: string
   onSearchChange: (value: string) => void
@@ -178,11 +181,7 @@ function Sidebar({
     <div className="hidden lg:block space-y-6">
       {/* 検索バー */}
       <div>
-        <SearchBar 
-          value={searchQuery}
-          onChange={onSearchChange}
-          placeholder={searchPlaceholder}
-        />
+        <SearchBar value={searchQuery} onChange={onSearchChange} placeholder={searchPlaceholder} />
       </div>
 
       {/* タイプフィルター */}
@@ -191,8 +190,8 @@ function Sidebar({
           {typeTitle}
         </h3>
         <nav className="space-y-1">
-          <FilterItem 
-            active={filterType === 'all'} 
+          <FilterItem
+            active={filterType === 'all'}
             onClick={() => {
               onFilterTypeChange('all')
               onFilterTagChange(null)
@@ -202,8 +201,8 @@ function Sidebar({
           >
             {allText}
           </FilterItem>
-          <FilterItem 
-            active={filterType === 'external'} 
+          <FilterItem
+            active={filterType === 'external'}
             onClick={() => {
               onFilterTypeChange('external')
               onFilterTagChange(null)
@@ -213,8 +212,8 @@ function Sidebar({
           >
             {externalText}
           </FilterItem>
-          <FilterItem 
-            active={filterType === 'news'} 
+          <FilterItem
+            active={filterType === 'news'}
             onClick={() => {
               onFilterTypeChange('news')
               onFilterTagChange(null)
@@ -234,17 +233,17 @@ function Sidebar({
             {tagTitle}
           </h3>
           <nav className="space-y-1">
-            <FilterItem 
-              active={filterTag === null} 
+            <FilterItem
+              active={filterTag === null}
               onClick={() => onFilterTagChange(null)}
               count={counts.all}
             >
               {allText}
             </FilterItem>
             {availableTags.map((tag) => (
-              <FilterItem 
+              <FilterItem
                 key={tag}
-                active={filterTag === tag} 
+                active={filterTag === tag}
                 onClick={() => onFilterTagChange(tag)}
                 count={counts.byTag[tag] || 0}
               >
@@ -262,8 +261,8 @@ function Sidebar({
             {sourceTitle}
           </h3>
           <nav className="space-y-1">
-            <FilterItem 
-              active={filterDataSource === null} 
+            <FilterItem
+              active={filterDataSource === null}
               onClick={() => onFilterDataSourceChange(null)}
               count={counts.all}
             >
@@ -273,8 +272,8 @@ function Sidebar({
               const sourceHref = dataSourceMap.get(source) || '#'
               return (
                 <div key={source} className="space-y-1">
-                  <FilterItem 
-                    active={filterDataSource === source} 
+                  <FilterItem
+                    active={filterDataSource === source}
                     onClick={() => onFilterDataSourceChange(source)}
                     count={counts.byDataSource[source] || 0}
                   >
@@ -288,8 +287,18 @@ function Sidebar({
                       className="ml-4 text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-1"
                     >
                       {lang === 'ja' ? '元のサイトで見る' : 'View on original site'}
-                      <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      <svg
+                        className="h-3 w-3"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                        />
                       </svg>
                     </a>
                   )}
@@ -303,12 +312,12 @@ function Sidebar({
   )
 }
 
-export default function WritingPageContent({ 
+export default function WritingPageContent({
   lang,
   externalArticles,
   hasMoreBySource = {},
-  newsArticles
-}: { 
+  newsArticles,
+}: {
   lang: string
   externalArticles: FeedItem[]
   hasMoreBySource?: Record<string, boolean>
@@ -321,17 +330,16 @@ export default function WritingPageContent({
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
 
   // 全記事を統合
-  const allItems: WritingItem[] = [
-    ...externalArticles,
-    ...newsArticles,
-  ]
+  const allItems: WritingItem[] = [...externalArticles, ...newsArticles]
 
   // 利用可能なタグとデータソースを抽出
   const availableTags = useMemo(() => {
     const tagSet = new Set<string>()
-    newsArticles.forEach(article => {
+    newsArticles.forEach((article) => {
       if (article.tags) {
-        article.tags.forEach(tag => tagSet.add(tag))
+        article.tags.forEach((tag) => {
+          tagSet.add(tag)
+        })
       }
     })
     return Array.from(tagSet).sort()
@@ -339,7 +347,7 @@ export default function WritingPageContent({
 
   const availableDataSources = useMemo(() => {
     const sourceSet = new Set<string>()
-    externalArticles.forEach(article => {
+    externalArticles.forEach((article) => {
       if (article.dataSource) {
         sourceSet.add(article.dataSource.name)
       }
@@ -350,7 +358,7 @@ export default function WritingPageContent({
   // データソースのhref情報を取得
   const dataSourceMap = useMemo(() => {
     const map = new Map<string, string>()
-    externalArticles.forEach(article => {
+    externalArticles.forEach((article) => {
       if (article.dataSource) {
         map.set(article.dataSource.name, article.dataSource.href)
       }
@@ -363,17 +371,17 @@ export default function WritingPageContent({
     if (!searchQuery.trim()) return true
     const query = searchQuery.toLowerCase()
     const title = item.title.toLowerCase()
-    const description = ('dataSource' in item 
-      ? item.description 
-      : item.content.replace(/<[^>]*>/g, '')).toLowerCase()
+    const description = (
+      'dataSource' in item ? item.description : item.content.replace(/<[^>]*>/g, '')
+    ).toLowerCase()
     const tags = ('dataSource' in item ? [] : item.tags || []).join(' ').toLowerCase()
-    
+
     return title.includes(query) || description.includes(query) || tags.includes(query)
   }
 
   // フィルターと検索を適用
   const filteredItems = useMemo(() => {
-    let items = allItems.filter(item => {
+    let items = allItems.filter((item) => {
       // タイプフィルター
       if (filterType === 'external' && !('dataSource' in item)) return false
       if (filterType === 'news' && 'dataSource' in item) return false
@@ -404,7 +412,7 @@ export default function WritingPageContent({
     })
 
     return items
-  }, [allItems, filterType, filterTag, filterDataSource, searchQuery])
+  }, [allItems, filterType, filterTag, filterDataSource, matchesSearch])
 
   // カウント計算
   const counts = useMemo(() => {
@@ -412,16 +420,14 @@ export default function WritingPageContent({
     const byDataSource: Record<string, number> = {}
 
     // タグ別カウント
-    availableTags.forEach(tag => {
-      byTag[tag] = newsArticles.filter(article => 
-        article.tags && article.tags.includes(tag)
-      ).length
+    availableTags.forEach((tag) => {
+      byTag[tag] = newsArticles.filter((article) => article.tags?.includes(tag)).length
     })
 
     // データソース別カウント（20件以上ある場合は「20+」として扱う）
-    availableDataSources.forEach(source => {
-      const count = externalArticles.filter(article => 
-        article.dataSource && article.dataSource.name === source
+    availableDataSources.forEach((source) => {
+      const count = externalArticles.filter(
+        (article) => article.dataSource && article.dataSource.name === source,
       ).length
       // hasMoreBySourceがある場合は20+として扱う（実際のカウントは20だが、表示は20+）
       byDataSource[source] = hasMoreBySource[source] ? 21 : count
@@ -434,13 +440,21 @@ export default function WritingPageContent({
       byTag,
       byDataSource,
     }
-  }, [allItems, externalArticles, newsArticles, availableTags, availableDataSources, hasMoreBySource])
+  }, [
+    allItems,
+    externalArticles,
+    newsArticles,
+    availableTags,
+    availableDataSources,
+    hasMoreBySource,
+  ])
 
   // テキスト
   const title = lang === 'ja' ? 'Writing' : 'Writing'
-  const description = lang === 'ja' 
-    ? '技術記事、ブログ投稿、ニュースなどの執筆活動を紹介しています。'
-    : 'A collection of technical articles, blog posts, news, and other writing I\'ve published.'
+  const description =
+    lang === 'ja'
+      ? '技術記事、ブログ投稿、ニュースなどの執筆活動を紹介しています。'
+      : "A collection of technical articles, blog posts, news, and other writing I've published."
   const filterButtonText = lang === 'ja' ? 'フィルター' : 'Filter'
 
   // アクティブなフィルターの数を計算
@@ -474,7 +488,7 @@ export default function WritingPageContent({
               setFilterType('all')
               setFilterTag(null)
               setFilterDataSource(null)
-            }
+            },
           },
           {
             id: 'external',
@@ -485,7 +499,7 @@ export default function WritingPageContent({
               setFilterType('external')
               setFilterTag(null)
               setFilterDataSource(null)
-            }
+            },
           },
           {
             id: 'news',
@@ -496,10 +510,10 @@ export default function WritingPageContent({
               setFilterType('news')
               setFilterTag(null)
               setFilterDataSource(null)
-            }
-          }
-        ]
-      }
+            },
+          },
+        ],
+      },
     ]
 
     // タグフィルター
@@ -512,16 +526,16 @@ export default function WritingPageContent({
             label: allText,
             active: filterTag === null,
             count: counts.all,
-            onClick: () => setFilterTag(null)
+            onClick: () => setFilterTag(null),
           },
-          ...availableTags.map(tag => ({
+          ...availableTags.map((tag) => ({
             id: `tag-${tag}`,
             label: tag,
             active: filterTag === tag,
             count: counts.byTag[tag] || 0,
-            onClick: () => setFilterTag(tag)
-          }))
-        ]
+            onClick: () => setFilterTag(tag),
+          })),
+        ],
       })
     }
 
@@ -535,22 +549,31 @@ export default function WritingPageContent({
             label: allText,
             active: filterDataSource === null,
             count: counts.all,
-            onClick: () => setFilterDataSource(null)
+            onClick: () => setFilterDataSource(null),
           },
-          ...availableDataSources.map(source => ({
+          ...availableDataSources.map((source) => ({
             id: `source-${source}`,
             label: source,
             active: filterDataSource === source,
             count: counts.byDataSource[source] || 0,
             onClick: () => setFilterDataSource(source),
-            externalLink: dataSourceMap.get(source)
-          }))
-        ]
+            externalLink: dataSourceMap.get(source),
+          })),
+        ],
       })
     }
 
     return groups
-  }, [lang, filterType, filterTag, filterDataSource, availableTags, availableDataSources, counts])
+  }, [
+    lang,
+    filterType,
+    filterTag,
+    filterDataSource,
+    availableTags,
+    availableDataSources,
+    counts,
+    dataSourceMap.get,
+  ])
 
   return (
     <>
@@ -573,7 +596,7 @@ export default function WritingPageContent({
 
           {/* モバイル用検索バーとフィルターボタン */}
           <div className="lg:hidden mb-6 space-y-4">
-            <SearchBar 
+            <SearchBar
               value={searchQuery}
               onChange={setSearchQuery}
               placeholder={lang === 'ja' ? '検索...' : 'Search...'}
@@ -609,15 +632,21 @@ export default function WritingPageContent({
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                   {filteredItems.map((item, index) => {
-                    const key = 'dataSource' in item 
-                      ? `external-${item.href}` 
-                      : `news-${item.id}`
+                    const key = 'dataSource' in item ? `external-${item.href}` : `news-${item.id}`
                     return (
-                      <UnifiedWritingCard key={key} item={item} lang={lang} />
+                      <React.Fragment key={key}>
+                        <UnifiedWritingCard item={item} lang={lang} />
+                        {/* 4記事ごとに In-Feed Ad を表示 */}
+                        {(index + 1) % 4 === 0 && index < filteredItems.length - 1 && (
+                          <div className="md:col-span-2">
+                            <InFeedAd />
+                          </div>
+                        )}
+                      </React.Fragment>
                     )
                   })}
                 </div>
-                
+
                 {/* 外部動線セクション */}
                 {availableDataSources.length > 0 && (
                   <div className="mt-16 pt-16 border-t border-zinc-200 dark:border-zinc-800">
@@ -626,7 +655,7 @@ export default function WritingPageContent({
                         {lang === 'ja' ? 'もっと記事を見る' : 'View More Articles'}
                       </h3>
                       <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
-                        {lang === 'ja' 
+                        {lang === 'ja'
                           ? '最新20件を表示しています。それ以前の記事は各サイトでご覧ください。'
                           : 'Showing the latest 20 articles. View older articles on each site.'}
                       </p>
@@ -642,8 +671,18 @@ export default function WritingPageContent({
                               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:border-indigo-400 dark:hover:border-indigo-600 transition-colors"
                             >
                               <span className="font-medium">{source}</span>
-                              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                              <svg
+                                className="h-4 w-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                                />
                               </svg>
                             </a>
                           )

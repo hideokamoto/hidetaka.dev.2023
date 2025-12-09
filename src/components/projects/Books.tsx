@@ -1,5 +1,5 @@
-import { MicroCMSAPI } from '@/lib/microCMS/apis'
-import { createMicroCMSClient } from '@/lib/microCMS/client'
+import { MicroCMSAPI } from '@/libs/microCMS/apis'
+import { createMicroCMSClient } from '@/libs/microCMS/client'
 import ProjectCard from './ProjectCard'
 
 export default async function Books({ lang }: { lang: string }) {
@@ -22,4 +22,3 @@ export default async function Books({ lang }: { lang: string }) {
     </div>
   )
 }
-

@@ -5,8 +5,9 @@ type BadgeProps = {
 }
 
 export default function Badge({ label, variant = 'indigo', className = '' }: BadgeProps) {
-  const baseStyles = 'inline-flex items-center gap-3 rounded-full border px-4 py-1.5 backdrop-blur-sm shadow-sm'
-  
+  const baseStyles =
+    'inline-flex items-center gap-3 rounded-full border px-4 py-1.5 backdrop-blur-sm shadow-sm'
+
   const variantStyles = {
     default: 'border-zinc-200 bg-zinc-50/80 dark:border-zinc-500/30 dark:bg-zinc-500/10',
     indigo: 'border-indigo-200 bg-indigo-50/80 dark:border-indigo-500/30 dark:bg-indigo-500/10',
@@ -25,10 +26,7 @@ export default function Badge({ label, variant = 'indigo', className = '' }: Bad
   return (
     <div className={`${baseStyles} ${variantStyles[variant]} ${className}`}>
       <span className={dotStyles[variant]} />
-      <p className={textStyles[variant]}>
-        {label}
-      </p>
+      <p className={textStyles[variant]}>{label}</p>
     </div>
   )
 }
-

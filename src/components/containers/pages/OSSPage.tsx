@@ -1,10 +1,6 @@
-import Container from '@/components/tailwindui/Container'
 import SimpleLayout from '@/components/tailwindui/SimpleLayout'
-import Link from 'next/link'
 import { listMyNPMPackages } from '@/libs/dataSources/npmjs'
 import { listMyWordPressPlugins } from '@/libs/dataSources/wporg'
-import type { NPMRegistrySearchResult } from '@/libs/dataSources/npmjs'
-import type { WordPressPluginDetail } from '@/libs/dataSources/wporg'
 
 function formatDate(dateString: string, lang: string): string {
   return new Date(dateString).toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', {
@@ -38,7 +34,10 @@ export default async function OSSPageContent({ lang }: { lang: string }) {
               <div className="md:border-l md:border-zinc-100 md:pl-6 md:dark:border-zinc-700/40">
                 <div className="flex max-w-3xl flex-col space-y-16">
                   {npmPackages.map((pkg) => (
-                    <article key={pkg.package.name} className="md:grid md:grid-cols-4 md:items-baseline">
+                    <article
+                      key={pkg.package.name}
+                      className="md:grid md:grid-cols-4 md:items-baseline"
+                    >
                       <div className="group relative flex flex-col items-start md:col-span-3">
                         <h2 className="text-base font-semibold tracking-tight text-zinc-800 dark:text-zinc-100">
                           <a href={pkg.package.links.npm} target="_blank" rel="noopener noreferrer">
@@ -49,7 +48,10 @@ export default async function OSSPageContent({ lang }: { lang: string }) {
                           dateTime={pkg.package.date}
                           className="relative z-10 order-first mb-3 flex items-center text-sm text-zinc-400 dark:text-zinc-500 md:hidden pl-3.5"
                         >
-                          <span className="absolute inset-y-0 left-0 flex items-center" aria-hidden="true">
+                          <span
+                            className="absolute inset-y-0 left-0 flex items-center"
+                            aria-hidden="true"
+                          >
                             <span className="h-4 w-0.5 rounded-full bg-zinc-200 dark:bg-zinc-500" />
                           </span>
                           {formatDate(pkg.package.date, lang)}
@@ -91,7 +93,11 @@ export default async function OSSPageContent({ lang }: { lang: string }) {
                     <article key={plugin.slug} className="md:grid md:grid-cols-4 md:items-baseline">
                       <div className="group relative flex flex-col items-start md:col-span-3">
                         <h2 className="text-base font-semibold tracking-tight text-zinc-800 dark:text-zinc-100">
-                          <a href={`https://wordpress.org/plugins/${plugin.slug}`} target="_blank" rel="noopener noreferrer">
+                          <a
+                            href={`https://wordpress.org/plugins/${plugin.slug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
                             {plugin.name}
                           </a>
                         </h2>
@@ -99,7 +105,10 @@ export default async function OSSPageContent({ lang }: { lang: string }) {
                           dateTime={plugin.added}
                           className="relative z-10 order-first mb-3 flex items-center text-sm text-zinc-400 dark:text-zinc-500 md:hidden pl-3.5"
                         >
-                          <span className="absolute inset-y-0 left-0 flex items-center" aria-hidden="true">
+                          <span
+                            className="absolute inset-y-0 left-0 flex items-center"
+                            aria-hidden="true"
+                          >
                             <span className="h-4 w-0.5 rounded-full bg-zinc-200 dark:bg-zinc-500" />
                           </span>
                           {formatDate(plugin.added, lang)}
@@ -125,4 +134,3 @@ export default async function OSSPageContent({ lang }: { lang: string }) {
     </SimpleLayout>
   )
 }
-

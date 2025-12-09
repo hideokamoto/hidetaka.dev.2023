@@ -1,4 +1,4 @@
-import { NextRequest } from 'next/server'
+import type { NextRequest } from 'next/server'
 import { SITE_CONFIG } from '@/config'
 import type { WPThought } from '@/libs/dataSources/types'
 
@@ -6,19 +6,24 @@ import type { WPThought } from '@/libs/dataSources/types'
 // export const runtime = 'edge'
 
 // getCloudflareContextを動的インポートで取得（OpenNextのビルドプロセスで正しく解決されるように）
-async function getCloudflareContext(options: { async: true } | { async?: false } = { async: false }) {
+async function getCloudflareContext(
+  options: { async: true } | { async?: false } = { async: false },
+) {
   try {
     const { getCloudflareContext: getContext } = await import('@opennextjs/cloudflare')
     // 型アサーションでオーバーロードを解決
     if (options.async === true) {
-      return getContext({ async: true })
-    } else {
-      return getContext({ async: false })
+      return await getContext({ async: true })
     }
-  } catch (error) {
+    return getContext({ async: false })
+  } catch (_error) {
     // フォールバック: グローバルスコープから直接取得
     const cloudflareContextSymbol = Symbol.for('__cloudflare-context__')
-    const context = (globalThis as any)[cloudflareContextSymbol]
+    const context = (
+      globalThis as typeof globalThis & {
+        [key: symbol]: unknown
+      }
+    )[cloudflareContextSymbol]
     if (context) {
       return options.async === true ? Promise.resolve(context) : context
     }
@@ -28,31 +33,28 @@ async function getCloudflareContext(options: { async: true } | { async?: false }
 
 /**
  * WordPressのthoughts投稿タイプ用のサムネイル画像生成API
- * 
+ *
  * セキュリティ: post_idからWordPress APIで記事を取得し、存在する記事のタイトルのみを使用
  * これにより、任意の文字列で画像を生成することを防止
- * 
+ *
  * 将来的に他のコンテンツタイプ用のルートを追加する場合:
  * - /api/thumbnail/posts/[id]/route.tsx - MicroCMSのposts用
  * - /api/thumbnail/projects/[id]/route.tsx - MicroCMSのprojects用
  * - /api/thumbnail/events/[id]/route.tsx - MicroCMSのevents用
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params
     const postId = parseInt(id, 10)
 
     // IDが有効な数値でない場合は404を返す
-    if (isNaN(postId) || postId <= 0) {
+    if (Number.isNaN(postId) || postId <= 0) {
       return new Response('Invalid post ID', { status: 404 })
     }
 
     // WordPress REST APIから記事を取得
     const wpResponse = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs/${postId}?_fields=id,title`
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs/${postId}?_fields=id,title`,
     )
 
     if (!wpResponse.ok) {
@@ -75,12 +77,13 @@ export async function GET(
 
     // OpenNextのCloudflareアダプターでは、getCloudflareContext()経由でbindingsにアクセス
     // async: trueを指定することで、SSGや開発環境でも動作する
-    const { env } = await getCloudflareContext({ async: true })
-    // 型定義は npm run cf-typegen で生成されるが、ここでは型アサーションを使用
-    const typedEnv = env as {
-      OG_IMAGE_GENERATOR?: { fetch: typeof fetch }
-      OG_IMAGE_GEN_AUTH_TOKEN?: string
+    const context = (await getCloudflareContext({ async: true })) as {
+      env: {
+        OG_IMAGE_GENERATOR?: { fetch: typeof fetch }
+        OG_IMAGE_GEN_AUTH_TOKEN?: string
+      }
     }
+    const typedEnv = context.env
     const ogImageGenerator = typedEnv.OG_IMAGE_GENERATOR
     console.log('ogImageGenerator', ogImageGenerator)
     if (!ogImageGenerator) {
@@ -101,7 +104,6 @@ export async function GET(
     }
 
     // Service Binding経由でOG画像生成Workerを呼び出す
-    // @ts-ignore
     const response = await ogImageGenerator.fetch(ogImageUrl, { headers })
 
     // エラーハンドリング
@@ -110,11 +112,23 @@ export async function GET(
       return new Response('Failed to generate image', { status: response.status })
     }
 
-    // 新しいWorkerからのレスポンスをそのまま返す
-    return response
+    // 新しいWorkerからのレスポンスにキャッシュヘッダーを追加して返す
+    const responseHeaders = new Headers(response.headers)
+
+    // ブラウザとCDNの両方で1日間キャッシュ
+    // OG画像は記事IDベースで生成されるため、長期キャッシュが有効
+    responseHeaders.set('Cache-Control', 'public, max-age=86400, s-maxage=86400')
+
+    // Cloudflare CDNのキャッシュを明示的に設定（1日間）
+    responseHeaders.set('CDN-Cache-Control', 'public, max-age=86400')
+
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: responseHeaders,
+    })
   } catch (error) {
     console.error('Error generating thumbnail image:', error)
     return new Response('Failed to generate image', { status: 500 })
   }
 }
-

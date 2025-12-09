@@ -8,9 +8,7 @@ type JsonLdProps = {
  */
 export default function JsonLd({ data }: JsonLdProps) {
   return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
-    />
+    // biome-ignore lint/security/noDangerouslySetInnerHtml: Safe usage - JSON.stringify output for structured data
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />
   )
 }

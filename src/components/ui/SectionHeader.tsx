@@ -5,11 +5,11 @@ type SectionHeaderProps = {
   className?: string
 }
 
-export default function SectionHeader({ 
-  title, 
+export default function SectionHeader({
+  title,
   description,
   align = 'center',
-  className = '' 
+  className = '',
 }: SectionHeaderProps) {
   const alignStyles = {
     left: 'text-left',
@@ -30,4 +30,3 @@ export default function SectionHeader({
     </div>
   )
 }
-

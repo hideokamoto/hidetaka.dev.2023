@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 function TwitterIcon({ className }: { className?: string }) {
   return (
@@ -30,13 +30,13 @@ function LinkedInIcon({ className }: { className?: string }) {
   )
 }
 
-export default function SocialLink({ 
-  href, 
-  icon: Icon, 
+export default function SocialLink({
+  href,
+  icon: Icon,
   children,
   className = '',
-  'aria-label': ariaLabel
-}: { 
+  'aria-label': ariaLabel,
+}: {
   href: string
   icon: ({ className }: { className?: string }) => ReactNode
   children: ReactNode
@@ -58,4 +58,3 @@ export default function SocialLink({
 }
 
 export { TwitterIcon, GitHubIcon, LinkedInIcon }
-

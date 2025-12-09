@@ -1,10 +1,10 @@
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
-export default function Container({ 
-  children, 
+export default function Container({
+  children,
   className = '',
-  style
-}: { 
+  style,
+}: {
   children: ReactNode
   className?: string
   style?: React.CSSProperties
@@ -15,4 +15,3 @@ export default function Container({
     </div>
   )
 }
-

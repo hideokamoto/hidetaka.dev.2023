@@ -12,7 +12,7 @@ const extractCategories = (thought: WPThought): Category[] => {
   if (!thought._embedded?.['wp:term']) {
     return []
   }
-  
+
   // wp:termは配列の配列で、各配列には異なるタクソノミーのタームが含まれる
   // taxonomyが'category'のものを抽出
   const categories: Category[] = []
@@ -34,7 +34,7 @@ const extractCategories = (thought: WPThought): Category[] => {
 export const loadThoughts = async (
   page: number = 1,
   perPage: number = 20,
-  lang: 'en' | 'ja' = 'en'
+  lang: 'en' | 'ja' = 'en',
 ): Promise<ThoughtsResult> => {
   // 英語の記事は存在しないため、英語が指定された場合は即座に空の結果を返す
   if (lang === 'en') {
@@ -49,7 +49,7 @@ export const loadThoughts = async (
   try {
     // _embedと_fieldsを組み合わせてカテゴリ情報を取得
     const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?page=${page}&per_page=${perPage}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?page=${page}&per_page=${perPage}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
     )
 
     if (!response.ok) {
@@ -98,7 +98,7 @@ export const loadThoughtsByCategory = async (
   categorySlug: string,
   page: number = 1,
   perPage: number = 20,
-  lang: 'en' | 'ja' = 'en'
+  lang: 'en' | 'ja' = 'en',
 ): Promise<ThoughtsResult> => {
   // 英語の記事は存在しないため、英語が指定された場合は即座に空の結果を返す
   if (lang === 'en') {
@@ -117,13 +117,13 @@ export const loadThoughtsByCategory = async (
       if (categorySlug.includes('%')) {
         normalizedCategorySlug = decodeURIComponent(categorySlug)
       }
-    } catch (e) {
+    } catch (_e) {
       // デコードに失敗した場合はそのまま
     }
-    
+
     // WordPress APIのcategoriesエンドポイントでslugからIDを取得
     const categoryResponse = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/categories?slug=${encodeURIComponent(normalizedCategorySlug)}`
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/categories?slug=${encodeURIComponent(normalizedCategorySlug)}`,
     )
 
     if (!categoryResponse.ok) {
@@ -146,7 +146,7 @@ export const loadThoughtsByCategory = async (
 
     // WordPress APIのcategoriesパラメータでフィルタリング
     const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?categories=${categoryId}&page=${page}&per_page=${perPage}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?categories=${categoryId}&page=${page}&per_page=${perPage}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
     )
 
     if (!response.ok) {
@@ -205,7 +205,7 @@ export const loadAllCategories = async (lang: 'en' | 'ja' = 'en'): Promise<Categ
     // 十分な数の記事を取得してカテゴリを抽出
     const fetchPerPage = 100
     const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?per_page=${fetchPerPage}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?per_page=${fetchPerPage}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
     )
 
     if (!response.ok) {
@@ -216,7 +216,7 @@ export const loadAllCategories = async (lang: 'en' | 'ja' = 'en'): Promise<Categ
 
     // カテゴリを集計
     const categoryMap = new Map<string, CategoryWithCount>()
-    
+
     for (const thought of thoughts) {
       const categories = extractCategories(thought)
       for (const category of categories) {
@@ -243,7 +243,10 @@ export const loadAllCategories = async (lang: 'en' | 'ja' = 'en'): Promise<Categ
   }
 }
 
-export const getThoughtBySlug = async (slug: string, lang: 'en' | 'ja' = 'en'): Promise<WPThought | null> => {
+export const getThoughtBySlug = async (
+  slug: string,
+  lang: 'en' | 'ja' = 'en',
+): Promise<WPThought | null> => {
   // 英語の記事は存在しないため、英語が指定された場合は即座にnullを返す
   if (lang === 'en') {
     return null
@@ -252,7 +255,7 @@ export const getThoughtBySlug = async (slug: string, lang: 'en' | 'ja' = 'en'): 
   try {
     // _embedと_fieldsを組み合わせてカテゴリ情報を取得
     const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?slug=${encodeURIComponent(slug)}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,content,slug,link,categories`
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?slug=${encodeURIComponent(slug)}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,content,slug,link,categories`,
     )
 
     if (!response.ok) {
@@ -296,7 +299,7 @@ const fetchThought = async (url: string): Promise<WPThought | null> => {
 // 前後の記事を取得
 export const getAdjacentThoughts = async (
   currentThought: WPThought,
-  lang: 'en' | 'ja' = 'en'
+  lang: 'en' | 'ja' = 'en',
 ): Promise<AdjacentThoughts> => {
   // 英語の記事は存在しないため、英語が指定された場合は即座に空の結果を返す
   if (lang === 'en') {
@@ -314,10 +317,7 @@ export const getAdjacentThoughts = async (
     const nextUrl = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?after=${encodeURIComponent(currentThought.date)}&per_page=1&orderby=date&order=asc&_fields=id,title,slug`
 
     // 並列で実行
-    const [previous, next] = await Promise.all([
-      fetchThought(previousUrl),
-      fetchThought(nextUrl),
-    ])
+    const [previous, next] = await Promise.all([fetchThought(previousUrl), fetchThought(nextUrl)])
 
     return {
       previous,
@@ -335,9 +335,7 @@ export const getAdjacentThoughts = async (
 /**
  * すべてのブログ記事を取得（sitemap用）
  */
-export const loadAllThoughts = async (
-  lang: 'en' | 'ja' = 'en'
-): Promise<BlogItem[]> => {
+export const loadAllThoughts = async (lang: 'en' | 'ja' = 'en'): Promise<BlogItem[]> => {
   // 英語の記事は存在しないため、英語が指定された場合は即座に空の配列を返す
   if (lang === 'en') {
     return []
@@ -367,3 +365,69 @@ export const loadAllThoughts = async (
   }
 }
 
+/**
+ * 関連記事を取得（同じカテゴリの記事からランダムに選択）
+ */
+export const getRelatedThoughts = async (
+  currentThought: WPThought,
+  limit: number = 4,
+  lang: 'en' | 'ja' = 'en',
+): Promise<BlogItem[]> => {
+  // 英語の記事は存在しないため、英語が指定された場合は即座に空の配列を返す
+  if (lang !== 'ja') {
+    return []
+  }
+
+  try {
+    // カテゴリを抽出
+    const categories = extractCategories(currentThought)
+
+    // カテゴリが存在しない場合は空の配列を返す
+    if (categories.length === 0) {
+      return []
+    }
+
+    // 最初のカテゴリで関連記事を取得（複数カテゴリがある場合は最初のもの）
+    const categoryId = categories[0].id
+
+    // 同じカテゴリの記事を10件取得（現在の記事を除外）
+    const fetchLimit = Math.max(limit * 2.5, 10) // 最低10件、limitの2.5倍まで
+    const response = await fetch(
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?categories=${categoryId}&exclude=${currentThought.id}&per_page=${fetchLimit}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
+    )
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch related thoughts: ${response.status}`)
+    }
+
+    const thoughts: WPThought[] = await response.json()
+
+    // BlogItem型に変換
+    const items: BlogItem[] = thoughts.map((thought: WPThought): BlogItem => {
+      const basePath = '/ja/blog'
+      const href = `${basePath}/${thought.slug}`
+
+      return {
+        id: thought.id.toString(),
+        title: thought.title.rendered,
+        description: thought.excerpt.rendered.replace(/<[^>]*>/g, '').substring(0, 150),
+        datetime: thought.date,
+        href,
+        categories: extractCategories(thought),
+      }
+    })
+
+    // Fisher-Yatesアルゴリズムでシャッフル
+    const shuffled = [...items]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+
+    // limitの数だけ返す
+    return shuffled.slice(0, limit)
+  } catch (error) {
+    console.error('Error loading related thoughts:', error)
+    return []
+  }
+}

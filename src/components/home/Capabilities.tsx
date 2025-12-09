@@ -13,7 +13,9 @@ function CapabilityCard({ capability }: { capability: Capability }) {
       <h3 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
         {capability.title}
       </h3>
-      <p className="mt-6 text-base leading-relaxed text-slate-700 dark:text-slate-400">{capability.description}</p>
+      <p className="mt-6 text-base leading-relaxed text-slate-700 dark:text-slate-400">
+        {capability.description}
+      </p>
       <ul className="mt-8 space-y-4 text-sm leading-6 text-slate-600 dark:text-slate-400">
         {capability.highlights.map((highlight) => (
           <li key={highlight} className="flex items-start gap-4">

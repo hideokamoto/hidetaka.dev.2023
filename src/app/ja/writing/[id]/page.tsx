@@ -1,6 +1,7 @@
-import { MicroCMSAPI } from '@/lib/microCMS/apis'
-import { createMicroCMSClient } from '@/lib/microCMS/client'
 import Container from '@/components/tailwindui/Container'
+import { InArticleAd } from '@/components/ui/GoogleAds'
+import { MicroCMSAPI } from '@/libs/microCMS/apis'
+import { createMicroCMSClient } from '@/libs/microCMS/client'
 
 export async function generateStaticParams() {
   const microCMS = new MicroCMSAPI(createMicroCMSClient())
@@ -25,12 +26,17 @@ export default async function WritingDetailPage({ params }: { params: Promise<{ 
         <h1 className="text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-5xl">
           {post.title}
         </h1>
-        <div 
-          className="mt-6 prose prose-zinc dark:prose-invert" 
-          dangerouslySetInnerHTML={{ __html: typeof post.content === 'string' ? post.content : String(post.content || '') }} 
+        <div
+          className="mt-6 prose prose-zinc dark:prose-invert"
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: Content is from trusted microCMS, controlled by site owner
+          dangerouslySetInnerHTML={{
+            __html: typeof post.content === 'string' ? post.content : String(post.content || ''),
+          }}
         />
+
+        {/* In-Article Ad */}
+        <InArticleAd />
       </article>
     </Container>
   )
 }
-

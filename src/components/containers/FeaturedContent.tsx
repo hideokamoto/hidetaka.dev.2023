@@ -1,30 +1,35 @@
-import Link from 'next/link'
 import Image from 'next/image'
+import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
-import { loadBlogPosts } from '@/libs/dataSources/blogs'
-import { MicroCMSAPI } from '@/lib/microCMS/apis'
-import { createMicroCMSClient } from '@/lib/microCMS/client'
-import type { FeedItem } from '@/libs/dataSources/types'
-import type { MicroCMSProjectsRecord, MicroCMSPostsRecord, MicroCMSEventsRecord } from '@/lib/microCMS/types'
+import BackgroundDecoration from '@/components/ui/BackgroundDecoration'
 import DateDisplay from '@/components/ui/DateDisplay'
 import Tag from '@/components/ui/Tag'
-import BackgroundDecoration from '@/components/ui/BackgroundDecoration'
+import { loadBlogPosts } from '@/libs/dataSources/blogs'
+import type { FeedItem } from '@/libs/dataSources/types'
+import { MicroCMSAPI } from '@/libs/microCMS/apis'
+import { createMicroCMSClient } from '@/libs/microCMS/client'
+import type {
+  MicroCMSEventsRecord,
+  MicroCMSPostsRecord,
+  MicroCMSProjectsRecord,
+} from '@/libs/microCMS/types'
 
 // ============================================================================
 // Unified Content Types & Helpers
 // ============================================================================
 
-type UnifiedContentItem = 
+type UnifiedContentItem =
   | { type: 'article'; data: FeedItem | MicroCMSPostsRecord }
   | { type: 'project'; data: MicroCMSProjectsRecord }
   | { type: 'event'; data: MicroCMSEventsRecord }
 
-function getContentDate(item: UnifiedContentItem): Date {
+function _getContentDate(item: UnifiedContentItem): Date {
   switch (item.type) {
-    case 'article':
+    case 'article': {
       const article = item.data
       const dateStr = 'datetime' in article ? article.datetime : article.publishedAt
       return new Date(dateStr)
+    }
     case 'project':
       return item.data.published_at ? new Date(item.data.published_at) : new Date(0)
     case 'event':
@@ -36,31 +41,33 @@ function getContentDate(item: UnifiedContentItem): Date {
 // Content Cards
 // ============================================================================
 
-function ArticleCard({ 
-  article, 
-  lang, 
-  variant = 'default' 
-}: { 
+function ArticleCard({
+  article,
+  lang,
+  variant = 'default',
+}: {
   article: FeedItem | MicroCMSPostsRecord
   lang: string
   variant?: 'featured' | 'default'
 }) {
   const isFeedItem = 'dataSource' in article
-  const href = isFeedItem 
-    ? article.href 
-    : (lang === 'ja' ? `/ja/writing/${article.id}` : `/writing/${article.id}`)
+  const href = isFeedItem
+    ? article.href
+    : lang === 'ja'
+      ? `/ja/writing/${article.id}`
+      : `/writing/${article.id}`
   const title = article.title
-  const description = isFeedItem 
-    ? article.description 
+  const description = isFeedItem
+    ? article.description
     : article.content.replace(/<[^>]*>/g, '').substring(0, variant === 'featured' ? 200 : 120)
   const datetime = isFeedItem ? article.datetime : article.publishedAt
-  
+
   // Parse date properly - handle RFC 822 format from RSS feeds
   let date: Date
   try {
     date = new Date(datetime)
     // Validate date
-    if (isNaN(date.getTime())) {
+    if (Number.isNaN(date.getTime())) {
       console.warn('Invalid date string:', datetime, 'for article:', title)
       date = new Date() // Fallback to current date
     }
@@ -72,12 +79,7 @@ function ArticleCard({
   const CardWrapper = ({ children }: { children: React.ReactNode }) => {
     if (isFeedItem) {
       return (
-        <a 
-          href={href} 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="group block h-full"
-        >
+        <a href={href} target="_blank" rel="noopener noreferrer" className="group block h-full">
           {children}
         </a>
       )
@@ -95,9 +97,9 @@ function ArticleCard({
         <article className="relative h-full overflow-hidden rounded-3xl border border-zinc-200 bg-gradient-to-br from-white via-indigo-50/50 to-purple-50/30 p-10 transition-all hover:border-indigo-300 hover:shadow-2xl dark:border-zinc-800 dark:from-zinc-900 dark:via-indigo-950/30 dark:to-purple-950/20 dark:hover:border-indigo-700">
           <div className="flex flex-col gap-6">
             <div className="flex items-center justify-between">
-              <DateDisplay 
-                date={date} 
-                lang={lang} 
+              <DateDisplay
+                date={date}
+                lang={lang}
                 format="short"
                 className="text-sm font-bold text-indigo-600 dark:text-indigo-400"
               />
@@ -107,11 +109,11 @@ function ArticleCard({
                 </Tag>
               )}
             </div>
-            
+
             <h3 className="text-3xl font-extrabold leading-tight tracking-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
               {title}
             </h3>
-            
+
             <p className="text-base leading-relaxed text-slate-700 dark:text-slate-300 line-clamp-4">
               {description}
               {description.length >= 200 ? '...' : ''}
@@ -131,9 +133,9 @@ function ArticleCard({
     <CardWrapper>
       <article className="flex h-full flex-col rounded-xl border border-zinc-200 bg-white p-6 transition-all hover:border-indigo-300 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700">
         <div className="flex items-center justify-between mb-3">
-          <DateDisplay 
-            date={date} 
-            lang={lang} 
+          <DateDisplay
+            date={date}
+            lang={lang}
             format="short"
             className="text-xs font-semibold text-slate-500 dark:text-slate-400"
           />
@@ -143,11 +145,11 @@ function ArticleCard({
             </Tag>
           )}
         </div>
-        
+
         <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors mb-3">
           {title}
         </h3>
-        
+
         <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-2 flex-1">
           {description}
           {description.length >= 120 ? '...' : ''}
@@ -157,11 +159,11 @@ function ArticleCard({
   )
 }
 
-function ProjectCard({ 
-  project, 
-  lang, 
-  variant = 'default' 
-}: { 
+function ProjectCard({
+  project,
+  lang,
+  variant = 'default',
+}: {
   project: MicroCMSProjectsRecord
   lang: string
   variant?: 'featured' | 'default'
@@ -187,19 +189,19 @@ function ProjectCard({
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
             </div>
           )}
-          
+
           {/* Content - Bottom */}
           <div className="p-8 lg:p-10">
             <div className="flex flex-col gap-4">
               {date && (
-                <DateDisplay 
-                  date={date} 
-                  lang={lang} 
+                <DateDisplay
+                  date={date}
+                  lang={lang}
                   format="short"
                   className="text-sm font-semibold text-purple-600 dark:text-purple-400"
                 />
               )}
-              
+
               <h3 className="text-2xl font-bold leading-tight tracking-tight text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors lg:text-3xl">
                 {project.title}
               </h3>
@@ -240,19 +242,19 @@ function ProjectCard({
             />
           </div>
         )}
-        
+
         {/* Content - Bottom */}
         <div className="p-5 lg:p-6">
           <div className="flex flex-col gap-3">
             {date && (
-              <DateDisplay 
-                date={date} 
-                lang={lang} 
+              <DateDisplay
+                date={date}
+                lang={lang}
                 format="short"
                 className="text-xs font-semibold text-slate-500 dark:text-slate-400"
               />
             )}
-            
+
             <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
               {project.title}
             </h3>
@@ -277,34 +279,27 @@ function EventCard({ event, lang }: { event: MicroCMSEventsRecord; lang: string 
   const date = new Date(event.date)
 
   return (
-    <a 
-      href={event.url} 
-      target="_blank" 
-      rel="noopener noreferrer"
-      className="group block h-full"
-    >
+    <a href={event.url} target="_blank" rel="noopener noreferrer" className="group block h-full">
       <article className="flex h-full flex-col rounded-xl border border-zinc-200 bg-white p-6 transition-all hover:border-cyan-300 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-cyan-700">
-        <DateDisplay 
-          date={date} 
-          lang={lang} 
+        <DateDisplay
+          date={date}
+          lang={lang}
           format="short"
           className="mb-3 text-xs font-semibold uppercase tracking-wider text-cyan-600 dark:text-cyan-400"
         />
-        
+
         <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors mb-3">
           {event.title}
         </h3>
-        
+
         {event.place && (
           <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
             {event.place}
           </p>
         )}
-        
+
         {event.session_title && (
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            {event.session_title}
-          </p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{event.session_title}</p>
         )}
       </article>
     </a>
@@ -317,7 +312,7 @@ function EventCard({ event, lang }: { event: MicroCMSEventsRecord; lang: string 
 
 export default async function FeaturedContent({ lang }: { lang: string }) {
   const microCMS = new MicroCMSAPI(createMicroCMSClient())
-  
+
   // Fetch all content
   const { items: externalPosts } = await loadBlogPosts(lang === 'ja' ? 'ja' : 'en')
   const newsPosts = await microCMS.listPosts({ lang: lang === 'ja' ? 'japanese' : 'english' })
@@ -325,14 +320,13 @@ export default async function FeaturedContent({ lang }: { lang: string }) {
   const allEvents = await microCMS.listEndedEvents()
 
   // Prepare unified content
-  const articles: Array<FeedItem | MicroCMSPostsRecord> = [
-    ...externalPosts,
-    ...newsPosts,
-  ].sort((a, b) => {
-    const dateA = 'datetime' in a ? a.datetime : a.publishedAt
-    const dateB = 'datetime' in b ? b.datetime : b.publishedAt
-    return new Date(dateB).getTime() - new Date(dateA).getTime()
-  })
+  const articles: Array<FeedItem | MicroCMSPostsRecord> = [...externalPosts, ...newsPosts].sort(
+    (a, b) => {
+      const dateA = 'datetime' in a ? a.datetime : a.publishedAt
+      const dateB = 'datetime' in b ? b.datetime : b.publishedAt
+      return new Date(dateB).getTime() - new Date(dateA).getTime()
+    },
+  )
 
   const projects = allProjects
     .filter((p) => p.published_at)

@@ -2,10 +2,10 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import SocialLink from './SocialLink'
-import TwitterIcon from './SocialIcons/Twitter'
+import { SITE_CONFIG } from '@/config'
 import GitHubIcon from './SocialIcons/GitHub'
 import LinkedInIcon from './SocialIcons/LinkedIn'
+import TwitterIcon from './SocialIcons/Twitter'
 
 function getLanguageFromURL(pathname: string) {
   if (pathname.startsWith('/ja/') || pathname === '/ja') {
@@ -23,7 +23,7 @@ function getPathnameWithLangType(targetPath: string, lang: string): string {
 function changeLanguageURL(pathname: string, targetLang: 'en' | 'ja' = 'en'): string {
   const lang = getLanguageFromURL(pathname)
   if (lang === targetLang) return pathname
-  
+
   if (targetLang === 'en') {
     return pathname.replace(/^\/ja/, '') || '/'
   } else {
@@ -33,8 +33,8 @@ function changeLanguageURL(pathname: string, targetLang: 'en' | 'ja' = 'en'): st
 
 function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <Link 
-      href={href} 
+    <Link
+      href={href}
       className="text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
     >
       {children}
@@ -42,7 +42,13 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
   )
 }
 
-function InnerContainer({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+function InnerContainer({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode
+  className?: string
+}) {
   return (
     <div className={`relative px-4 sm:px-8 lg:px-12 ${className}`}>
       <div className="mx-auto max-w-2xl lg:max-w-5xl">{children}</div>
@@ -50,7 +56,13 @@ function InnerContainer({ children, className = '' }: { children: React.ReactNod
   )
 }
 
-function OuterContainer({ children, className = '' }: { children: React.ReactNode; className?: string }) {
+function OuterContainer({
+  children,
+  className = '',
+}: {
+  children: React.ReactNode
+  className?: string
+}) {
   return (
     <div className={`sm:px-8 ${className}`}>
       <div className="mx-auto max-w-7xl lg:px-8">{children}</div>
@@ -82,11 +94,16 @@ export default function Footer() {
                     Navigation
                   </h3>
                   <nav className="flex flex-col gap-4">
-                    <NavLink href={getPathnameWithLangType("about", lang)}>About</NavLink>
-                    <NavLink href={getPathnameWithLangType("work", lang)}>Work</NavLink>
-                    <NavLink href={getPathnameWithLangType("writing", lang)}>Writing</NavLink>
-                    <NavLink href={getPathnameWithLangType("blog", lang)}>{lang === 'ja' ? 'ブログ' : 'Blog'}</NavLink>
-                    <NavLink href={getPathnameWithLangType("speaking", lang)}>Speaking</NavLink>
+                    <NavLink href={getPathnameWithLangType('about', lang)}>About</NavLink>
+                    <NavLink href={getPathnameWithLangType('work', lang)}>Work</NavLink>
+                    <NavLink href={getPathnameWithLangType('writing', lang)}>Writing</NavLink>
+                    <NavLink href={getPathnameWithLangType('blog', lang)}>
+                      {lang === 'ja' ? 'ブログ' : 'Blog'}
+                    </NavLink>
+                    <NavLink href={getPathnameWithLangType('speaking', lang)}>Speaking</NavLink>
+                    <NavLink href={getPathnameWithLangType('privacy', lang)}>
+                      {lang === 'ja' ? 'プライバシーポリシー' : 'Privacy Policy'}
+                    </NavLink>
                   </nav>
                 </div>
 
@@ -109,32 +126,32 @@ export default function Footer() {
                   <ul className="flex flex-col gap-4">
                     <li>
                       <a
-                        href="https://twitter.com/hidetaka_dev"
-                        aria-label="Follow on Twitter"
+                        href={SITE_CONFIG.social.twitter.url}
+                        aria-label={SITE_CONFIG.social.twitter.ariaLabel}
                         className="group flex items-center gap-3 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
                       >
                         <TwitterIcon className="h-5 w-5 flex-none fill-slate-500 transition-colors group-hover:fill-indigo-600 dark:fill-slate-400 dark:group-hover:fill-indigo-400" />
-                        <span>Twitter</span>
+                        <span>{SITE_CONFIG.social.twitter.label}</span>
                       </a>
                     </li>
                     <li>
                       <a
-                        href="https://github.com/hideokamoto"
-                        aria-label="Follow on GitHub"
+                        href={SITE_CONFIG.social.github.url}
+                        aria-label={SITE_CONFIG.social.github.ariaLabel}
                         className="group flex items-center gap-3 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
                       >
                         <GitHubIcon className="h-5 w-5 flex-none fill-slate-500 transition-colors group-hover:fill-indigo-600 dark:fill-slate-400 dark:group-hover:fill-indigo-400" />
-                        <span>GitHub</span>
+                        <span>{SITE_CONFIG.social.github.label}</span>
                       </a>
                     </li>
                     <li>
                       <a
-                        href="https://www.linkedin.com/in/hideokamoto/"
-                        aria-label="Follow on LinkedIn"
+                        href={SITE_CONFIG.social.linkedin.url}
+                        aria-label={SITE_CONFIG.social.linkedin.ariaLabel}
                         className="group flex items-center gap-3 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
                       >
                         <LinkedInIcon className="h-5 w-5 flex-none fill-slate-500 transition-colors group-hover:fill-indigo-600 dark:fill-slate-400 dark:group-hover:fill-indigo-400" />
-                        <span>LinkedIn</span>
+                        <span>{SITE_CONFIG.social.linkedin.label}</span>
                       </a>
                     </li>
                   </ul>
@@ -144,7 +161,7 @@ export default function Footer() {
               {/* Bottom section: Copyright */}
               <div className="border-t border-zinc-200 dark:border-zinc-800 pt-8">
                 <p className="text-sm text-slate-600 dark:text-slate-400 text-center sm:text-left">
-                  &copy; {new Date().getFullYear()} Hidetaka Okamoto. All rights reserved.
+                  &copy; {new Date().getFullYear()} {SITE_CONFIG.author.name}. All rights reserved.
                 </p>
               </div>
             </div>
