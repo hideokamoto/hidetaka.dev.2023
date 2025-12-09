@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { SITE_CONFIG } from '@/config'
+import { loadAllDevNotes } from '@/libs/dataSources/devnotes'
 import { loadAllThoughts } from '@/libs/dataSources/thoughts'
 import { MicroCMSAPI } from '@/libs/microCMS/apis'
 import { createMicroCMSClient } from '@/libs/microCMS/client'
@@ -141,5 +142,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('Error loading events for sitemap:', error)
   }
 
-  return [...staticPages, ...blogPages, ...projectPages, ...postPages, ...eventPages]
+  // Dev Notes（WordPress API、日本語のみ）
+  let devNotesPages: MetadataRoute.Sitemap = []
+  try {
+    const allDevNotes = await loadAllDevNotes()
+    devNotesPages = allDevNotes.map((item) => ({
+      url: `${SITE_CONFIG.url}${item.href}`,
+      lastModified: new Date(item.datetime),
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    }))
+  } catch (error) {
+    console.error('Error loading dev-notes for sitemap:', error)
+  }
+
+  return [
+    ...staticPages,
+    ...blogPages,
+    ...projectPages,
+    ...postPages,
+    ...eventPages,
+    ...devNotesPages,
+  ]
 }

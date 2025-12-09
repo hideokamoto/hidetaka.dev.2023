@@ -1,8 +1,15 @@
+import { loadDevNotes } from './devnotes'
 import { loadDevToPosts } from './devto'
 import { loadQiitaPosts } from './qiita'
 import type { FeedDataSource, FeedItem } from './types'
 import { loadWPPosts } from './wordpress'
 import { loadZennPosts } from './zenn'
+
+const sourceDevNotes: FeedDataSource = {
+  href: '/ja/writing/dev-notes',
+  name: 'Dev Notes',
+  color: 'green',
+}
 export const isJapanese = (locale?: string) => {
   if (!locale) return false
   return /^ja/.test(locale)
@@ -75,14 +82,42 @@ export const loadBlogPosts = async (
       : { items: [], hasMore: false }
     const stripePosts = isJapanese(locale) ? [] : stripeDotDevPosts
 
+    // dev-notesを取得（日本語のみ）
+    const devNotesResult = isJapanese(locale)
+      ? await loadDevNotes(1, 20).catch(() => ({
+          items: [],
+          totalPages: 0,
+          totalItems: 0,
+          currentPage: 1,
+        }))
+      : { items: [], totalPages: 0, totalItems: 0, currentPage: 1 }
+
+    // BlogItemをFeedItemに変換
+    const devNotesPosts: FeedItem[] = devNotesResult.items.map((item) => ({
+      id: item.id,
+      title: item.title,
+      href: item.href,
+      description: item.description,
+      datetime: item.datetime,
+      dataSource: sourceDevNotes,
+    }))
+
     // hasMore情報をデータソース名でマッピング
     const hasMoreBySource: Record<string, boolean> = {}
     if (wp.hasMore) hasMoreBySource['WP Kyoto Blog'] = true
     if (zenn.hasMore) hasMoreBySource.Zenn = true
     if (qiita.hasMore) hasMoreBySource.Qiita = true
     if (devto.hasMore) hasMoreBySource['Dev.to'] = true
+    if (devNotesResult.totalPages > 1) hasMoreBySource['Dev Notes'] = true
 
-    const allPosts = [...wp.items, ...devto.items, ...zenn.items, ...qiita.items, ...stripePosts]
+    const allPosts = [
+      ...wp.items,
+      ...devto.items,
+      ...zenn.items,
+      ...qiita.items,
+      ...stripePosts,
+      ...devNotesPosts,
+    ]
 
     const sortedPosts = allPosts.sort((a: FeedItem, b: FeedItem) => {
       const bDate = new Date(b.datetime)
