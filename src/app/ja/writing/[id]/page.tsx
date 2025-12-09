@@ -2,6 +2,8 @@ import Container from '@/components/tailwindui/Container'
 import { MicroCMSAPI } from '@/libs/microCMS/apis'
 import { createMicroCMSClient } from '@/libs/microCMS/client'
 
+export const revalidate = 86400 // 1 day
+
 export async function generateStaticParams() {
   const microCMS = new MicroCMSAPI(createMicroCMSClient())
   const posts = await microCMS.listPosts({ lang: 'japanese' })
