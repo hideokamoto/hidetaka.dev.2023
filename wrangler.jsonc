@@ -20,12 +20,30 @@
       "binding": "OG_IMAGE_GENERATOR",
       "service": "cf-ogp-image-gen-worker"
     }
+  ],
+  // R2 bucket for incremental cache and ISR
+  "r2_buckets": [
+    {
+      "binding": "NEXT_INC_CACHE_R2_BUCKET",
+      "bucket_name": "hidetaka-dev-cache"
+    }
+  ],
+  // Durable Objects for ISR queue handling
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "NEXT_CACHE_DO_QUEUE",
+        "class_name": "DOQueueHandler"
+      }
+    ]
+  },
+  // Durable Objects migrations
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_classes": [
+        "DOQueueHandler"
+      ]
+    }
   ]
-  // R2 bucket is optional - only needed if using incremental cache
-  // "r2_buckets": [
-  //   {
-  //     "binding": "NEXT_INC_CACHE_R2_BUCKET",
-  //     "bucket_name": "cache"
-  //   }
-  // ],
 }
