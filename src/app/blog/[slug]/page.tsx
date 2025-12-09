@@ -5,6 +5,8 @@ import { getRelatedThoughts, getThoughtBySlug } from '@/libs/dataSources/thought
 import { generateBlogBreadcrumbJsonLd, generateBlogPostingJsonLd } from '@/libs/jsonLd'
 import { generateBlogPostMetadata } from '@/libs/metadata'
 
+export const revalidate = 86400 // 1 day
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const thought = await getThoughtBySlug(slug, 'en')

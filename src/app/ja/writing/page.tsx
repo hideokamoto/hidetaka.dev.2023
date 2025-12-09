@@ -3,6 +3,8 @@ import { loadBlogPosts } from '@/libs/dataSources/blogs'
 import { MicroCMSAPI } from '@/libs/microCMS/apis'
 import { createMicroCMSClient } from '@/libs/microCMS/client'
 
+export const revalidate = 10800 // 3 hours
+
 export const metadata = {
   title: 'Writing',
 }

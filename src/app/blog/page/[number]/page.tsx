@@ -4,6 +4,8 @@ import JsonLd from '@/components/JsonLd'
 import { loadAllCategories, loadThoughts } from '@/libs/dataSources/thoughts'
 import { generateBlogListJsonLd } from '@/libs/jsonLd'
 
+export const revalidate = 10800 // 3 hours
+
 export const metadata = {
   title: 'Blog',
 }
