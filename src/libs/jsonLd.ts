@@ -54,6 +54,85 @@ export function generateBlogPostingJsonLd(thought: WPThought, lang: string, base
 }
 
 /**
+ * dev-notes詳細ページ用のBlogPosting JSON-LDを生成
+ */
+export function generateDevNoteJsonLd(note: WPThought, basePath: string) {
+  const fullUrl = `${SITE_CONFIG.url}${basePath}/${note.slug}`
+
+  const stripHtml = (html: string) => {
+    return html.replace(/<[^>]*>/g, '').trim()
+  }
+
+  const description = stripHtml(note.excerpt.rendered)
+
+  const categories =
+    note._embedded?.['wp:term']
+      ?.flat()
+      .filter((term) => term.taxonomy === 'category')
+      .map((cat) => cat.name) || []
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: note.title.rendered,
+    description: description,
+    url: fullUrl,
+    datePublished: note.date,
+    dateModified: note.modified,
+    author: {
+      '@type': 'Person',
+      name: SITE_CONFIG.author.name,
+      url: SITE_CONFIG.url,
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: SITE_CONFIG.name,
+      url: SITE_CONFIG.url,
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': fullUrl,
+    },
+    inLanguage: 'ja-JP',
+    ...(categories.length > 0 && {
+      keywords: categories.join(', '),
+      articleSection: categories,
+    }),
+  }
+
+  return jsonLd
+}
+
+/**
+ * dev-notes詳細ページ用のBreadcrumbList JSON-LDを生成
+ */
+export function generateDevNoteBreadcrumbJsonLd(note: WPThought, basePath: string) {
+  const fullUrl = `${SITE_CONFIG.url}${basePath}/${note.slug}`
+  const listUrl = `${SITE_CONFIG.url}/ja/writing`
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Writing',
+        item: listUrl,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: note.title.rendered,
+        item: fullUrl,
+      },
+    ],
+  }
+
+  return jsonLd
+}
+
+/**
  * ブログ詳細ページ用のBreadcrumbList JSON-LDを生成
  */
 export function generateBlogBreadcrumbJsonLd(thought: WPThought, lang: string, basePath: string) {
