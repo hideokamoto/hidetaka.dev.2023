@@ -3,7 +3,9 @@ import { XMLParser } from 'fast-xml-parser'
 const parser = new XMLParser()
 export const loadFeedPosts = async <T>(url: string): Promise<T> => {
   try {
-    const response = await fetch(url)
+    const response = await fetch(url, {
+      next: { revalidate: 7200 }, // 2時間ごとに再検証（週一程度の更新）
+    })
     const feedData = await response.text()
     const parsedItem = parser.parse(feedData)
     if (parsedItem.rss) {

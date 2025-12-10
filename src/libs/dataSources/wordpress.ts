@@ -11,6 +11,9 @@ export const loadWPPosts = async (
   // 21件取得して、20件以上あるかどうかを判定
   const wp = await fetch(
     `https://wp-api.wp-kyoto.net/wp-json/wp/v2/posts?filter[lang]=${locale}&per_page=21`,
+    {
+      next: { revalidate: 1800 }, // 30分ごとに再検証（毎日1〜2記事更新）
+    },
   )
     .then((data) => data.json())
     .then((posts: WPPost[]) => {

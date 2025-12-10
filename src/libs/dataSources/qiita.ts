@@ -22,6 +22,9 @@ const fetchAllQiitaItems = async (userId: string): Promise<QiitaItem[]> => {
   while (true) {
     const response = await fetch(
       `https://qiita.com/api/v2/users/${userId}/items?page=${page}&per_page=${perPage}`,
+      {
+        next: { revalidate: 7200 }, // 2時間ごとに再検証（週一更新）
+      },
     )
 
     if (!response.ok) {

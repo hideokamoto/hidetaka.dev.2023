@@ -41,9 +41,7 @@
   "migrations": [
     {
       "tag": "v1",
-      "new_classes": [
-        "DOQueueHandler"
-      ]
+      "new_classes": ["DOQueueHandler"]
     }
   ]
 }
