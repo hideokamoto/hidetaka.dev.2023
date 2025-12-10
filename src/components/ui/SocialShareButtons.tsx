@@ -72,7 +72,7 @@ export default function SocialShareButtons({
   ]
 
   return (
-    <div className={`${className}`}>
+    <div className={className}>
       <div className="flex items-center gap-2">
         <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
           {shareButtonLabel}:
