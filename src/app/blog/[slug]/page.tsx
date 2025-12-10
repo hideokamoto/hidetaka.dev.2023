@@ -5,7 +5,8 @@ import { getRelatedThoughts, getThoughtBySlug } from '@/libs/dataSources/thought
 import { generateBlogBreadcrumbJsonLd, generateBlogPostingJsonLd } from '@/libs/jsonLd'
 import { generateBlogPostMetadata } from '@/libs/metadata'
 
-export const revalidate = 86400 // 1 day
+// See REVALIDATION_PERIOD.ARTICLE in @/consts
+export const revalidate = 86400
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
