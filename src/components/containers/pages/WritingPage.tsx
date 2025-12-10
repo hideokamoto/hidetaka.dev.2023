@@ -6,7 +6,6 @@ import React, { useMemo, useState } from 'react'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import FilterItem from '@/components/ui/FilterItem'
-import { InFeedAd } from '@/components/ui/GoogleAds'
 import MobileFilterButton from '@/components/ui/MobileFilterButton'
 import MobileFilterDrawer, { type FilterGroup } from '@/components/ui/MobileFilterDrawer'
 import PageHeader from '@/components/ui/PageHeader'
@@ -631,19 +630,9 @@ export default function WritingPageContent({
             {filteredItems.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                  {filteredItems.map((item, index) => {
+                  {filteredItems.map((item) => {
                     const key = 'dataSource' in item ? `external-${item.href}` : `news-${item.id}`
-                    return (
-                      <React.Fragment key={key}>
-                        <UnifiedWritingCard item={item} lang={lang} />
-                        {/* 4記事ごとに In-Feed Ad を表示 */}
-                        {(index + 1) % 4 === 0 && index < filteredItems.length - 1 && (
-                          <div className="md:col-span-2">
-                            <InFeedAd />
-                          </div>
-                        )}
-                      </React.Fragment>
-                    )
+                    return <UnifiedWritingCard key={key} item={item} lang={lang} />
                   })}
                 </div>
 

@@ -131,37 +131,6 @@ export default function PrivacyPolicyPage() {
               </a>
               .
             </p>
-
-            <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3 mt-6">
-              2.3 Google AdSense
-            </h3>
-            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
-              We use Google AdSense to display advertisements on our Site. Google and its partners
-              use cookies to serve ads based on your prior visits to our Site or other websites.
-              Google's use of advertising cookies enables it and its partners to serve ads based on
-              your visit to our Site and/or other sites on the Internet.
-            </p>
-            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
-              You may opt out of personalized advertising by visiting{' '}
-              <a
-                href="https://www.google.com/settings/ads"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-indigo-600 dark:text-indigo-400 hover:underline"
-              >
-                Google Ads Settings
-              </a>{' '}
-              or{' '}
-              <a
-                href="http://www.aboutads.info/choices/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-indigo-600 dark:text-indigo-400 hover:underline"
-              >
-                www.aboutads.info
-              </a>
-              .
-            </p>
           </section>
 
           <section className="mb-8">
@@ -180,9 +149,6 @@ export default function PrivacyPolicyPage() {
               <li>
                 <strong>Analytics Cookies:</strong> Help us understand how visitors interact with
                 our Site
-              </li>
-              <li>
-                <strong>Advertising Cookies:</strong> Used to deliver relevant advertisements
               </li>
               <li>
                 <strong>Functional Cookies:</strong> Enable certain functionality such as theme
@@ -205,7 +171,6 @@ export default function PrivacyPolicyPage() {
             <ul className="list-disc list-inside text-zinc-700 dark:text-zinc-300 mb-4 space-y-2">
               <li>To analyze and improve our Site's content and user experience</li>
               <li>To understand visitor behavior and preferences</li>
-              <li>To display relevant advertisements</li>
               <li>To maintain and improve the security of our Site</li>
             </ul>
           </section>
@@ -223,9 +188,6 @@ export default function PrivacyPolicyPage() {
               </li>
               <li>
                 <strong>Microsoft Clarity:</strong> User behavior analytics
-              </li>
-              <li>
-                <strong>Google AdSense:</strong> Advertising service
               </li>
             </ul>
             <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
