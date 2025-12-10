@@ -5,7 +5,9 @@ import DateDisplay from '@/components/ui/DateDisplay'
 import { InArticleAd } from '@/components/ui/GoogleAds'
 import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
+import SocialShareButtons from '@/components/ui/SocialShareButtons'
 import Tag from '@/components/ui/Tag'
+import { SITE_CONFIG } from '@/config'
 import type { BlogItem, WPThought } from '@/libs/dataSources/types'
 
 type DevNoteDetailPageProps = {
@@ -114,6 +116,14 @@ export default function DevNoteDetailPage({
 
         {/* In-Article Ad */}
         <InArticleAd />
+
+        {/* SNS共有ボタン */}
+        <SocialShareButtons
+          url={`${SITE_CONFIG.url}${basePath}/${note.slug}`}
+          title={note.title.rendered}
+          lang="ja"
+          className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700"
+        />
 
         {/* プロフィールカード */}
         <ProfileCard lang="ja" imageSrc="/images/profile.jpg" className="mt-12" />
