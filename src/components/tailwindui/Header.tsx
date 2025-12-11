@@ -115,6 +115,7 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
     { path: 'work', label: lang === 'ja' ? '制作物' : 'Work' },
     { path: 'writing', label: lang === 'ja' ? 'Writing' : 'Writing' },
     { path: 'blog', label: lang === 'ja' ? 'ブログ' : 'Blog' },
+    { path: 'news', label: lang === 'ja' ? 'News' : 'News' },
     { path: 'speaking', label: lang === 'ja' ? 'Speaking' : 'Speaking' },
   ]
 
@@ -228,6 +229,7 @@ function DesktopNavigation() {
     { path: 'work', label: lang === 'ja' ? '制作物' : 'Work' },
     { path: 'writing', label: lang === 'ja' ? 'Writing' : 'Writing' },
     { path: 'blog', label: lang === 'ja' ? 'ブログ' : 'Blog' },
+    { path: 'news', label: lang === 'ja' ? 'News' : 'News' },
     { path: 'speaking', label: lang === 'ja' ? 'Speaking' : 'Speaking' },
   ]
 
