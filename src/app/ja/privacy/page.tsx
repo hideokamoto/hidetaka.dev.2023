@@ -129,36 +129,6 @@ export default function PrivacyPolicyPage() {
               </a>
               をご覧ください。
             </p>
-
-            <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3 mt-6">
-              2.3 Google AdSense
-            </h3>
-            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
-              当サイトでは、広告を配信するためにGoogle AdSenseを使用しています。
-              GoogleおよびGoogleのパートナーは、Cookieを使用して、当サイトへの過去のアクセス情報や
-              他のウェブサイトへのアクセス情報に基づいて広告を配信します。
-            </p>
-            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
-              パーソナライズド広告を無効にするには、
-              <a
-                href="https://www.google.com/settings/ads?hl=ja"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-indigo-600 dark:text-indigo-400 hover:underline"
-              >
-                Google広告設定
-              </a>
-              または
-              <a
-                href="http://www.aboutads.info/choices/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-indigo-600 dark:text-indigo-400 hover:underline"
-              >
-                www.aboutads.info
-              </a>
-              にアクセスしてください。
-            </p>
           </section>
 
           <section className="mb-8">
@@ -176,9 +146,6 @@ export default function PrivacyPolicyPage() {
             <ul className="list-disc list-inside text-zinc-700 dark:text-zinc-300 mb-4 space-y-2">
               <li>
                 <strong>分析Cookie:</strong> 訪問者のサイトでの行動を理解するために使用
-              </li>
-              <li>
-                <strong>広告Cookie:</strong> 関連性の高い広告を配信するために使用
               </li>
               <li>
                 <strong>機能Cookie:</strong> テーマの設定など、特定の機能を有効にするために使用
@@ -200,7 +167,6 @@ export default function PrivacyPolicyPage() {
             <ul className="list-disc list-inside text-zinc-700 dark:text-zinc-300 mb-4 space-y-2">
               <li>当サイトのコンテンツとユーザーエクスペリエンスの分析と改善</li>
               <li>訪問者の行動と嗜好の理解</li>
-              <li>関連性の高い広告の表示</li>
               <li>当サイトのセキュリティの維持と改善</li>
             </ul>
           </section>
@@ -218,9 +184,6 @@ export default function PrivacyPolicyPage() {
               </li>
               <li>
                 <strong>Microsoft Clarity:</strong> ユーザー行動分析
-              </li>
-              <li>
-                <strong>Google AdSense:</strong> 広告配信サービス
               </li>
             </ul>
             <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">

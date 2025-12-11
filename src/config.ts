@@ -31,21 +31,4 @@ export const SITE_CONFIG = {
       ariaLabel: 'Follow on LinkedIn',
     },
   },
-
-  // Google AdSense 設定
-  googleAds: {
-    // AdSense クライアント ID
-    publisherId: 'ca-pub-6091198629319043',
-
-    // In-Article Ad (記事詳細ページ用)
-    inArticleAd: {
-      slot: '4690493008',
-    },
-
-    // In-Feed Ad (記事一覧ページ用)
-    inFeedAd: {
-      slot: '2648328180',
-      layoutKey: '-fb+5w+4e-db+86',
-    },
-  },
 } as const
