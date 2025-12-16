@@ -1,4 +1,11 @@
 import Link from 'next/link'
+import {
+  calculateNextPage,
+  calculatePrevPage,
+  generatePageHref,
+  getPaginationText,
+  shouldShowPagination,
+} from '@/libs/pagination.utils'
 
 type PaginationProps = {
   currentPage: number
@@ -8,19 +15,19 @@ type PaginationProps = {
 }
 
 export default function Pagination({ currentPage, totalPages, basePath, lang }: PaginationProps) {
-  if (totalPages <= 1) {
+  if (!shouldShowPagination(totalPages)) {
     return null
   }
 
-  const prevPage = currentPage > 1 ? currentPage - 1 : null
-  const nextPage = currentPage < totalPages ? currentPage + 1 : null
+  const prevPage = calculatePrevPage(currentPage)
+  const nextPage = calculateNextPage(currentPage, totalPages)
 
-  const prevHref = prevPage === 1 ? basePath : `${basePath}/page/${prevPage}`
-  const nextHref = `${basePath}/page/${nextPage}`
+  const prevHref = generatePageHref(basePath, prevPage)
+  const nextHref = generatePageHref(basePath, nextPage)
 
-  const prevText = lang === 'ja' ? '前へ' : 'Previous'
-  const nextText = lang === 'ja' ? '次へ' : 'Next'
-  const pageText = lang === 'ja' ? 'ページ' : 'Page'
+  const prevText = getPaginationText(lang, 'prev')
+  const nextText = getPaginationText(lang, 'next')
+  const pageText = getPaginationText(lang, 'page')
 
   return (
     <nav

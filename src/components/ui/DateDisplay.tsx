@@ -1,7 +1,9 @@
+import { type DateFormat, parseDateAndFormat } from '@/libs/dateDisplay.utils'
+
 type DateDisplayProps = {
   date: Date | string
   lang: string
-  format?: 'short' | 'long' | 'month-year'
+  format?: DateFormat
   className?: string
 }
 
@@ -11,36 +13,10 @@ export default function DateDisplay({
   format = 'short',
   className = '',
 }: DateDisplayProps) {
-  // Handle string dates (from RSS feeds)
-  const dateObj = typeof date === 'string' ? new Date(date) : date
+  const formattedDate = parseDateAndFormat(date, lang, format)
 
-  // Check if date is valid
-  if (Number.isNaN(dateObj.getTime())) {
-    console.warn('Invalid date:', date)
+  if (formattedDate === null) {
     return null
-  }
-
-  let formattedDate: string
-
-  if (format === 'short') {
-    formattedDate = dateObj.toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    })
-  } else if (format === 'long') {
-    formattedDate = dateObj.toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    })
-  } else {
-    // month-year
-    formattedDate = dateObj.toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', {
-      month: 'long',
-      year: 'numeric',
-      timeZone: 'UTC',
-    })
   }
 
   return <time className={className}>{formattedDate}</time>
