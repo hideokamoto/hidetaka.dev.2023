@@ -174,7 +174,7 @@ export const getRelatedDevNotes = async (
     }
 
     const categoryId = categories[0].id
-    const fetchLimit = Math.max(limit * 2.5, 10)
+    const fetchLimit = 20
 
     const response = await fetch(
       `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?categories=${categoryId}&exclude=${currentNote.id}&per_page=${fetchLimit}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
