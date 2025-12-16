@@ -12,26 +12,10 @@ export type DevNotesResult = {
 // すべてのタクソノミーからカテゴリを抽出する
 const extractCategories = (note: WPThought): Category[] => {
   if (!note._embedded?.['wp:term']) {
-    // デバッグ: _embedded['wp:term']が存在しない場合
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[devnotes] No _embedded.wp:term found for note:', note.id, note.slug)
-      console.log('[devnotes] Available fields:', Object.keys(note))
-      console.log('[devnotes] categories field:', note.categories)
-    }
     return []
   }
 
   const categories: Category[] = []
-  // デバッグ: すべてのタクソノミーをログ出力
-  if (process.env.NODE_ENV === 'development') {
-    console.log('[devnotes] _embedded.wp:term for note:', note.id, note.slug)
-    for (const termArray of note._embedded['wp:term']) {
-      for (const term of termArray) {
-        console.log('[devnotes] Found taxonomy:', term.taxonomy, 'term:', term.name, term.id)
-      }
-    }
-  }
-
   for (const termArray of note._embedded['wp:term']) {
     for (const term of termArray) {
       // post_tag（タグ）は除外し、それ以外のすべてのタクソノミーをカテゴリとして扱う
@@ -45,11 +29,6 @@ const extractCategories = (note: WPThought): Category[] => {
         })
       }
     }
-  }
-
-  // デバッグ: 抽出されたカテゴリをログ出力
-  if (process.env.NODE_ENV === 'development' && categories.length === 0) {
-    console.log('[devnotes] No categories extracted for note:', note.id, note.slug)
   }
 
   return categories
