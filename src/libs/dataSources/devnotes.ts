@@ -8,15 +8,35 @@ export type DevNotesResult = {
 }
 
 // カテゴリ情報を抽出するヘルパー関数
+// dev-notesのカスタム投稿タイプでは、カテゴリのタクソノミー名が異なる可能性があるため、
+// すべてのタクソノミーからカテゴリを抽出する
 const extractCategories = (note: WPThought): Category[] => {
   if (!note._embedded?.['wp:term']) {
+    // デバッグ: _embedded['wp:term']が存在しない場合
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[devnotes] No _embedded.wp:term found for note:', note.id, note.slug)
+      console.log('[devnotes] Available fields:', Object.keys(note))
+      console.log('[devnotes] categories field:', note.categories)
+    }
     return []
   }
 
   const categories: Category[] = []
+  // デバッグ: すべてのタクソノミーをログ出力
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[devnotes] _embedded.wp:term for note:', note.id, note.slug)
+    for (const termArray of note._embedded['wp:term']) {
+      for (const term of termArray) {
+        console.log('[devnotes] Found taxonomy:', term.taxonomy, 'term:', term.name, term.id)
+      }
+    }
+  }
+
   for (const termArray of note._embedded['wp:term']) {
     for (const term of termArray) {
-      if (term.taxonomy === 'category') {
+      // post_tag（タグ）は除外し、それ以外のすべてのタクソノミーをカテゴリとして扱う
+      // これにより、カスタム投稿タイプのカスタムタクソノミーも含まれる
+      if (term.taxonomy !== 'post_tag') {
         categories.push({
           id: term.id,
           name: term.name,
@@ -26,6 +46,12 @@ const extractCategories = (note: WPThought): Category[] => {
       }
     }
   }
+
+  // デバッグ: 抽出されたカテゴリをログ出力
+  if (process.env.NODE_ENV === 'development' && categories.length === 0) {
+    console.log('[devnotes] No categories extracted for note:', note.id, note.slug)
+  }
+
   return categories
 }
 
@@ -172,9 +198,16 @@ export const getRelatedDevNotes = async (
     const fetchLimit = Math.max(limit * 2.5, 10)
 
     // カテゴリがある場合は同じカテゴリの記事を取得、ない場合はすべての記事を取得
-    const categoryId = categories.length > 0 ? categories[0].id : undefined
-    const categoryFilter = categoryId ? `categories=${categoryId}&` : ''
-    const url = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?${categoryFilter}exclude=${currentNote.id}&per_page=${fetchLimit}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`
+    let url: string
+    if (categories.length > 0) {
+      const category = categories[0]
+      // カスタム投稿タイプでは、カテゴリのタクソノミー名をパラメータとして使用
+      // 例: categories (デフォルト) または dev-note-category (カスタム)
+      const taxonomyParam = category.taxonomy === 'category' ? 'categories' : category.taxonomy
+      url = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?${taxonomyParam}=${category.id}&exclude=${currentNote.id}&per_page=${fetchLimit}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`
+    } else {
+      url = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?exclude=${currentNote.id}&per_page=${fetchLimit}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`
+    }
 
     const response = await fetch(url, {
       next: { revalidate: 1800 }, // 30分ごとに再検証
