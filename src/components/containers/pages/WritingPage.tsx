@@ -225,30 +225,51 @@ function Sidebar({
         </nav>
       </div>
 
-      {/* タグフィルター */}
+      {/* カテゴリフィルター（タグベース） */}
       {availableTags.length > 0 && (
         <div>
           <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
             {tagTitle}
           </h3>
           <nav className="space-y-1">
-            <FilterItem
-              active={filterTag === null}
-              onClick={() => onFilterTagChange(null)}
-              count={counts.all}
+            <Link
+              href={lang === 'ja' ? '/ja/writing' : '/writing'}
+              className={`w-full flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${
+                filterTag === null
+                  ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'
+                  : 'text-slate-700 hover:bg-zinc-50 dark:text-slate-300 dark:hover:bg-zinc-800'
+              }`}
             >
-              {allText}
-            </FilterItem>
-            {availableTags.map((tag) => (
-              <FilterItem
-                key={tag}
-                active={filterTag === tag}
-                onClick={() => onFilterTagChange(tag)}
-                count={counts.byTag[tag] || 0}
-              >
-                {tag}
-              </FilterItem>
-            ))}
+              <span>{allText}</span>
+            </Link>
+            {availableTags.map((tag) => {
+              const categoryUrl =
+                lang === 'ja'
+                  ? `/ja/writing/category/${encodeURIComponent(tag)}`
+                  : `/writing/category/${encodeURIComponent(tag)}`
+              return (
+                <Link
+                  key={tag}
+                  href={categoryUrl}
+                  className={`w-full flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${
+                    filterTag === tag
+                      ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'
+                      : 'text-slate-700 hover:bg-zinc-50 dark:text-slate-300 dark:hover:bg-zinc-800'
+                  }`}
+                >
+                  <span>{tag}</span>
+                  <span
+                    className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
+                      filterTag === tag
+                        ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300'
+                        : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400'
+                    }`}
+                  >
+                    {counts.byTag[tag] || 0}
+                  </span>
+                </Link>
+              )
+            })}
           </nav>
         </div>
       )}
@@ -316,15 +337,17 @@ export default function WritingPageContent({
   externalArticles,
   hasMoreBySource = {},
   newsArticles,
+  categoryName,
 }: {
   lang: string
   externalArticles: FeedItem[]
   hasMoreBySource?: Record<string, boolean>
   newsArticles: MicroCMSPostsRecord[]
+  categoryName?: string
 }) {
   const [searchQuery, setSearchQuery] = useState('')
-  const [filterType, setFilterType] = useState<FilterType>('all')
-  const [filterTag, setFilterTag] = useState<FilterTag>(null)
+  const [filterType, setFilterType] = useState<FilterType>(categoryName ? 'news' : 'all')
+  const [filterTag, setFilterTag] = useState<FilterTag>(categoryName || null)
   const [filterDataSource, setFilterDataSource] = useState<FilterDataSource>(null)
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
 
@@ -449,9 +472,18 @@ export default function WritingPageContent({
   ])
 
   // テキスト
-  const title = lang === 'ja' ? 'Writing' : 'Writing'
-  const description =
-    lang === 'ja'
+  const title = categoryName
+    ? lang === 'ja'
+      ? `カテゴリ: ${categoryName}`
+      : `Category: ${categoryName}`
+    : lang === 'ja'
+      ? 'Writing'
+      : 'Writing'
+  const description = categoryName
+    ? lang === 'ja'
+      ? `「${categoryName}」カテゴリの記事一覧です。`
+      : `Articles in the "${categoryName}" category.`
+    : lang === 'ja'
       ? '技術記事、ブログ投稿、ニュースなどの執筆活動を紹介しています。'
       : "A collection of technical articles, blog posts, news, and other writing I've published."
   const filterButtonText = lang === 'ja' ? 'フィルター' : 'Filter'

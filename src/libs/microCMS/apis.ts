@@ -221,4 +221,35 @@ export class MicroCMSAPI {
     })
     return events
   }
+
+  /**
+   * タグで投稿記事をフィルタリング（writing category用）
+   */
+  public async listPostsByTag(
+    tag: string,
+    query?: { lang?: 'japanese' | 'english' },
+  ): Promise<MicroCMSPostsRecord[]> {
+    if (!this.client) {
+      if (process.env.MICROCMS_API_MODE === 'mock') {
+        return MICROCMS_MOCK_POSTs.filter((post) => post.tags.includes(tag))
+      }
+      return []
+    }
+    const lang = query?.lang ?? null
+    const filters = [`tags[contains]${tag}`, lang ? `lang[contains]${query?.lang}` : undefined]
+      .filter(Boolean)
+      .join('[and]')
+
+    const { contents: posts } = await this.client.get<{
+      contents: MicroCMSPostsRecord[]
+    }>({
+      endpoint: 'posts',
+      queries: {
+        orders: '-publishedAt',
+        filters,
+        limit: 50,
+      },
+    })
+    return posts
+  }
 }
