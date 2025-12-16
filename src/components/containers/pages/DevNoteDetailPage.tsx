@@ -95,11 +95,24 @@ export default function DevNoteDetailPage({
               {note._embedded['wp:term']
                 .flat()
                 .filter((term) => term.taxonomy === 'category')
-                .map((category) => (
-                  <Tag key={category.id} variant="indigo" size="sm">
-                    {category.name}
-                  </Tag>
-                ))}
+                .map((category) => {
+                  // category.slugが既にエンコードされている可能性があるので、一度デコードしてからエンコード
+                  const normalizedSlug = category.slug.includes('%')
+                    ? decodeURIComponent(category.slug)
+                    : category.slug
+                  const categoryUrl = `/ja/writing/category/${encodeURIComponent(normalizedSlug)}`
+                  return (
+                    <Link key={category.id} href={categoryUrl}>
+                      <Tag
+                        variant="indigo"
+                        size="sm"
+                        className="cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors"
+                      >
+                        {category.name}
+                      </Tag>
+                    </Link>
+                  )
+                })}
             </div>
           )}
         </div>
