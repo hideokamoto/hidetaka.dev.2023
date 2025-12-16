@@ -161,6 +161,7 @@ export const getAdjacentDevNotes = async (currentNote: WPThought): Promise<Adjac
 
 /**
  * 関連記事を取得（同じカテゴリの記事からランダムに選択）
+ * カテゴリがない場合は、すべてのdev-notes記事から選択
  */
 export const getRelatedDevNotes = async (
   currentNote: WPThought,
@@ -168,20 +169,16 @@ export const getRelatedDevNotes = async (
 ): Promise<BlogItem[]> => {
   try {
     const categories = extractCategories(currentNote)
-
-    if (categories.length === 0) {
-      return []
-    }
-
-    const categoryId = categories[0].id
     const fetchLimit = Math.max(limit * 2.5, 10)
 
-    const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?categories=${categoryId}&exclude=${currentNote.id}&per_page=${fetchLimit}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
-      {
-        next: { revalidate: 1800 }, // 30分ごとに再検証
-      },
-    )
+    // カテゴリがある場合は同じカテゴリの記事を取得、ない場合はすべての記事を取得
+    const categoryId = categories.length > 0 ? categories[0].id : undefined
+    const categoryFilter = categoryId ? `categories=${categoryId}&` : ''
+    const url = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?${categoryFilter}exclude=${currentNote.id}&per_page=${fetchLimit}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`
+
+    const response = await fetch(url, {
+      next: { revalidate: 1800 }, // 30分ごとに再検証
+    })
 
     if (!response.ok) {
       throw new Error(`Failed to fetch related dev-notes: ${response.status}`)
