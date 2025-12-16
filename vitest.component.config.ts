@@ -6,13 +6,13 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./src/test/component-setup.ts'],
-    include: ['src/components/**/*.test.{ts,tsx}'],
+    include: ['**/*.component.test.{ts,tsx}'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'lcov'],
       include: ['src/components/**/*.{ts,tsx}'],
       exclude: [
-        'src/components/**/*.test.{ts,tsx}',
+        'src/components/**/*.component.test.{ts,tsx}',
         'src/components/**/*.stories.{ts,tsx}',
         'src/components/**/index.{ts,tsx}',
       ],
