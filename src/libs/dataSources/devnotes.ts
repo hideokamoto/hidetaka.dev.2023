@@ -38,7 +38,7 @@ export const loadDevNotes = async (
 ): Promise<DevNotesResult> => {
   try {
     const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?page=${page}&per_page=${perPage}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?page=${page}&per_page=${perPage}&_embed=wp:term&_fields=_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
       {
         next: { revalidate: 1800 }, // 30分ごとに再検証（WordPress記事）
       },
@@ -90,7 +90,7 @@ export const loadDevNotes = async (
 export const getDevNoteBySlug = async (slug: string): Promise<WPThought | null> => {
   try {
     const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?slug=${encodeURIComponent(slug)}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,content,slug,link,categories`,
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?slug=${encodeURIComponent(slug)}&_embed=wp:term&_fields=_embedded,id,title,date,date_gmt,excerpt,content,slug,link,categories`,
       {
         next: { revalidate: 1800 }, // 30分ごとに再検証
       },
@@ -177,7 +177,7 @@ export const getRelatedDevNotes = async (
     const fetchLimit = 20
 
     const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?categories=${categoryId}&exclude=${currentNote.id}&per_page=${fetchLimit}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?categories=${categoryId}&exclude=${currentNote.id}&per_page=${fetchLimit}&_embed=wp:term&_fields=_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
       {
         next: { revalidate: 1800 }, // 30分ごとに再検証
       },

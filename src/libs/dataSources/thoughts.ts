@@ -49,7 +49,7 @@ export const loadThoughts = async (
   try {
     // _embedと_fieldsを組み合わせてカテゴリ情報を取得
     const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?page=${page}&per_page=${perPage}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?page=${page}&per_page=${perPage}&_embed=wp:term&_fields=_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
       {
         next: { revalidate: 1800 }, // 30分ごとに再検証（毎日1〜2記事更新）
       },
@@ -152,7 +152,7 @@ export const loadThoughtsByCategory = async (
 
     // WordPress APIのcategoriesパラメータでフィルタリング
     const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?categories=${categoryId}&page=${page}&per_page=${perPage}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?categories=${categoryId}&page=${page}&per_page=${perPage}&_embed=wp:term&_fields=_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
       {
         next: { revalidate: 1800 }, // 30分ごとに再検証
       },
@@ -214,7 +214,7 @@ export const loadAllCategories = async (lang: 'en' | 'ja' = 'en'): Promise<Categ
     // 十分な数の記事を取得してカテゴリを抽出
     const fetchPerPage = 100
     const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?per_page=${fetchPerPage}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?per_page=${fetchPerPage}&_embed=wp:term&_fields=_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
       {
         next: { revalidate: 1800 }, // 30分ごとに再検証
       },
@@ -267,7 +267,7 @@ export const getThoughtBySlug = async (
   try {
     // _embedと_fieldsを組み合わせてカテゴリ情報を取得
     const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?slug=${encodeURIComponent(slug)}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,content,slug,link,categories`,
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?slug=${encodeURIComponent(slug)}&_embed=wp:term&_fields=_embedded,id,title,date,date_gmt,excerpt,content,slug,link,categories`,
       {
         next: { revalidate: 1800 }, // 30分ごとに再検証
       },
@@ -407,10 +407,10 @@ export const getRelatedThoughts = async (
     // 最初のカテゴリで関連記事を取得（複数カテゴリがある場合は最初のもの）
     const categoryId = categories[0].id
 
-    // 同じカテゴリの記事を10件取得（現在の記事を除外）
-    const fetchLimit = Math.max(limit * 2.5, 10) // 最低10件、limitの2.5倍まで
+    // 同じカテゴリの記事を取得（現在の記事を除外）
+    const fetchLimit = 20
     const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?categories=${categoryId}&exclude=${currentThought.id}&per_page=${fetchLimit}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?categories=${categoryId}&exclude=${currentThought.id}&per_page=${fetchLimit}&_embed=wp:term&_fields=_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
       {
         next: { revalidate: 1800 }, // 30分ごとに再検証
       },
