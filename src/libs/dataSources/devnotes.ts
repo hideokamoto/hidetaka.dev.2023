@@ -10,7 +10,8 @@ export type DevNotesResult = {
 // カテゴリ情報を抽出するヘルパー関数
 // dev-notesのカスタム投稿タイプでは、カテゴリのタクソノミー名が異なる可能性があるため、
 // すべてのタクソノミーからカテゴリを抽出する
-const extractCategories = (note: WPThought): Category[] => {
+// テスト可能にするためにexport
+export const extractCategories = (note: WPThought): Category[] => {
   if (!note._embedded?.['wp:term']) {
     return []
   }
