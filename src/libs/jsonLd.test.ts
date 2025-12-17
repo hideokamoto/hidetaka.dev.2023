@@ -233,6 +233,8 @@ describe('generateBlogBreadcrumbJsonLd', () => {
 })
 
 describe('generateBlogListJsonLd', () => {
+  const emptyItems: BlogItem[] = []
+
   it('should generate valid CollectionPage JSON-LD', () => {
     const items: BlogItem[] = [createMockBlogItem()]
     const result = generateBlogListJsonLd(items, 'en', '/blog', 1, 5)
@@ -242,29 +244,25 @@ describe('generateBlogListJsonLd', () => {
   })
 
   it('should use correct title for English', () => {
-    const items: BlogItem[] = []
-    const result = generateBlogListJsonLd(items, 'en', '/blog', 1, 1)
+    const result = generateBlogListJsonLd(emptyItems, 'en', '/blog', 1, 1)
 
     expect(result.name).toBe('Blog')
   })
 
   it('should use correct title for Japanese', () => {
-    const items: BlogItem[] = []
-    const result = generateBlogListJsonLd(items, 'ja', '/ja/blog', 1, 1)
+    const result = generateBlogListJsonLd(emptyItems, 'ja', '/ja/blog', 1, 1)
 
     expect(result.name).toBe('ブログ')
   })
 
   it('should include category name in title when provided', () => {
-    const items: BlogItem[] = []
-    const result = generateBlogListJsonLd(items, 'en', '/blog', 1, 1, 'Technology')
+    const result = generateBlogListJsonLd(emptyItems, 'en', '/blog', 1, 1, 'Technology')
 
     expect(result.name).toBe('Category: Technology')
   })
 
   it('should include Japanese category title', () => {
-    const items: BlogItem[] = []
-    const result = generateBlogListJsonLd(items, 'ja', '/ja/blog', 1, 1, 'テクノロジー')
+    const result = generateBlogListJsonLd(emptyItems, 'ja', '/ja/blog', 1, 1, 'テクノロジー')
 
     expect(result.name).toBe('カテゴリ: テクノロジー')
   })
@@ -292,28 +290,25 @@ describe('generateBlogListJsonLd', () => {
   })
 
   it('should handle pagination in URL', () => {
-    const items: BlogItem[] = []
-    const resultPage1 = generateBlogListJsonLd(items, 'en', '/blog', 1, 5)
-    const resultPage2 = generateBlogListJsonLd(items, 'en', '/blog', 2, 5)
+    const resultPage1 = generateBlogListJsonLd(emptyItems, 'en', '/blog', 1, 5)
+    const resultPage2 = generateBlogListJsonLd(emptyItems, 'en', '/blog', 2, 5)
 
     expect(resultPage1.url).toBe('https://hidetaka.dev/blog')
     expect(resultPage2.url).toBe('https://hidetaka.dev/blog/page/2')
   })
 
   it('should set correct inLanguage', () => {
-    const items: BlogItem[] = []
-    const resultEn = generateBlogListJsonLd(items, 'en', '/blog', 1, 1)
-    const resultJa = generateBlogListJsonLd(items, 'ja', '/ja/blog', 1, 1)
+    const resultEn = generateBlogListJsonLd(emptyItems, 'en', '/blog', 1, 1)
+    const resultJa = generateBlogListJsonLd(emptyItems, 'ja', '/ja/blog', 1, 1)
 
     expect(resultEn.inLanguage).toBe('en-US')
     expect(resultJa.inLanguage).toBe('ja-JP')
   })
 
   it('should include description based on language and category', () => {
-    const items: BlogItem[] = []
-    const resultEn = generateBlogListJsonLd(items, 'en', '/blog', 1, 1)
-    const resultJa = generateBlogListJsonLd(items, 'ja', '/ja/blog', 1, 1)
-    const resultWithCategory = generateBlogListJsonLd(items, 'en', '/blog', 1, 1, 'Tech')
+    const resultEn = generateBlogListJsonLd(emptyItems, 'en', '/blog', 1, 1)
+    const resultJa = generateBlogListJsonLd(emptyItems, 'ja', '/ja/blog', 1, 1)
+    const resultWithCategory = generateBlogListJsonLd(emptyItems, 'en', '/blog', 1, 1, 'Tech')
 
     expect(resultEn.description).toContain('non-technical topics')
     expect(resultJa.description).toContain('技術的ではないトピック')
@@ -321,7 +316,7 @@ describe('generateBlogListJsonLd', () => {
   })
 
   it('should handle empty items array', () => {
-    const result = generateBlogListJsonLd([], 'en', '/blog', 1, 1)
+    const result = generateBlogListJsonLd(emptyItems, 'en', '/blog', 1, 1)
 
     expect(result.mainEntity.numberOfItems).toBe(0)
     expect(result.mainEntity.itemListElement).toEqual([])
