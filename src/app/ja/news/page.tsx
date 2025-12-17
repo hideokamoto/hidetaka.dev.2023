@@ -1,9 +1,15 @@
 import NewsPageContent from '@/components/containers/pages/NewsPage'
+import { loadProducts } from '@/libs/dataSources/products'
 
 export const metadata = {
   title: 'News',
 }
 
-export default function NewsPage() {
-  return <NewsPageContent lang="ja" />
+// ISR: 30分ごとにページを再検証（製品ニュース更新）
+export const revalidate = 1800
+
+export default async function NewsPage() {
+  const result = await loadProducts(1, 100, 'ja')
+
+  return <NewsPageContent lang="ja" products={result.items} />
 }

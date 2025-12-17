@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { SITE_CONFIG } from '@/config'
 import { loadAllDevNotes } from '@/libs/dataSources/devnotes'
+import { loadAllProducts } from '@/libs/dataSources/products'
 import { loadAllThoughts } from '@/libs/dataSources/thoughts'
 import { MicroCMSAPI } from '@/libs/microCMS/apis'
 import { createMicroCMSClient } from '@/libs/microCMS/client'
@@ -130,16 +131,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('Error loading posts for sitemap:', error)
   }
 
-  // イベント
-  let eventPages: MetadataRoute.Sitemap = []
+  // 製品ニュース（WordPress API products）
+  let productNewsPages: MetadataRoute.Sitemap = []
   try {
-    const allEvents = await microCMS.listAllEvents()
-    eventPages = allEvents.flatMap((event) => {
-      const lastModified = event.updatedAt ? new Date(event.updatedAt) : undefined
-      return createEntriesForPaths(['/news', '/ja/news'], event.id, lastModified, 'monthly', 0.6)
+    const allProducts = await loadAllProducts()
+    productNewsPages = allProducts.flatMap((product) => {
+      const lastModified = product.modified ? new Date(product.modified) : undefined
+      return createEntriesForPaths(
+        ['/news', '/ja/news'],
+        product.slug,
+        lastModified,
+        'monthly',
+        0.7,
+      )
     })
   } catch (error) {
-    console.error('Error loading events for sitemap:', error)
+    console.error('Error loading product news for sitemap:', error)
   }
 
   // Dev Notes（WordPress API、日本語のみ）
@@ -161,7 +168,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...blogPages,
     ...projectPages,
     ...postPages,
-    ...eventPages,
+    ...productNewsPages,
     ...devNotesPages,
   ]
 }
