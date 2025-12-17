@@ -4,20 +4,18 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   test: {
     globals: true,
-    environment: 'node',
-    include: ['**/*.test.ts'],
-    exclude: ['**/*.component.test.{ts,tsx}', '**/node_modules/**'],
+    environment: 'jsdom',
+    setupFiles: ['./src/test/component-setup.ts'],
+    include: ['**/*.component.test.{ts,tsx}'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'lcov'],
-      include: ['src/libs/**/*.ts'],
+      include: ['src/components/**/*.{ts,tsx}'],
       exclude: [
-        'src/libs/**/*.test.ts',
-        'src/libs/microCMS/mocks.ts',
-        'src/libs/microCMS/types.ts',
-        'src/libs/dataSources/types.ts',
+        'src/components/**/*.component.test.{ts,tsx}',
+        'src/components/**/*.stories.{ts,tsx}',
+        'src/components/**/index.{ts,tsx}',
       ],
-      // Phase 1: Start with tested files only
       // Future: Gradually increase thresholds as more tests are added
       // thresholds: {
       //   lines: 80,
