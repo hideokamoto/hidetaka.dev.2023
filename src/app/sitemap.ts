@@ -137,20 +137,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const allProducts = await loadAllProducts()
     productNewsPages = allProducts.flatMap((product) => {
       const lastModified = product.modified ? new Date(product.modified) : undefined
-      return [
-        {
-          url: `${SITE_CONFIG.url}/news/${product.slug}`,
-          lastModified,
-          changeFrequency: 'monthly' as const,
-          priority: 0.7,
-        },
-        {
-          url: `${SITE_CONFIG.url}/ja/news/${product.slug}`,
-          lastModified,
-          changeFrequency: 'monthly' as const,
-          priority: 0.7,
-        },
-      ]
+      return createEntriesForPaths(
+        ['/news', '/ja/news'],
+        product.slug,
+        lastModified,
+        'monthly',
+        0.7,
+      )
     })
   } catch (error) {
     console.error('Error loading product news for sitemap:', error)

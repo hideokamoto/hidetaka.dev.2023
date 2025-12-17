@@ -9,7 +9,7 @@ export const metadata = {
 export const revalidate = 1800
 
 export default async function NewsPage() {
-  const result = await loadProducts('ja')
+  const result = await loadProducts(1, 100, 'ja')
 
   return <NewsPageContent lang="ja" products={result.items} />
 }
