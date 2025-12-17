@@ -4,6 +4,9 @@ import JsonLd from '@/components/JsonLd'
 import { loadAllCategories, loadThoughtsByCategory } from '@/libs/dataSources/thoughts'
 import { generateBlogListJsonLd } from '@/libs/jsonLd'
 
+// See REVALIDATION_PERIOD.ARCHIVE in @/consts
+export const revalidate = 10800
+
 export const metadata = {
   title: 'ブログカテゴリ',
 }
