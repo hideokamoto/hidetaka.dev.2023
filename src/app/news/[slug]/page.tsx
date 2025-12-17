@@ -1,6 +1,14 @@
 import { notFound } from 'next/navigation'
-import Container from '@/components/tailwindui/Container'
-import { getProductBySlug, loadAllProducts } from '@/libs/dataSources/products'
+import NewsDetailPageContent from '@/components/containers/pages/NewsDetailPage'
+import JsonLd from '@/components/JsonLd'
+import {
+  getAdjacentProducts,
+  getProductBySlug,
+  getRelatedProducts,
+  loadAllProducts,
+} from '@/libs/dataSources/products'
+import { generateBlogBreadcrumbJsonLd, generateBlogPostingJsonLd } from '@/libs/jsonLd'
+import { generateBlogPostMetadata } from '@/libs/metadata'
 
 export async function generateStaticParams() {
   const products = await loadAllProducts()
@@ -19,9 +27,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
   }
 
-  return {
-    title: product.title.rendered,
+  // WPProductをWPThought形式に変換してメタデータを生成
+  const thoughtLike = {
+    id: product.id,
+    title: product.title,
+    date: product.date,
+    modified: product.modified,
+    excerpt: product.excerpt || { rendered: '' },
+    content: product.content,
+    slug: product.slug,
   }
+
+  return generateBlogPostMetadata(thoughtLike as any)
 }
 
 export default async function NewsDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -32,30 +49,37 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ slu
     notFound()
   }
 
+  // JSON-LDを生成
+  const thoughtLike = {
+    id: product.id,
+    title: product.title,
+    date: product.date,
+    modified: product.modified,
+    excerpt: product.excerpt || { rendered: '' },
+    content: product.content,
+    slug: product.slug,
+  }
+  const blogPostingJsonLd = generateBlogPostingJsonLd(thoughtLike as any, 'en', '/news')
+  const breadcrumbJsonLd = generateBlogBreadcrumbJsonLd(thoughtLike as any, 'en', '/news')
+
+  // 前後の記事と関連記事を取得
+  const [adjacentProducts, relatedArticles] = await Promise.all([
+    getAdjacentProducts(product),
+    getRelatedProducts(product, 4),
+  ])
+
   return (
-    <Container className="mt-16 sm:mt-32">
-      <article>
-        <h1 className="text-4xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-5xl">
-          {product.title.rendered}
-        </h1>
-        <time
-          dateTime={product.date}
-          className="mt-4 flex items-center text-sm text-zinc-500 dark:text-zinc-400"
-        >
-          {new Date(product.date).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })}
-        </time>
-        <div
-          className="mt-8 prose prose-zinc dark:prose-invert max-w-none"
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: Content is from trusted WordPress API, controlled by site owner
-          dangerouslySetInnerHTML={{
-            __html: product.content.rendered,
-          }}
-        />
-      </article>
-    </Container>
+    <>
+      <JsonLd data={blogPostingJsonLd} />
+      <JsonLd data={breadcrumbJsonLd} />
+      <NewsDetailPageContent
+        product={product}
+        lang="en"
+        basePath="/news"
+        previousProduct={adjacentProducts.previous}
+        nextProduct={adjacentProducts.next}
+        relatedArticles={relatedArticles}
+      />
+    </>
   )
 }

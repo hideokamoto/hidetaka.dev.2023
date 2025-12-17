@@ -124,6 +124,116 @@ export const getProductBySlug = async (
   }
 }
 
+export type AdjacentProducts = {
+  previous: WPProduct | null
+  next: WPProduct | null
+}
+
+// WordPress APIから記事を取得するヘルパー関数
+const fetchProduct = async (url: string): Promise<WPProduct | null> => {
+  try {
+    const response = await fetch(url, {
+      next: { revalidate: 1800 }, // 30分ごとに再検証
+    })
+    if (!response.ok) {
+      console.error(`Failed to fetch product: ${response.status}`)
+      return null
+    }
+    const products: WPProduct[] = await response.json()
+    return products.length > 0 ? products[0] : null
+  } catch (error) {
+    console.error('Error fetching product:', error)
+    return null
+  }
+}
+
+/**
+ * 前後の製品ニュース記事を取得
+ * @param currentProduct 現在の記事
+ * @returns AdjacentProducts
+ */
+export const getAdjacentProducts = async (currentProduct: WPProduct): Promise<AdjacentProducts> => {
+  try {
+    // 前の記事を取得（現在の記事より前の日付で最も新しいもの）
+    const previousUrl = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/products?before=${encodeURIComponent(currentProduct.date)}&per_page=1&orderby=date&order=desc&_fields=id,title,date,date_gmt,modified,modified_gmt,excerpt,content,slug,link,featured_media`
+
+    // 次の記事を取得（現在の記事より後の日付で最も古いもの）
+    const nextUrl = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/products?after=${encodeURIComponent(currentProduct.date)}&per_page=1&orderby=date&order=asc&_fields=id,title,date,date_gmt,modified,modified_gmt,excerpt,content,slug,link,featured_media`
+
+    // 並列で実行
+    const [previous, next] = await Promise.all([fetchProduct(previousUrl), fetchProduct(nextUrl)])
+
+    return {
+      previous,
+      next,
+    }
+  } catch (error) {
+    console.error('Error loading adjacent products:', error)
+    return {
+      previous: null,
+      next: null,
+    }
+  }
+}
+
+/**
+ * 関連製品ニュース記事を取得（最新記事からランダムに選択）
+ * @param currentProduct 現在の記事
+ * @param limit 取得件数（デフォルト: 4）
+ * @param lang 言語 ('en' | 'ja')
+ * @returns BlogItem[]
+ */
+export const getRelatedProducts = async (
+  currentProduct: WPProduct,
+  limit: number = 4,
+  lang: 'en' | 'ja' = 'en',
+): Promise<BlogItem[]> => {
+  try {
+    // 現在の記事を除外して最新記事を取得
+    const fetchLimit = Math.max(limit * 2, 10) // 最低10件、limitの2倍まで
+    const response = await fetch(
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/products?exclude=${currentProduct.id}&per_page=${fetchLimit}&orderby=date&order=desc&_fields=id,title,date,date_gmt,excerpt,slug,link`,
+      {
+        next: { revalidate: 1800 }, // 30分ごとに再検証
+      },
+    )
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch related products: ${response.status}`)
+    }
+
+    const products: WPProduct[] = await response.json()
+
+    // BlogItem型に変換
+    const basePath = lang === 'ja' ? '/ja/news' : '/news'
+    const items: BlogItem[] = products.map((product: WPProduct): BlogItem => {
+      const excerptText = product.excerpt?.rendered
+        ? product.excerpt.rendered.replace(/<[^>]*>/g, '').substring(0, 150)
+        : ''
+      return {
+        id: product.id.toString(),
+        title: product.title.rendered,
+        description: excerptText,
+        datetime: product.date,
+        href: `${basePath}/${product.slug}`,
+      }
+    })
+
+    // Fisher-Yatesアルゴリズムでシャッフル
+    const shuffled = [...items]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+
+    // limitの数だけ返す
+    return shuffled.slice(0, limit)
+  } catch (error) {
+    console.error('Error loading related products:', error)
+    return []
+  }
+}
+
 /**
  * サイトマップ生成用：全製品ニュースを取得
  * @returns WPProduct[]

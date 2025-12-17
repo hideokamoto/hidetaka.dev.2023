@@ -41,16 +41,6 @@ export function middleware(request: NextRequest) {
     const newPath = pathname.replace('/ja/articles', '/ja/writing')
     return NextResponse.redirect(new URL(newPath, request.url))
   }
-  // /news → /writing
-  if (pathname === '/news' || pathname.startsWith('/news/')) {
-    const newPath = pathname.replace('/news', '/writing')
-    return NextResponse.redirect(new URL(newPath, request.url))
-  }
-  // /ja/news → /ja/writing
-  if (pathname === '/ja/news' || pathname.startsWith('/ja/news/')) {
-    const newPath = pathname.replace('/ja/news', '/ja/writing')
-    return NextResponse.redirect(new URL(newPath, request.url))
-  }
 
   return NextResponse.next()
 }
