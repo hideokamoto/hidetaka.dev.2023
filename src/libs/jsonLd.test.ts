@@ -277,10 +277,10 @@ describe('generateBlogListJsonLd', () => {
     ]
     const result = generateBlogListJsonLd(items, 'en', '/blog', 1, 1)
 
-    expect(result.mainEntity.numberOfItems).toBe(3)
-    expect(result.mainEntity.itemListElement[0].position).toBe(1)
-    expect(result.mainEntity.itemListElement[1].position).toBe(2)
-    expect(result.mainEntity.itemListElement[2].position).toBe(3)
+    expect(result.mainEntity.numberOfItems).toBe(items.length)
+    result.mainEntity.itemListElement.forEach((element, index) => {
+      expect(element.position).toBe(index + 1)
+    })
   })
 
   it('should generate correct URLs for list items', () => {
