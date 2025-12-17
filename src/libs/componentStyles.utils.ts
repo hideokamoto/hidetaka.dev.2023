@@ -52,20 +52,20 @@ const TAG_VARIANT_STYLES = {
 } as const
 
 /**
- * Get size-specific styles for Tag component
+ * Get size-specific styles for Tag component (internal helper)
  * @param size - Tag size
  * @returns CSS class string for the size
  */
-export function getTagSizeStyles(size: TagSize): string {
+function getTagSizeStyles(size: TagSize): string {
   return TAG_SIZE_STYLES[size]
 }
 
 /**
- * Get variant-specific styles for Tag component
+ * Get variant-specific styles for Tag component (internal helper)
  * @param variant - Tag variant type
  * @returns CSS class string for the variant
  */
-export function getTagVariantStyles(variant: TagVariant): string {
+function getTagVariantStyles(variant: TagVariant): string {
   return TAG_VARIANT_STYLES[variant]
 }
 
