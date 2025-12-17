@@ -2,6 +2,9 @@ import Container from '@/components/tailwindui/Container'
 import { MicroCMSAPI } from '@/libs/microCMS/apis'
 import { createMicroCMSClient } from '@/libs/microCMS/client'
 
+// See REVALIDATION_PERIOD.ARTICLE in @/consts
+export const revalidate = 86400
+
 export async function generateStaticParams() {
   const microCMS = new MicroCMSAPI(createMicroCMSClient())
   const posts = await microCMS.listPosts({ lang: 'english' })
