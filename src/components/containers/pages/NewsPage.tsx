@@ -72,7 +72,7 @@ function NoArticlesMessage({ lang }: { lang: string }) {
 }
 
 export default function NewsPageContent({ lang, products }: NewsPageProps) {
-  const title = lang === 'ja' ? 'News' : 'News'
+  const title = lang === 'ja' ? 'ニュース' : 'News'
   const description =
     lang === 'ja'
       ? 'プロジェクトや製品のリリース情報、アップデートなどのお知らせを掲載しています。'
