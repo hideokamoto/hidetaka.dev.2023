@@ -8,7 +8,10 @@ export type DevNotesResult = {
 }
 
 // カテゴリ情報を抽出するヘルパー関数
-const extractCategories = (note: WPThought): Category[] => {
+// dev-notesのカスタム投稿タイプでは、カテゴリのタクソノミー名が異なる可能性があるため、
+// すべてのタクソノミーからカテゴリを抽出する
+// テスト可能にするためにexport
+export const extractCategories = (note: WPThought): Category[] => {
   if (!note._embedded?.['wp:term']) {
     return []
   }
@@ -16,7 +19,9 @@ const extractCategories = (note: WPThought): Category[] => {
   const categories: Category[] = []
   for (const termArray of note._embedded['wp:term']) {
     for (const term of termArray) {
-      if (term.taxonomy === 'category') {
+      // post_tag（タグ）は除外し、それ以外のすべてのタクソノミーをカテゴリとして扱う
+      // これにより、カスタム投稿タイプのカスタムタクソノミーも含まれる
+      if (term.taxonomy !== 'post_tag') {
         categories.push({
           id: term.id,
           name: term.name,
@@ -26,6 +31,7 @@ const extractCategories = (note: WPThought): Category[] => {
       }
     }
   }
+
   return categories
 }
 
@@ -161,6 +167,7 @@ export const getAdjacentDevNotes = async (currentNote: WPThought): Promise<Adjac
 
 /**
  * 関連記事を取得（同じカテゴリの記事からランダムに選択）
+ * カテゴリがない場合は、すべてのdev-notes記事から選択
  */
 export const getRelatedDevNotes = async (
   currentNote: WPThought,
@@ -168,20 +175,23 @@ export const getRelatedDevNotes = async (
 ): Promise<BlogItem[]> => {
   try {
     const categories = extractCategories(currentNote)
-
-    if (categories.length === 0) {
-      return []
-    }
-
-    const categoryId = categories[0].id
     const fetchLimit = Math.max(limit * 2.5, 10)
 
-    const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?categories=${categoryId}&exclude=${currentNote.id}&per_page=${fetchLimit}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
-      {
-        next: { revalidate: 1800 }, // 30分ごとに再検証
-      },
-    )
+    // カテゴリがある場合は同じカテゴリの記事を取得、ない場合はすべての記事を取得
+    let url: string
+    if (categories.length > 0) {
+      const category = categories[0]
+      // カスタム投稿タイプでは、カテゴリのタクソノミー名をパラメータとして使用
+      // 例: categories (デフォルト) または dev-note-category (カスタム)
+      const taxonomyParam = category.taxonomy === 'category' ? 'categories' : category.taxonomy
+      url = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?${taxonomyParam}=${category.id}&exclude=${currentNote.id}&per_page=${fetchLimit}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`
+    } else {
+      url = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?exclude=${currentNote.id}&per_page=${fetchLimit}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`
+    }
+
+    const response = await fetch(url, {
+      next: { revalidate: 1800 }, // 30分ごとに再検証
+    })
 
     if (!response.ok) {
       throw new Error(`Failed to fetch related dev-notes: ${response.status}`)
