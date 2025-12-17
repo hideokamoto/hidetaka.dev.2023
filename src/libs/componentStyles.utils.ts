@@ -77,9 +77,10 @@ function getTagVariantStyles(variant: TagVariant): string {
  */
 export function getTagStyles(variant: TagVariant, size: TagSize) {
   return {
-    size: getTagSizeStyles(size),
-    variant: getTagVariantStyles(variant),
+    size: TAG_SIZE_STYLES[size],
+    variant: TAG_VARIANT_STYLES[variant],
   }
+}
 }
 
 // SectionHeader component types
