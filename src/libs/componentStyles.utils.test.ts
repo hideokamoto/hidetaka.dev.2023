@@ -1,11 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  getBadgeStyles,
-  getSectionHeaderAlignStyles,
-  getTagStyles,
-  type TagSize,
-  type TagVariant,
-} from './componentStyles.utils'
+import { getBadgeStyles, getSectionHeaderAlignStyles, getTagStyles } from './componentStyles.utils'
 
 describe('Component Styles Utils', () => {
   describe('getBadgeStyles', () => {

@@ -52,24 +52,6 @@ const TAG_VARIANT_STYLES = {
 } as const
 
 /**
- * Get size-specific styles for Tag component (internal helper)
- * @param size - Tag size
- * @returns CSS class string for the size
- */
-function getTagSizeStyles(size: TagSize): string {
-  return TAG_SIZE_STYLES[size]
-}
-
-/**
- * Get variant-specific styles for Tag component (internal helper)
- * @param variant - Tag variant type
- * @returns CSS class string for the variant
- */
-function getTagVariantStyles(variant: TagVariant): string {
-  return TAG_VARIANT_STYLES[variant]
-}
-
-/**
  * Get complete styles for Tag component
  * @param variant - Tag variant type
  * @param size - Tag size
@@ -80,7 +62,6 @@ export function getTagStyles(variant: TagVariant, size: TagSize) {
     size: TAG_SIZE_STYLES[size],
     variant: TAG_VARIANT_STYLES[variant],
   }
-}
 }
 
 // SectionHeader component types
