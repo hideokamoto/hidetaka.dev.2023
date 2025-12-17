@@ -2,7 +2,6 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
-import { InArticleAd } from '@/components/ui/GoogleAds'
 import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
 import SocialShareButtons from '@/components/ui/SocialShareButtons'
@@ -132,12 +131,9 @@ export default function BlogDetailPage({
           dangerouslySetInnerHTML={{ __html: thought.content.rendered }}
         />
 
-        {/* In-Article Ad */}
-        <InArticleAd />
-
         {/* SNS共有ボタン */}
         <SocialShareButtons
-          url={`${SITE_CONFIG.url}${basePath}/${thought.slug}`}
+          url={new URL(`${basePath}/${thought.slug}`, SITE_CONFIG.url).toString()}
           title={thought.title.rendered}
           lang={lang}
           className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700"

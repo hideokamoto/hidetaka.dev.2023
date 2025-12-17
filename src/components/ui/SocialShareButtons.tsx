@@ -18,8 +18,7 @@ export default function SocialShareButtons({
   const shareLinks = {
     twitter: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`,
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
-    hatena: `http://b.hatena.ne.jp/add?mode=confirm&url=${encodedUrl}&title=${encodedTitle}`,
-    linkedin: `https://www.linkedin.com/shareArticle?mini=true&url=${encodedUrl}&title=${encodedTitle}`,
+    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
   }
 
   const shareButtonLabel = isJapanese ? 'シェア' : 'Share'
@@ -50,16 +49,6 @@ export default function SocialShareButtons({
       color: 'hover:bg-blue-50 dark:hover:bg-blue-900/20',
     },
     {
-      name: 'はてなブックマーク',
-      href: shareLinks.hatena,
-      icon: (
-        <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M4.5 2.5h15A2.5 2.5 0 0122 5v14a2.5 2.5 0 01-2.5 2.5h-15A2.5 2.5 0 012 19V5a2.5 2.5 0 012.5-2.5zm2.5 5v9h3.5c2.5 0 4-1.5 4-4.5S12.5 7.5 10 7.5H7zm3.5 2c1 0 1.5.5 1.5 1.5s-.5 1.5-1.5 1.5H9.5v-3h1zm7.5-.5a1.5 1.5 0 100 3 1.5 1.5 0 000-3zm0 5a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" />
-        </svg>
-      ),
-      color: 'hover:bg-cyan-50 dark:hover:bg-cyan-900/20',
-    },
-    {
       name: 'LinkedIn',
       href: shareLinks.linkedin,
       icon: (
@@ -72,7 +61,7 @@ export default function SocialShareButtons({
   ]
 
   return (
-    <div className={className}>
+    <div className={`${className}`}>
       <div className="flex items-center gap-2">
         <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
           {shareButtonLabel}:

@@ -2,7 +2,6 @@ import Link from 'next/link'
 import React from 'react'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
-import { InFeedAd } from '@/components/ui/GoogleAds'
 import PageHeader from '@/components/ui/PageHeader'
 import Pagination from '@/components/ui/Pagination'
 import SidebarLayout from '@/components/ui/SidebarLayout'
@@ -244,16 +243,8 @@ export default function BlogPageContent({
             {thoughts.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                  {thoughts.map((item, index) => (
-                    <React.Fragment key={item.id || item.href}>
-                      <BlogCard item={item} lang={lang} />
-                      {/* 4記事ごとに In-Feed Ad を表示 */}
-                      {(index + 1) % 4 === 0 && index < thoughts.length - 1 && (
-                        <div className="md:col-span-2">
-                          <InFeedAd />
-                        </div>
-                      )}
-                    </React.Fragment>
+                  {thoughts.map((item) => (
+                    <BlogCard key={item.id || item.href} item={item} lang={lang} />
                   ))}
                 </div>
 
@@ -275,16 +266,8 @@ export default function BlogPageContent({
             {thoughts.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                  {thoughts.map((item, index) => (
-                    <React.Fragment key={item.id || item.href}>
-                      <BlogCard item={item} lang={lang} />
-                      {/* 4記事ごとに In-Feed Ad を表示 */}
-                      {(index + 1) % 4 === 0 && index < thoughts.length - 1 && (
-                        <div className="md:col-span-2">
-                          <InFeedAd />
-                        </div>
-                      )}
-                    </React.Fragment>
+                  {thoughts.map((item) => (
+                    <BlogCard key={item.id || item.href} item={item} lang={lang} />
                   ))}
                 </div>
 

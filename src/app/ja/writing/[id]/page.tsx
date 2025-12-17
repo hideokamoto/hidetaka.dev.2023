@@ -1,5 +1,4 @@
 import Container from '@/components/tailwindui/Container'
-import { InArticleAd } from '@/components/ui/GoogleAds'
 import { MicroCMSAPI } from '@/libs/microCMS/apis'
 import { createMicroCMSClient } from '@/libs/microCMS/client'
 
@@ -33,9 +32,6 @@ export default async function WritingDetailPage({ params }: { params: Promise<{ 
             __html: typeof post.content === 'string' ? post.content : String(post.content || ''),
           }}
         />
-
-        {/* In-Article Ad */}
-        <InArticleAd />
       </article>
     </Container>
   )

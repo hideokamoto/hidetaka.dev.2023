@@ -46,7 +46,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className="h-full antialiased">
       <head>
-        <meta name="google-adsense-account" content="ca-pub-6091198629319043" />
         <link rel="alternate" type="application/rss+xml" title="RSS" href="/projects/rss.xml" />
       </head>
       <body className="flex h-full flex-col bg-zinc-50 dark:bg-black">

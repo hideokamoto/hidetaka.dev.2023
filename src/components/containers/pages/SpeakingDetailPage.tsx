@@ -115,7 +115,7 @@ export default function SpeakingDetailPage({
 
         {/* SNS共有ボタン */}
         <SocialShareButtons
-          url={`${SITE_CONFIG.url}${basePath}/${event.slug}`}
+          url={new URL(`${basePath}/${event.slug}`, SITE_CONFIG.url).toString()}
           title={event.title.rendered}
           lang={lang}
           className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700"
