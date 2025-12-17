@@ -4,7 +4,9 @@ import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
+import SocialShareButtons from '@/components/ui/SocialShareButtons'
 import Tag from '@/components/ui/Tag'
+import { SITE_CONFIG } from '@/config'
 import type { BlogItem, WPEvent } from '@/libs/dataSources/types'
 
 type SpeakingDetailPageProps = {
@@ -109,6 +111,14 @@ export default function SpeakingDetailPage({
           className="blog-content text-zinc-700 dark:text-zinc-300 leading-relaxed"
           // biome-ignore lint/security/noDangerouslySetInnerHtml: Content is from trusted WordPress CMS, controlled by site owner
           dangerouslySetInnerHTML={{ __html: event.content.rendered }}
+        />
+
+        {/* SNS共有ボタン */}
+        <SocialShareButtons
+          url={new URL(`${basePath}/${event.slug}`, SITE_CONFIG.url).toString()}
+          title={event.title.rendered}
+          lang={lang}
+          className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700"
         />
 
         {/* プロフィールカード */}

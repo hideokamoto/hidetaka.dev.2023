@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import FilterItem from '@/components/ui/FilterItem'

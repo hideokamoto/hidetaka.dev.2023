@@ -1,5 +1,6 @@
 import { SITE_CONFIG } from '@/config'
 import type { BlogItem, WPThought } from './dataSources/types'
+import { removeHtmlTags } from './sanitize'
 
 /**
  * ブログ詳細ページ用のBlogPosting JSON-LDを生成
@@ -7,12 +8,7 @@ import type { BlogItem, WPThought } from './dataSources/types'
 export function generateBlogPostingJsonLd(thought: WPThought, lang: string, basePath: string) {
   const fullUrl = `${SITE_CONFIG.url}${basePath}/${thought.slug}`
 
-  // HTMLタグを除去してプレーンテキストに変換
-  const stripHtml = (html: string) => {
-    return html.replace(/<[^>]*>/g, '').trim()
-  }
-
-  const description = stripHtml(thought.excerpt.rendered)
+  const description = removeHtmlTags(thought.excerpt.rendered).trim()
 
   // カテゴリ情報を取得
   const categories =
@@ -59,11 +55,7 @@ export function generateBlogPostingJsonLd(thought: WPThought, lang: string, base
 export function generateDevNoteJsonLd(note: WPThought, basePath: string) {
   const fullUrl = `${SITE_CONFIG.url}${basePath}/${note.slug}`
 
-  const stripHtml = (html: string) => {
-    return html.replace(/<[^>]*>/g, '').trim()
-  }
-
-  const description = stripHtml(note.excerpt.rendered)
+  const description = removeHtmlTags(note.excerpt.rendered).trim()
 
   const categories =
     note._embedded?.['wp:term']
