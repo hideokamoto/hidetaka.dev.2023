@@ -3,6 +3,20 @@
  * Pure functions for pagination logic following Kent Beck's unit testing principles
  */
 
+// Pagination text constants (defined at module level for performance)
+const PAGINATION_TEXTS = {
+  ja: {
+    prev: '前へ',
+    next: '次へ',
+    page: 'ページ',
+  },
+  en: {
+    prev: 'Previous',
+    next: 'Next',
+    page: 'Page',
+  },
+} as const
+
 /**
  * Calculate the previous page number
  * @param currentPage - Current page number (1-indexed)
@@ -42,21 +56,8 @@ export function generatePageHref(basePath: string, pageNumber: number | null): s
  * @returns Localized text string
  */
 export function getPaginationText(lang: string, key: 'prev' | 'next' | 'page'): string {
-  const texts = {
-    ja: {
-      prev: '前へ',
-      next: '次へ',
-      page: 'ページ',
-    },
-    en: {
-      prev: 'Previous',
-      next: 'Next',
-      page: 'Page',
-    },
-  }
-
   const isJapanese = lang.startsWith('ja')
-  return isJapanese ? texts.ja[key] : texts.en[key]
+  return isJapanese ? PAGINATION_TEXTS.ja[key] : PAGINATION_TEXTS.en[key]
 }
 
 /**

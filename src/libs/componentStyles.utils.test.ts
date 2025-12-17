@@ -5,6 +5,8 @@ import {
   getTagSizeStyles,
   getTagStyles,
   getTagVariantStyles,
+  type TagSize,
+  type TagVariant,
 } from './componentStyles.utils'
 
 describe('Component Styles Utils', () => {
@@ -133,8 +135,8 @@ describe('Component Styles Utils', () => {
 
     it('should return correct combined styles for all combinations', () => {
       const combinations: Array<{
-        variant: 'default' | 'purple' | 'indigo'
-        size: 'sm' | 'md'
+        variant: TagVariant
+        size: TagSize
       }> = [
         { variant: 'default', size: 'sm' },
         { variant: 'default', size: 'md' },

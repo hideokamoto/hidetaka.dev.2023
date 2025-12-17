@@ -6,31 +6,32 @@
 // Badge component types
 export type BadgeVariant = 'default' | 'indigo'
 
+// Badge style constants (defined at module level for performance)
+const BADGE_VARIANT_STYLES = {
+  default: 'border-zinc-200 bg-zinc-50/80 dark:border-zinc-500/30 dark:bg-zinc-500/10',
+  indigo: 'border-indigo-200 bg-indigo-50/80 dark:border-indigo-500/30 dark:bg-indigo-500/10',
+} as const
+
+const BADGE_TEXT_STYLES = {
+  default: 'text-sm font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-400',
+  indigo: 'text-sm font-semibold uppercase tracking-wider text-indigo-700 dark:text-indigo-400',
+} as const
+
+const BADGE_DOT_STYLES = {
+  default: 'h-2 w-2 rounded-full bg-zinc-500 animate-pulse',
+  indigo: 'h-2 w-2 rounded-full bg-indigo-500 animate-pulse',
+} as const
+
 /**
  * Get variant-specific styles for Badge component
  * @param variant - Badge variant type
  * @returns Object containing variant, text, and dot styles
  */
 export function getBadgeStyles(variant: BadgeVariant) {
-  const variantStyles = {
-    default: 'border-zinc-200 bg-zinc-50/80 dark:border-zinc-500/30 dark:bg-zinc-500/10',
-    indigo: 'border-indigo-200 bg-indigo-50/80 dark:border-indigo-500/30 dark:bg-indigo-500/10',
-  }
-
-  const textStyles = {
-    default: 'text-sm font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-400',
-    indigo: 'text-sm font-semibold uppercase tracking-wider text-indigo-700 dark:text-indigo-400',
-  }
-
-  const dotStyles = {
-    default: 'h-2 w-2 rounded-full bg-zinc-500 animate-pulse',
-    indigo: 'h-2 w-2 rounded-full bg-indigo-500 animate-pulse',
-  }
-
   return {
-    variant: variantStyles[variant],
-    text: textStyles[variant],
-    dot: dotStyles[variant],
+    variant: BADGE_VARIANT_STYLES[variant],
+    text: BADGE_TEXT_STYLES[variant],
+    dot: BADGE_DOT_STYLES[variant],
   }
 }
 
@@ -38,18 +39,25 @@ export function getBadgeStyles(variant: BadgeVariant) {
 export type TagVariant = 'default' | 'purple' | 'indigo'
 export type TagSize = 'sm' | 'md'
 
+// Tag style constants (defined at module level for performance)
+const TAG_SIZE_STYLES = {
+  sm: 'px-2.5 py-1 text-xs',
+  md: 'px-3 py-1.5 text-xs',
+} as const
+
+const TAG_VARIANT_STYLES = {
+  default: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
+  purple: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
+  indigo: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400',
+} as const
+
 /**
  * Get size-specific styles for Tag component
  * @param size - Tag size
  * @returns CSS class string for the size
  */
 export function getTagSizeStyles(size: TagSize): string {
-  const sizeStyles = {
-    sm: 'px-2.5 py-1 text-xs',
-    md: 'px-3 py-1.5 text-xs',
-  }
-
-  return sizeStyles[size]
+  return TAG_SIZE_STYLES[size]
 }
 
 /**
@@ -58,13 +66,7 @@ export function getTagSizeStyles(size: TagSize): string {
  * @returns CSS class string for the variant
  */
 export function getTagVariantStyles(variant: TagVariant): string {
-  const variantStyles = {
-    default: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
-    purple: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
-    indigo: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400',
-  }
-
-  return variantStyles[variant]
+  return TAG_VARIANT_STYLES[variant]
 }
 
 /**
@@ -83,17 +85,18 @@ export function getTagStyles(variant: TagVariant, size: TagSize) {
 // SectionHeader component types
 export type SectionHeaderAlign = 'left' | 'center' | 'right'
 
+// SectionHeader style constants (defined at module level for performance)
+const SECTION_HEADER_ALIGN_STYLES = {
+  left: 'text-left',
+  center: 'text-center',
+  right: 'text-right',
+} as const
+
 /**
  * Get alignment styles for SectionHeader component
  * @param align - Alignment type
  * @returns CSS class string for the alignment
  */
 export function getSectionHeaderAlignStyles(align: SectionHeaderAlign): string {
-  const alignStyles = {
-    left: 'text-left',
-    center: 'text-center',
-    right: 'text-right',
-  }
-
-  return alignStyles[align]
+  return SECTION_HEADER_ALIGN_STYLES[align]
 }

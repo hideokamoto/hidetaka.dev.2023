@@ -5,6 +5,25 @@
 
 export type DateFormat = 'short' | 'long' | 'month-year'
 
+// Date format options constants (defined at module level for performance)
+const DATE_FORMAT_OPTIONS: Record<DateFormat, Intl.DateTimeFormatOptions> = {
+  short: {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  },
+  long: {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  },
+  'month-year': {
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  },
+} as const
+
 /**
  * Parse date input to Date object
  * @param date - Date object or ISO date string
@@ -38,26 +57,7 @@ export function getDateLocale(lang: string): string {
  * @returns DateTimeFormatOptions object
  */
 export function getDateFormatOptions(format: DateFormat): Intl.DateTimeFormatOptions {
-  switch (format) {
-    case 'short':
-      return {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-      }
-    case 'long':
-      return {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      }
-    case 'month-year':
-      return {
-        month: 'long',
-        year: 'numeric',
-        timeZone: 'UTC',
-      }
-  }
+  return DATE_FORMAT_OPTIONS[format]
 }
 
 /**

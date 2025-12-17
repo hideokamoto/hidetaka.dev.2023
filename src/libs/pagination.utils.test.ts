@@ -115,7 +115,7 @@ describe('Pagination Utils', () => {
 
     describe('All text keys', () => {
       it('should handle all text keys correctly', () => {
-        const keys: Array<'prev' | 'next' | 'page'> = ['prev', 'next', 'page']
+        const keys: Array<Parameters<typeof getPaginationText>[1]> = ['prev', 'next', 'page']
         for (const key of keys) {
           expect(getPaginationText('en', key)).toBeTruthy()
           expect(getPaginationText('ja', key)).toBeTruthy()
