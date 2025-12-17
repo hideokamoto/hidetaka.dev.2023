@@ -61,18 +61,14 @@ describe('generateBlogPostingJsonLd', () => {
     expect(result.mainEntityOfPage['@id']).toBe('https://hidetaka.dev/blog/my-awesome-post')
   })
 
-  it('should set inLanguage to ja-JP for Japanese', () => {
+  it.each([
+    ['ja', '/ja/blog', 'ja-JP'],
+    ['en', '/blog', 'en-US'],
+  ])('should set inLanguage to %s for %s', (lang, basePath, expectedLanguage) => {
     const thought = createMockWPThought()
-    const result = generateBlogPostingJsonLd(thought, 'ja', '/ja/blog')
+    const result = generateBlogPostingJsonLd(thought, lang, basePath)
 
-    expect(result.inLanguage).toBe('ja-JP')
-  })
-
-  it('should set inLanguage to en-US for English', () => {
-    const thought = createMockWPThought()
-    const result = generateBlogPostingJsonLd(thought, 'en', '/blog')
-
-    expect(result.inLanguage).toBe('en-US')
+    expect(result.inLanguage).toBe(expectedLanguage)
   })
 
   it('should include categories as keywords when present', () => {
@@ -209,18 +205,14 @@ describe('generateBlogBreadcrumbJsonLd', () => {
     expect(result.itemListElement).toHaveLength(2)
   })
 
-  it('should use "Blog" label for English', () => {
+  it.each([
+    ['en', '/blog', 'Blog'],
+    ['ja', '/ja/blog', 'ブログ'],
+  ])('should use correct label for %s', (lang, basePath, expectedLabel) => {
     const thought = createMockWPThought()
-    const result = generateBlogBreadcrumbJsonLd(thought, 'en', '/blog')
+    const result = generateBlogBreadcrumbJsonLd(thought, lang, basePath)
 
-    expect(result.itemListElement[0].name).toBe('Blog')
-  })
-
-  it('should use Japanese label for Japanese', () => {
-    const thought = createMockWPThought()
-    const result = generateBlogBreadcrumbJsonLd(thought, 'ja', '/ja/blog')
-
-    expect(result.itemListElement[0].name).toBe('ブログ')
+    expect(result.itemListElement[0].name).toBe(expectedLabel)
   })
 
   it('should generate correct URLs', () => {
@@ -243,16 +235,13 @@ describe('generateBlogListJsonLd', () => {
     expect(result['@type']).toBe('CollectionPage')
   })
 
-  it('should use correct title for English', () => {
-    const result = generateBlogListJsonLd(emptyItems, 'en', '/blog', 1, 1)
+  it.each([
+    ['en', '/blog', 'Blog'],
+    ['ja', '/ja/blog', 'ブログ'],
+  ])('should use correct title for %s', (lang, basePath, expectedTitle) => {
+    const result = generateBlogListJsonLd(emptyItems, lang, basePath, 1, 1)
 
-    expect(result.name).toBe('Blog')
-  })
-
-  it('should use correct title for Japanese', () => {
-    const result = generateBlogListJsonLd(emptyItems, 'ja', '/ja/blog', 1, 1)
-
-    expect(result.name).toBe('ブログ')
+    expect(result.name).toBe(expectedTitle)
   })
 
   it('should include category name in title when provided', () => {
@@ -297,12 +286,13 @@ describe('generateBlogListJsonLd', () => {
     expect(resultPage2.url).toBe('https://hidetaka.dev/blog/page/2')
   })
 
-  it('should set correct inLanguage', () => {
-    const resultEn = generateBlogListJsonLd(emptyItems, 'en', '/blog', 1, 1)
-    const resultJa = generateBlogListJsonLd(emptyItems, 'ja', '/ja/blog', 1, 1)
+  it.each([
+    ['en', '/blog', 'en-US'],
+    ['ja', '/ja/blog', 'ja-JP'],
+  ])('should set correct inLanguage for %s', (lang, basePath, expectedLanguage) => {
+    const result = generateBlogListJsonLd(emptyItems, lang, basePath, 1, 1)
 
-    expect(resultEn.inLanguage).toBe('en-US')
-    expect(resultJa.inLanguage).toBe('ja-JP')
+    expect(result.inLanguage).toBe(expectedLanguage)
   })
 
   it('should include description based on language and category', () => {
