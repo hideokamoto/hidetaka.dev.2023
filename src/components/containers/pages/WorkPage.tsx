@@ -162,7 +162,7 @@ function UnifiedOSSCard({
 }
 
 // OSS Contributionリンク（GitHubリンクのみ）
-function OSSContributionLink({ project, lang }: { project: MicroCMSProjectsRecord; lang: string }) {
+function OSSContributionLink({ project }: { project: MicroCMSProjectsRecord }) {
   return (
     <a
       href={project.url}
@@ -621,7 +621,7 @@ export default function WorkPageContent({
                   </h2>
                   <div className="space-y-3">
                     {filteredOSSContributions.map((project) => (
-                      <OSSContributionLink key={project.id} project={project} lang={lang} />
+                      <OSSContributionLink key={project.id} project={project} />
                     ))}
                   </div>
                 </div>

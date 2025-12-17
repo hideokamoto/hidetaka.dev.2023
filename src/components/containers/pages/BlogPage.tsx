@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import React from 'react'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import PageHeader from '@/components/ui/PageHeader'
