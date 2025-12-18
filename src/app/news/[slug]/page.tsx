@@ -6,9 +6,28 @@ import {
   getProductBySlug,
   getRelatedProducts,
   loadAllProducts,
+  type WPProduct,
 } from '@/libs/dataSources/products'
+import type { WPThought } from '@/libs/dataSources/types'
 import { generateBlogBreadcrumbJsonLd, generateBlogPostingJsonLd } from '@/libs/jsonLd'
 import { generateBlogPostMetadata } from '@/libs/metadata'
+
+// WPProductをWPThoughtに変換するヘルパー関数
+function productToThought(product: WPProduct): WPThought {
+  return {
+    id: product.id,
+    title: product.title,
+    date: product.date,
+    date_gmt: product.date_gmt,
+    modified: product.modified,
+    modified_gmt: product.modified_gmt,
+    excerpt: product.excerpt || { rendered: '' },
+    content: product.content,
+    link: product.link,
+    slug: product.slug,
+    featured_media: product.featured_media,
+  }
+}
 
 export async function generateStaticParams() {
   const products = await loadAllProducts()
@@ -28,17 +47,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 
   // WPProductをWPThought形式に変換してメタデータを生成
-  const thoughtLike = {
-    id: product.id,
-    title: product.title,
-    date: product.date,
-    modified: product.modified,
-    excerpt: product.excerpt || { rendered: '' },
-    content: product.content,
-    slug: product.slug,
-  }
+  const thought = productToThought(product)
 
-  return generateBlogPostMetadata(thoughtLike as any)
+  return generateBlogPostMetadata(thought)
 }
 
 export default async function NewsDetailPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -50,17 +61,9 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ slu
   }
 
   // JSON-LDを生成
-  const thoughtLike = {
-    id: product.id,
-    title: product.title,
-    date: product.date,
-    modified: product.modified,
-    excerpt: product.excerpt || { rendered: '' },
-    content: product.content,
-    slug: product.slug,
-  }
-  const blogPostingJsonLd = generateBlogPostingJsonLd(thoughtLike as any, 'en', '/news')
-  const breadcrumbJsonLd = generateBlogBreadcrumbJsonLd(thoughtLike as any, 'en', '/news')
+  const thought = productToThought(product)
+  const blogPostingJsonLd = generateBlogPostingJsonLd(thought, 'en', '/news')
+  const breadcrumbJsonLd = generateBlogBreadcrumbJsonLd(thought, 'en', '/news')
 
   // 前後の記事と関連記事を取得
   const [adjacentProducts, relatedArticles] = await Promise.all([

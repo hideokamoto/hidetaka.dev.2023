@@ -48,7 +48,7 @@ describe('removeHtmlTags', () => {
   })
 
   it('should return input if falsy', () => {
-    expect(removeHtmlTags(null as any)).toBe(null)
-    expect(removeHtmlTags(undefined as any)).toBe(undefined)
+    expect(removeHtmlTags(null)).toBe(null)
+    expect(removeHtmlTags(undefined)).toBe(undefined)
   })
 })
