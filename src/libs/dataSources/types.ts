@@ -11,6 +11,7 @@ export type FeedItem = {
   datetime: string
   dataSource: FeedDataSource
   image?: string
+  categories?: Category[]
 }
 export type Category = {
   id: number

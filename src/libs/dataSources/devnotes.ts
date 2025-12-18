@@ -228,6 +228,101 @@ export const getRelatedDevNotes = async (
 }
 
 /**
+ * カテゴリで絞り込んでdev-notes記事を取得
+ */
+export const loadDevNotesByCategory = async (
+  categorySlug: string,
+  page: number = 1,
+  perPage: number = 20,
+): Promise<DevNotesResult> => {
+  try {
+    // categorySlugを正規化（デコード済みの形式に統一）
+    let normalizedCategorySlug = categorySlug
+    try {
+      if (categorySlug.includes('%')) {
+        normalizedCategorySlug = decodeURIComponent(categorySlug)
+      }
+    } catch (_e) {
+      // デコードに失敗した場合はそのまま
+    }
+
+    // WordPress APIのcategoriesエンドポイントでslugからIDを取得
+    // dev-notesのカテゴリタクソノミー名を使用
+    const categoryResponse = await fetch(
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-note-category?slug=${encodeURIComponent(normalizedCategorySlug)}`,
+      {
+        next: { revalidate: 1800 }, // 30分ごとに再検証
+      },
+    )
+
+    if (!categoryResponse.ok) {
+      throw new Error(`Failed to fetch category: ${categoryResponse.status}`)
+    }
+
+    const categories = await categoryResponse.json()
+
+    if (categories.length === 0) {
+      // カテゴリが見つからない場合は空の結果を返す
+      return {
+        items: [],
+        totalPages: 0,
+        totalItems: 0,
+        currentPage: page,
+      }
+    }
+
+    const categoryId = categories[0].id
+
+    // WordPress APIのcategoriesパラメータでフィルタリング
+    // dev-notesのカスタムタクソノミー名を使用
+    const response = await fetch(
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?dev-note-category=${categoryId}&page=${page}&per_page=${perPage}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
+      {
+        next: { revalidate: 1800 }, // 30分ごとに再検証
+      },
+    )
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch dev-notes: ${response.status}`)
+    }
+
+    const notes: WPThought[] = await response.json()
+
+    const totalItems = Number.parseInt(response.headers.get('X-WP-Total') || '0', 10)
+    const totalPages = Number.parseInt(response.headers.get('X-WP-TotalPages') || '0', 10)
+
+    const items: BlogItem[] = notes.map((note: WPThought): BlogItem => {
+      const basePath = '/ja/writing/dev-notes'
+      const href = `${basePath}/${note.slug}`
+
+      return {
+        id: note.id.toString(),
+        title: note.title.rendered,
+        description: note.excerpt.rendered.replace(/<[^>]*>/g, '').substring(0, 150),
+        datetime: note.date,
+        href,
+        categories: extractCategories(note),
+      }
+    })
+
+    return {
+      items,
+      totalPages,
+      totalItems,
+      currentPage: page,
+    }
+  } catch (error) {
+    console.error('Error loading dev-notes by category:', error)
+    return {
+      items: [],
+      totalPages: 0,
+      totalItems: 0,
+      currentPage: page,
+    }
+  }
+}
+
+/**
  * すべてのdev-notes記事を取得（sitemap用）
  */
 export const loadAllDevNotes = async (): Promise<BlogItem[]> => {

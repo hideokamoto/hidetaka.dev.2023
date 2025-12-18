@@ -1,9 +1,13 @@
 import { loadDevNotes } from './devnotes'
 import { loadDevToPosts } from './devto'
 import { loadQiitaPosts } from './qiita'
-import type { FeedDataSource, FeedItem } from './types'
+import type { Category, FeedDataSource, FeedItem } from './types'
 import { loadWPPosts } from './wordpress'
 import { loadZennPosts } from './zenn'
+
+export type CategoryWithCount = Category & {
+  count: number
+}
 
 const sourceDevNotes: FeedDataSource = {
   href: '/ja/writing/dev-notes',
@@ -100,6 +104,7 @@ export const loadBlogPosts = async (
       description: item.description,
       datetime: item.datetime,
       dataSource: sourceDevNotes,
+      categories: item.categories,
     }))
 
     // hasMore情報をデータソース名でマッピング
@@ -129,5 +134,56 @@ export const loadBlogPosts = async (
   } catch (error) {
     console.error('Error loading blog posts:', error)
     return { items: [], hasMoreBySource: {} }
+  }
+}
+
+/**
+ * Writingページ用のすべてのカテゴリを取得
+ * Dev Notesの記事からカテゴリを集約して返す
+ */
+export const loadAllCategoriesFromWriting = async (
+  lang: 'ja' | 'en' = 'ja',
+): Promise<CategoryWithCount[]> => {
+  // 英語の場合やDev Notesがない場合は空の配列を返す
+  if (!isJapanese(lang)) {
+    return []
+  }
+
+  try {
+    // Dev Notesから十分な数の記事を取得してカテゴリを抽出
+    const devNotesResult = await loadDevNotes(1, 100).catch(() => ({
+      items: [],
+      totalPages: 0,
+      totalItems: 0,
+      currentPage: 1,
+    }))
+
+    // カテゴリを集計
+    const categoryMap = new Map<string, CategoryWithCount>()
+
+    for (const item of devNotesResult.items) {
+      if (item.categories) {
+        for (const category of item.categories) {
+          const existing = categoryMap.get(category.slug)
+          if (existing) {
+            existing.count++
+          } else {
+            categoryMap.set(category.slug, {
+              ...category,
+              count: 1,
+            })
+          }
+        }
+      }
+    }
+
+    // 配列に変換してソート（記事数の多い順）
+    const categories = Array.from(categoryMap.values())
+    categories.sort((a, b) => b.count - a.count)
+
+    return categories
+  } catch (error) {
+    console.error('Error loading categories from writing:', error)
+    return []
   }
 }

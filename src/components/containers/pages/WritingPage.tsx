@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import FilterItem from '@/components/ui/FilterItem'
@@ -12,10 +12,12 @@ import PageHeader from '@/components/ui/PageHeader'
 import SearchBar from '@/components/ui/SearchBar'
 import SidebarLayout from '@/components/ui/SidebarLayout'
 import Tag from '@/components/ui/Tag'
+import type { CategoryWithCount } from '@/libs/dataSources/blogs'
 import type { FeedItem } from '@/libs/dataSources/types'
 
 type WritingItem = FeedItem
 type FilterDataSource = string | null
+type FilterCategory = string | null
 
 // 統一されたWritingカードコンポーネント
 function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string }) {
@@ -44,7 +46,7 @@ function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string })
       {/* Content */}
       <div className={`p-5 lg:p-6 ${imageUrl ? '' : 'pt-6'}`}>
         <div className="flex flex-col gap-3">
-          {/* Date and DataSource */}
+          {/* Date, DataSource, and Categories */}
           <div className="flex items-center gap-3 flex-wrap">
             <DateDisplay
               date={date}
@@ -57,6 +59,13 @@ function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string })
                 {item.dataSource.name}
               </Tag>
             )}
+            {item.categories &&
+              item.categories.length > 0 &&
+              item.categories.map((category) => (
+                <Tag key={category.id} variant="indigo" size="sm">
+                  {category.name}
+                </Tag>
+              ))}
           </div>
 
           {/* Title */}
@@ -97,8 +106,12 @@ function Sidebar({
   onSearchChange,
   filterDataSource,
   onFilterDataSourceChange,
+  filterCategory,
   availableDataSources,
   dataSourceMap,
+  categories,
+  basePath,
+  currentCategorySlug,
   counts,
   lang,
 }: {
@@ -106,18 +119,29 @@ function Sidebar({
   onSearchChange: (value: string) => void
   filterDataSource: FilterDataSource
   onFilterDataSourceChange: (source: FilterDataSource) => void
+  filterCategory: FilterCategory
   availableDataSources: string[]
   dataSourceMap: Map<string, string>
+  categories: CategoryWithCount[]
+  basePath: string
+  currentCategorySlug?: string
   counts: {
     all: number
     external: number
     byDataSource: Record<string, number>
+    byCategory: Record<string, number>
   }
   lang: string
 }) {
   const searchPlaceholder = lang === 'ja' ? '検索...' : 'Search...'
   const sourceTitle = lang === 'ja' ? 'データソース' : 'Source'
+  const categoryTitle = lang === 'ja' ? 'カテゴリ' : 'Categories'
   const allText = lang === 'ja' ? 'すべて' : 'All'
+
+  // basePathからカテゴリ部分を除去して、Writingのベースパスを取得
+  const writingBasePath = basePath.includes('/category/')
+    ? basePath.split('/category/')[0]
+    : basePath
 
   return (
     <div className="hidden lg:block space-y-6">
@@ -125,6 +149,59 @@ function Sidebar({
       <div>
         <SearchBar value={searchQuery} onChange={onSearchChange} placeholder={searchPlaceholder} />
       </div>
+
+      {/* カテゴリフィルター */}
+      {categories.length > 0 && (
+        <div>
+          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
+            {categoryTitle}
+          </h3>
+          <nav className="space-y-1">
+            <Link
+              href={writingBasePath}
+              className={`w-full flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${
+                !currentCategorySlug && filterCategory === null
+                  ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'
+                  : 'text-slate-700 hover:bg-zinc-50 dark:text-slate-300 dark:hover:bg-zinc-800'
+              }`}
+            >
+              <span>{allText}</span>
+            </Link>
+            {categories.map((category) => {
+              const normalizedSlug = category.slug.includes('%')
+                ? decodeURIComponent(category.slug)
+                : category.slug
+              const categoryUrl = `${writingBasePath}/category/${encodeURIComponent(normalizedSlug)}`
+              const isActive =
+                currentCategorySlug === category.slug ||
+                currentCategorySlug === normalizedSlug ||
+                filterCategory === category.slug
+              return (
+                <Link
+                  key={category.id}
+                  href={categoryUrl}
+                  className={`w-full flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${
+                    isActive
+                      ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'
+                      : 'text-slate-700 hover:bg-zinc-50 dark:text-slate-300 dark:hover:bg-zinc-800'
+                  }`}
+                >
+                  <span>{category.name}</span>
+                  <span
+                    className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
+                      isActive
+                        ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300'
+                        : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400'
+                    }`}
+                  >
+                    {category.count > 20 ? '20+' : category.count}
+                  </span>
+                </Link>
+              )
+            })}
+          </nav>
+        </div>
+      )}
 
       {/* データソースフィルター */}
       {availableDataSources.length > 0 && (
@@ -188,13 +265,20 @@ export default function WritingPageContent({
   lang,
   externalArticles,
   hasMoreBySource = {},
+  categoryName,
+  categories = [],
+  basePath = '/ja/writing',
 }: {
   lang: string
   externalArticles: FeedItem[]
   hasMoreBySource?: Record<string, boolean>
+  categoryName?: string
+  categories?: CategoryWithCount[]
+  basePath?: string
 }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [filterDataSource, setFilterDataSource] = useState<FilterDataSource>(null)
+  const [filterCategory, setFilterCategory] = useState<FilterCategory>(null)
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
 
   // 全記事を統合
@@ -222,14 +306,17 @@ export default function WritingPageContent({
   }, [externalArticles])
 
   // 検索フィルター関数
-  const matchesSearch = (item: WritingItem): boolean => {
-    if (!searchQuery.trim()) return true
-    const query = searchQuery.toLowerCase()
-    const title = item.title.toLowerCase()
-    const description = item.description.toLowerCase()
+  const matchesSearch = useCallback(
+    (item: WritingItem): boolean => {
+      if (!searchQuery.trim()) return true
+      const query = searchQuery.toLowerCase()
+      const title = item.title.toLowerCase()
+      const description = item.description.toLowerCase()
 
-    return title.includes(query) || description.includes(query)
-  }
+      return title.includes(query) || description.includes(query)
+    },
+    [searchQuery],
+  )
 
   // フィルターと検索を適用
   const filteredItems = useMemo(() => {
@@ -237,6 +324,13 @@ export default function WritingPageContent({
       // データソースフィルター
       if (filterDataSource !== null) {
         if (!item.dataSource || item.dataSource.name !== filterDataSource) return false
+      }
+
+      // カテゴリフィルター
+      if (filterCategory !== null) {
+        if (!item.categories || item.categories.length === 0) return false
+        const hasCategory = item.categories.some((cat) => cat.slug === filterCategory)
+        if (!hasCategory) return false
       }
 
       return true
@@ -251,11 +345,12 @@ export default function WritingPageContent({
     })
 
     return items
-  }, [allItems, filterDataSource, matchesSearch])
+  }, [allItems, filterDataSource, filterCategory, matchesSearch])
 
   // カウント計算
   const counts = useMemo(() => {
     const byDataSource: Record<string, number> = {}
+    const byCategory: Record<string, number> = {}
 
     // データソース別カウント（20件以上ある場合は「20+」として扱う）
     availableDataSources.forEach((source) => {
@@ -266,34 +361,85 @@ export default function WritingPageContent({
       byDataSource[source] = hasMoreBySource[source] ? 21 : count
     })
 
+    // カテゴリ別カウント
+    categories.forEach((category) => {
+      const count = externalArticles.filter(
+        (article) =>
+          article.categories &&
+          article.categories.length > 0 &&
+          article.categories.some((cat) => cat.slug === category.slug),
+      ).length
+      byCategory[category.slug] = count
+    })
+
     return {
       all: allItems.length,
       external: externalArticles.length,
       byDataSource,
+      byCategory,
     }
-  }, [allItems, externalArticles, availableDataSources, hasMoreBySource])
+  }, [allItems, externalArticles, availableDataSources, hasMoreBySource, categories])
 
   // テキスト
-  const title = lang === 'ja' ? 'Writing' : 'Writing'
-  const description =
-    lang === 'ja'
+  const title = categoryName
+    ? lang === 'ja'
+      ? `カテゴリ: ${categoryName}`
+      : `Category: ${categoryName}`
+    : lang === 'ja'
+      ? 'Writing'
+      : 'Writing'
+  const description = categoryName
+    ? lang === 'ja'
+      ? `「${categoryName}」カテゴリの記事一覧です。`
+      : `Articles in the "${categoryName}" category.`
+    : lang === 'ja'
       ? '技術記事、ブログ投稿、ニュースなどの執筆活動を紹介しています。'
       : "A collection of technical articles, blog posts, news, and other writing I've published."
   const filterButtonText = lang === 'ja' ? 'フィルター' : 'Filter'
+
+  // 現在のカテゴリslugを取得（URLから）
+  const currentCategorySlug = categoryName
+    ? categories.find((cat) => cat.name === categoryName)?.slug
+    : undefined
 
   // アクティブなフィルターの数を計算
   const activeFilterCount = useMemo(() => {
     let count = 0
     if (filterDataSource !== null) count++
+    if (filterCategory !== null) count++
     return count
-  }, [filterDataSource])
+  }, [filterDataSource, filterCategory])
 
   // フィルターグループを構築
   const filterGroups = useMemo<FilterGroup[]>(() => {
     const allText = lang === 'ja' ? 'すべて' : 'All'
     const sourceTitle = lang === 'ja' ? 'データソース' : 'Source'
+    const categoryTitle = lang === 'ja' ? 'カテゴリ' : 'Categories'
 
     const groups: FilterGroup[] = []
+
+    // カテゴリフィルター
+    if (categories.length > 0) {
+      groups.push({
+        title: categoryTitle,
+        items: [
+          {
+            id: 'category-all',
+            label: allText,
+            active: filterCategory === null,
+            count: counts.all,
+            onClick: () => setFilterCategory(null),
+          },
+          ...categories.map((category) => ({
+            id: `category-${category.slug}`,
+            label: category.name,
+            active: filterCategory === category.slug,
+            count: counts.byCategory[category.slug] || 0,
+            onClick: () => setFilterCategory(category.slug),
+          })),
+        ],
+      })
+    }
 
     // データソースフィルター
     if (availableDataSources.length > 0) {
@@ -320,7 +466,15 @@ export default function WritingPageContent({
     }
 
     return groups
-  }, [lang, filterDataSource, availableDataSources, counts, dataSourceMap.get])
+  }, [
+    lang,
+    filterDataSource,
+    filterCategory,
+    availableDataSources,
+    categories,
+    counts,
+    dataSourceMap.get,
+  ])
 
   return (
     <>
@@ -362,8 +516,12 @@ export default function WritingPageContent({
                 onSearchChange={setSearchQuery}
                 filterDataSource={filterDataSource}
                 onFilterDataSourceChange={setFilterDataSource}
+                filterCategory={filterCategory}
                 availableDataSources={availableDataSources}
                 dataSourceMap={dataSourceMap}
+                categories={categories}
+                basePath={basePath}
+                currentCategorySlug={currentCategorySlug}
                 counts={counts}
                 lang={lang}
               />
