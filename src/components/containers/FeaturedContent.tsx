@@ -8,27 +8,21 @@ import { loadBlogPosts } from '@/libs/dataSources/blogs'
 import type { FeedItem } from '@/libs/dataSources/types'
 import { MicroCMSAPI } from '@/libs/microCMS/apis'
 import { createMicroCMSClient } from '@/libs/microCMS/client'
-import type {
-  MicroCMSEventsRecord,
-  MicroCMSPostsRecord,
-  MicroCMSProjectsRecord,
-} from '@/libs/microCMS/types'
+import type { MicroCMSEventsRecord, MicroCMSProjectsRecord } from '@/libs/microCMS/types'
 
 // ============================================================================
 // Unified Content Types & Helpers
 // ============================================================================
 
 type UnifiedContentItem =
-  | { type: 'article'; data: FeedItem | MicroCMSPostsRecord }
+  | { type: 'article'; data: FeedItem }
   | { type: 'project'; data: MicroCMSProjectsRecord }
   | { type: 'event'; data: MicroCMSEventsRecord }
 
 function _getContentDate(item: UnifiedContentItem): Date {
   switch (item.type) {
     case 'article': {
-      const article = item.data
-      const dateStr = 'datetime' in article ? article.datetime : article.publishedAt
-      return new Date(dateStr)
+      return new Date(item.data.datetime)
     }
     case 'project':
       return item.data.published_at ? new Date(item.data.published_at) : new Date(0)
@@ -46,21 +40,14 @@ function ArticleCard({
   lang,
   variant = 'default',
 }: {
-  article: FeedItem | MicroCMSPostsRecord
+  article: FeedItem
   lang: string
   variant?: 'featured' | 'default'
 }) {
-  const isFeedItem = 'dataSource' in article
-  const href = isFeedItem
-    ? article.href
-    : lang === 'ja'
-      ? `/ja/writing/${article.id}`
-      : `/writing/${article.id}`
+  const href = article.href
   const title = article.title
-  const description = isFeedItem
-    ? article.description
-    : article.content.replace(/<[^>]*>/g, '').substring(0, variant === 'featured' ? 200 : 120)
-  const datetime = isFeedItem ? article.datetime : article.publishedAt
+  const description = article.description
+  const datetime = article.datetime
 
   // Parse date properly - handle RFC 822 format from RSS feeds
   let date: Date
@@ -77,17 +64,10 @@ function ArticleCard({
   }
 
   const CardWrapper = ({ children }: { children: React.ReactNode }) => {
-    if (isFeedItem) {
-      return (
-        <a href={href} target="_blank" rel="noopener noreferrer" className="group block h-full">
-          {children}
-        </a>
-      )
-    }
     return (
-      <Link href={href} className="group block h-full">
+      <a href={href} target="_blank" rel="noopener noreferrer" className="group block h-full">
         {children}
-      </Link>
+      </a>
     )
   }
 
@@ -103,7 +83,7 @@ function ArticleCard({
                 format="short"
                 className="text-sm font-bold text-indigo-600 dark:text-indigo-400"
               />
-              {isFeedItem && article.dataSource && (
+              {article.dataSource && (
                 <Tag variant="indigo" size="md" className="px-4 py-1.5 font-bold">
                   {article.dataSource.name}
                 </Tag>
@@ -120,7 +100,7 @@ function ArticleCard({
             </p>
 
             <div className="mt-auto flex items-center gap-2 text-sm font-bold text-indigo-600 dark:text-indigo-400">
-              <span>{lang === 'ja' ? '続きを読む' : 'Read article'}</span>
+              <span>{lang === 'ja' ? '記事を読む' : 'Read article'}</span>
               <span className="transition-transform group-hover:translate-x-1">→</span>
             </div>
           </div>
@@ -139,7 +119,7 @@ function ArticleCard({
             format="short"
             className="text-xs font-semibold text-slate-500 dark:text-slate-400"
           />
-          {isFeedItem && article.dataSource && (
+          {article.dataSource && (
             <Tag variant="default" size="sm" className="text-[10px]">
               {article.dataSource.name}
             </Tag>
@@ -315,18 +295,13 @@ export default async function FeaturedContent({ lang }: { lang: string }) {
 
   // Fetch all content
   const { items: externalPosts } = await loadBlogPosts(lang === 'ja' ? 'ja' : 'en')
-  const newsPosts = await microCMS.listPosts({ lang: lang === 'ja' ? 'japanese' : 'english' })
   const allProjects = await microCMS.listAllProjects()
   const allEvents = await microCMS.listEndedEvents()
 
   // Prepare unified content
-  const articles: Array<FeedItem | MicroCMSPostsRecord> = [...externalPosts, ...newsPosts].sort(
-    (a, b) => {
-      const dateA = 'datetime' in a ? a.datetime : a.publishedAt
-      const dateB = 'datetime' in b ? b.datetime : b.publishedAt
-      return new Date(dateB).getTime() - new Date(dateA).getTime()
-    },
-  )
+  const articles: FeedItem[] = externalPosts.sort((a, b) => {
+    return new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
+  })
 
   const projects = allProjects
     .filter((p) => p.published_at)
@@ -381,8 +356,8 @@ export default async function FeaturedContent({ lang }: { lang: string }) {
 
                 {/* Other Articles */}
                 <div className="grid gap-6 lg:grid-cols-1">
-                  {otherArticles.map((article, index) => (
-                    <ArticleCard key={index} article={article} lang={lang} />
+                  {otherArticles.map((article) => (
+                    <ArticleCard key={article.href} article={article} lang={lang} />
                   ))}
                 </div>
               </div>

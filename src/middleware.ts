@@ -41,6 +41,14 @@ export function middleware(request: NextRequest) {
     const newPath = pathname.replace('/ja/articles', '/ja/writing')
     return NextResponse.redirect(new URL(newPath, request.url))
   }
+  // /writing/[id] → /news/ (microCMS posts API廃止に伴う移行)
+  if (pathname.startsWith('/writing/') && pathname !== '/writing/') {
+    return NextResponse.redirect(new URL('/news/', request.url))
+  }
+  // /ja/writing/[id] → /ja/news/
+  if (pathname.startsWith('/ja/writing/') && pathname !== '/ja/writing/') {
+    return NextResponse.redirect(new URL('/ja/news/', request.url))
+  }
 
   return NextResponse.next()
 }

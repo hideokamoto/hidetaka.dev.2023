@@ -1,11 +1,6 @@
 import dayjs from 'dayjs'
-import { MICROCMS_MOCK_BOOKs, MICROCMS_MOCK_EVENTs, MICROCMS_MOCK_POSTs } from './mocks'
-import type {
-  MicroCMSClient,
-  MicroCMSEventsRecord,
-  MicroCMSPostsRecord,
-  MicroCMSProjectsRecord,
-} from './types'
+import { MICROCMS_MOCK_BOOKs, MICROCMS_MOCK_EVENTs } from './mocks'
+import type { MicroCMSClient, MicroCMSEventsRecord, MicroCMSProjectsRecord } from './types'
 
 export class MicroCMSAPI {
   private readonly client: MicroCMSClient
@@ -137,72 +132,6 @@ export class MicroCMSAPI {
       }),
     ]
   }
-  public async listPosts(query?: {
-    lang?: 'japanese' | 'english'
-  }): Promise<MicroCMSPostsRecord[]> {
-    if (!this.client) {
-      if (process.env.MICROCMS_API_MODE === 'mock') {
-        return MICROCMS_MOCK_POSTs
-      }
-      return []
-    }
-    const lang = query?.lang ?? null
-    const { contents: posts } = await this.client.get<{
-      contents: MicroCMSPostsRecord[]
-    }>({
-      endpoint: 'posts',
-      queries: {
-        orders: '-publishedAt',
-        filters: [lang ? `lang[contains]${query?.lang}` : undefined].filter(Boolean).join('[and]'),
-        limit: 50,
-      },
-    })
-    return posts
-  }
-
-  public async getPost(id: string): Promise<MicroCMSPostsRecord | null> {
-    if (!this.client) {
-      if (process.env.MICROCMS_API_MODE === 'mock') {
-        const post = MICROCMS_MOCK_POSTs.find((post) => post.id === id)
-        return post || null
-      }
-      return null
-    }
-    try {
-      const post = await this.client.get<MicroCMSPostsRecord>({
-        endpoint: 'posts',
-        contentId: id,
-      })
-      return post
-    } catch (error) {
-      console.error('Error fetching post:', error)
-      return null
-    }
-  }
-
-  /**
-   * すべての投稿記事を取得（sitemap用）
-   */
-  public async listAllPosts(query?: {
-    lang?: 'japanese' | 'english'
-  }): Promise<MicroCMSPostsRecord[]> {
-    if (!this.client) {
-      if (process.env.MICROCMS_API_MODE === 'mock') {
-        return MICROCMS_MOCK_POSTs
-      }
-      return []
-    }
-    const lang = query?.lang ?? null
-    const posts = await this.client.getAllContents<MicroCMSPostsRecord>({
-      endpoint: 'posts',
-      queries: {
-        orders: '-publishedAt',
-        filters: [lang ? `lang[contains]${query?.lang}` : undefined].filter(Boolean).join('[and]'),
-      },
-    })
-    return posts
-  }
-
   /**
    * すべてのイベントを取得（sitemap用）
    */
