@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import FilterItem from '@/components/ui/FilterItem'
@@ -353,6 +353,115 @@ function Sidebar({
   )
 }
 
+// フィルターグループ作成のヘルパー関数
+type FilterGroupCounts = {
+  all: number
+  byType: Record<string, number>
+  byPlace: Record<string, number>
+  byYear: Record<string, number>
+}
+
+function createTypeFilterGroup(
+  lang: string,
+  filterType: FilterType,
+  counts: FilterGroupCounts,
+  setFilterType: (type: FilterType) => void,
+): FilterGroup {
+  const allText = lang === 'ja' ? 'すべて' : 'All'
+  const typeTitle = lang === 'ja' ? 'タイプ' : 'Type'
+  const announcementText = lang === 'ja' ? '告知' : 'Announcement'
+  const reportText = lang === 'ja' ? 'レポート' : 'Report'
+
+  return {
+    title: typeTitle,
+    items: [
+      {
+        id: 'type-all',
+        label: allText,
+        active: filterType === null,
+        count: counts.all,
+        onClick: () => setFilterType(null),
+      },
+      {
+        id: 'type-announcement',
+        label: announcementText,
+        active: filterType === 'announcement',
+        count: counts.byType.announcement || 0,
+        onClick: () => setFilterType('announcement'),
+      },
+      {
+        id: 'type-report',
+        label: reportText,
+        active: filterType === 'report',
+        count: counts.byType.report || 0,
+        onClick: () => setFilterType('report'),
+      },
+    ],
+  }
+}
+
+function createPlaceFilterGroup(
+  lang: string,
+  filterPlace: FilterPlace,
+  availablePlaces: string[],
+  counts: FilterGroupCounts,
+  setFilterPlace: (place: FilterPlace) => void,
+): FilterGroup {
+  const allText = lang === 'ja' ? 'すべて' : 'All'
+  const placeTitle = lang === 'ja' ? '場所' : 'Place'
+
+  return {
+    title: placeTitle,
+    items: [
+      {
+        id: 'place-all',
+        label: allText,
+        active: filterPlace === null,
+        count: counts.all,
+        onClick: () => setFilterPlace(null),
+      },
+      ...availablePlaces.map((place) => ({
+        id: `place-${place}`,
+        label: place,
+        active: filterPlace === place,
+        count: counts.byPlace[place] || 0,
+        onClick: () => setFilterPlace(place),
+      })),
+    ],
+  }
+}
+
+function createYearFilterGroup(
+  lang: string,
+  filterYear: FilterYear,
+  availableYears: string[],
+  counts: FilterGroupCounts,
+  setFilterYear: (year: FilterYear) => void,
+): FilterGroup {
+  const allText = lang === 'ja' ? 'すべて' : 'All'
+  const yearTitle = lang === 'ja' ? '年' : 'Year'
+
+  return {
+    title: yearTitle,
+    items: [
+      {
+        id: 'year-all',
+        label: allText,
+        active: filterYear === null,
+        count: counts.all,
+        onClick: () => setFilterYear(null),
+      },
+      ...availableYears.map((year) => ({
+        id: `year-${year}`,
+        label: year,
+        active: filterYear === year,
+        count: counts.byYear[year] || 0,
+        onClick: () => setFilterYear(year),
+      })),
+    ],
+  }
+}
+
 export default function SpeakingPageContent({
   lang,
   events,
@@ -391,26 +500,31 @@ export default function SpeakingPageContent({
   }, [events])
 
   // 検索フィルター関数
-  const matchesSearch = (event: UnifiedEvent): boolean => {
-    if (!searchQuery.trim()) return true
-    const query = searchQuery.toLowerCase()
-    const title =
-      event.type === 'announcement' ? event.title.toLowerCase() : event.title.rendered.toLowerCase()
-    const description =
-      event.type === 'announcement'
-        ? (event.description || '').toLowerCase()
-        : (event.excerpt.rendered || '').toLowerCase()
-    const sessionTitle =
-      event.type === 'announcement' ? (event.session_title || '').toLowerCase() : ''
-    const place = event.type === 'announcement' ? (event.place || '').toLowerCase() : ''
+  const matchesSearch = useCallback(
+    (event: UnifiedEvent): boolean => {
+      if (!searchQuery.trim()) return true
+      const query = searchQuery.toLowerCase()
+      const title =
+        event.type === 'announcement'
+          ? event.title.toLowerCase()
+          : event.title.rendered.toLowerCase()
+      const description =
+        event.type === 'announcement'
+          ? (event.description || '').toLowerCase()
+          : (event.excerpt.rendered || '').toLowerCase()
+      const sessionTitle =
+        event.type === 'announcement' ? (event.session_title || '').toLowerCase() : ''
+      const place = event.type === 'announcement' ? (event.place || '').toLowerCase() : ''
 
-    return (
-      title.includes(query) ||
-      description.includes(query) ||
-      sessionTitle.includes(query) ||
-      place.includes(query)
-    )
-  }
+      return (
+        title.includes(query) ||
+        description.includes(query) ||
+        sessionTitle.includes(query) ||
+        place.includes(query)
+      )
+    },
+    [searchQuery],
+  )
 
   // フィルターと検索を適用
   const filteredEvents = useMemo(() => {
@@ -502,87 +616,21 @@ export default function SpeakingPageContent({
 
   // フィルターグループを構築
   const filterGroups = useMemo<FilterGroup[]>(() => {
-    const typeTitle = lang === 'ja' ? 'タイプ' : 'Type'
-    const placeTitle = lang === 'ja' ? '場所' : 'Place'
-    const yearTitle = lang === 'ja' ? '年' : 'Year'
-    const allText = lang === 'ja' ? 'すべて' : 'All'
-    const announcementText = lang === 'ja' ? '告知' : 'Announcement'
-    const reportText = lang === 'ja' ? 'レポート' : 'Report'
-
     const groups: FilterGroup[] = []
 
     // タイプフィルター
-    groups.push({
-      title: typeTitle,
-      items: [
-        {
-          id: 'type-all',
-          label: allText,
-          active: filterType === null,
-          count: counts.all,
-          onClick: () => setFilterType(null),
-        },
-        {
-          id: 'type-announcement',
-          label: announcementText,
-          active: filterType === 'announcement',
-          count: counts.byType.announcement || 0,
-          onClick: () => setFilterType('announcement'),
-        },
-        {
-          id: 'type-report',
-          label: reportText,
-          active: filterType === 'report',
-          count: counts.byType.report || 0,
-          onClick: () => setFilterType('report'),
-        },
-      ],
-    })
+    groups.push(createTypeFilterGroup(lang, filterType, counts, setFilterType))
 
     // 場所フィルター
     if (availablePlaces.length > 0) {
-      groups.push({
-        title: placeTitle,
-        items: [
-          {
-            id: 'place-all',
-            label: allText,
-            active: filterPlace === null,
-            count: counts.all,
-            onClick: () => setFilterPlace(null),
-          },
-          ...availablePlaces.map((place) => ({
-            id: `place-${place}`,
-            label: place,
-            active: filterPlace === place,
-            count: counts.byPlace[place] || 0,
-            onClick: () => setFilterPlace(place),
-          })),
-        ],
-      })
+      groups.push(
+        createPlaceFilterGroup(lang, filterPlace, availablePlaces, counts, setFilterPlace),
+      )
     }
 
     // 年フィルター
     if (availableYears.length > 0) {
-      groups.push({
-        title: yearTitle,
-        items: [
-          {
-            id: 'year-all',
-            label: allText,
-            active: filterYear === null,
-            count: counts.all,
-            onClick: () => setFilterYear(null),
-          },
-          ...availableYears.map((year) => ({
-            id: `year-${year}`,
-            label: year,
-            active: filterYear === year,
-            count: counts.byYear[year] || 0,
-            onClick: () => setFilterYear(year),
-          })),
-        ],
-      })
+      groups.push(createYearFilterGroup(lang, filterYear, availableYears, counts, setFilterYear))
     }
 
     return groups
