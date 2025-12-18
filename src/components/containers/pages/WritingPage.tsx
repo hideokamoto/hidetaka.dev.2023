@@ -347,30 +347,42 @@ export default function WritingPageContent({
     return items
   }, [allItems, filterDataSource, filterCategory, matchesSearch])
 
-  // カウント計算
+  // カウント計算（最適化: 記事を一度だけループ）
   const counts = useMemo(() => {
     const byDataSource: Record<string, number> = {}
     const byCategory: Record<string, number> = {}
 
-    // データソース別カウント（20件以上ある場合は「20+」として扱う）
-    availableDataSources.forEach((source) => {
-      const count = externalArticles.filter(
-        (article) => article.dataSource && article.dataSource.name === source,
-      ).length
-      // hasMoreBySourceがある場合は20+として扱う（実際のカウントは20だが、表示は20+）
-      byDataSource[source] = hasMoreBySource[source] ? 21 : count
-    })
+    // データソースとカテゴリを初期化
+    for (const source of availableDataSources) {
+      byDataSource[source] = 0
+    }
+    for (const category of categories) {
+      byCategory[category.slug] = 0
+    }
 
-    // カテゴリ別カウント
-    categories.forEach((category) => {
-      const count = externalArticles.filter(
-        (article) =>
-          article.categories &&
-          article.categories.length > 0 &&
-          article.categories.some((cat) => cat.slug === category.slug),
-      ).length
-      byCategory[category.slug] = count
-    })
+    // 記事を一度だけループしてカウント（O(N)）
+    for (const article of externalArticles) {
+      // データソース別カウント
+      if (article.dataSource && article.dataSource.name in byDataSource) {
+        byDataSource[article.dataSource.name]++
+      }
+
+      // カテゴリ別カウント
+      if (article.categories && article.categories.length > 0) {
+        for (const cat of article.categories) {
+          if (cat.slug in byCategory) {
+            byCategory[cat.slug]++
+          }
+        }
+      }
+    }
+
+    // hasMoreBySourceがある場合は20+として扱う
+    for (const source of availableDataSources) {
+      if (hasMoreBySource[source]) {
+        byDataSource[source] = 21
+      }
+    }
 
     return {
       all: allItems.length,
@@ -473,7 +485,7 @@ export default function WritingPageContent({
     availableDataSources,
     categories,
     counts,
-    dataSourceMap.get,
+    dataSourceMap,
   ])
 
   return (
