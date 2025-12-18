@@ -24,6 +24,7 @@ jobs:
       test: ${{ steps.filter.outputs.test }}
       build: ${{ steps.filter.outputs.build }}
       cf-build: ${{ steps.filter.outputs.cf-build }}
+      workflow: ${{ steps.filter.outputs.workflow }}
     steps:
       - uses: actions/checkout@v4
 
@@ -58,13 +59,15 @@ jobs:
               - 'wrangler.jsonc'
               - 'package.json'
               - 'package-lock.json'
+            workflow:
+              - '.github/workflows/test.yml'
 
   lint:
     name: Lint
     runs-on: ubuntu-latest
     timeout-minutes: 5
     needs: changes
-    if: needs.changes.outputs.lint == 'true'
+    if: needs.changes.outputs.lint == 'true' || needs.changes.outputs.workflow == 'true'
 
     steps:
       - uses: actions/checkout@v4
@@ -85,8 +88,8 @@ jobs:
     name: Unit Tests
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: changes
-    if: needs.changes.outputs.test == 'true'
+    needs: [changes, lint]
+    if: needs.changes.outputs.workflow == 'true' || (needs.changes.outputs.test == 'true' && needs.lint.conclusion != 'failure')
 
     steps:
       - uses: actions/checkout@v4
@@ -116,8 +119,8 @@ jobs:
     name: Next.js Build
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: changes
-    if: needs.changes.outputs.build == 'true'
+    needs: [changes, lint]
+    if: needs.changes.outputs.workflow == 'true' || (needs.changes.outputs.build == 'true' && needs.lint.conclusion != 'failure')
 
     steps:
       - uses: actions/checkout@v4
@@ -140,8 +143,8 @@ jobs:
     name: OpenNext Build
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: changes
-    if: needs.changes.outputs.cf-build == 'true'
+    needs: [changes, lint]
+    if: needs.changes.outputs.workflow == 'true' || (needs.changes.outputs.cf-build == 'true' && needs.lint.conclusion != 'failure')
 
     steps:
       - uses: actions/checkout@v4
