@@ -1,4 +1,5 @@
 import { createClient } from 'microcms-js-sdk'
+import { reportMissingMicroCMSApiKey } from '../sentry'
 import type { MicroCMSClient } from './types'
 
 export const createMicroCMSClient = (): MicroCMSClient => {
@@ -11,9 +12,8 @@ export const createMicroCMSClient = (): MicroCMSClient => {
     })
   }
 
-  console.log({
-    message: 'Failed to load the microcms API keys',
-  })
+  // Report missing API key to Sentry (only once per process)
+  reportMissingMicroCMSApiKey()
 
   return {
     async get(props) {
