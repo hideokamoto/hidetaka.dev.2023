@@ -85,7 +85,7 @@ jobs:
     name: Unit Tests
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: changes
+    needs: [changes, lint]
     if: needs.changes.outputs.test == 'true'
 
     steps:
@@ -116,7 +116,7 @@ jobs:
     name: Next.js Build
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: changes
+    needs: [changes, lint]
     if: needs.changes.outputs.build == 'true'
 
     steps:
@@ -140,7 +140,7 @@ jobs:
     name: OpenNext Build
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: changes
+    needs: [changes, lint]
     if: needs.changes.outputs.cf-build == 'true'
 
     steps:
