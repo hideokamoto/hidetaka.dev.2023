@@ -99,15 +99,12 @@ export default function DevNoteDetailPage({
                 .filter((term) => term.taxonomy === 'category')
                 .map((category) => {
                   // category.slugが既にエンコードされている可能性があるので、一度デコードしてからエンコード
-                  // malformed percent-encodingの場合はそのまま使用
+                  // malformed percent-encodingの場合は初期値をそのまま使用
                   let normalizedSlug = category.slug
-                  if (category.slug.includes('%')) {
-                    try {
-                      normalizedSlug = decodeURIComponent(category.slug)
-                    } catch {
-                      // malformed percent-encoding (e.g., 'foo%bar') の場合はそのまま使用
-                      normalizedSlug = category.slug
-                    }
+                  try {
+                    normalizedSlug = decodeURIComponent(category.slug)
+                  } catch {
+                    // decodeURIComponentが失敗した場合は初期値(category.slug)を使用
                   }
                   const categoryUrl = `/ja/writing/category/${encodeURIComponent(normalizedSlug)}`
                   return (
