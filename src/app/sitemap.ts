@@ -109,28 +109,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('Error loading projects for sitemap:', error)
   }
 
-  // 投稿記事
-  let postPages: MetadataRoute.Sitemap = []
-  try {
-    const [enPosts, jaPosts] = await Promise.all([
-      microCMS.listAllPosts({ lang: 'english' }),
-      microCMS.listAllPosts({ lang: 'japanese' }),
-    ])
-
-    postPages = [
-      ...enPosts.flatMap((post) => {
-        const lastModified = post.updatedAt ? new Date(post.updatedAt) : undefined
-        return createEntriesForPaths(['/writing'], post.id, lastModified, 'monthly', 0.7)
-      }),
-      ...jaPosts.flatMap((post) => {
-        const lastModified = post.updatedAt ? new Date(post.updatedAt) : undefined
-        return createEntriesForPaths(['/ja/writing'], post.id, lastModified, 'monthly', 0.7)
-      }),
-    ]
-  } catch (error) {
-    console.error('Error loading posts for sitemap:', error)
-  }
-
   // 製品ニュース（WordPress API products）
   let productNewsPages: MetadataRoute.Sitemap = []
   try {
@@ -163,12 +141,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('Error loading dev-notes for sitemap:', error)
   }
 
-  return [
-    ...staticPages,
-    ...blogPages,
-    ...projectPages,
-    ...postPages,
-    ...productNewsPages,
-    ...devNotesPages,
-  ]
+  return [...staticPages, ...blogPages, ...projectPages, ...productNewsPages, ...devNotesPages]
 }
