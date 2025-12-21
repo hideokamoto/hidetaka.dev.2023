@@ -1,63 +1,24 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
+import { createRedirectRules, RedirectRuleEngine } from '@/libs/middleware/redirectRules'
+
+// リダイレクトルールエンジンを初期化（シングルトン）
+const redirectEngine = new RedirectRuleEngine(createRedirectRules())
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
+  const baseUrl = request.url.split(request.nextUrl.pathname)[0]
 
-  // /ja-JP/* を /ja/* にリダイレクト
+  // /ja-JP/* を /ja/* にリダイレクト（特別なルール）
   if (pathname.startsWith('/ja-JP')) {
     const newPath = pathname.replace('/ja-JP', '/ja')
     return NextResponse.redirect(new URL(newPath, request.url))
   }
 
-  // 旧URLを新URLにリダイレクト
-  // /projects → /work
-  if (pathname === '/projects' || pathname.startsWith('/projects/')) {
-    const newPath = pathname.replace('/projects', '/work')
-    return NextResponse.redirect(new URL(newPath, request.url))
-  }
-  // /ja/projects → /ja/work
-  if (pathname === '/ja/projects' || pathname.startsWith('/ja/projects/')) {
-    const newPath = pathname.replace('/ja/projects', '/ja/work')
-    return NextResponse.redirect(new URL(newPath, request.url))
-  }
-  // /oss → /work
-  if (pathname === '/oss' || pathname.startsWith('/oss/')) {
-    const newPath = pathname.replace('/oss', '/work')
-    return NextResponse.redirect(new URL(newPath, request.url))
-  }
-  // /ja/oss → /ja/work
-  if (pathname === '/ja/oss' || pathname.startsWith('/ja/oss/')) {
-    const newPath = pathname.replace('/ja/oss', '/ja/work')
-    return NextResponse.redirect(new URL(newPath, request.url))
-  }
-  // /articles → /writing
-  if (pathname === '/articles' || pathname.startsWith('/articles/')) {
-    const newPath = pathname.replace('/articles', '/writing')
-    return NextResponse.redirect(new URL(newPath, request.url))
-  }
-  // /ja/articles → /ja/writing
-  if (pathname === '/ja/articles' || pathname.startsWith('/ja/articles/')) {
-    const newPath = pathname.replace('/ja/articles', '/ja/writing')
-    return NextResponse.redirect(new URL(newPath, request.url))
-  }
-  // /writing/[id] → /news/ (microCMS posts API廃止に伴う移行)
-  // dev-notesパスは除外（dev-notesは独自のルーティングを使用）
-  if (
-    pathname.startsWith('/writing/') &&
-    pathname !== '/writing/' &&
-    !pathname.startsWith('/writing/dev-notes/')
-  ) {
-    return NextResponse.redirect(new URL('/news/', request.url))
-  }
-  // /ja/writing/[id] → /ja/news/
-  // dev-notesパスは除外（dev-notesは独自のルーティングを使用）
-  if (
-    pathname.startsWith('/ja/writing/') &&
-    pathname !== '/ja/writing/' &&
-    !pathname.startsWith('/ja/writing/dev-notes/')
-  ) {
-    return NextResponse.redirect(new URL('/ja/news/', request.url))
+  // リダイレクトルールエンジンで判定
+  if (redirectEngine.shouldRedirect(pathname, baseUrl)) {
+    const redirectUrl = redirectEngine.getRedirectPath(pathname, baseUrl)
+    return NextResponse.redirect(new URL(redirectUrl))
   }
 
   return NextResponse.next()
