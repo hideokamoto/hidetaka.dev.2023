@@ -42,11 +42,21 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(newPath, request.url))
   }
   // /writing/[id] → /news/ (microCMS posts API廃止に伴う移行)
-  if (pathname.startsWith('/writing/') && pathname !== '/writing/') {
+  // dev-notesパスは除外（dev-notesは独自のルーティングを使用）
+  if (
+    pathname.startsWith('/writing/') &&
+    pathname !== '/writing/' &&
+    !pathname.startsWith('/writing/dev-notes/')
+  ) {
     return NextResponse.redirect(new URL('/news/', request.url))
   }
   // /ja/writing/[id] → /ja/news/
-  if (pathname.startsWith('/ja/writing/') && pathname !== '/ja/writing/') {
+  // dev-notesパスは除外（dev-notesは独自のルーティングを使用）
+  if (
+    pathname.startsWith('/ja/writing/') &&
+    pathname !== '/ja/writing/' &&
+    !pathname.startsWith('/ja/writing/dev-notes/')
+  ) {
     return NextResponse.redirect(new URL('/ja/news/', request.url))
   }
 
