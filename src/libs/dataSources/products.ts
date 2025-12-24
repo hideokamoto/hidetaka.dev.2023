@@ -81,7 +81,7 @@ export const loadProducts = async (
     }
   } catch (error) {
     logger.error('Failed to load products', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
       page,
       perPage,
     })
@@ -125,7 +125,7 @@ export const getProductBySlug = async (
     return products[0]
   } catch (error) {
     logger.error('Failed to load product by slug', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
       slug,
     })
     return null
@@ -154,7 +154,7 @@ const fetchProduct = async (url: string): Promise<WPProduct | null> => {
     return products.length > 0 ? products[0] : null
   } catch (error) {
     logger.error('Failed to fetch product', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
       url,
     })
     return null
@@ -183,7 +183,7 @@ export const getAdjacentProducts = async (currentProduct: WPProduct): Promise<Ad
     }
   } catch (error) {
     logger.error('Failed to load adjacent products', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
       productId: currentProduct.id,
     })
     return {
@@ -247,7 +247,7 @@ export const getRelatedProducts = async (
     return shuffled.slice(0, limit)
   } catch (error) {
     logger.error('Failed to load related products', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
       productId: currentProduct.id,
       limit,
     })
@@ -304,7 +304,7 @@ export const loadAllProducts = async (): Promise<WPProduct[]> => {
     return allProducts
   } catch (error) {
     logger.error('Failed to load all products', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
     })
     return []
   }

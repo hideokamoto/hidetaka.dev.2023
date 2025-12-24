@@ -15,7 +15,7 @@ export const loadWPEvents = async (): Promise<WPEvent[]> => {
     return events
   } catch (error) {
     logger.error('Failed to load WordPress events', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
     })
     return []
   }
@@ -40,7 +40,7 @@ export const getWPEventBySlug = async (slug: string): Promise<WPEvent | null> =>
     return events[0]
   } catch (error) {
     logger.error('Failed to load WordPress event by slug', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
       slug,
     })
     return null
@@ -70,7 +70,7 @@ const fetchEvent = async (url: string): Promise<WPEvent | null> => {
     return events[0]
   } catch (error) {
     logger.error('Failed to fetch event', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
       url,
     })
     return null
@@ -94,7 +94,7 @@ export const getAdjacentEvents = async (currentEvent: WPEvent): Promise<Adjacent
     }
   } catch (error) {
     logger.error('Failed to load adjacent events', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
       eventId: currentEvent.id,
     })
     return {
@@ -138,7 +138,7 @@ export const getRelatedEvents = async (
     return items
   } catch (error) {
     logger.error('Failed to load related events', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
       eventId: currentEvent.id,
       limit,
     })

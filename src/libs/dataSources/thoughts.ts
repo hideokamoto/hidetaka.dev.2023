@@ -89,7 +89,7 @@ export const loadThoughts = async (
     }
   } catch (error) {
     logger.error('Failed to load thoughts', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
       page,
       perPage,
       lang,
@@ -197,7 +197,7 @@ export const loadThoughtsByCategory = async (
     }
   } catch (error) {
     logger.error('Failed to load thoughts by category', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
       categorySlug,
       page,
       perPage,
@@ -263,7 +263,7 @@ export const loadAllCategories = async (lang: 'en' | 'ja' = 'en'): Promise<Categ
     return categories
   } catch (error) {
     logger.error('Failed to load categories', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
       lang,
     })
     return []
@@ -301,7 +301,7 @@ export const getThoughtBySlug = async (
     return thoughts[0]
   } catch (error) {
     logger.error('Failed to load thought by slug', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
       slug,
       lang,
     })
@@ -331,7 +331,7 @@ const fetchThought = async (url: string): Promise<WPThought | null> => {
     return thoughts.length > 0 ? thoughts[0] : null
   } catch (error) {
     logger.error('Failed to fetch thought', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
       url,
     })
     return null
@@ -367,7 +367,7 @@ export const getAdjacentThoughts = async (
     }
   } catch (error) {
     logger.error('Failed to load adjacent thoughts', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
       thoughtId: currentThought.id,
       lang,
     })
@@ -407,7 +407,7 @@ export const loadAllThoughts = async (lang: 'en' | 'ja' = 'en'): Promise<BlogIte
     return allItems
   } catch (error) {
     logger.error('Failed to load all thoughts', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
     })
     return []
   }
@@ -479,7 +479,7 @@ export const getRelatedThoughts = async (
     return shuffled.slice(0, limit)
   } catch (error) {
     logger.error('Failed to load related thoughts', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
       thoughtId: currentThought.id,
       limit,
       lang,

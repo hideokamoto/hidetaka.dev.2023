@@ -90,7 +90,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   } catch (error) {
     logger.error('Failed to load blog posts for sitemap', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
     })
   }
 
@@ -110,7 +110,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   } catch (error) {
     logger.error('Failed to load projects for sitemap', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
     })
   }
 
@@ -130,7 +130,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   } catch (error) {
     logger.error('Failed to load product news for sitemap', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
     })
   }
 
@@ -146,7 +146,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
   } catch (error) {
     logger.error('Failed to load dev-notes for sitemap', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
     })
   }
 

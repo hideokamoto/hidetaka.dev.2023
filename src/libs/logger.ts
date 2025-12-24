@@ -21,11 +21,7 @@ export const logger = {
    * エラー情報は常に記録し、将来的には外部ロギングサービスに送信可能
    */
   error: (message: string, context?: Record<string, unknown>) => {
-    if (context) {
-      console.error('[ERROR]', message, context)
-    } else {
-      console.error('[ERROR]', message)
-    }
+    console.error('[ERROR]', message, context)
     // TODO: 将来的には外部ロギングサービス（Sentry等）に送信
   },
 

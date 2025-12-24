@@ -26,6 +26,7 @@ export class MicroCMSAPI {
         })
         return events
       },
+      [],
     )
   }
   public async listUpcomingEvents() {
@@ -45,6 +46,7 @@ export class MicroCMSAPI {
         })
         return events
       },
+      [],
     )
   }
   public async listGuestPosts(): Promise<MicroCMSProjectsRecord[]> {
@@ -63,6 +65,7 @@ export class MicroCMSAPI {
         })
         return events
       },
+      [],
     )
   }
   public async listAllProjects(): Promise<MicroCMSProjectsRecord[]> {
@@ -74,6 +77,7 @@ export class MicroCMSAPI {
           endpoint: 'projects',
         })
       },
+      [],
     )
   }
   public async listApps(): Promise<MicroCMSProjectsRecord[]> {
@@ -93,6 +97,7 @@ export class MicroCMSAPI {
         })
         return events
       },
+      [],
     )
   }
   public async listBooks(): Promise<MicroCMSProjectsRecord[]> {
@@ -112,6 +117,7 @@ export class MicroCMSAPI {
         })
         return events
       },
+      [],
     )
   }
   public async listFeaturedBooks() {
@@ -130,6 +136,7 @@ export class MicroCMSAPI {
           }),
         ]
       },
+      [],
     )
   }
   /**
@@ -147,6 +154,7 @@ export class MicroCMSAPI {
           },
         })
       },
+      [],
     )
   }
 }

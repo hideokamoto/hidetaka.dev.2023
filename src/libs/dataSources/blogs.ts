@@ -126,7 +126,7 @@ export const loadBlogPosts = async (
     return { items: sortedPosts, hasMoreBySource }
   } catch (error) {
     logger.error('Failed to load blog posts', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
       locale,
     })
     return { items: [], hasMoreBySource: {} }

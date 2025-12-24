@@ -96,7 +96,7 @@ export const loadQiitaPosts = async (): Promise<{ items: FeedItem[]; hasMore: bo
     return { items, hasMore }
   } catch (error) {
     logger.error('Failed to load Qiita posts', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
     })
     return { items: [], hasMore: false }
   }

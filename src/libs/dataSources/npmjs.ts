@@ -23,7 +23,7 @@ export const listMyNPMPackages = async () => {
     return Array.from(uniquePackages.values())
   } catch (error) {
     logger.error('Failed to load NPM packages', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
     })
     return []
   }

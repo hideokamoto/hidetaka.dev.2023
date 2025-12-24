@@ -112,7 +112,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     })
   } catch (error) {
     logger.error('Error generating thumbnail image', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
       postId: id,
     })
     return new Response('Failed to generate image', { status: 500 })

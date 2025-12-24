@@ -10,7 +10,7 @@ export const listMyWordPressPlugins = async () => {
     })
   } catch (error) {
     logger.error('Failed to load WordPress plugins', {
-      error: error instanceof Error ? error.message : String(error),
+      error,
     })
     return []
   }
