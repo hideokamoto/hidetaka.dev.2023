@@ -257,9 +257,7 @@ describe('DateDisplay Utils', () => {
       it('should return true for valid dates', () => {
         fc.assert(
           fc.property(
-            fc.date({ min: new Date('1900-01-01'), max: new Date('2100-12-31') }).filter((date) => {
-              return !Number.isNaN(date.getTime())
-            }),
+            fc.date({ min: new Date('1900-01-01'), max: new Date('2100-12-31') }),
             (date) => {
               expect(isValidDate(date)).toBe(true)
             },
@@ -405,9 +403,7 @@ describe('DateDisplay Utils', () => {
       it('should include year in output for all formats', () => {
         fc.assert(
           fc.property(
-            fc.date({ min: new Date('1900-01-01'), max: new Date('2100-12-31') }).filter((date) => {
-              return !Number.isNaN(date.getTime())
-            }),
+            fc.date({ min: new Date('1900-01-01'), max: new Date('2100-12-31') }),
             fc.string({ minLength: 0, maxLength: 20 }),
             fc.constantFrom('short', 'long', 'month-year' as const),
             (date, lang, format) => {

@@ -133,20 +133,48 @@ describe('getPathnameWithLangType', () => {
         )
       })
 
-      it('should extract 2-letter language code from pathname starting with /XX-YYY format', () => {
-        fc.assert(
-          fc.property(
-            fc.string({ minLength: 2, maxLength: 2 }).filter((s) => /^[a-z]{2}$/i.test(s)),
-            fc.string({ minLength: 2, maxLength: 10 }).filter((s) => /^[\w-]+$/.test(s)),
-            fc.string({ minLength: 0, maxLength: 50 }),
-            (langCode, region, path) => {
-              const pathname = `/${langCode}-${region}${path ? `/${path}` : ''}`
-              const result = getLanguageFromURL(pathname)
-              // 実装では大文字小文字が保持される可能性があるので、小文字に変換して比較
-              expect(result.toLowerCase()).toBe(langCode.toLowerCase())
-            },
-          ),
-        )
+      describe('実際に使用される言語コード形式', () => {
+        it('should extract 2-letter language code from common language code formats', () => {
+          fc.assert(
+            fc.property(
+              fc.constantFrom('ja', 'en', 'fr', 'de', 'es', 'it', 'pt', 'zh', 'ko', 'ru'),
+              fc.constantFrom('JP', 'US', 'GB', 'CA', 'FR', 'DE', 'ES'),
+              fc.string({ minLength: 0, maxLength: 50 }),
+              (langCode, region, path) => {
+                const pathname = `/${langCode}-${region}${path ? `/${path}` : ''}`
+                const result = getLanguageFromURL(pathname)
+                // 実装では大文字小文字が保持される可能性があるので、小文字に変換して比較
+                expect(result.toLowerCase()).toBe(langCode.toLowerCase())
+              },
+            ),
+          )
+        })
+      })
+
+      describe('境界値テスト', () => {
+        it('should extract 2-letter language code from various pathname formats', () => {
+          fc.assert(
+            fc.property(
+              fc
+                .tuple(
+                  fc.string({ minLength: 2, maxLength: 2 }).filter((c) => /^[a-z]{2}$/i.test(c)),
+                  fc.string({ minLength: 2, maxLength: 10 }).filter((s) => /^[\w-]+$/.test(s)),
+                )
+                .map(([langCode, region]) => ({ langCode, region })),
+              fc.string({ minLength: 0, maxLength: 50 }),
+              ({ langCode, region }, path) => {
+                const pathname = `/${langCode}-${region}${path ? `/${path}` : ''}`
+                const result = getLanguageFromURL(pathname)
+                // 正規表現がマッチする場合のみ、言語コードが抽出される
+                if (/^\/(\w{2})-([\w-]{2,})/.test(pathname)) {
+                  expect(result.toLowerCase()).toBe(langCode.toLowerCase())
+                } else {
+                  expect(result).toBe('en-US')
+                }
+              },
+            ),
+          )
+        })
       })
     })
 
@@ -215,43 +243,123 @@ describe('getPathnameWithLangType', () => {
         )
       })
 
-      it('should return path with /ja-JP/ prefix for languages containing "ja"', () => {
-        fc.assert(
-          fc.property(
-            fc.string({ minLength: 0, maxLength: 100 }),
-            fc.string({ minLength: 2, maxLength: 20 }).filter((s) => /ja/.test(s) && !/en/.test(s)),
-            (targetPath, lang) => {
-              const result = getPathnameWithLangType(targetPath, lang)
-              expect(result).toMatch(/^\/ja-JP\//)
-            },
-          ),
-        )
+      describe('実際に使用される言語コード', () => {
+        it('should return path with /ja-JP/ prefix for common Japanese language codes', () => {
+          fc.assert(
+            fc.property(
+              fc.string({ minLength: 0, maxLength: 100 }),
+              fc.constantFrom('ja', 'ja-JP', 'japanese', 'ja_JP'),
+              (targetPath, lang) => {
+                const result = getPathnameWithLangType(targetPath, lang)
+                expect(result).toMatch(/^\/ja-JP\//)
+              },
+            ),
+          )
+        })
+
+        it('should return path without language prefix for common English language codes', () => {
+          fc.assert(
+            fc.property(
+              fc.string({ minLength: 0, maxLength: 100 }),
+              fc.constantFrom('en', 'en-US', 'en-GB', 'en-CA', 'english'),
+              (targetPath, lang) => {
+                const result = getPathnameWithLangType(targetPath, lang)
+                expect(result).toBe(`/${targetPath}`)
+              },
+            ),
+          )
+        })
+
+        it('should return path with language code prefix for other common languages', () => {
+          fc.assert(
+            fc.property(
+              fc.string({ minLength: 0, maxLength: 100 }),
+              fc.constantFrom('fr', 'de', 'es', 'it', 'pt', 'zh', 'ko', 'ru'),
+              (targetPath, lang) => {
+                const result = getPathnameWithLangType(targetPath, lang)
+                expect(result).toBe(`/${lang}/${targetPath}`)
+              },
+            ),
+          )
+        })
       })
 
-      it('should return path without language prefix for languages containing "en"', () => {
-        fc.assert(
-          fc.property(
-            fc.string({ minLength: 0, maxLength: 100 }),
-            fc.string({ minLength: 2, maxLength: 20 }).filter((s) => /en/.test(s) && !/ja/.test(s)),
-            (targetPath, lang) => {
-              const result = getPathnameWithLangType(targetPath, lang)
-              expect(result).toBe(`/${targetPath}`)
-            },
-          ),
-        )
+      describe('境界値テスト', () => {
+        it('should handle edge cases: empty string, single character, long strings', () => {
+          fc.assert(
+            fc.property(
+              fc.string({ minLength: 0, maxLength: 100 }),
+              fc.oneof(
+                fc.constant(''),
+                fc.string({ minLength: 1, maxLength: 1 }),
+                fc.string({ minLength: 50, maxLength: 100 }),
+              ),
+              (targetPath, lang) => {
+                const result = getPathnameWithLangType(targetPath, lang)
+                expect(result).toMatch(/^\//)
+                // 空文字列や長い文字列は「ja」や「en」を含まない可能性が高い
+                if (!/ja/.test(lang) && !/en/.test(lang)) {
+                  expect(result).toBe(`/${lang}/${targetPath}`)
+                }
+              },
+            ),
+          )
+        })
+
+        it('should handle "ja" prefix with various suffixes (boundary cases)', () => {
+          fc.assert(
+            fc.property(
+              fc.string({ minLength: 0, maxLength: 100 }),
+              fc.oneof(
+                fc.constant('ja'),
+                fc
+                  .tuple(fc.constant('ja'), fc.string({ minLength: 1, maxLength: 1 }))
+                  .map(([prefix, suffix]) => prefix + suffix),
+                fc
+                  .tuple(fc.constant('ja'), fc.string({ minLength: 10, maxLength: 20 }))
+                  .map(([prefix, suffix]) => prefix + suffix),
+              ),
+              (targetPath, lang) => {
+                const result = getPathnameWithLangType(targetPath, lang)
+                expect(result).toMatch(/^\/ja-JP\//)
+              },
+            ),
+          )
+        })
       })
 
-      it('should return path with language code prefix for other languages', () => {
-        fc.assert(
-          fc.property(
-            fc.string({ minLength: 0, maxLength: 100 }),
-            fc.string({ minLength: 1, maxLength: 10 }).filter((s) => !/en|ja/.test(s)),
-            (targetPath, lang) => {
-              const result = getPathnameWithLangType(targetPath, lang)
-              expect(result).toBe(`/${lang}/${targetPath}`)
-            },
-          ),
-        )
+      describe('特殊文字を含む文字列', () => {
+        it('should handle special characters and various string patterns', () => {
+          fc.assert(
+            fc.property(
+              fc.string({ minLength: 0, maxLength: 100 }),
+              fc.oneof(
+                fc
+                  .tuple(fc.constant('ja'), fc.string({ minLength: 0, maxLength: 10 }))
+                  .map(([prefix, suffix]) => prefix + suffix),
+                fc
+                  .tuple(fc.constant('en'), fc.string({ minLength: 0, maxLength: 10 }))
+                  .map(([prefix, suffix]) => prefix + suffix),
+                fc
+                  .tuple(
+                    fc.string({ minLength: 1, maxLength: 1 }).filter((c) => c !== 'j' && c !== 'e'),
+                    fc.string({ minLength: 0, maxLength: 10 }),
+                  )
+                  .map(([first, rest]) => first + rest),
+              ),
+              (targetPath, lang) => {
+                const result = getPathnameWithLangType(targetPath, lang)
+                if (/ja/.test(lang)) {
+                  expect(result).toMatch(/^\/ja-JP\//)
+                } else if (/en/.test(lang)) {
+                  expect(result).toBe(`/${targetPath}`)
+                } else {
+                  expect(result).toBe(`/${lang}/${targetPath}`)
+                }
+              },
+            ),
+          )
+        })
       })
     })
   })
