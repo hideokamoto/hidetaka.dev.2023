@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
@@ -11,6 +12,7 @@ import PageHeader from '@/components/ui/PageHeader'
 import SearchBar from '@/components/ui/SearchBar'
 import SidebarLayout from '@/components/ui/SidebarLayout'
 import Tag from '@/components/ui/Tag'
+import type { CategoryWithCount } from '@/libs/dataSources/blogs'
 import type { FeedItem } from '@/libs/dataSources/types'
 import { removeHtmlTags } from '@/libs/sanitize'
 
@@ -44,7 +46,7 @@ function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string })
       {/* Content */}
       <div className={`p-5 lg:p-6 ${imageUrl ? '' : 'pt-6'}`}>
         <div className="flex flex-col gap-3">
-          {/* Date and DataSource */}
+          {/* Date, DataSource, and Categories */}
           <div className="flex items-center gap-3 flex-wrap">
             <DateDisplay
               date={date}
@@ -57,6 +59,13 @@ function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string })
                 {item.dataSource.name}
               </Tag>
             )}
+            {item.categories &&
+              item.categories.length > 0 &&
+              item.categories.map((category) => (
+                <Tag key={category.id} variant="indigo" size="sm">
+                  {category.name}
+                </Tag>
+              ))}
           </div>
 
           {/* Title */}
@@ -91,6 +100,83 @@ function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string })
   )
 }
 
+// カテゴリサイドバーコンポーネント
+function CategorySidebar({
+  categories,
+  basePath,
+  lang,
+  currentCategorySlug,
+}: {
+  categories: CategoryWithCount[]
+  basePath: string
+  lang: string
+  currentCategorySlug?: string
+}) {
+  const categoryTitle = lang === 'ja' ? 'カテゴリ' : 'Categories'
+  const allText = lang === 'ja' ? 'すべて' : 'All'
+
+  // basePathからカテゴリ部分を除去して、writingのベースパスを取得
+  const writingBasePath = basePath.includes('/category/')
+    ? basePath.split('/category/')[0]
+    : basePath
+
+  if (categories.length === 0) {
+    return null
+  }
+
+  return (
+    <div className="hidden lg:block">
+      <div>
+        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
+          {categoryTitle}
+        </h3>
+        <nav className="space-y-1">
+          <Link
+            href={writingBasePath}
+            className={`w-full flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${
+              !currentCategorySlug
+                ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'
+                : 'text-slate-700 hover:bg-zinc-50 dark:text-slate-300 dark:hover:bg-zinc-800'
+            }`}
+          >
+            <span>{allText}</span>
+          </Link>
+          {categories.map((category) => {
+            const normalizedSlug = category.slug.includes('%')
+              ? decodeURIComponent(category.slug)
+              : category.slug
+            const categoryUrl = `${writingBasePath}/category/${encodeURIComponent(normalizedSlug)}`
+            const isActive =
+              currentCategorySlug === category.slug || currentCategorySlug === normalizedSlug
+            return (
+              <Link
+                key={category.id}
+                href={categoryUrl}
+                className={`w-full flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${
+                  isActive
+                    ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'
+                    : 'text-slate-700 hover:bg-zinc-50 dark:text-slate-300 dark:hover:bg-zinc-800'
+                }`}
+              >
+                <span>{category.name}</span>
+                <span
+                  className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
+                    isActive
+                      ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300'
+                      : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400'
+                  }`}
+                >
+                  {category.count > 20 ? '20+' : category.count}
+                </span>
+              </Link>
+            )
+          })}
+        </nav>
+      </div>
+    </div>
+  )
+}
+
 // サイドバーコンポーネント（デスクトップ用）
 function Sidebar({
   searchQuery,
@@ -100,6 +186,9 @@ function Sidebar({
   availableDataSources,
   dataSourceMap,
   counts,
+  categories,
+  basePath,
+  currentCategorySlug,
   lang,
 }: {
   searchQuery: string
@@ -113,6 +202,9 @@ function Sidebar({
     external: number
     byDataSource: Record<string, number>
   }
+  categories: CategoryWithCount[]
+  basePath: string
+  currentCategorySlug?: string
   lang: string
 }) {
   const searchPlaceholder = lang === 'ja' ? '検索...' : 'Search...'
@@ -125,6 +217,14 @@ function Sidebar({
       <div>
         <SearchBar value={searchQuery} onChange={onSearchChange} placeholder={searchPlaceholder} />
       </div>
+
+      {/* カテゴリフィルター */}
+      <CategorySidebar
+        categories={categories}
+        basePath={basePath}
+        lang={lang}
+        currentCategorySlug={currentCategorySlug}
+      />
 
       {/* データソースフィルター */}
       {availableDataSources.length > 0 && (
@@ -188,14 +288,25 @@ export default function WritingPageContent({
   lang,
   externalArticles,
   hasMoreBySource = {},
+  categories = [],
+  basePath = '/ja/writing',
+  categoryName,
 }: {
   lang: string
   externalArticles: FeedItem[]
   hasMoreBySource?: Record<string, boolean>
+  categories?: CategoryWithCount[]
+  basePath?: string
+  categoryName?: string
 }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [filterDataSource, setFilterDataSource] = useState<FilterDataSource>(null)
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
+
+  // 現在のカテゴリslugを取得
+  const currentCategorySlug = categoryName
+    ? categories.find((cat) => cat.name === categoryName)?.slug
+    : undefined
 
   // 全記事を統合
   const allItems: WritingItem[] = externalArticles
@@ -234,6 +345,22 @@ export default function WritingPageContent({
   // フィルターと検索を適用
   const filteredItems = useMemo(() => {
     let items = allItems.filter((item) => {
+      // カテゴリフィルター（categoryNameが指定されている場合）
+      if (categoryName && currentCategorySlug) {
+        if (!item.categories || item.categories.length === 0) return false
+        const hasCategory = item.categories.some((category) => {
+          const normalizedSlug = category.slug.includes('%')
+            ? decodeURIComponent(category.slug)
+            : category.slug
+          return (
+            category.slug === currentCategorySlug ||
+            normalizedSlug === currentCategorySlug ||
+            category.name === categoryName
+          )
+        })
+        if (!hasCategory) return false
+      }
+
       // データソースフィルター
       if (filterDataSource !== null) {
         if (!item.dataSource || item.dataSource.name !== filterDataSource) return false
@@ -251,7 +378,7 @@ export default function WritingPageContent({
     })
 
     return items
-  }, [allItems, filterDataSource, matchesSearch])
+  }, [allItems, filterDataSource, matchesSearch, categoryName, currentCategorySlug])
 
   // カウント計算
   const counts = useMemo(() => {
@@ -274,9 +401,18 @@ export default function WritingPageContent({
   }, [allItems, externalArticles, availableDataSources, hasMoreBySource])
 
   // テキスト
-  const title = lang === 'ja' ? 'Writing' : 'Writing'
-  const description =
-    lang === 'ja'
+  const title = categoryName
+    ? lang === 'ja'
+      ? `カテゴリ: ${categoryName}`
+      : `Category: ${categoryName}`
+    : lang === 'ja'
+      ? 'Writing'
+      : 'Writing'
+  const description = categoryName
+    ? lang === 'ja'
+      ? `「${categoryName}」カテゴリの記事一覧です。`
+      : `Articles in the "${categoryName}" category.`
+    : lang === 'ja'
       ? '技術記事、ブログ投稿、ニュースなどの執筆活動を紹介しています。'
       : "A collection of technical articles, blog posts, news, and other writing I've published."
   const filterButtonText = lang === 'ja' ? 'フィルター' : 'Filter'
@@ -292,8 +428,50 @@ export default function WritingPageContent({
   const filterGroups = useMemo<FilterGroup[]>(() => {
     const allText = lang === 'ja' ? 'すべて' : 'All'
     const sourceTitle = lang === 'ja' ? 'データソース' : 'Source'
+    const categoryTitle = lang === 'ja' ? 'カテゴリ' : 'Categories'
 
     const groups: FilterGroup[] = []
+
+    // カテゴリフィルター
+    if (categories.length > 0) {
+      const writingBasePath = basePath.includes('/category/')
+        ? basePath.split('/category/')[0]
+        : basePath
+      groups.push({
+        title: categoryTitle,
+        items: [
+          {
+            id: 'category-all',
+            label: allText,
+            active: !currentCategorySlug,
+            count: counts.all,
+            onClick: () => {
+              // カテゴリページの場合は、ベースパスにリダイレクト
+              if (currentCategorySlug) {
+                window.location.href = writingBasePath
+              }
+            },
+          },
+          ...categories.map((category) => {
+            const normalizedSlug = category.slug.includes('%')
+              ? decodeURIComponent(category.slug)
+              : category.slug
+            const categoryUrl = `${writingBasePath}/category/${encodeURIComponent(normalizedSlug)}`
+            const isActive =
+              currentCategorySlug === category.slug || currentCategorySlug === normalizedSlug
+            return {
+              id: `category-${category.id}`,
+              label: category.name,
+              active: isActive,
+              count: category.count > 20 ? 21 : category.count,
+              onClick: () => {
+                window.location.href = categoryUrl
+              },
+            }
+          }),
+        ],
+      })
+    }
 
     // データソースフィルター
     if (availableDataSources.length > 0) {
@@ -320,7 +498,16 @@ export default function WritingPageContent({
     }
 
     return groups
-  }, [lang, filterDataSource, availableDataSources, counts, dataSourceMap.get])
+  }, [
+    lang,
+    filterDataSource,
+    availableDataSources,
+    counts,
+    dataSourceMap.get,
+    categories,
+    basePath,
+    currentCategorySlug,
+  ])
 
   return (
     <>
@@ -365,6 +552,9 @@ export default function WritingPageContent({
                 availableDataSources={availableDataSources}
                 dataSourceMap={dataSourceMap}
                 counts={counts}
+                categories={categories}
+                basePath={basePath}
+                currentCategorySlug={currentCategorySlug}
                 lang={lang}
               />
             }

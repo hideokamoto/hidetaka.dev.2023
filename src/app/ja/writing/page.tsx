@@ -1,5 +1,5 @@
 import WritingPageContent from '@/components/containers/pages/WritingPage'
-import { loadBlogPosts } from '@/libs/dataSources/blogs'
+import { loadAllCategories, loadBlogPosts } from '@/libs/dataSources/blogs'
 
 export const metadata = {
   title: 'Writing',
@@ -9,13 +9,18 @@ export const metadata = {
 export const revalidate = 3600
 
 export default async function WritingPage() {
-  const { items: externalArticles, hasMoreBySource } = await loadBlogPosts('ja')
+  const [{ items: externalArticles, hasMoreBySource }, categories] = await Promise.all([
+    loadBlogPosts('ja'),
+    loadAllCategories('ja'),
+  ])
 
   return (
     <WritingPageContent
       lang="ja"
       externalArticles={externalArticles}
       hasMoreBySource={hasMoreBySource}
+      categories={categories}
+      basePath="/ja/writing"
     />
   )
 }

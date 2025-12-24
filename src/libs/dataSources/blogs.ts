@@ -1,7 +1,7 @@
 import { loadDevNotes } from './devnotes'
 import { loadDevToPosts } from './devto'
 import { loadQiitaPosts } from './qiita'
-import type { FeedDataSource, FeedItem } from './types'
+import type { Category, FeedDataSource, FeedItem } from './types'
 import { loadWPPosts } from './wordpress'
 import { loadZennPosts } from './zenn'
 
@@ -100,6 +100,7 @@ export const loadBlogPosts = async (
       description: item.description,
       datetime: item.datetime,
       dataSource: sourceDevNotes,
+      categories: item.categories,
     }))
 
     // hasMore情報をデータソース名でマッピング
@@ -128,6 +129,96 @@ export const loadBlogPosts = async (
     return { items: sortedPosts, hasMoreBySource }
   } catch (error) {
     console.error('Error loading blog posts:', error)
+    return { items: [], hasMoreBySource: {} }
+  }
+}
+
+export type CategoryWithCount = Category & {
+  count: number
+}
+
+/**
+ * すべての記事からカテゴリを抽出して集計する
+ */
+export const loadAllCategories = async (
+  locale: 'ja' | 'en' = 'ja',
+): Promise<CategoryWithCount[]> => {
+  try {
+    const result = await loadBlogPosts(locale)
+    const items = result.items
+
+    // カテゴリを集計
+    const categoryMap = new Map<string, CategoryWithCount>()
+
+    for (const item of items) {
+      if (item.categories && item.categories.length > 0) {
+        for (const category of item.categories) {
+          const key = `${category.taxonomy}:${category.slug}`
+          const existing = categoryMap.get(key)
+          if (existing) {
+            existing.count++
+          } else {
+            categoryMap.set(key, {
+              ...category,
+              count: 1,
+            })
+          }
+        }
+      }
+    }
+
+    // 配列に変換してソート（記事数の多い順）
+    const categories = Array.from(categoryMap.values())
+    categories.sort((a, b) => b.count - a.count)
+
+    return categories
+  } catch (error) {
+    console.error('Error loading categories:', error)
+    return []
+  }
+}
+
+/**
+ * カテゴリslugで記事をフィルタリング
+ */
+export const loadBlogPostsByCategory = async (
+  categorySlug: string,
+  locale: 'ja' | 'en' = 'ja',
+): Promise<{ items: FeedItem[]; hasMoreBySource: Record<string, boolean> }> => {
+  try {
+    const result = await loadBlogPosts(locale)
+    const allItems = result.items
+
+    // カテゴリslugでフィルタリング
+    // slugがエンコードされている可能性があるので、デコードを試みる
+    let normalizedSlug = categorySlug
+    try {
+      if (categorySlug.includes('%')) {
+        normalizedSlug = decodeURIComponent(categorySlug)
+      }
+    } catch (_e) {
+      // デコードに失敗した場合はそのまま
+    }
+
+    const filteredItems = allItems.filter((item) => {
+      if (!item.categories || item.categories.length === 0) {
+        return false
+      }
+      return item.categories.some((category) => {
+        // slugが一致するか確認（エンコード/デコードの両方に対応）
+        const categorySlugNormalized = category.slug.includes('%')
+          ? decodeURIComponent(category.slug)
+          : category.slug
+        return categorySlugNormalized === normalizedSlug || category.slug === normalizedSlug
+      })
+    })
+
+    return {
+      items: filteredItems,
+      hasMoreBySource: result.hasMoreBySource,
+    }
+  } catch (error) {
+    console.error('Error loading blog posts by category:', error)
     return { items: [], hasMoreBySource: {} }
   }
 }
