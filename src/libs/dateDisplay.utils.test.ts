@@ -284,48 +284,105 @@ describe('DateDisplay Utils', () => {
     })
 
     describe('getDateLocale', () => {
-      it('should return "ja-JP" for languages starting with "ja"', () => {
-        fc.assert(
-          fc.property(
-            fc
-              .tuple(fc.constant('ja'), fc.string({ minLength: 0, maxLength: 18 }))
-              .map(([prefix, suffix]) => prefix + suffix),
-            (lang) => {
-              expect(getDateLocale(lang)).toBe('ja-JP')
-            },
-          ),
-          { timeout: 10000 },
-        )
+      describe('実際に使用される言語コード', () => {
+        it('should return "ja-JP" for common Japanese language codes', () => {
+          fc.assert(
+            fc.property(
+              fc.constantFrom('ja', 'ja-JP', 'japanese', 'ja_JP', 'ja-JP-u-ca-japanese'),
+              (lang) => {
+                expect(getDateLocale(lang)).toBe('ja-JP')
+              },
+            ),
+          )
+        })
+
+        it('should return "en-US" for common non-Japanese language codes', () => {
+          fc.assert(
+            fc.property(
+              fc.constantFrom(
+                'en',
+                'en-US',
+                'en-GB',
+                'en-CA',
+                'fr',
+                'de',
+                'es',
+                'it',
+                'pt',
+                'zh',
+                'ko',
+              ),
+              (lang) => {
+                expect(getDateLocale(lang)).toBe('en-US')
+              },
+            ),
+          )
+        })
       })
 
-      it('should return "en-US" for languages not starting with "ja"', () => {
-        fc.assert(
-          fc.property(
-            fc.oneof(
-              fc.string({ minLength: 0, maxLength: 1 }),
-              fc
-                .tuple(
-                  fc.string({ minLength: 1, maxLength: 1 }).filter((c) => c !== 'j'),
-                  fc.string({ minLength: 0, maxLength: 19 }),
-                )
-                .map(([first, rest]) => first + rest),
-              fc
-                .tuple(
-                  fc.constant('j'),
-                  fc.string({ minLength: 1, maxLength: 1 }).filter((c) => c !== 'a'),
-                  fc.string({ minLength: 0, maxLength: 18 }),
-                )
-                .map(([first, second, rest]) => first + second + rest),
-              fc
-                .tuple(fc.constant('en'), fc.string({ minLength: 0, maxLength: 18 }))
-                .map(([prefix, suffix]) => prefix + suffix),
+      describe('境界値テスト', () => {
+        it('should handle edge cases: empty string, single character, long strings', () => {
+          fc.assert(
+            fc.property(
+              fc.oneof(
+                fc.constant(''),
+                fc.string({ minLength: 1, maxLength: 1 }),
+                fc.string({ minLength: 50, maxLength: 100 }),
+              ),
+              (lang) => {
+                const result = getDateLocale(lang)
+                expect(result).toBe('en-US') // 空文字列や長い文字列は「ja」で始まらない
+              },
             ),
-            (lang) => {
-              expect(getDateLocale(lang)).toBe('en-US')
-            },
-          ),
-          { timeout: 10000 },
-        )
+          )
+        })
+
+        it('should handle "ja" prefix with various suffixes (boundary cases)', () => {
+          fc.assert(
+            fc.property(
+              fc.oneof(
+                fc.constant('ja'),
+                fc
+                  .tuple(fc.constant('ja'), fc.string({ minLength: 1, maxLength: 1 }))
+                  .map(([prefix, suffix]) => prefix + suffix),
+                fc
+                  .tuple(fc.constant('ja'), fc.string({ minLength: 10, maxLength: 20 }))
+                  .map(([prefix, suffix]) => prefix + suffix),
+              ),
+              (lang) => {
+                expect(getDateLocale(lang)).toBe('ja-JP')
+              },
+            ),
+          )
+        })
+      })
+
+      describe('特殊文字を含む文字列', () => {
+        it('should handle special characters in language codes', () => {
+          fc.assert(
+            fc.property(
+              fc.oneof(
+                fc
+                  .tuple(fc.constant('ja'), fc.string({ minLength: 0, maxLength: 10 }))
+                  .map(([prefix, suffix]) => prefix + suffix),
+                fc
+                  .tuple(
+                    fc.string({ minLength: 1, maxLength: 1 }).filter((c) => c !== 'j'),
+                    fc.string({ minLength: 0, maxLength: 10 }),
+                  )
+                  .map(([first, rest]) => first + rest),
+              ),
+              (lang) => {
+                const result = getDateLocale(lang)
+                if (lang.startsWith('ja')) {
+                  expect(result).toBe('ja-JP')
+                } else {
+                  expect(result).toBe('en-US')
+                }
+              },
+            ),
+          )
+        })
       })
     })
 

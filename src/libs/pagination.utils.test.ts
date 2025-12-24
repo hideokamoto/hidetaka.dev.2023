@@ -277,45 +277,139 @@ describe('Pagination Utils', () => {
         )
       })
 
-      it('should return Japanese text for languages starting with "ja"', () => {
-        fc.assert(
-          fc.property(
-            fc
-              .tuple(fc.constant('ja'), fc.string({ minLength: 0, maxLength: 18 }))
-              .map(([prefix, suffix]) => prefix + suffix),
-            fc.constantFrom('prev', 'next', 'page' as const),
-            (lang, key) => {
-              const result = getPaginationText(lang, key)
-              // 日本語のテキストが返されることを確認
-              const expectedJapanese = {
-                prev: '前へ',
-                next: '次へ',
-                page: 'ページ',
-              }
-              expect(result).toBe(expectedJapanese[key])
-            },
-          ),
-          { timeout: 10000 },
-        )
+      describe('実際に使用される言語コード', () => {
+        it('should return Japanese text for common Japanese language codes', () => {
+          fc.assert(
+            fc.property(
+              fc.constantFrom('ja', 'ja-JP', 'japanese', 'ja_JP'),
+              fc.constantFrom('prev', 'next', 'page' as const),
+              (lang, key) => {
+                const result = getPaginationText(lang, key)
+                const expectedJapanese = {
+                  prev: '前へ',
+                  next: '次へ',
+                  page: 'ページ',
+                }
+                expect(result).toBe(expectedJapanese[key])
+              },
+            ),
+          )
+        })
+
+        it('should return English text for common non-Japanese language codes', () => {
+          fc.assert(
+            fc.property(
+              fc.constantFrom('en', 'en-US', 'en-GB', 'fr', 'de', 'es', 'it', 'pt', 'zh', 'ko'),
+              fc.constantFrom('prev', 'next', 'page' as const),
+              (lang, key) => {
+                const result = getPaginationText(lang, key)
+                const expectedEnglish = {
+                  prev: 'Previous',
+                  next: 'Next',
+                  page: 'Page',
+                }
+                expect(result).toBe(expectedEnglish[key])
+              },
+            ),
+          )
+        })
       })
 
-      it('should return English text for languages not starting with "ja"', () => {
-        fc.assert(
-          fc.property(
-            fc.string({ minLength: 0, maxLength: 20 }).filter((s) => !s.startsWith('ja')),
-            fc.constantFrom('prev', 'next', 'page' as const),
-            (lang, key) => {
-              const result = getPaginationText(lang, key)
-              // 英語のテキストが返されることを確認
-              const expectedEnglish = {
-                prev: 'Previous',
-                next: 'Next',
-                page: 'Page',
-              }
-              expect(result).toBe(expectedEnglish[key])
-            },
-          ),
-        )
+      describe('境界値テスト', () => {
+        it('should handle edge cases: empty string, single character, long strings', () => {
+          fc.assert(
+            fc.property(
+              fc.oneof(
+                fc.constant(''),
+                fc.string({ minLength: 1, maxLength: 1 }),
+                fc.string({ minLength: 50, maxLength: 100 }),
+              ),
+              fc.constantFrom('prev', 'next', 'page' as const),
+              (lang, key) => {
+                const result = getPaginationText(lang, key)
+                // 空文字列や長い文字列は「ja」で始まらないので英語を返す
+                const expectedEnglish = {
+                  prev: 'Previous',
+                  next: 'Next',
+                  page: 'Page',
+                }
+                expect(result).toBe(expectedEnglish[key])
+              },
+            ),
+          )
+        })
+
+        it('should handle "ja" prefix with various suffixes (boundary cases)', () => {
+          fc.assert(
+            fc.property(
+              fc.oneof(
+                fc.constant('ja'),
+                fc
+                  .tuple(fc.constant('ja'), fc.string({ minLength: 1, maxLength: 1 }))
+                  .map(([prefix, suffix]) => prefix + suffix),
+                fc
+                  .tuple(fc.constant('ja'), fc.string({ minLength: 10, maxLength: 20 }))
+                  .map(([prefix, suffix]) => prefix + suffix),
+              ),
+              fc.constantFrom('prev', 'next', 'page' as const),
+              (lang, key) => {
+                const result = getPaginationText(lang, key)
+                const expectedJapanese = {
+                  prev: '前へ',
+                  next: '次へ',
+                  page: 'ページ',
+                }
+                expect(result).toBe(expectedJapanese[key])
+              },
+            ),
+          )
+        })
+      })
+
+      describe('特殊文字を含む文字列', () => {
+        it('should handle special characters and various string patterns', () => {
+          fc.assert(
+            fc.property(
+              fc.oneof(
+                fc
+                  .tuple(fc.constant('ja'), fc.string({ minLength: 0, maxLength: 10 }))
+                  .map(([prefix, suffix]) => prefix + suffix),
+                fc
+                  .tuple(
+                    fc.string({ minLength: 1, maxLength: 1 }).filter((c) => c !== 'j'),
+                    fc.string({ minLength: 0, maxLength: 10 }),
+                  )
+                  .map(([first, rest]) => first + rest),
+                fc
+                  .tuple(
+                    fc.constant('j'),
+                    fc.string({ minLength: 1, maxLength: 1 }).filter((c) => c !== 'a'),
+                    fc.string({ minLength: 0, maxLength: 10 }),
+                  )
+                  .map(([first, second, rest]) => first + second + rest),
+              ),
+              fc.constantFrom('prev', 'next', 'page' as const),
+              (lang, key) => {
+                const result = getPaginationText(lang, key)
+                if (lang.startsWith('ja')) {
+                  const expectedJapanese = {
+                    prev: '前へ',
+                    next: '次へ',
+                    page: 'ページ',
+                  }
+                  expect(result).toBe(expectedJapanese[key])
+                } else {
+                  const expectedEnglish = {
+                    prev: 'Previous',
+                    next: 'Next',
+                    page: 'Page',
+                  }
+                  expect(result).toBe(expectedEnglish[key])
+                }
+              },
+            ),
+          )
+        })
       })
     })
   })
