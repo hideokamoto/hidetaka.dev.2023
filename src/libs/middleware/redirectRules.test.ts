@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  createRedirectRules,
   DevNotesExclusionRedirectRule,
   LegacyPathRedirectRule,
   type RedirectRule,
@@ -50,6 +51,17 @@ describe('RedirectRuleEngine', () => {
       const engine = new RedirectRuleEngine([rule])
       const result = engine.getRedirectPath('/old-path', 'https://example.com')
       expect(result).toBe('https://example.com/new-path')
+    })
+
+    it('マッチするルールがない場合はエラーをスローする', () => {
+      const rule: RedirectRule = {
+        shouldRedirect: (pathname) => pathname === '/old-path',
+        getRedirectPath: (_pathname, baseUrl) => `${baseUrl}/new-path`,
+      }
+      const engine = new RedirectRuleEngine([rule])
+      expect(() => {
+        engine.getRedirectPath('/non-matching-path', 'https://example.com')
+      }).toThrow('No matching rule found for pathname: /non-matching-path')
     })
   })
 })
@@ -176,5 +188,35 @@ describe('統合テスト: 実際のmiddlewareのルール', () => {
     // 他のルールも動作する
     expect(engine.shouldRedirect('/projects', 'https://hidetaka.dev')).toBe(true)
     expect(engine.shouldRedirect('/ja/projects', 'https://hidetaka.dev')).toBe(true)
+  })
+})
+
+describe('createRedirectRules', () => {
+  it('すべてのリダイレクトルールを正しく生成する', () => {
+    const rules = createRedirectRules()
+    expect(rules).toHaveLength(8)
+    expect(rules[0]).toBeInstanceOf(LegacyPathRedirectRule)
+    expect(rules[6]).toBeInstanceOf(DevNotesExclusionRedirectRule)
+  })
+
+  it('生成されたルールが正しく動作する', () => {
+    const rules = createRedirectRules()
+    const engine = new RedirectRuleEngine(rules)
+
+    // レガシーパスのリダイレクト
+    expect(engine.shouldRedirect('/projects', 'https://hidetaka.dev')).toBe(true)
+    expect(engine.shouldRedirect('/ja/projects', 'https://hidetaka.dev')).toBe(true)
+    expect(engine.shouldRedirect('/oss', 'https://hidetaka.dev')).toBe(true)
+    expect(engine.shouldRedirect('/ja/oss', 'https://hidetaka.dev')).toBe(true)
+    expect(engine.shouldRedirect('/articles', 'https://hidetaka.dev')).toBe(true)
+    expect(engine.shouldRedirect('/ja/articles', 'https://hidetaka.dev')).toBe(true)
+
+    // dev-notesは除外される
+    expect(engine.shouldRedirect('/writing/dev-notes/test', 'https://hidetaka.dev')).toBe(false)
+    expect(engine.shouldRedirect('/ja/writing/dev-notes/test', 'https://hidetaka.dev')).toBe(false)
+
+    // 他のwritingパスはリダイレクトされる
+    expect(engine.shouldRedirect('/writing/old-post', 'https://hidetaka.dev')).toBe(true)
+    expect(engine.shouldRedirect('/ja/writing/old-post', 'https://hidetaka.dev')).toBe(true)
   })
 })
