@@ -18,6 +18,7 @@
     "test:component:watch": "vitest --config vitest.component.config.ts",
     "test:component:ui": "vitest --ui --config vitest.component.config.ts",
     "test:component:coverage": "vitest run --coverage --config vitest.component.config.ts",
+    "pre-push": "npm run lint:check && npm run test && npm run build",
     "cf:build": "npx opennextjs-cloudflare build",
     "cf:preview": "npm run cf:build && npx wrangler dev",
     "cf:dev": "npm run cf:build && npx opennextjs-cloudflare preview",

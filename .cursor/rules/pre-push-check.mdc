@@ -1,0 +1,112 @@
+---
+description: Push前の必須チェック
+alwaysApply: true
+---
+
+# Push前の必須チェック
+
+## ⚠️ CRITICAL: Push前の必須チェック
+
+**Cursor Cloud Agentがコードを編集・pushする際は、必ず以下のチェックを実行し、すべてパスすることを確認してからpushすること。**
+
+### 必須チェック項目
+
+1. **Lintチェック** (`npm run lint:check`)
+   - Biomeによるコード品質チェック
+   - フォーマット、リンターエラーの検出
+   - **失敗した場合は `npm run lint` で自動修正を試みる**
+
+2. **Unit Test** (`npm run test`)
+   - Vitestによるユニットテストの実行
+   - すべてのテストがパスすることを確認
+   - **失敗した場合はテストを修正する**
+
+3. **Buildチェック** (`npm run build`)
+   - TypeScriptコンパイルエラーの検出
+   - Next.jsビルドの成功確認
+   - **失敗した場合はTypeScriptエラーを修正する**
+
+### 実行手順
+
+**Push前に必ず以下を実行:**
+
+```bash
+# 1. Lintチェック
+npm run lint:check
+# 失敗した場合: npm run lint で自動修正
+
+# 2. Unit Test
+npm run test
+# 失敗した場合はテストを修正
+
+# 3. Buildチェック
+npm run build
+# 失敗した場合はTypeScriptエラーを修正
+
+# 4. すべてパスしたらpush
+git push
+```
+
+### Git Pre-push Hook
+
+プロジェクトにはGit pre-push hookが設定されており、push時に自動的に以下のチェックが実行されます：
+
+1. Lintチェック (`npm run lint:check`)
+2. Unit Test (`npm run test`)
+3. Buildチェック (`npm run build`)
+
+**すべてのチェックがパスしない限り、pushはブロックされます。**
+
+### AIエージェント向けの注意事項
+
+- **コードを編集した後、pushする前に必ず上記の3つのチェックを実行すること**
+- **チェックが失敗した場合は、pushせずにエラーを修正すること**
+- **Git pre-push hookが設定されているため、チェックをスキップしてpushすることはできない**
+- **チェックをスキップしたい場合は、`git push --no-verify` を使用できるが、これは推奨されない**
+
+### チェックをスキップする場合（非推奨）
+
+緊急時のみ、以下のコマンドでチェックをスキップできます：
+
+```bash
+git push --no-verify
+```
+
+**ただし、CIで失敗する可能性が高いため、通常は使用しないこと。**
+
+### トラブルシューティング
+
+**Lintエラーが発生した場合:**
+```bash
+npm run lint  # 自動修正を試みる
+npm run lint:check  # 再度チェック
+```
+
+**テストが失敗した場合:**
+```bash
+npm run test  # エラーメッセージを確認
+# テストファイルを修正
+npm run test  # 再度実行
+```
+
+**Buildエラーが発生した場合:**
+```bash
+npm run build  # エラーメッセージを確認
+# TypeScriptエラーを修正
+npm run build  # 再度実行
+```
+
+### チェックの目的
+
+これらのチェックは、以下の目的で実施されます：
+
+1. **コード品質の維持**: Lintチェックにより、コードスタイルと品質を統一
+2. **回帰の防止**: Unit Testにより、既存機能が壊れていないことを確認
+3. **型安全性の確保**: Buildチェックにより、TypeScriptの型エラーを検出
+4. **CIの失敗を防ぐ**: Push前にチェックすることで、GitHub ActionsでのCI失敗を防止
+
+### 参考
+
+- **CLAUDE.md**: プロジェクトの詳細な開発ガイドライン
+- **Git Hooks**: `.git/hooks/pre-push` に設定されているpre-push hook
+- **CI設定**: `.github/workflows/test.yml` に設定されているGitHub Actionsワークフロー
