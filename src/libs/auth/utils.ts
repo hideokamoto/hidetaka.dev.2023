@@ -1,27 +1,40 @@
-import { auth } from '@/auth'
+import { auth, currentUser } from '@clerk/nextjs/server'
 import { checkSubscriptionStatus } from '@/libs/stripe/subscription'
 
 export async function isPremiumUser(): Promise<boolean> {
-  const session = await auth()
+  const { userId } = await auth()
 
-  if (!session?.user) {
+  if (!userId) {
     return false
   }
 
-  // セッションにisPremiumフラグがある場合はそれを使用
-  if (session.user.isPremium) {
-    return true
+  const user = await currentUser()
+
+  if (!user) {
+    return false
   }
 
-  // Stripe Customer IDがある場合はサブスクリプション状態を確認
-  if (session.user.stripeCustomerId) {
-    const subscriptionStatus = await checkSubscriptionStatus(session.user.stripeCustomerId)
-    return subscriptionStatus.isActive
+  // ClerkのメタデータからStripe Customer IDを取得
+  const stripeCustomerId = user.publicMetadata?.stripeCustomerId as string | undefined
+
+  if (!stripeCustomerId) {
+    return false
   }
 
-  return false
+  // Stripeでサブスクリプション状態を確認
+  const subscriptionStatus = await checkSubscriptionStatus(stripeCustomerId)
+  return subscriptionStatus.isActive
 }
 
 export async function getCurrentUser() {
-  return await auth()
+  return await currentUser()
+}
+
+export async function getStripeCustomerId(): Promise<string | null> {
+  const user = await currentUser()
+  if (!user) {
+    return null
+  }
+
+  return (user.publicMetadata?.stripeCustomerId as string | undefined) || null
 }

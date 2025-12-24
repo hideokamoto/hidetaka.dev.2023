@@ -1,6 +1,7 @@
-import { NextResponse } from 'next/server'
-import type Stripe from 'stripe'
+import { clerkClient } from '@clerk/nextjs/server'
 import { stripe } from '@/libs/stripe/client'
+import { NextResponse } from 'next/server'
+import Stripe from 'stripe'
 
 export async function POST(request: Request) {
   const body = await request.text()
@@ -30,15 +31,28 @@ export async function POST(request: Request) {
   }
 
   // サブスクリプション関連のイベントを処理
-  if (
-    event.type === 'customer.subscription.created' ||
-    event.type === 'customer.subscription.updated'
-  ) {
+  if (event.type === 'customer.subscription.created' || event.type === 'customer.subscription.updated') {
     const subscription = event.data.object as Stripe.Subscription
     const customerId = subscription.customer as string
 
-    // ここでユーザーのサブスクリプション状態を更新
-    // 実際の実装では、データベースに保存する必要があります
+    // Stripe CustomerからClerk User IDを取得
+    const customer = await stripe.customers.retrieve(customerId)
+    if (customer && !customer.deleted && 'metadata' in customer) {
+      const clerkUserId = customer.metadata?.clerkUserId
+
+      if (clerkUserId) {
+        // Clerkのメタデータにサブスクリプション情報を保存
+        const client = await clerkClient()
+        await client.users.updateUserMetadata(clerkUserId, {
+          publicMetadata: {
+            stripeCustomerId: customerId,
+            stripeSubscriptionId: subscription.id,
+            subscriptionStatus: subscription.status,
+          },
+        })
+      }
+    }
+
     console.log('Subscription updated:', {
       customerId,
       subscriptionId: subscription.id,
@@ -50,7 +64,24 @@ export async function POST(request: Request) {
     const subscription = event.data.object as Stripe.Subscription
     const customerId = subscription.customer as string
 
-    // サブスクリプションがキャンセルされた場合の処理
+    // Stripe CustomerからClerk User IDを取得
+    const customer = await stripe.customers.retrieve(customerId)
+    if (customer && !customer.deleted && 'metadata' in customer) {
+      const clerkUserId = customer.metadata?.clerkUserId
+
+      if (clerkUserId) {
+        // Clerkのメタデータからサブスクリプション情報を削除
+        const client = await clerkClient()
+        await client.users.updateUserMetadata(clerkUserId, {
+          publicMetadata: {
+            stripeCustomerId: customerId,
+            stripeSubscriptionId: null,
+            subscriptionStatus: 'canceled',
+          },
+        })
+      }
+    }
+
     console.log('Subscription canceled:', {
       customerId,
       subscriptionId: subscription.id,

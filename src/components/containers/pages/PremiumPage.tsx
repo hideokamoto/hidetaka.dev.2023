@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { signOut } from 'next-auth/react'
+import { SignOutButton } from '@clerk/nextjs'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import PageHeader from '@/components/ui/PageHeader'
@@ -182,13 +182,14 @@ export default function PremiumPageContent({
                     {isJapanese ? 'プレミアム会員' : 'Premium Member'}
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => signOut()}
-                  className="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-zinc-200 dark:text-slate-300 dark:hover:bg-zinc-700"
-                >
-                  {isJapanese ? 'ログアウト' : 'Sign Out'}
-                </button>
+                <SignOutButton>
+                  <button
+                    type="button"
+                    className="rounded-lg px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-zinc-200 dark:text-slate-300 dark:hover:bg-zinc-700"
+                  >
+                    {isJapanese ? 'ログアウト' : 'Sign Out'}
+                  </button>
+                </SignOutButton>
               </div>
             </div>
 

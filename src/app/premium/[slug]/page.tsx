@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
-import { auth } from '@/auth'
+import { auth, currentUser } from '@clerk/nextjs/server'
 import PremiumPostDetailPageContent from '@/components/containers/pages/PremiumPostDetailPage'
 import { MicroCMSAPI } from '@/libs/microCMS/apis'
 import { createMicroCMSClient } from '@/libs/microCMS/client'
@@ -17,17 +17,26 @@ export default async function PremiumPostDetailPage({
   params: Promise<{ slug: string }>
 }) {
   const { slug } = await params
-  const session = await auth()
+  const { userId } = await auth()
   const lang = 'en'
 
-  if (!session?.user) {
-    redirect('/auth/signin')
+  if (!userId) {
+    redirect('/sign-in')
   }
+
+  const user = await currentUser()
+
+  if (!user) {
+    redirect('/sign-in')
+  }
+
+  // ClerkのメタデータからStripe Customer IDを取得
+  const stripeCustomerId = user.publicMetadata?.stripeCustomerId as string | undefined
 
   // サブスクリプション状態を確認
   let isPremium = false
-  if (session.user.stripeCustomerId) {
-    const subscriptionStatus = await checkSubscriptionStatus(session.user.stripeCustomerId)
+  if (stripeCustomerId) {
+    const subscriptionStatus = await checkSubscriptionStatus(stripeCustomerId)
     isPremium = subscriptionStatus.isActive
   }
 

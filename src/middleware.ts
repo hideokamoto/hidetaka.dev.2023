@@ -1,3 +1,4 @@
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
 import { createRedirectRules, RedirectRuleEngine } from '@/libs/middleware/redirectRules'
@@ -5,9 +6,17 @@ import { createRedirectRules, RedirectRuleEngine } from '@/libs/middleware/redir
 // リダイレクトルールエンジンを初期化（シングルトン）
 const redirectEngine = new RedirectRuleEngine(createRedirectRules())
 
-export function middleware(request: NextRequest) {
+// Clerkの認証が必要なルートを定義
+const isProtectedRoute = createRouteMatcher(['/premium(.*)', '/ja/premium(.*)'])
+
+export default clerkMiddleware(async (auth, request: NextRequest) => {
   const { pathname } = request.nextUrl
   const baseUrl = request.url.split(request.nextUrl.pathname)[0]
+
+  // Premiumルートは認証が必要
+  if (isProtectedRoute(request)) {
+    await auth.protect()
+  }
 
   // /ja-JP/* を /ja/* にリダイレクト（特別なルール）
   if (pathname.startsWith('/ja-JP')) {
@@ -22,7 +31,7 @@ export function middleware(request: NextRequest) {
   }
 
   return NextResponse.next()
-}
+})
 
 export const config = {
   matcher: [
@@ -33,6 +42,7 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    '/(api|trpc)(.*)',
   ],
 }

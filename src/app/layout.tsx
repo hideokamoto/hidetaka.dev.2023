@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { ClerkProvider } from '@clerk/nextjs'
 import { SITE_DESCRIPTION, SITE_TITLE } from '@/consts'
 import './globals.css'
 import { ClarityAnalytics } from '@/components/ClarityAnalytics'
@@ -44,25 +45,27 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="h-full antialiased">
-      <head>
-        <link rel="alternate" type="application/rss+xml" title="RSS" href="/projects/rss.xml" />
-      </head>
-      <body className="flex h-full flex-col bg-zinc-50 dark:bg-black">
-        <GoogleAnalytics gaId="G-RV8PYHHYHN" />
-        <DarkModeScript />
-        <ClarityAnalytics />
-        <div className="fixed inset-0 flex justify-center sm:px-8">
-          <div className="flex w-full max-w-7xl lg:px-8">
-            <div className="w-full bg-white ring-1 ring-zinc-100 dark:bg-zinc-900 dark:ring-zinc-300/20" />
+    <ClerkProvider>
+      <html lang="en" className="h-full antialiased">
+        <head>
+          <link rel="alternate" type="application/rss+xml" title="RSS" href="/projects/rss.xml" />
+        </head>
+        <body className="flex h-full flex-col bg-zinc-50 dark:bg-black">
+          <GoogleAnalytics gaId="G-RV8PYHHYHN" />
+          <DarkModeScript />
+          <ClarityAnalytics />
+          <div className="fixed inset-0 flex justify-center sm:px-8">
+            <div className="flex w-full max-w-7xl lg:px-8">
+              <div className="w-full bg-white ring-1 ring-zinc-100 dark:bg-zinc-900 dark:ring-zinc-300/20" />
+            </div>
           </div>
-        </div>
-        <div className="relative">
-          <Header />
-          <main>{children}</main>
-          <Footer />
-        </div>
-      </body>
-    </html>
+          <div className="relative">
+            <Header />
+            <main>{children}</main>
+            <Footer />
+          </div>
+        </body>
+      </html>
+    </ClerkProvider>
   )
 }
