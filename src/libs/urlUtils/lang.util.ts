@@ -6,6 +6,16 @@ export function getLanguageFromURL(pathname: string) {
   return langCodeMatch ? langCodeMatch[1] : 'en-US'
 }
 
+/**
+ * ロケールが日本語かどうかを判定
+ * @param locale - ロケール文字列（例: 'ja', 'ja-JP', 'en', 'en-US'）
+ * @returns 日本語の場合はtrue、それ以外はfalse
+ */
+export function isJapanese(locale?: string): boolean {
+  if (!locale) return false
+  return /^ja/.test(locale)
+}
+
 export const changeLanguageURL = (
   pathname: string,
   targetLang: 'en-US' | 'ja-JP' = 'en-US',

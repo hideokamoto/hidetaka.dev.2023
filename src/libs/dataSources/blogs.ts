@@ -1,3 +1,5 @@
+import { logger } from '@/libs/logger'
+import { isJapanese } from '@/libs/urlUtils/lang.util'
 import { loadDevNotes } from './devnotes'
 import { loadDevToPosts } from './devto'
 import { loadQiitaPosts } from './qiita'
@@ -9,10 +11,6 @@ const sourceDevNotes: FeedDataSource = {
   href: '/ja/writing/dev-notes',
   name: 'Dev Notes',
   color: 'green',
-}
-export const isJapanese = (locale?: string) => {
-  if (!locale) return false
-  return /^ja/.test(locale)
 }
 
 const sourceStripeDotDev: FeedDataSource = {
@@ -127,7 +125,10 @@ export const loadBlogPosts = async (
 
     return { items: sortedPosts, hasMoreBySource }
   } catch (error) {
-    console.error('Error loading blog posts:', error)
+    logger.error('Failed to load blog posts', {
+      error,
+      locale,
+    })
     return { items: [], hasMoreBySource: {} }
   }
 }

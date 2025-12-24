@@ -1,3 +1,4 @@
+import { logger } from '@/libs/logger'
 import type { BlogItem } from './types'
 
 export type WPProduct = {
@@ -79,7 +80,11 @@ export const loadProducts = async (
       currentPage: page,
     }
   } catch (error) {
-    console.error('Error loading products:', error)
+    logger.error('Failed to load products', {
+      error,
+      page,
+      perPage,
+    })
     return {
       items: [],
       totalPages: 0,
@@ -97,7 +102,7 @@ export const loadProducts = async (
  */
 export const getProductBySlug = async (
   slug: string,
-  lang: 'en' | 'ja' = 'en',
+  _lang: 'en' | 'ja' = 'en',
 ): Promise<WPProduct | null> => {
   try {
     const response = await fetch(
@@ -119,7 +124,10 @@ export const getProductBySlug = async (
 
     return products[0]
   } catch (error) {
-    console.error('Error loading product by slug:', error)
+    logger.error('Failed to load product by slug', {
+      error,
+      slug,
+    })
     return null
   }
 }
@@ -136,13 +144,19 @@ const fetchProduct = async (url: string): Promise<WPProduct | null> => {
       next: { revalidate: 1800 }, // 30分ごとに再検証
     })
     if (!response.ok) {
-      console.error(`Failed to fetch product: ${response.status}`)
+      logger.error('Failed to fetch product', {
+        status: response.status,
+        url,
+      })
       return null
     }
     const products: WPProduct[] = await response.json()
     return products.length > 0 ? products[0] : null
   } catch (error) {
-    console.error('Error fetching product:', error)
+    logger.error('Failed to fetch product', {
+      error,
+      url,
+    })
     return null
   }
 }
@@ -168,7 +182,10 @@ export const getAdjacentProducts = async (currentProduct: WPProduct): Promise<Ad
       next,
     }
   } catch (error) {
-    console.error('Error loading adjacent products:', error)
+    logger.error('Failed to load adjacent products', {
+      error,
+      productId: currentProduct.id,
+    })
     return {
       previous: null,
       next: null,
@@ -229,7 +246,11 @@ export const getRelatedProducts = async (
     // limitの数だけ返す
     return shuffled.slice(0, limit)
   } catch (error) {
-    console.error('Error loading related products:', error)
+    logger.error('Failed to load related products', {
+      error,
+      productId: currentProduct.id,
+      limit,
+    })
     return []
   }
 }
@@ -282,7 +303,9 @@ export const loadAllProducts = async (): Promise<WPProduct[]> => {
 
     return allProducts
   } catch (error) {
-    console.error('Error loading all products:', error)
+    logger.error('Failed to load all products', {
+      error,
+    })
     return []
   }
 }

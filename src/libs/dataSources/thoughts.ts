@@ -1,3 +1,4 @@
+import { logger } from '@/libs/logger'
 import type { BlogItem, Category, WPThought } from './types'
 
 export type ThoughtsResult = {
@@ -87,7 +88,12 @@ export const loadThoughts = async (
       currentPage: page,
     }
   } catch (error) {
-    console.error('Error loading thoughts:', error)
+    logger.error('Failed to load thoughts', {
+      error,
+      page,
+      perPage,
+      lang,
+    })
     return {
       items: [],
       totalPages: 0,
@@ -190,7 +196,13 @@ export const loadThoughtsByCategory = async (
       currentPage: page,
     }
   } catch (error) {
-    console.error('Error loading thoughts by category:', error)
+    logger.error('Failed to load thoughts by category', {
+      error,
+      categorySlug,
+      page,
+      perPage,
+      lang,
+    })
     return {
       items: [],
       totalPages: 0,
@@ -250,7 +262,10 @@ export const loadAllCategories = async (lang: 'en' | 'ja' = 'en'): Promise<Categ
 
     return categories
   } catch (error) {
-    console.error('Error loading categories:', error)
+    logger.error('Failed to load categories', {
+      error,
+      lang,
+    })
     return []
   }
 }
@@ -285,7 +300,11 @@ export const getThoughtBySlug = async (
 
     return thoughts[0]
   } catch (error) {
-    console.error('Error loading thought by slug:', error)
+    logger.error('Failed to load thought by slug', {
+      error,
+      slug,
+      lang,
+    })
     return null
   }
 }
@@ -302,13 +321,19 @@ const fetchThought = async (url: string): Promise<WPThought | null> => {
       next: { revalidate: 1800 }, // 30分ごとに再検証
     })
     if (!response.ok) {
-      console.error(`Failed to fetch thought: ${response.status}`)
+      logger.error('Failed to fetch thought', {
+        status: response.status,
+        url,
+      })
       return null
     }
     const thoughts: WPThought[] = await response.json()
     return thoughts.length > 0 ? thoughts[0] : null
   } catch (error) {
-    console.error('Error fetching thought:', error)
+    logger.error('Failed to fetch thought', {
+      error,
+      url,
+    })
     return null
   }
 }
@@ -341,7 +366,11 @@ export const getAdjacentThoughts = async (
       next,
     }
   } catch (error) {
-    console.error('Error loading adjacent thoughts:', error)
+    logger.error('Failed to load adjacent thoughts', {
+      error,
+      thoughtId: currentThought.id,
+      lang,
+    })
     return {
       previous: null,
       next: null,
@@ -377,7 +406,9 @@ export const loadAllThoughts = async (lang: 'en' | 'ja' = 'en'): Promise<BlogIte
 
     return allItems
   } catch (error) {
-    console.error('Error loading all thoughts:', error)
+    logger.error('Failed to load all thoughts', {
+      error,
+    })
     return []
   }
 }
@@ -447,7 +478,12 @@ export const getRelatedThoughts = async (
     // limitの数だけ返す
     return shuffled.slice(0, limit)
   } catch (error) {
-    console.error('Error loading related thoughts:', error)
+    logger.error('Failed to load related thoughts', {
+      error,
+      thoughtId: currentThought.id,
+      limit,
+      lang,
+    })
     return []
   }
 }

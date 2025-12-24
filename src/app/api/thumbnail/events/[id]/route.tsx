@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server'
 import { SITE_CONFIG } from '@/config'
 import type { WPEvent } from '@/libs/dataSources/types'
+import { logger } from '@/libs/logger'
 
 // @see https://opennext.js.org/cloudflare/get-started#9-remove-any-export-const-runtime--edge-if-present
 // export const runtime = 'edge'
@@ -38,10 +39,10 @@ async function getCloudflareContext(
  * これにより、任意の文字列で画像を生成することを防止
  */
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    const { id } = await params
-    const postId = parseInt(id, 10)
+  const { id } = await params
+  const postId = parseInt(id, 10)
 
+  try {
     // IDが有効な数値でない場合は404を返す
     if (Number.isNaN(postId) || postId <= 0) {
       return new Response('Invalid post ID', { status: 404 })
@@ -56,7 +57,11 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       if (wpResponse.status === 404) {
         return new Response('Post not found', { status: 404 })
       }
-      console.error('WordPress API error:', wpResponse.status, wpResponse.statusText)
+      logger.error('WordPress API error', {
+        status: wpResponse.status,
+        statusText: wpResponse.statusText,
+        postId,
+      })
       return new Response('Failed to fetch post', { status: wpResponse.status })
     }
 
@@ -68,7 +73,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     }
 
     const title = event.title.rendered
-    console.log('Generating thumbnail for event:', postId, 'title:', title)
+    logger.log('Generating thumbnail for event', { postId, title })
 
     // OpenNextのCloudflareアダプターでは、getCloudflareContext()経由でbindingsにアクセス
     // async: trueを指定することで、SSGや開発環境でも動作する
@@ -80,9 +85,8 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     }
     const typedEnv = context.env
     const ogImageGenerator = typedEnv.OG_IMAGE_GENERATOR
-    console.log('ogImageGenerator', ogImageGenerator)
     if (!ogImageGenerator) {
-      console.error('OG_IMAGE_GENERATOR Service Binding is not available')
+      logger.error('OG_IMAGE_GENERATOR Service Binding is not available')
       return new Response('Service Binding not available', { status: 500 })
     }
 
@@ -103,7 +107,12 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 
     // エラーハンドリング
     if (!response.ok) {
-      console.error('OG image generation failed:', response.status, response.statusText)
+      logger.error('OG image generation failed', {
+        status: response.status,
+        statusText: response.statusText,
+        postId,
+        title,
+      })
       return new Response('Failed to generate image', { status: response.status })
     }
 
@@ -123,7 +132,10 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       headers: responseHeaders,
     })
   } catch (error) {
-    console.error('Error generating thumbnail image:', error)
+    logger.error('Error generating thumbnail image', {
+      error,
+      postId: id,
+    })
     return new Response('Failed to generate image', { status: 500 })
   }
 }

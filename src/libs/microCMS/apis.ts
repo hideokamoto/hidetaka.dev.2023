@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 import { MICROCMS_MOCK_BOOKs, MICROCMS_MOCK_EVENTs } from './mocks'
 import type { MicroCMSClient, MicroCMSEventsRecord, MicroCMSProjectsRecord } from './types'
+import { handleMicroCMSRequest } from './utils'
 
 export class MicroCMSAPI {
   private readonly client: MicroCMSClient
@@ -9,145 +10,151 @@ export class MicroCMSAPI {
   }
   public async listEndedEvents() {
     const thisMonth = dayjs().format('YYYY-MM')
-    if (!this.client) {
-      if (process.env.MICROCMS_API_MODE === 'mock') {
-        return MICROCMS_MOCK_EVENTs
-      }
-      return []
-    }
-    const { contents: events } = await this.client.get<{
-      contents: MicroCMSEventsRecord[]
-    }>({
-      endpoint: 'events',
-      queries: {
-        orders: '-date',
-        limit: 20,
-        filters: `date[less_than]${thisMonth}`,
+    return handleMicroCMSRequest(
+      this.client,
+      MICROCMS_MOCK_EVENTs,
+      async () => {
+        const { contents: events } = await this.client!.get<{
+          contents: MicroCMSEventsRecord[]
+        }>({
+          endpoint: 'events',
+          queries: {
+            orders: '-date',
+            limit: 20,
+            filters: `date[less_than]${thisMonth}`,
+          },
+        })
+        return events
       },
-    })
-    return events
+      [],
+    )
   }
   public async listUpcomingEvents() {
     const thisMonth = dayjs().format('YYYY-MM')
-    if (!this.client) {
-      if (process.env.MICROCMS_API_MODE === 'mock') {
-        return MICROCMS_MOCK_EVENTs
-      }
-      return []
-    }
-    const { contents: events } = await this.client.get<{
-      contents: MicroCMSEventsRecord[]
-    }>({
-      endpoint: 'events',
-      queries: {
-        orders: '-date',
-        filters: `date[greater_than]${thisMonth}`,
+    return handleMicroCMSRequest(
+      this.client,
+      MICROCMS_MOCK_EVENTs,
+      async () => {
+        const { contents: events } = await this.client!.get<{
+          contents: MicroCMSEventsRecord[]
+        }>({
+          endpoint: 'events',
+          queries: {
+            orders: '-date',
+            filters: `date[greater_than]${thisMonth}`,
+          },
+        })
+        return events
       },
-    })
-    return events
+      [],
+    )
   }
   public async listGuestPosts(): Promise<MicroCMSProjectsRecord[]> {
-    if (!this.client) {
-      if (process.env.MICROCMS_API_MODE === 'mock') {
-        return MICROCMS_MOCK_BOOKs
-      }
-      return []
-    }
-    const { contents: events } = await this.client.get<{
-      contents: MicroCMSProjectsRecord[]
-    }>({
-      endpoint: 'projects',
-      queries: {
-        orders: '-published_at',
-        filters: `project_type[contains]guest_posts`,
+    return handleMicroCMSRequest(
+      this.client,
+      MICROCMS_MOCK_BOOKs,
+      async () => {
+        const { contents: events } = await this.client!.get<{
+          contents: MicroCMSProjectsRecord[]
+        }>({
+          endpoint: 'projects',
+          queries: {
+            orders: '-published_at',
+            filters: `project_type[contains]guest_posts`,
+          },
+        })
+        return events
       },
-    })
-    return events
+      [],
+    )
   }
   public async listAllProjects(): Promise<MicroCMSProjectsRecord[]> {
-    if (!this.client) {
-      if (process.env.MICROCMS_API_MODE === 'mock') {
-        return MICROCMS_MOCK_BOOKs
-      }
-      return []
-    }
-    const projects = await this.client.getAllContents({
-      endpoint: 'projects',
-    })
-    return projects
+    return handleMicroCMSRequest(
+      this.client,
+      MICROCMS_MOCK_BOOKs,
+      async () => {
+        return await this.client!.getAllContents({
+          endpoint: 'projects',
+        })
+      },
+      [],
+    )
   }
   public async listApps(): Promise<MicroCMSProjectsRecord[]> {
-    if (!this.client) {
-      if (process.env.MICROCMS_API_MODE === 'mock') {
-        return MICROCMS_MOCK_BOOKs
-      }
-      return []
-    }
-    const { contents: events } = await this.client.get<{
-      contents: MicroCMSProjectsRecord[]
-    }>({
-      endpoint: 'projects',
-      queries: {
-        orders: '-published_at',
-        filters: `project_type[contains]applications`,
-        limit: 50,
+    return handleMicroCMSRequest(
+      this.client,
+      MICROCMS_MOCK_BOOKs,
+      async () => {
+        const { contents: events } = await this.client!.get<{
+          contents: MicroCMSProjectsRecord[]
+        }>({
+          endpoint: 'projects',
+          queries: {
+            orders: '-published_at',
+            filters: `project_type[contains]applications`,
+            limit: 50,
+          },
+        })
+        return events
       },
-    })
-    return events
+      [],
+    )
   }
   public async listBooks(): Promise<MicroCMSProjectsRecord[]> {
-    if (!this.client) {
-      if (process.env.MICROCMS_API_MODE === 'mock') {
-        return MICROCMS_MOCK_BOOKs
-      }
-      return []
-    }
-    const { contents: events } = await this.client.get<{
-      contents: MicroCMSProjectsRecord[]
-    }>({
-      endpoint: 'projects',
-      queries: {
-        orders: '-published_at',
-        filters: `project_type[contains]books`,
-        limit: 50,
+    return handleMicroCMSRequest(
+      this.client,
+      MICROCMS_MOCK_BOOKs,
+      async () => {
+        const { contents: events } = await this.client!.get<{
+          contents: MicroCMSProjectsRecord[]
+        }>({
+          endpoint: 'projects',
+          queries: {
+            orders: '-published_at',
+            filters: `project_type[contains]books`,
+            limit: 50,
+          },
+        })
+        return events
       },
-    })
-    return events
+      [],
+    )
   }
   public async listFeaturedBooks() {
-    if (!this.client) {
-      if (process.env.MICROCMS_API_MODE === 'mock') {
-        return MICROCMS_MOCK_BOOKs
-      }
-      return []
-    }
-    return [
-      await this.client.get<MicroCMSProjectsRecord>({
-        endpoint: 'projects',
-        contentId: '48xxv5o8vt8j',
-      }),
-      await this.client.get<MicroCMSProjectsRecord>({
-        endpoint: 'projects',
-        contentId: 'iutgcn7l3ad',
-      }),
-    ]
+    return handleMicroCMSRequest(
+      this.client,
+      MICROCMS_MOCK_BOOKs,
+      async () => {
+        return [
+          await this.client!.get<MicroCMSProjectsRecord>({
+            endpoint: 'projects',
+            contentId: '48xxv5o8vt8j',
+          }),
+          await this.client!.get<MicroCMSProjectsRecord>({
+            endpoint: 'projects',
+            contentId: 'iutgcn7l3ad',
+          }),
+        ]
+      },
+      [],
+    )
   }
   /**
    * すべてのイベントを取得（sitemap用）
    */
   public async listAllEvents(): Promise<MicroCMSEventsRecord[]> {
-    if (!this.client) {
-      if (process.env.MICROCMS_API_MODE === 'mock') {
-        return MICROCMS_MOCK_EVENTs
-      }
-      return []
-    }
-    const events = await this.client.getAllContents<MicroCMSEventsRecord>({
-      endpoint: 'events',
-      queries: {
-        orders: '-date',
+    return handleMicroCMSRequest(
+      this.client,
+      MICROCMS_MOCK_EVENTs,
+      async () => {
+        return await this.client!.getAllContents<MicroCMSEventsRecord>({
+          endpoint: 'events',
+          queries: {
+            orders: '-date',
+          },
+        })
       },
-    })
-    return events
+      [],
+    )
   }
 }

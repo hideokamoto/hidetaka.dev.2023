@@ -1,3 +1,4 @@
+import { logger } from '@/libs/logger'
 import type { BlogItem, WPEvent } from './types'
 
 export const loadWPEvents = async (): Promise<WPEvent[]> => {
@@ -13,7 +14,9 @@ export const loadWPEvents = async (): Promise<WPEvent[]> => {
     const events: WPEvent[] = await response.json()
     return events
   } catch (error) {
-    console.error('Error loading WordPress events:', error)
+    logger.error('Failed to load WordPress events', {
+      error,
+    })
     return []
   }
 }
@@ -36,7 +39,10 @@ export const getWPEventBySlug = async (slug: string): Promise<WPEvent | null> =>
 
     return events[0]
   } catch (error) {
-    console.error('Error loading WordPress event by slug:', error)
+    logger.error('Failed to load WordPress event by slug', {
+      error,
+      slug,
+    })
     return null
   }
 }
@@ -63,7 +69,10 @@ const fetchEvent = async (url: string): Promise<WPEvent | null> => {
 
     return events[0]
   } catch (error) {
-    console.error('Error fetching event:', error)
+    logger.error('Failed to fetch event', {
+      error,
+      url,
+    })
     return null
   }
 }
@@ -84,7 +93,10 @@ export const getAdjacentEvents = async (currentEvent: WPEvent): Promise<Adjacent
       next,
     }
   } catch (error) {
-    console.error('Error loading adjacent events:', error)
+    logger.error('Failed to load adjacent events', {
+      error,
+      eventId: currentEvent.id,
+    })
     return {
       previous: null,
       next: null,
@@ -125,7 +137,11 @@ export const getRelatedEvents = async (
 
     return items
   } catch (error) {
-    console.error('Error loading related events:', error)
+    logger.error('Failed to load related events', {
+      error,
+      eventId: currentEvent.id,
+      limit,
+    })
     return []
   }
 }

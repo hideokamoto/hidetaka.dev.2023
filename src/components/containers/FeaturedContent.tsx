@@ -6,6 +6,7 @@ import DateDisplay from '@/components/ui/DateDisplay'
 import Tag from '@/components/ui/Tag'
 import { loadBlogPosts } from '@/libs/dataSources/blogs'
 import type { FeedItem } from '@/libs/dataSources/types'
+import { logger } from '@/libs/logger'
 import { MicroCMSAPI } from '@/libs/microCMS/apis'
 import { createMicroCMSClient } from '@/libs/microCMS/client'
 import type { MicroCMSEventsRecord, MicroCMSProjectsRecord } from '@/libs/microCMS/types'
@@ -55,11 +56,15 @@ function ArticleCard({
     date = new Date(datetime)
     // Validate date
     if (Number.isNaN(date.getTime())) {
-      console.warn('Invalid date string:', datetime, 'for article:', title)
+      logger.warn('Invalid date string', { datetime, articleTitle: title })
       date = new Date() // Fallback to current date
     }
   } catch (e) {
-    console.warn('Date parsing error:', e, 'for article:', title)
+    logger.warn('Date parsing error', {
+      error: e instanceof Error ? e.message : String(e),
+      datetime,
+      articleTitle: title,
+    })
     date = new Date() // Fallback to current date
   }
 

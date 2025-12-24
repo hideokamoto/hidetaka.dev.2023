@@ -1,3 +1,4 @@
+import { logger } from '@/libs/logger'
 import { loadFeedPosts } from './feed.utils'
 import type { FeedDataSource, FeedItem, ZennFeed } from './types'
 
@@ -23,7 +24,10 @@ export const loadZennPosts = async (): Promise<{ items: FeedItem[]; hasMore: boo
     if (datetime) {
       const parsedDate = new Date(datetime)
       if (Number.isNaN(parsedDate.getTime())) {
-        console.warn('Invalid date from Zenn feed:', datetime, 'for article:', data.title)
+        logger.warn('Invalid date from Zenn feed', {
+          datetime,
+          articleTitle: data.title,
+        })
         // Fallback: use current date if parsing fails
         datetime = new Date().toISOString()
       } else {

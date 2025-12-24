@@ -1,3 +1,5 @@
+import { logger } from '@/libs/logger'
+
 export const listMyNPMPackages = async () => {
   try {
     const { objects: packages } = await searchNPMPackages('text=author:hideokamoto').catch(() => ({
@@ -20,7 +22,9 @@ export const listMyNPMPackages = async () => {
     }
     return Array.from(uniquePackages.values())
   } catch (error) {
-    console.error('Error loading NPM packages:', error)
+    logger.error('Failed to load NPM packages', {
+      error,
+    })
     return []
   }
 }
@@ -76,7 +80,10 @@ export const searchNPMPackages = async (query: string): Promise<NPMRegistrySearc
     const result = await res.json()
     return result
   } catch (e) {
-    console.log(e)
+    logger.error('Failed to search NPM packages', {
+      error: e instanceof Error ? e.message : String(e),
+      query,
+    })
     throw e
   }
 }

@@ -298,11 +298,11 @@ export default function Header() {
 
         <div
           className="relative top-0 z-10 h-20 pt-6"
-          style={{ position: 'var(--header-position)' as any }}
+          style={{ position: 'var(--header-position)' } as unknown as React.CSSProperties}
         >
           <Container
             className="top-[var(--header-top,theme(spacing.6))] w-full"
-            style={{ position: 'var(--header-inner-position)' as any }}
+            style={{ position: 'var(--header-inner-position)' } as unknown as React.CSSProperties}
           >
             <div className="flex items-center justify-between gap-4">
               {/* Logo */}

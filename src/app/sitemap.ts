@@ -3,6 +3,7 @@ import { SITE_CONFIG } from '@/config'
 import { loadAllDevNotes } from '@/libs/dataSources/devnotes'
 import { loadAllProducts } from '@/libs/dataSources/products'
 import { loadAllThoughts } from '@/libs/dataSources/thoughts'
+import { logger } from '@/libs/logger'
 import { MicroCMSAPI } from '@/libs/microCMS/apis'
 import { createMicroCMSClient } from '@/libs/microCMS/client'
 
@@ -88,7 +89,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     }))
   } catch (error) {
-    console.error('Error loading blog posts for sitemap:', error)
+    logger.error('Failed to load blog posts for sitemap', {
+      error,
+    })
   }
 
   // プロジェクト
@@ -106,7 +109,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       )
     })
   } catch (error) {
-    console.error('Error loading projects for sitemap:', error)
+    logger.error('Failed to load projects for sitemap', {
+      error,
+    })
   }
 
   // 製品ニュース（WordPress API products）
@@ -124,7 +129,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       )
     })
   } catch (error) {
-    console.error('Error loading product news for sitemap:', error)
+    logger.error('Failed to load product news for sitemap', {
+      error,
+    })
   }
 
   // Dev Notes（WordPress API、日本語のみ）
@@ -138,7 +145,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     }))
   } catch (error) {
-    console.error('Error loading dev-notes for sitemap:', error)
+    logger.error('Failed to load dev-notes for sitemap', {
+      error,
+    })
   }
 
   return [...staticPages, ...blogPages, ...projectPages, ...productNewsPages, ...devNotesPages]

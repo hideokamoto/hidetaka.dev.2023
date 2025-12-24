@@ -1,6 +1,24 @@
 import { XMLParser } from 'fast-xml-parser'
+import { logger } from '@/libs/logger'
 
 const parser = new XMLParser()
+
+// RSSフィードのアイテム型定義
+type RSSItem = {
+  title: string
+  description: string
+  pubDate: string
+  link: string
+}
+
+// Atomフィードのエントリ型定義
+type AtomEntry = {
+  title: string
+  content: string
+  updated: string
+  url: string
+}
+
 export const loadFeedPosts = async <T>(url: string): Promise<T> => {
   try {
     const response = await fetch(url, {
@@ -14,7 +32,7 @@ export const loadFeedPosts = async <T>(url: string): Promise<T> => {
       const items = Array.isArray(item) ? item : item ? [item] : []
       return {
         lastBuildDate,
-        items: items.map((d: any) => {
+        items: items.map((d: RSSItem) => {
           return {
             title: d.title,
             content: d.description,
@@ -32,7 +50,7 @@ export const loadFeedPosts = async <T>(url: string): Promise<T> => {
       const entries = Array.isArray(entry) ? entry : entry ? [entry] : []
       return {
         lastBuildDate: updated,
-        items: entries.map((e: any) => {
+        items: entries.map((e: AtomEntry) => {
           return {
             title: e.title,
             content: e.content,
@@ -45,10 +63,13 @@ export const loadFeedPosts = async <T>(url: string): Promise<T> => {
         link,
       } as T
     } else {
-      throw new Error('Un supported feed type')
+      throw new Error('Unsupported feed type')
     }
   } catch (e) {
-    console.log('Importing feed error', e)
+    logger.error('Failed to import feed', {
+      error: e instanceof Error ? e.message : String(e),
+      url,
+    })
     throw e
   }
 }

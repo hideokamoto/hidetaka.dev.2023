@@ -3,6 +3,8 @@
  * Pure functions for date formatting logic following Kent Beck's unit testing principles
  */
 
+import { logger } from './logger'
+
 export type DateFormat = 'short' | 'long' | 'month-year'
 
 // Date format options constants (defined at module level for performance)
@@ -88,7 +90,7 @@ export function parseDateAndFormat(
   const dateObj = parseDate(date)
 
   if (!isValidDate(dateObj)) {
-    console.warn('Invalid date:', date)
+    logger.warn('Invalid date', { date: String(date) })
     return null
   }
 
