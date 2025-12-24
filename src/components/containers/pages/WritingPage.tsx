@@ -1,7 +1,6 @@
 'use client'
 
 import Image from 'next/image'
-import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
@@ -13,6 +12,7 @@ import SearchBar from '@/components/ui/SearchBar'
 import SidebarLayout from '@/components/ui/SidebarLayout'
 import Tag from '@/components/ui/Tag'
 import type { FeedItem } from '@/libs/dataSources/types'
+import { removeHtmlTags } from '@/libs/sanitize'
 
 type WritingItem = FeedItem
 type FilterDataSource = string | null
@@ -21,7 +21,7 @@ type FilterDataSource = string | null
 function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string }) {
   const href = item.href
   const title = item.title
-  const description = item.description
+  const description = removeHtmlTags(item.description)
   const datetime = item.datetime
   const date = new Date(datetime)
   const imageUrl = item.image
@@ -226,7 +226,7 @@ export default function WritingPageContent({
     if (!searchQuery.trim()) return true
     const query = searchQuery.toLowerCase()
     const title = item.title.toLowerCase()
-    const description = item.description.toLowerCase()
+    const description = removeHtmlTags(item.description || '').toLowerCase()
 
     return title.includes(query) || description.includes(query)
   }
