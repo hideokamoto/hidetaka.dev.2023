@@ -1,3 +1,4 @@
+import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
 import {
   calculateNextPage,
@@ -141,6 +142,168 @@ describe('Pagination Utils', () => {
       expect(shouldShowPagination(5)).toBe(true)
       expect(shouldShowPagination(10)).toBe(true)
       expect(shouldShowPagination(100)).toBe(true)
+    })
+  })
+
+  describe('property-based tests', () => {
+    describe('calculatePrevPage', () => {
+      it('should return null for page 1, and currentPage - 1 for pages > 1', () => {
+        fc.assert(
+          fc.property(fc.integer({ min: 1, max: 1000 }), (currentPage) => {
+            const result = calculatePrevPage(currentPage)
+            if (currentPage === 1) {
+              expect(result).toBe(null)
+            } else {
+              expect(result).toBe(currentPage - 1)
+            }
+          }),
+        )
+      })
+
+      it('should always return a value less than currentPage or null', () => {
+        fc.assert(
+          fc.property(fc.integer({ min: 1, max: 1000 }), (currentPage) => {
+            const result = calculatePrevPage(currentPage)
+            if (result !== null) {
+              expect(result).toBeLessThan(currentPage)
+              expect(result).toBeGreaterThanOrEqual(1)
+            }
+          }),
+        )
+      })
+    })
+
+    describe('calculateNextPage', () => {
+      it('should return null when currentPage >= totalPages, otherwise currentPage + 1', () => {
+        fc.assert(
+          fc.property(
+            fc.integer({ min: 1, max: 1000 }),
+            fc.integer({ min: 1, max: 1000 }),
+            (currentPage, totalPages) => {
+              const result = calculateNextPage(currentPage, totalPages)
+              if (currentPage >= totalPages) {
+                expect(result).toBe(null)
+              } else {
+                expect(result).toBe(currentPage + 1)
+              }
+            },
+          ),
+        )
+      })
+
+      it('should always return a value greater than currentPage or null', () => {
+        fc.assert(
+          fc.property(
+            fc.integer({ min: 1, max: 1000 }),
+            fc.integer({ min: 1, max: 1000 }),
+            (currentPage, totalPages) => {
+              const result = calculateNextPage(currentPage, totalPages)
+              if (result !== null) {
+                expect(result).toBeGreaterThan(currentPage)
+                expect(result).toBeLessThanOrEqual(totalPages)
+              }
+            },
+          ),
+        )
+      })
+    })
+
+    describe('generatePageHref', () => {
+      it('should return empty string for null, basePath for page 1, and basePath/page/N for page > 1', () => {
+        fc.assert(
+          fc.property(
+            fc.string({ minLength: 1, maxLength: 50 }),
+            fc.oneof(fc.constant(null), fc.integer({ min: 1, max: 1000 })),
+            (basePath, pageNumber) => {
+              const result = generatePageHref(basePath, pageNumber)
+              if (pageNumber === null) {
+                expect(result).toBe('')
+              } else if (pageNumber === 1) {
+                expect(result).toBe(basePath)
+              } else {
+                expect(result).toBe(`${basePath}/page/${pageNumber}`)
+              }
+            },
+          ),
+        )
+      })
+
+      it('should always include basePath in result (except for null)', () => {
+        fc.assert(
+          fc.property(
+            fc.string({ minLength: 1, maxLength: 50 }),
+            fc.integer({ min: 1, max: 1000 }),
+            (basePath, pageNumber) => {
+              const result = generatePageHref(basePath, pageNumber)
+              if (pageNumber === 1) {
+                expect(result).toBe(basePath)
+              } else {
+                expect(result).toContain(basePath)
+                expect(result).toContain(`/page/${pageNumber}`)
+              }
+            },
+          ),
+        )
+      })
+    })
+
+    describe('shouldShowPagination', () => {
+      it('should return false for totalPages <= 1, true for totalPages > 1', () => {
+        fc.assert(
+          fc.property(fc.integer({ min: 0, max: 1000 }), (totalPages) => {
+            const result = shouldShowPagination(totalPages)
+            if (totalPages <= 1) {
+              expect(result).toBe(false)
+            } else {
+              expect(result).toBe(true)
+            }
+          }),
+        )
+      })
+    })
+
+    describe('getPaginationText', () => {
+      it('should return non-empty string for any language and key', () => {
+        fc.assert(
+          fc.property(
+            fc.string({ minLength: 0, maxLength: 20 }),
+            fc.constantFrom('prev', 'next', 'page' as const),
+            (lang, key) => {
+              const result = getPaginationText(lang, key)
+              expect(typeof result).toBe('string')
+              expect(result.length).toBeGreaterThan(0)
+            },
+          ),
+        )
+      })
+
+      it('should return Japanese text for languages starting with "ja"', () => {
+        fc.assert(
+          fc.property(
+            fc.string({ minLength: 2, maxLength: 20 }).filter((s) => s.startsWith('ja')),
+            fc.constantFrom('prev', 'next', 'page' as const),
+            (lang, key) => {
+              const result = getPaginationText(lang, key)
+              // 日本語のテキストが返されることを確認（具体的な値は既存テストで確認済み）
+              expect(result).toBeTruthy()
+            },
+          ),
+        )
+      })
+
+      it('should return English text for languages not starting with "ja"', () => {
+        fc.assert(
+          fc.property(
+            fc.string({ minLength: 0, maxLength: 20 }).filter((s) => !s.startsWith('ja')),
+            fc.constantFrom('prev', 'next', 'page' as const),
+            (lang, key) => {
+              const result = getPaginationText(lang, key)
+              // 英語のテキストが返されることを確認（具体的な値は既存テストで確認済み）
+              expect(result).toBeTruthy()
+            },
+          ),
+        )
+      })
     })
   })
 })

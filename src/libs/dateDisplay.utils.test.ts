@@ -1,3 +1,4 @@
+import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
 import {
   formatDateDisplay,
@@ -216,6 +217,195 @@ describe('DateDisplay Utils', () => {
       expect(parseDateAndFormat('2024-01-01', 'en', 'short')).toBeTruthy()
       expect(parseDateAndFormat('2024-12-31', 'en', 'short')).toBeTruthy()
       expect(parseDateAndFormat('2024-02-29', 'en', 'short')).toBeTruthy() // Leap year
+    })
+  })
+
+  describe('property-based tests', () => {
+    describe('parseDate', () => {
+      it('should return Date object when input is Date', () => {
+        fc.assert(
+          fc.property(
+            fc.date({ min: new Date('1900-01-01'), max: new Date('2100-12-31') }),
+            (date) => {
+              const result = parseDate(date)
+              expect(result).toBe(date)
+              expect(result).toBeInstanceOf(Date)
+            },
+          ),
+        )
+      })
+
+      it('should return Date object when input is string', () => {
+        fc.assert(
+          fc.property(
+            fc.date({ min: new Date('1900-01-01'), max: new Date('2100-12-31') }).map((date) => {
+              const year = date.getUTCFullYear()
+              const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+              const day = String(date.getUTCDate()).padStart(2, '0')
+              return `${year}-${month}-${day}`
+            }),
+            (dateStr) => {
+              const result = parseDate(dateStr)
+              expect(result).toBeInstanceOf(Date)
+            },
+          ),
+        )
+      })
+    })
+
+    describe('isValidDate', () => {
+      it('should return true for valid dates', () => {
+        fc.assert(
+          fc.property(
+            fc.date({ min: new Date('1900-01-01'), max: new Date('2100-12-31') }),
+            (date) => {
+              expect(isValidDate(date)).toBe(true)
+            },
+          ),
+        )
+      })
+
+      it('should return false for invalid dates', () => {
+        fc.assert(
+          fc.property(
+            fc.string().filter((s) => {
+              const date = new Date(s)
+              return Number.isNaN(date.getTime())
+            }),
+            (invalidStr) => {
+              const invalidDate = new Date(invalidStr)
+              expect(isValidDate(invalidDate)).toBe(false)
+            },
+          ),
+        )
+      })
+    })
+
+    describe('getDateLocale', () => {
+      it('should return "ja-JP" for languages starting with "ja"', () => {
+        fc.assert(
+          fc.property(
+            fc.string({ minLength: 2, maxLength: 20 }).filter((s) => s.startsWith('ja')),
+            (lang) => {
+              expect(getDateLocale(lang)).toBe('ja-JP')
+            },
+          ),
+        )
+      })
+
+      it('should return "en-US" for languages not starting with "ja"', () => {
+        fc.assert(
+          fc.property(
+            fc.string({ minLength: 0, maxLength: 20 }).filter((s) => !s.startsWith('ja')),
+            (lang) => {
+              expect(getDateLocale(lang)).toBe('en-US')
+            },
+          ),
+        )
+      })
+    })
+
+    describe('formatDateDisplay', () => {
+      it('should return a non-empty string for any valid date', () => {
+        fc.assert(
+          fc.property(
+            fc.date({ min: new Date('1900-01-01'), max: new Date('2100-12-31') }),
+            fc.string({ minLength: 0, maxLength: 20 }),
+            fc.constantFrom('short', 'long', 'month-year' as const),
+            (date, lang, format) => {
+              const result = formatDateDisplay(date, lang, format)
+              expect(typeof result).toBe('string')
+              expect(result.length).toBeGreaterThan(0)
+            },
+          ),
+        )
+      })
+
+      it('should include year in output for all formats', () => {
+        fc.assert(
+          fc.property(
+            fc.date({ min: new Date('1900-01-01'), max: new Date('2100-12-31') }).filter((date) => {
+              return !Number.isNaN(date.getTime())
+            }),
+            fc.string({ minLength: 0, maxLength: 20 }),
+            fc.constantFrom('short', 'long', 'month-year' as const),
+            (date, lang, format) => {
+              const result = formatDateDisplay(date, lang, format)
+              const year = date.getFullYear().toString()
+              expect(result).toContain(year)
+            },
+          ),
+        )
+      })
+
+      it('should be consistent for same date, lang, and format', () => {
+        fc.assert(
+          fc.property(
+            fc.date({ min: new Date('1900-01-01'), max: new Date('2100-12-31') }),
+            fc.string({ minLength: 0, maxLength: 20 }),
+            fc.constantFrom('short', 'long', 'month-year' as const),
+            (date, lang, format) => {
+              const result1 = formatDateDisplay(date, lang, format)
+              const result2 = formatDateDisplay(date, lang, format)
+              expect(result1).toBe(result2)
+            },
+          ),
+        )
+      })
+    })
+
+    describe('parseDateAndFormat', () => {
+      it('should return string or null for any input', () => {
+        fc.assert(
+          fc.property(
+            fc.oneof(
+              fc.date({ min: new Date('1900-01-01'), max: new Date('2100-12-31') }),
+              fc.string({ minLength: 0, maxLength: 100 }),
+            ),
+            fc.string({ minLength: 0, maxLength: 20 }),
+            fc.constantFrom('short', 'long', 'month-year' as const),
+            (date, lang, format) => {
+              const result = parseDateAndFormat(date, lang, format)
+              expect(result === null || typeof result === 'string').toBe(true)
+            },
+          ),
+        )
+      })
+
+      it('should return null for invalid date strings', () => {
+        fc.assert(
+          fc.property(
+            fc.string().filter((s) => {
+              const date = new Date(s)
+              return Number.isNaN(date.getTime())
+            }),
+            fc.string({ minLength: 0, maxLength: 20 }),
+            fc.constantFrom('short', 'long', 'month-year' as const),
+            (invalidStr, lang, format) => {
+              const result = parseDateAndFormat(invalidStr, lang, format)
+              expect(result).toBe(null)
+            },
+          ),
+        )
+      })
+
+      it('should return non-null string for valid dates', () => {
+        fc.assert(
+          fc.property(
+            fc.date({ min: new Date('1900-01-01'), max: new Date('2100-12-31') }),
+            fc.string({ minLength: 0, maxLength: 20 }),
+            fc.constantFrom('short', 'long', 'month-year' as const),
+            (date, lang, format) => {
+              const result = parseDateAndFormat(date, lang, format)
+              expect(result).not.toBe(null)
+              if (result !== null) {
+                expect(typeof result).toBe('string')
+                expect(result.length).toBeGreaterThan(0)
+              }
+            },
+          ),
+        )
+      })
     })
   })
 })
