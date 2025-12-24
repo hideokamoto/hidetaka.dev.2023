@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import FilterItem from '@/components/ui/FilterItem'
@@ -12,7 +12,6 @@ import SearchBar from '@/components/ui/SearchBar'
 import SidebarLayout from '@/components/ui/SidebarLayout'
 import Tag from '@/components/ui/Tag'
 import type { FeedItem } from '@/libs/dataSources/types'
-import { removeHtmlTags } from '@/libs/sanitize'
 
 type WritingItem = FeedItem
 type FilterDataSource = string | null
@@ -67,8 +66,8 @@ function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string })
           {/* Description */}
           {description && (
             <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-3">
-              {removeHtmlTags(description)}
-              {removeHtmlTags(description).length >= 150 ? '...' : ''}
+              {description}
+              {description.length >= 150 ? '...' : ''}
             </p>
           )}
 
@@ -222,17 +221,14 @@ export default function WritingPageContent({
   }, [externalArticles])
 
   // 検索フィルター関数
-  const matchesSearch = useCallback(
-    (item: WritingItem): boolean => {
-      if (!searchQuery.trim()) return true
-      const query = searchQuery.toLowerCase()
-      const title = item.title.toLowerCase()
-      const description = item.description.toLowerCase()
+  const matchesSearch = (item: WritingItem): boolean => {
+    if (!searchQuery.trim()) return true
+    const query = searchQuery.toLowerCase()
+    const title = item.title.toLowerCase()
+    const description = item.description.toLowerCase()
 
-      return title.includes(query) || description.includes(query)
-    },
-    [searchQuery],
-  )
+    return title.includes(query) || description.includes(query)
+  }
 
   // フィルターと検索を適用
   const filteredItems = useMemo(() => {
@@ -254,7 +250,7 @@ export default function WritingPageContent({
     })
 
     return items
-  }, [allItems, filterDataSource, matchesSearch])
+  }, [allItems, filterDataSource, searchQuery])
 
   // カウント計算
   const counts = useMemo(() => {
