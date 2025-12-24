@@ -61,7 +61,6 @@ describe('formatDate', () => {
           const result = formatDate(dateStr)
           const date = new Date(`${dateStr}T00:00:00Z`)
           const year = date.getUTCFullYear().toString()
-          const month = date.getUTCMonth() + 1 // 1-12
           const day = date.getUTCDate().toString()
           expect(result).toContain(year)
           // 月名が含まれていることを確認（January, February, etc.）
