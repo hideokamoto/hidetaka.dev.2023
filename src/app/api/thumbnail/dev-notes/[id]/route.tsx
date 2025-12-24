@@ -1,7 +1,7 @@
 import type { NextRequest } from 'next/server'
 import { SITE_CONFIG } from '@/config'
-import { logger } from '@/libs/logger'
 import type { WPThought } from '@/libs/dataSources/types'
+import { logger } from '@/libs/logger'
 
 // getCloudflareContextを動的インポートで取得（OpenNextのビルドプロセスで正しく解決されるように）
 async function getCloudflareContext(
@@ -31,10 +31,10 @@ async function getCloudflareContext(
  * WordPressのdev-notes投稿タイプ用のサムネイル画像生成API
  */
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    const { id } = await params
-    const postId = Number.parseInt(id, 10)
+  const { id } = await params
+  const postId = Number.parseInt(id, 10)
 
+  try {
     if (Number.isNaN(postId) || postId <= 0) {
       return new Response('Invalid post ID', { status: 404 })
     }

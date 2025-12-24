@@ -1,5 +1,5 @@
 import { logger } from '@/libs/logger'
-import type { MicroCMSClient } from './types'
+import type { MicroCMSClient, MicroCMSEventsRecord } from './types'
 
 /**
  * microCMS APIリクエストのエラーハンドリングヘルパー
@@ -37,4 +37,17 @@ export async function handleMicroCMSRequest<T>(
     // モックモードでない場合は空値を返す
     return emptyValue
   }
+}
+
+/**
+ * イベントを日付で降順にソート（最新が先頭）
+ * @param events - ソートするイベントの配列
+ * @returns ソートされたイベントの配列（元の配列は変更されない）
+ */
+export function sortByEventDate(events: MicroCMSEventsRecord[]): MicroCMSEventsRecord[] {
+  return [...events].sort((a, b) => {
+    const dateA = new Date(a.date).getTime()
+    const dateB = new Date(b.date).getTime()
+    return dateB - dateA // 降順（新しい日付が先）
+  })
 }

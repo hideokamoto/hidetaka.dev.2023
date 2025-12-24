@@ -24,20 +24,21 @@ function CardTitle({ href, children }: { href?: string; children: React.ReactNod
   )
 }
 
-type CardEyebrowProps<T extends keyof React.JSX.IntrinsicElements = 'p'> = {
-  as?: T
+type CardEyebrowProps = {
+  as?: keyof React.JSX.IntrinsicElements
   children: React.ReactNode
   className?: string
   decorate?: boolean
-} & Omit<React.ComponentPropsWithoutRef<T>, 'children' | 'className'>
+  [key: string]: unknown
+}
 
-function CardEyebrow<T extends keyof React.JSX.IntrinsicElements = 'p'>({
-  as: Component = 'p' as T,
+function CardEyebrow({
+  as: Component = 'p',
   children,
   className = '',
   decorate,
   ...props
-}: CardEyebrowProps<T>) {
+}: CardEyebrowProps) {
   return (
     <Component
       className={`relative z-10 order-first mb-3 flex items-center text-sm text-zinc-400 dark:text-zinc-500 ${

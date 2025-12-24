@@ -1,9 +1,9 @@
 import type { MetadataRoute } from 'next'
 import { SITE_CONFIG } from '@/config'
-import { logger } from '@/libs/logger'
 import { loadAllDevNotes } from '@/libs/dataSources/devnotes'
 import { loadAllProducts } from '@/libs/dataSources/products'
 import { loadAllThoughts } from '@/libs/dataSources/thoughts'
+import { logger } from '@/libs/logger'
 import { MicroCMSAPI } from '@/libs/microCMS/apis'
 import { createMicroCMSClient } from '@/libs/microCMS/client'
 

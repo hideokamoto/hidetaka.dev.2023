@@ -1,5 +1,5 @@
-import { isJapanese } from '@/libs/urlUtils/lang.util'
 import { logger } from '@/libs/logger'
+import { isJapanese } from '@/libs/urlUtils/lang.util'
 import { loadDevNotes } from './devnotes'
 import { loadDevToPosts } from './devto'
 import { loadQiitaPosts } from './qiita'

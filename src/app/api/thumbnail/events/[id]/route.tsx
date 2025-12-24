@@ -1,7 +1,7 @@
 import type { NextRequest } from 'next/server'
 import { SITE_CONFIG } from '@/config'
-import { logger } from '@/libs/logger'
 import type { WPEvent } from '@/libs/dataSources/types'
+import { logger } from '@/libs/logger'
 
 // @see https://opennext.js.org/cloudflare/get-started#9-remove-any-export-const-runtime--edge-if-present
 // export const runtime = 'edge'
@@ -39,10 +39,10 @@ async function getCloudflareContext(
  * これにより、任意の文字列で画像を生成することを防止
  */
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  try {
-    const { id } = await params
-    const postId = parseInt(id, 10)
+  const { id } = await params
+  const postId = parseInt(id, 10)
 
+  try {
     // IDが有効な数値でない場合は404を返す
     if (Number.isNaN(postId) || postId <= 0) {
       return new Response('Invalid post ID', { status: 404 })

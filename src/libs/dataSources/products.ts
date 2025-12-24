@@ -102,7 +102,7 @@ export const loadProducts = async (
  */
 export const getProductBySlug = async (
   slug: string,
-  lang: 'en' | 'ja' = 'en',
+  _lang: 'en' | 'ja' = 'en',
 ): Promise<WPProduct | null> => {
   try {
     const response = await fetch(
