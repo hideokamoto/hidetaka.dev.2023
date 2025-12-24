@@ -17,7 +17,8 @@ export const loadDevToPosts = async (): Promise<{ items: FeedItem[]; hasMore: bo
     },
   )
   const allItems = [...personal, ...stripe]
-  const items = allItems.map((data): FeedItem => {
+  const hasMore = allItems.length > 20
+  const items = allItems.slice(0, 20).map((data): FeedItem => {
     return {
       id: data.id,
       title: data.title,
@@ -31,5 +32,5 @@ export const loadDevToPosts = async (): Promise<{ items: FeedItem[]; hasMore: bo
       },
     }
   })
-  return { items, hasMore: false }
+  return { items, hasMore }
 }

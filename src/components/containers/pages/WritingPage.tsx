@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import FilterItem from '@/components/ui/FilterItem'
@@ -196,8 +196,6 @@ export default function WritingPageContent({
   const [searchQuery, setSearchQuery] = useState('')
   const [filterDataSource, setFilterDataSource] = useState<FilterDataSource>(null)
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
-  const [currentPage, setCurrentPage] = useState(1)
-  const itemsPerPage = 20
 
   // 全記事を統合
   const allItems: WritingItem[] = externalArticles
@@ -257,17 +255,6 @@ export default function WritingPageContent({
 
     return items
   }, [allItems, filterDataSource, matchesSearch])
-
-  // ページネーション計算
-  const totalPages = Math.ceil(filteredItems.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const paginatedItems = filteredItems.slice(startIndex, endIndex)
-
-  // フィルターや検索が変更されたらページをリセット
-  useEffect(() => {
-    setCurrentPage(1)
-  }, [filterDataSource, searchQuery])
 
   // カウント計算
   const counts = useMemo(() => {
@@ -389,116 +376,13 @@ export default function WritingPageContent({
             {filteredItems.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                  {paginatedItems.map((item) => (
+                  {filteredItems.map((item) => (
                     <UnifiedWritingCard key={item.href} item={item} lang={lang} />
                   ))}
                 </div>
 
-                {/* ページネーション */}
-                {totalPages > 1 && (
-                  <nav
-                    className="flex items-center justify-between border-t border-zinc-200 dark:border-zinc-800 px-4 py-3 sm:px-6 mt-12"
-                    aria-label="Pagination"
-                  >
-                    <div className="flex flex-1 justify-between sm:justify-start">
-                      {currentPage > 1 ? (
-                        <button
-                          type="button"
-                          onClick={() => setCurrentPage(currentPage - 1)}
-                          className="relative inline-flex items-center rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
-                        >
-                          <svg
-                            className="mr-2 h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M15 19l-7-7 7-7"
-                            />
-                          </svg>
-                          {lang === 'ja' ? '前へ' : 'Previous'}
-                        </button>
-                      ) : (
-                        <div className="relative inline-flex items-center rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-400 dark:text-zinc-600 cursor-not-allowed">
-                          <svg
-                            className="mr-2 h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M15 19l-7-7 7-7"
-                            />
-                          </svg>
-                          {lang === 'ja' ? '前へ' : 'Previous'}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-center">
-                      <div>
-                        <p className="text-sm text-zinc-700 dark:text-zinc-300">
-                          <span className="font-medium">{currentPage}</span>
-                          <span className="mx-1">/</span>
-                          <span className="font-medium">{totalPages}</span>
-                          <span className="ml-1">{lang === 'ja' ? 'ページ' : 'Page'}</span>
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-1 justify-end">
-                      {currentPage < totalPages ? (
-                        <button
-                          type="button"
-                          onClick={() => setCurrentPage(currentPage + 1)}
-                          className="relative inline-flex items-center rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
-                        >
-                          {lang === 'ja' ? '次へ' : 'Next'}
-                          <svg
-                            className="ml-2 h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 5l7 7-7 7"
-                            />
-                          </svg>
-                        </button>
-                      ) : (
-                        <div className="relative inline-flex items-center rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-400 dark:text-zinc-600 cursor-not-allowed">
-                          {lang === 'ja' ? '次へ' : 'Next'}
-                          <svg
-                            className="ml-2 h-5 w-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 5l7 7-7 7"
-                            />
-                          </svg>
-                        </div>
-                      )}
-                    </div>
-                  </nav>
-                )}
-
-                {/* 外部動線セクション（最初のページのみ表示） */}
-                {currentPage === 1 && availableDataSources.length > 0 && (
+                {/* 外部動線セクション */}
+                {availableDataSources.length > 0 && (
                   <div className="mt-16 pt-16 border-t border-zinc-200 dark:border-zinc-800">
                     <div className="text-center">
                       <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
@@ -506,8 +390,8 @@ export default function WritingPageContent({
                       </h3>
                       <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
                         {lang === 'ja'
-                          ? 'すべての記事を表示しています。各サイトでも記事を閲覧できます。'
-                          : 'Showing all articles. You can also view articles on each site.'}
+                          ? '最新20件を表示しています。それ以前の記事は各サイトでご覧ください。'
+                          : 'Showing the latest 20 articles. View older articles on each site.'}
                       </p>
                       <div className="flex flex-wrap justify-center gap-4">
                         {availableDataSources.map((source) => {
