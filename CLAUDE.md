@@ -412,26 +412,50 @@ Before committing or pushing any code changes, you **MUST** run these commands a
 
 ```bash
 # 1. Run Biome linter/formatter check
-npm run lint
+npm run lint:check
 
-# 2. Build the project to verify no TypeScript errors
+# 2. Run unit tests
+npm run test
+
+# 3. Build the project to verify no TypeScript errors
 npm run build
 ```
 
 ### Why This Is Critical
 
-1. **Lint Check (`npm run lint`):**
+1. **Lint Check (`npm run lint:check`):**
    - Catches code quality issues, potential bugs, and style violations
    - Ensures accessibility (a11y) compliance
    - Validates TypeScript correctness
-   - **If lint fails:** Fix all issues before committing
+   - **If lint fails:** Run `npm run lint` to auto-fix issues, then re-check
 
-2. **Build Check (`npm run build`):**
+2. **Unit Test (`npm run test`):**
+   - Verifies all unit tests pass
+   - Prevents regression bugs
+   - Ensures code changes don't break existing functionality
+   - **If tests fail:** Fix failing tests before committing
+
+3. **Build Check (`npm run build`):**
    - Verifies TypeScript compilation succeeds
    - Catches type errors across the entire codebase
    - Ensures all imports and dependencies resolve correctly
    - Validates Next.js static generation works
    - **If build fails:** Fix all errors before committing
+
+### Git Pre-push Hook
+
+**A Git pre-push hook is configured** (`.git/hooks/pre-push`) that automatically runs all checks before allowing a push:
+
+1. Lint check (`npm run lint:check`)
+2. Unit tests (`npm run test`)
+3. Build check (`npm run build`)
+
+**If any check fails, the push will be blocked.** You must fix all issues before pushing.
+
+To manually run all checks:
+```bash
+npm run pre-push
+```
 
 ### Pre-commit Workflow
 
@@ -439,32 +463,41 @@ npm run build
 # 1. Make your code changes
 # ... edit files ...
 
-# 2. Run lint and fix issues
-npm run lint
+# 2. Run lint check
+npm run lint:check
+# If fails, run: npm run lint (auto-fix)
 
-# 3. Build and verify
+# 3. Run unit tests
+npm run test
+# Fix any failing tests
+
+# 4. Build and verify
 npm run build
+# Fix any TypeScript errors
 
-# 4. If both pass, commit your changes
+# 5. If all pass, commit your changes
 git add .
 git commit -m "feat: your commit message"
 
-# 5. Push to remote
+# 6. Push to remote (pre-push hook will run automatically)
 git push -u origin <branch-name>
 ```
 
 ### For AI Assistants
 
 **NEVER commit or push code without:**
-1. ✅ Running `npm run lint` and confirming it passes
-2. ✅ Running `npm run build` and confirming it succeeds
-3. ✅ Fixing any errors or warnings that appear
+1. ✅ Running `npm run lint:check` and confirming it passes
+2. ✅ Running `npm run test` and confirming all tests pass
+3. ✅ Running `npm run build` and confirming it succeeds
+4. ✅ Fixing any errors or warnings that appear
 
-**If either command fails:**
+**If any command fails:**
 - Read the error messages carefully
 - Fix all issues in the code
 - Re-run the checks
-- Only proceed when both commands succeed
+- Only proceed when all commands succeed
+
+**Note:** The Git pre-push hook will automatically block pushes if checks fail, but you should run checks manually before attempting to push to avoid delays.
 
 ---
 
