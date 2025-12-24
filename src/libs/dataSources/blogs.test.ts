@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isJapanese } from './blogs'
+import { isJapanese } from '@/libs/urlUtils/lang.util'
 
 describe('isJapanese', () => {
   it.each([

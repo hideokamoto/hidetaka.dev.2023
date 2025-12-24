@@ -1,14 +1,11 @@
 import Link from 'next/link'
 import type { FeedItem } from '@/libs/dataSources/types'
+import { parseDateAndFormat } from '@/libs/dateDisplay.utils'
 import { removeHtmlTags } from '@/libs/sanitize'
 
 function formatDate(dateString: string, lang: string): string {
-  return new Date(`${dateString}`).toLocaleDateString(lang, {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'UTC',
-  })
+  const formatted = parseDateAndFormat(dateString, lang, 'long')
+  return formatted || dateString
 }
 
 function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
@@ -27,19 +24,20 @@ function CardTitle({ href, children }: { href?: string; children: React.ReactNod
   )
 }
 
-function CardEyebrow({
-  as: Component = 'p',
+type CardEyebrowProps<T extends keyof React.JSX.IntrinsicElements = 'p'> = {
+  as?: T
+  children: React.ReactNode
+  className?: string
+  decorate?: boolean
+} & Omit<React.ComponentPropsWithoutRef<T>, 'children' | 'className'>
+
+function CardEyebrow<T extends keyof React.JSX.IntrinsicElements = 'p'>({
+  as: Component = 'p' as T,
   children,
   className = '',
   decorate,
   ...props
-}: {
-  as?: keyof React.JSX.IntrinsicElements
-  children: React.ReactNode
-  className?: string
-  decorate?: boolean
-  [key: string]: any
-}) {
+}: CardEyebrowProps<T>) {
   return (
     <Component
       className={`relative z-10 order-first mb-3 flex items-center text-sm text-zinc-400 dark:text-zinc-500 ${

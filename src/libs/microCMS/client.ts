@@ -1,4 +1,5 @@
 import { createClient } from 'microcms-js-sdk'
+import { logger } from '@/libs/logger'
 import type { MicroCMSClient } from './types'
 
 export const createMicroCMSClient = (): MicroCMSClient => {
@@ -11,9 +12,7 @@ export const createMicroCMSClient = (): MicroCMSClient => {
     })
   }
 
-  console.log({
-    message: 'Failed to load the microcms API keys',
-  })
+  logger.warn('Failed to load the microcms API keys')
 
   return {
     async get(props) {

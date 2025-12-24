@@ -1,5 +1,7 @@
 import Link from 'next/link'
 import type { MicroCMSProjectsRecord } from '@/libs/microCMS/types'
+import { parseDateAndFormat } from '@/libs/dateDisplay.utils'
+import { removeHtmlTags } from '@/libs/sanitize'
 
 function Card({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return <div className={`group relative flex flex-col items-start ${className}`}>{children}</div>
@@ -17,19 +19,20 @@ function CardTitle({ href, children }: { href?: string; children: React.ReactNod
   )
 }
 
-function CardEyebrow({
-  as: Component = 'p',
+type CardEyebrowProps<T extends keyof React.JSX.IntrinsicElements = 'p'> = {
+  as?: T
+  children: React.ReactNode
+  className?: string
+  decorate?: boolean
+} & Omit<React.ComponentPropsWithoutRef<T>, 'children' | 'className'>
+
+function CardEyebrow<T extends keyof React.JSX.IntrinsicElements = 'p'>({
+  as: Component = 'p' as T,
   children,
   className = '',
   decorate,
   ...props
-}: {
-  as?: keyof React.JSX.IntrinsicElements
-  children: React.ReactNode
-  className?: string
-  decorate?: boolean
-  [key: string]: any
-}) {
+}: CardEyebrowProps<T>) {
   return (
     <Component
       className={`relative z-10 order-first mb-3 flex items-center text-sm text-zinc-400 dark:text-zinc-500 ${
@@ -91,30 +94,22 @@ export default function ProjectCard({
         <CardTitle href={href}>{project.title}</CardTitle>
         {project.published_at && (
           <CardEyebrow as="time" dateTime={project.published_at} className="md:hidden" decorate>
-            {new Date(project.published_at).toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', {
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric',
-              timeZone: 'UTC',
-            })}
+            {parseDateAndFormat(project.published_at, lang, 'long') || project.published_at}
           </CardEyebrow>
         )}
         {project.about && (
           <CardDescription>
-            {project.about.replace(/<[^>]*>/g, '').substring(0, 200)}
-            {project.about.replace(/<[^>]*>/g, '').length > 200 ? '...' : ''}
+            {(() => {
+              const cleaned = removeHtmlTags(project.about)
+              return cleaned.length > 200 ? `${cleaned.substring(0, 200)}...` : cleaned
+            })()}
           </CardDescription>
         )}
         <CardCta>Read more</CardCta>
       </Card>
       {project.published_at && (
         <CardEyebrow as="time" dateTime={project.published_at} className="mt-1 hidden md:block">
-          {new Date(project.published_at).toLocaleDateString(lang === 'ja' ? 'ja-JP' : 'en-US', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric',
-            timeZone: 'UTC',
-          })}
+          {parseDateAndFormat(project.published_at, lang, 'long') || project.published_at}
         </CardEyebrow>
       )}
     </article>
