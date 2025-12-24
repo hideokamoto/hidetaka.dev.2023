@@ -287,22 +287,44 @@ describe('DateDisplay Utils', () => {
       it('should return "ja-JP" for languages starting with "ja"', () => {
         fc.assert(
           fc.property(
-            fc.string({ minLength: 2, maxLength: 20 }).filter((s) => s.startsWith('ja')),
+            fc
+              .tuple(fc.constant('ja'), fc.string({ minLength: 0, maxLength: 18 }))
+              .map(([prefix, suffix]) => prefix + suffix),
             (lang) => {
               expect(getDateLocale(lang)).toBe('ja-JP')
             },
           ),
+          { timeout: 10000 },
         )
       })
 
       it('should return "en-US" for languages not starting with "ja"', () => {
         fc.assert(
           fc.property(
-            fc.string({ minLength: 0, maxLength: 20 }).filter((s) => !s.startsWith('ja')),
+            fc.oneof(
+              fc.string({ minLength: 0, maxLength: 1 }),
+              fc
+                .tuple(
+                  fc.string({ minLength: 1, maxLength: 1 }).filter((c) => c !== 'j'),
+                  fc.string({ minLength: 0, maxLength: 19 }),
+                )
+                .map(([first, rest]) => first + rest),
+              fc
+                .tuple(
+                  fc.constant('j'),
+                  fc.string({ minLength: 1, maxLength: 1 }).filter((c) => c !== 'a'),
+                  fc.string({ minLength: 0, maxLength: 18 }),
+                )
+                .map(([first, second, rest]) => first + second + rest),
+              fc
+                .tuple(fc.constant('en'), fc.string({ minLength: 0, maxLength: 18 }))
+                .map(([prefix, suffix]) => prefix + suffix),
+            ),
             (lang) => {
               expect(getDateLocale(lang)).toBe('en-US')
             },
           ),
+          { timeout: 10000 },
         )
       })
     })

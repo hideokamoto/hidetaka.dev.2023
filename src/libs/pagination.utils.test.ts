@@ -280,7 +280,9 @@ describe('Pagination Utils', () => {
       it('should return Japanese text for languages starting with "ja"', () => {
         fc.assert(
           fc.property(
-            fc.string({ minLength: 2, maxLength: 20 }).filter((s) => s.startsWith('ja')),
+            fc
+              .tuple(fc.constant('ja'), fc.string({ minLength: 0, maxLength: 18 }))
+              .map(([prefix, suffix]) => prefix + suffix),
             fc.constantFrom('prev', 'next', 'page' as const),
             (lang, key) => {
               const result = getPaginationText(lang, key)
@@ -293,6 +295,7 @@ describe('Pagination Utils', () => {
               expect(result).toBe(expectedJapanese[key])
             },
           ),
+          { timeout: 10000 },
         )
       })
 
