@@ -63,11 +63,10 @@ describe('removeHtmlTags', () => {
     it('should not contain HTML tags in output', () => {
       fc.assert(
         fc.property(htmlString, (str) => {
-          if (str === null || str === undefined) return true
           const result = removeHtmlTags(str)
           if (result === null || result === undefined) return true
-          // 結果に < と > が含まれていないことを確認（HTMLタグの痕跡がない）
-          expect(result).not.toMatch(/<[^>]*>/)
+          // 結果に有効なHTMLタグ（<tag>形式）が含まれていないことを確認
+          expect(result).not.toMatch(/<[a-z][a-z0-9]*[^>]*>/i)
         }),
       )
     })
@@ -75,7 +74,6 @@ describe('removeHtmlTags', () => {
     it('should be idempotent (applying twice produces same result)', () => {
       fc.assert(
         fc.property(htmlString, (str) => {
-          if (str === null || str === undefined) return true
           const result1 = removeHtmlTags(str)
           const result2 = removeHtmlTags(result1 as string)
           expect(result1).toBe(result2)

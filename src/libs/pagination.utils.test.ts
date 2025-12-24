@@ -284,8 +284,13 @@ describe('Pagination Utils', () => {
             fc.constantFrom('prev', 'next', 'page' as const),
             (lang, key) => {
               const result = getPaginationText(lang, key)
-              // 日本語のテキストが返されることを確認（具体的な値は既存テストで確認済み）
-              expect(result).toBeTruthy()
+              // 日本語のテキストが返されることを確認
+              const expectedJapanese = {
+                prev: '前へ',
+                next: '次へ',
+                page: 'ページ',
+              }
+              expect(result).toBe(expectedJapanese[key])
             },
           ),
         )
@@ -298,8 +303,13 @@ describe('Pagination Utils', () => {
             fc.constantFrom('prev', 'next', 'page' as const),
             (lang, key) => {
               const result = getPaginationText(lang, key)
-              // 英語のテキストが返されることを確認（具体的な値は既存テストで確認済み）
-              expect(result).toBeTruthy()
+              // 英語のテキストが返されることを確認
+              const expectedEnglish = {
+                prev: 'Previous',
+                next: 'Next',
+                page: 'Page',
+              }
+              expect(result).toBe(expectedEnglish[key])
             },
           ),
         )

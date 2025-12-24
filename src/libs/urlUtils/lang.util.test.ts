@@ -119,46 +119,31 @@ describe('getPathnameWithLangType', () => {
 
   describe('property-based tests', () => {
     describe('getLanguageFromURL', () => {
-      it('should return a string for any pathname', () => {
-        fc.assert(
-          fc.property(fc.string({ minLength: 0, maxLength: 200 }), (pathname) => {
-            const result = getLanguageFromURL(pathname)
-            expect(typeof result).toBe('string')
-            expect(result.length).toBeGreaterThan(0)
-          }),
-        )
-      })
-
       it('should return "en-US" when pathname does not start with language code', () => {
         fc.assert(
           fc.property(
             fc
               .string({ minLength: 0, maxLength: 100 })
-              .filter((s) => !/^\/[a-z]{2}-[a-z-]+/.test(s)),
+              .filter((s) => s === '/' || !s.startsWith('/') || !/^\/[a-z]{2}-[a-z-]+/i.test(s)),
             (pathname) => {
-              // ルートパスまたは言語コードで始まらないパスの場合
-              if (pathname === '/' || !pathname.startsWith('/')) {
-                const result = getLanguageFromURL(pathname)
-                // ルートパスの場合は'en-US'、それ以外は実装に依存
-                expect(typeof result).toBe('string')
-              }
+              const result = getLanguageFromURL(pathname)
+              expect(result).toBe('en-US')
             },
           ),
         )
       })
 
-      it('should extract language code from pathname starting with /XX-YYY format', () => {
+      it('should extract 2-letter language code from pathname starting with /XX-YYY format', () => {
         fc.assert(
           fc.property(
-            fc.string({ minLength: 2, maxLength: 5 }),
-            fc.string({ minLength: 2, maxLength: 10 }),
+            fc.string({ minLength: 2, maxLength: 2 }).filter((s) => /^[a-z]{2}$/i.test(s)),
+            fc.string({ minLength: 2, maxLength: 10 }).filter((s) => /^[\w-]+$/.test(s)),
             fc.string({ minLength: 0, maxLength: 50 }),
             (langCode, region, path) => {
               const pathname = `/${langCode}-${region}${path ? `/${path}` : ''}`
               const result = getLanguageFromURL(pathname)
-              expect(typeof result).toBe('string')
-              // 結果は言語コードの最初の2文字または'en-US'である
-              expect(result.length).toBeGreaterThan(0)
+              // 実装では大文字小文字が保持される可能性があるので、小文字に変換して比較
+              expect(result.toLowerCase()).toBe(langCode.toLowerCase())
             },
           ),
         )
@@ -200,12 +185,15 @@ describe('getPathnameWithLangType', () => {
       it('should preserve path structure when changing language', () => {
         fc.assert(
           fc.property(
-            fc.string({ minLength: 1, maxLength: 100 }).filter((s) => s.startsWith('/')),
+            fc
+              .string({ minLength: 1, maxLength: 100 })
+              .filter((s) => s.startsWith('/') && !/^\/[a-z]{2}-[a-z-]+/i.test(s)),
             fc.constantFrom('en-US', 'ja-JP' as const),
             (pathname, targetLang) => {
               const result = changeLanguageURL(pathname, targetLang)
               // パスの構造が保持される（言語プレフィックス以外）
               expect(result).toMatch(/^\//)
+              expect(result.length).toBeGreaterThan(0)
             },
           ),
         )

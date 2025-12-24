@@ -60,12 +60,16 @@ describe('formatDate', () => {
         fc.property(validDateString, (dateStr) => {
           const result = formatDate(dateStr)
           const date = new Date(`${dateStr}T00:00:00Z`)
-          if (Number.isNaN(date.getTime())) {
-            // 無効な日付の場合はスキップ
-            return
-          }
           const year = date.getUTCFullYear().toString()
+          const month = date.getUTCMonth() + 1 // 1-12
+          const day = date.getUTCDate().toString()
           expect(result).toContain(year)
+          // 月名が含まれていることを確認（January, February, etc.）
+          expect(result).toMatch(
+            /January|February|March|April|May|June|July|August|September|October|November|December/,
+          )
+          // 日が含まれていることを確認
+          expect(result).toContain(day)
         }),
       )
     })

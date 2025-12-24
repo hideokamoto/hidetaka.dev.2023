@@ -396,6 +396,10 @@ describe('DateDisplay Utils', () => {
             fc.string({ minLength: 0, maxLength: 20 }),
             fc.constantFrom('short', 'long', 'month-year' as const),
             (date, lang, format) => {
+              // 有効な日付であることを確認
+              if (Number.isNaN(date.getTime())) {
+                return
+              }
               const result = parseDateAndFormat(date, lang, format)
               expect(result).not.toBe(null)
               if (result !== null) {

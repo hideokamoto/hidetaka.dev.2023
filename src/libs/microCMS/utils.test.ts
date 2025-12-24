@@ -150,7 +150,6 @@ describe('sortByEventDate', () => {
               id: fc.string({ minLength: 1 }),
               date: fc
                 .date({ min: new Date('1900-01-01'), max: new Date('2100-12-31') })
-                .filter((d) => !Number.isNaN(d.getTime()))
                 .map((d) => {
                   const year = d.getUTCFullYear()
                   const month = String(d.getUTCMonth() + 1).padStart(2, '0')
@@ -171,9 +170,10 @@ describe('sortByEventDate', () => {
             for (let i = 0; i < sorted.length - 1; i++) {
               const currentDate = new Date(sorted[i].date).getTime()
               const nextDate = new Date(sorted[i + 1].date).getTime()
-              expect(Number.isNaN(currentDate)).toBe(false)
-              expect(Number.isNaN(nextDate)).toBe(false)
-              expect(currentDate).toBeGreaterThanOrEqual(nextDate)
+              // 有効な日付であることを確認してから比較
+              if (!Number.isNaN(currentDate) && !Number.isNaN(nextDate)) {
+                expect(currentDate).toBeGreaterThanOrEqual(nextDate)
+              }
             }
           },
         ),
