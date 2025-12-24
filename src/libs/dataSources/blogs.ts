@@ -1,4 +1,4 @@
-import { loadDevNotes } from './devnotes'
+import { loadAllDevNotes } from './devnotes'
 import { loadDevToPosts } from './devto'
 import { loadQiitaPosts } from './qiita'
 import type { FeedDataSource, FeedItem } from './types'
@@ -82,18 +82,11 @@ export const loadBlogPosts = async (
       : { items: [], hasMore: false }
     const stripePosts = isJapanese(locale) ? [] : stripeDotDevPosts
 
-    // dev-notesを取得（日本語のみ）
-    const devNotesResult = isJapanese(locale)
-      ? await loadDevNotes(1, 20).catch(() => ({
-          items: [],
-          totalPages: 0,
-          totalItems: 0,
-          currentPage: 1,
-        }))
-      : { items: [], totalPages: 0, totalItems: 0, currentPage: 1 }
+    // dev-notesを全件取得（日本語のみ）
+    const devNotesItems = isJapanese(locale) ? await loadAllDevNotes().catch(() => []) : []
 
     // BlogItemをFeedItemに変換
-    const devNotesPosts: FeedItem[] = devNotesResult.items.map((item) => ({
+    const devNotesPosts: FeedItem[] = devNotesItems.map((item) => ({
       id: item.id,
       title: item.title,
       href: item.href,
@@ -102,13 +95,8 @@ export const loadBlogPosts = async (
       dataSource: sourceDevNotes,
     }))
 
-    // hasMore情報をデータソース名でマッピング
+    // hasMore情報をデータソース名でマッピング（全件取得したのでfalse）
     const hasMoreBySource: Record<string, boolean> = {}
-    if (wp.hasMore) hasMoreBySource['WP Kyoto Blog'] = true
-    if (zenn.hasMore) hasMoreBySource.Zenn = true
-    if (qiita.hasMore) hasMoreBySource.Qiita = true
-    if (devto.hasMore) hasMoreBySource['Dev.to'] = true
-    if (devNotesResult.totalPages > 1) hasMoreBySource['Dev Notes'] = true
 
     const allPosts = [
       ...wp.items,
@@ -125,7 +113,7 @@ export const loadBlogPosts = async (
       return bDate.getTime() - aDate.getTime()
     })
 
-    return { items: sortedPosts, hasMoreBySource }
+    return { items: sortedPosts, hasMoreBySource: {} }
   } catch (error) {
     console.error('Error loading blog posts:', error)
     return { items: [], hasMoreBySource: {} }

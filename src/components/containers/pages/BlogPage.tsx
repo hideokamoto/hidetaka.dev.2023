@@ -1,8 +1,12 @@
+'use client'
+
 import Link from 'next/link'
+import { useCallback, useMemo, useState } from 'react'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import PageHeader from '@/components/ui/PageHeader'
 import Pagination from '@/components/ui/Pagination'
+import SearchBar from '@/components/ui/SearchBar'
 import SidebarLayout from '@/components/ui/SidebarLayout'
 import Tag from '@/components/ui/Tag'
 import type { CategoryWithCount } from '@/libs/dataSources/thoughts'
@@ -116,14 +120,19 @@ function BlogSidebar({
   basePath,
   lang,
   currentCategorySlug,
+  searchQuery,
+  onSearchChange,
 }: {
   categories: CategoryWithCount[]
   basePath: string
   lang: string
   currentCategorySlug?: string
+  searchQuery: string
+  onSearchChange: (value: string) => void
 }) {
   const categoryTitle = lang === 'ja' ? 'カテゴリ' : 'Categories'
   const allText = lang === 'ja' ? 'すべて' : 'All'
+  const searchPlaceholder = lang === 'ja' ? '検索...' : 'Search...'
 
   // basePathからカテゴリ部分を除去して、ブログのベースパスを取得
   // basePathが `/ja/blog/category/xxx` の場合は `/ja/blog` に
@@ -132,6 +141,11 @@ function BlogSidebar({
 
   return (
     <div className="hidden lg:block space-y-6">
+      {/* 検索バー */}
+      <div>
+        <SearchBar value={searchQuery} onChange={onSearchChange} placeholder={searchPlaceholder} />
+      </div>
+
       <div>
         <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
           {categoryTitle}
@@ -214,6 +228,7 @@ export default function BlogPageContent({
   categoryName,
   categories = [],
 }: BlogPageProps) {
+  const [searchQuery, setSearchQuery] = useState('')
   const { title, description } = getPageContent(lang, categoryName)
 
   // 現在のカテゴリslugを取得（URLから）
@@ -221,10 +236,43 @@ export default function BlogPageContent({
     ? categories.find((cat) => cat.name === categoryName)?.slug
     : undefined
 
+  // 検索フィルター関数
+  const matchesSearch = useCallback(
+    (item: BlogItem): boolean => {
+      if (!searchQuery.trim()) return true
+      const query = searchQuery.toLowerCase()
+      const title = item.title.toLowerCase()
+      const description = item.description.toLowerCase()
+      const categoryNames = item.categories?.map((cat) => cat.name.toLowerCase()).join(' ') || ''
+
+      return title.includes(query) || description.includes(query) || categoryNames.includes(query)
+    },
+    [searchQuery],
+  )
+
+  // 検索フィルターを適用
+  const filteredThoughts = useMemo(() => {
+    if (!searchQuery.trim()) {
+      return thoughts
+    }
+    return thoughts.filter(matchesSearch)
+  }, [thoughts, matchesSearch])
+
+  const searchPlaceholder = lang === 'ja' ? '検索...' : 'Search...'
+
   return (
     <section className="pt-12 sm:pt-16 pb-8 sm:pb-12 bg-white dark:bg-zinc-900">
       <Container>
         <PageHeader title={title} description={description} />
+
+        {/* モバイル用検索バー */}
+        <div className="lg:hidden mb-6">
+          <SearchBar
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder={searchPlaceholder}
+          />
+        </div>
 
         {/* サイドバーとメインコンテンツ */}
         {categories.length > 0 ? (
@@ -235,25 +283,29 @@ export default function BlogPageContent({
                 basePath={basePath}
                 lang={lang}
                 currentCategorySlug={currentCategorySlug}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
               />
             }
           >
             {/* 記事グリッド */}
-            {thoughts.length > 0 ? (
+            {filteredThoughts.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                  {thoughts.map((item) => (
+                  {filteredThoughts.map((item) => (
                     <BlogCard key={item.id || item.href} item={item} lang={lang} />
                   ))}
                 </div>
 
-                {/* ページネーション */}
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  basePath={basePath}
-                  lang={lang}
-                />
+                {/* ページネーション（検索時は非表示） */}
+                {!searchQuery.trim() && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    basePath={basePath}
+                    lang={lang}
+                  />
+                )}
               </>
             ) : (
               <NoArticlesMessage lang={lang} />
@@ -262,21 +314,23 @@ export default function BlogPageContent({
         ) : (
           <>
             {/* 記事グリッド */}
-            {thoughts.length > 0 ? (
+            {filteredThoughts.length > 0 ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                  {thoughts.map((item) => (
+                  {filteredThoughts.map((item) => (
                     <BlogCard key={item.id || item.href} item={item} lang={lang} />
                   ))}
                 </div>
 
-                {/* ページネーション */}
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  basePath={basePath}
-                  lang={lang}
-                />
+                {/* ページネーション（検索時は非表示） */}
+                {!searchQuery.trim() && (
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    basePath={basePath}
+                    lang={lang}
+                  />
+                )}
               </>
             ) : (
               <NoArticlesMessage lang={lang} />
