@@ -12,6 +12,7 @@ import SearchBar from '@/components/ui/SearchBar'
 import SidebarLayout from '@/components/ui/SidebarLayout'
 import Tag from '@/components/ui/Tag'
 import type { FeedItem } from '@/libs/dataSources/types'
+import { removeHtmlTags } from '@/libs/sanitize'
 
 type WritingItem = FeedItem
 type FilterDataSource = string | null
@@ -66,8 +67,8 @@ function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string })
           {/* Description */}
           {description && (
             <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-3">
-              {description}
-              {description.length >= 150 ? '...' : ''}
+              {removeHtmlTags(description)}
+              {removeHtmlTags(description).length >= 150 ? '...' : ''}
             </p>
           )}
 
