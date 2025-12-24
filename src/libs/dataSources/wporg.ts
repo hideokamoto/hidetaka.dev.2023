@@ -1,3 +1,5 @@
+import { logger } from '@/libs/logger'
+
 export const listMyWordPressPlugins = async () => {
   try {
     const packages = await searchWordPressPlugins('request[author]=hideokamoto').catch(() => ({
@@ -7,7 +9,9 @@ export const listMyWordPressPlugins = async () => {
       return plugin.author_profile === 'https://profiles.wordpress.org/hideokamoto/'
     })
   } catch (error) {
-    console.error('Error loading WordPress plugins:', error)
+    logger.error('Failed to load WordPress plugins', {
+      error: error instanceof Error ? error.message : String(error),
+    })
     return []
   }
 }
@@ -67,7 +71,10 @@ export const searchWordPressPlugins = async (query: string): Promise<WordPressPl
     const result = await res.json()
     return result
   } catch (e) {
-    console.log(e)
+    logger.error('Failed to search WordPress plugins', {
+      error: e instanceof Error ? e.message : String(e),
+      query,
+    })
     throw e
   }
 }

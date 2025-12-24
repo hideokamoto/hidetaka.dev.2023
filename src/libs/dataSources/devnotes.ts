@@ -1,3 +1,4 @@
+import { logger } from '@/libs/logger'
 import type { BlogItem, Category, WPThought } from './types'
 
 export type DevNotesResult = {
@@ -80,7 +81,11 @@ export const loadDevNotes = async (
       currentPage: page,
     }
   } catch (error) {
-    console.error('Error loading dev-notes:', error)
+    logger.error('Failed to load dev-notes', {
+      error: error instanceof Error ? error.message : String(error),
+      page,
+      perPage,
+    })
     return {
       items: [],
       totalPages: 0,
@@ -114,7 +119,10 @@ export const getDevNoteBySlug = async (slug: string): Promise<WPThought | null> 
 
     return notes[0]
   } catch (error) {
-    console.error('Error loading dev-note by slug:', error)
+    logger.error('Failed to load dev-note by slug', {
+      error: error instanceof Error ? error.message : String(error),
+      slug,
+    })
     return null
   }
 }
@@ -131,13 +139,19 @@ const fetchDevNote = async (url: string): Promise<WPThought | null> => {
       next: { revalidate: 1800 }, // 30分ごとに再検証
     })
     if (!response.ok) {
-      console.error(`Failed to fetch dev-note: ${response.status}`)
+      logger.error('Failed to fetch dev-note', {
+        status: response.status,
+        url,
+      })
       return null
     }
     const notes: WPThought[] = await response.json()
     return notes.length > 0 ? notes[0] : null
   } catch (error) {
-    console.error('Error fetching dev-note:', error)
+    logger.error('Failed to fetch dev-note', {
+      error: error instanceof Error ? error.message : String(error),
+      url,
+    })
     return null
   }
 }
@@ -157,7 +171,10 @@ export const getAdjacentDevNotes = async (currentNote: WPThought): Promise<Adjac
       next,
     }
   } catch (error) {
-    console.error('Error loading adjacent dev-notes:', error)
+    logger.error('Failed to load adjacent dev-notes', {
+      error: error instanceof Error ? error.message : String(error),
+      noteId: currentNote.id,
+    })
     return {
       previous: null,
       next: null,
@@ -222,7 +239,11 @@ export const getRelatedDevNotes = async (
 
     return shuffled.slice(0, limit)
   } catch (error) {
-    console.error('Error loading related dev-notes:', error)
+    logger.error('Failed to load related dev-notes', {
+      error: error instanceof Error ? error.message : String(error),
+      noteId: currentNote.id,
+      limit,
+    })
     return []
   }
 }
@@ -248,7 +269,9 @@ export const loadAllDevNotes = async (): Promise<BlogItem[]> => {
 
     return allItems
   } catch (error) {
-    console.error('Error loading all dev-notes:', error)
+    logger.error('Failed to load all dev-notes', {
+      error: error instanceof Error ? error.message : String(error),
+    })
     return []
   }
 }

@@ -1,4 +1,5 @@
 import Script from 'next/script'
+import { logger } from '@/libs/logger'
 
 type GoogleAnalyticsProps = {
   gaId: string
@@ -8,7 +9,7 @@ export default function GoogleAnalytics({ gaId }: GoogleAnalyticsProps) {
   // Validate gaId format to prevent XSS attacks
   if (!gaId || !/^G-[A-Z0-9]{10}$/.test(gaId)) {
     if (process.env.NODE_ENV === 'development' && gaId) {
-      console.error('Invalid Google Analytics ID format:', gaId)
+      logger.error('Invalid Google Analytics ID format', { gaId })
     }
     return null
   }

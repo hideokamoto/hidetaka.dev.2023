@@ -1,5 +1,6 @@
 import type { NextRequest } from 'next/server'
 import { SITE_CONFIG } from '@/config'
+import { logger } from '@/libs/logger'
 import type { WPThought } from '@/libs/dataSources/types'
 
 // getCloudflareContextを動的インポートで取得（OpenNextのビルドプロセスで正しく解決されるように）
@@ -47,7 +48,11 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       if (wpResponse.status === 404) {
         return new Response('Post not found', { status: 404 })
       }
-      console.error('WordPress API error:', wpResponse.status, wpResponse.statusText)
+      logger.error('WordPress API error', {
+        status: wpResponse.status,
+        statusText: wpResponse.statusText,
+        postId,
+      })
       return new Response('Failed to fetch post', { status: wpResponse.status })
     }
 
@@ -58,7 +63,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     }
 
     const title = note.title.rendered
-    console.log('Generating thumbnail for dev-note:', postId, 'title:', title)
+    logger.log('Generating thumbnail for dev-note', { postId, title })
 
     const context = (await getCloudflareContext({ async: true })) as {
       env: {
@@ -70,7 +75,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     const ogImageGenerator = typedEnv.OG_IMAGE_GENERATOR
 
     if (!ogImageGenerator) {
-      console.error('OG_IMAGE_GENERATOR Service Binding is not available')
+      logger.error('OG_IMAGE_GENERATOR Service Binding is not available')
       return new Response('Service Binding not available', { status: 500 })
     }
 
@@ -87,7 +92,12 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     const response = await ogImageGenerator.fetch(ogImageUrl, { headers })
 
     if (!response.ok) {
-      console.error('OG image generation failed:', response.status, response.statusText)
+      logger.error('OG image generation failed', {
+        status: response.status,
+        statusText: response.statusText,
+        postId,
+        title,
+      })
       return new Response('Failed to generate image', { status: response.status })
     }
 
@@ -101,7 +111,10 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       headers: responseHeaders,
     })
   } catch (error) {
-    console.error('Error generating thumbnail image:', error)
+    logger.error('Error generating thumbnail image', {
+      error: error instanceof Error ? error.message : String(error),
+      postId: id,
+    })
     return new Response('Failed to generate image', { status: 500 })
   }
 }

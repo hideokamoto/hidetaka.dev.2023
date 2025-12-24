@@ -1,3 +1,4 @@
+import { logger } from '@/libs/logger'
 import type { FeedDataSource, FeedItem } from './types'
 
 type QiitaItem = {
@@ -28,7 +29,11 @@ const fetchAllQiitaItems = async (userId: string): Promise<QiitaItem[]> => {
     )
 
     if (!response.ok) {
-      console.error(`Failed to fetch Qiita items for ${userId}: ${response.status}`)
+      logger.error('Failed to fetch Qiita items', {
+        userId,
+        status: response.status,
+        page,
+      })
       break
     }
 
@@ -90,7 +95,9 @@ export const loadQiitaPosts = async (): Promise<{ items: FeedItem[]; hasMore: bo
 
     return { items, hasMore }
   } catch (error) {
-    console.error('Error loading Qiita posts:', error)
+    logger.error('Failed to load Qiita posts', {
+      error: error instanceof Error ? error.message : String(error),
+    })
     return { items: [], hasMore: false }
   }
 }

@@ -4,6 +4,7 @@ import Container from '@/components/tailwindui/Container'
 import BackgroundDecoration from '@/components/ui/BackgroundDecoration'
 import DateDisplay from '@/components/ui/DateDisplay'
 import Tag from '@/components/ui/Tag'
+import { logger } from '@/libs/logger'
 import { loadBlogPosts } from '@/libs/dataSources/blogs'
 import type { FeedItem } from '@/libs/dataSources/types'
 import { MicroCMSAPI } from '@/libs/microCMS/apis'
@@ -55,11 +56,15 @@ function ArticleCard({
     date = new Date(datetime)
     // Validate date
     if (Number.isNaN(date.getTime())) {
-      console.warn('Invalid date string:', datetime, 'for article:', title)
+      logger.warn('Invalid date string', { datetime, articleTitle: title })
       date = new Date() // Fallback to current date
     }
   } catch (e) {
-    console.warn('Date parsing error:', e, 'for article:', title)
+    logger.warn('Date parsing error', {
+      error: e instanceof Error ? e.message : String(e),
+      datetime,
+      articleTitle: title,
+    })
     date = new Date() // Fallback to current date
   }
 

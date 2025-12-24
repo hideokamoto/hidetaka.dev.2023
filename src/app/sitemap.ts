@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { SITE_CONFIG } from '@/config'
+import { logger } from '@/libs/logger'
 import { loadAllDevNotes } from '@/libs/dataSources/devnotes'
 import { loadAllProducts } from '@/libs/dataSources/products'
 import { loadAllThoughts } from '@/libs/dataSources/thoughts'
@@ -88,7 +89,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     }))
   } catch (error) {
-    console.error('Error loading blog posts for sitemap:', error)
+    logger.error('Failed to load blog posts for sitemap', {
+      error: error instanceof Error ? error.message : String(error),
+    })
   }
 
   // プロジェクト
@@ -106,7 +109,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       )
     })
   } catch (error) {
-    console.error('Error loading projects for sitemap:', error)
+    logger.error('Failed to load projects for sitemap', {
+      error: error instanceof Error ? error.message : String(error),
+    })
   }
 
   // 製品ニュース（WordPress API products）
@@ -124,7 +129,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       )
     })
   } catch (error) {
-    console.error('Error loading product news for sitemap:', error)
+    logger.error('Failed to load product news for sitemap', {
+      error: error instanceof Error ? error.message : String(error),
+    })
   }
 
   // Dev Notes（WordPress API、日本語のみ）
@@ -138,7 +145,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     }))
   } catch (error) {
-    console.error('Error loading dev-notes for sitemap:', error)
+    logger.error('Failed to load dev-notes for sitemap', {
+      error: error instanceof Error ? error.message : String(error),
+    })
   }
 
   return [...staticPages, ...blogPages, ...projectPages, ...productNewsPages, ...devNotesPages]
