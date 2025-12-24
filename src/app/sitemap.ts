@@ -14,7 +14,7 @@ type SitemapEntry = {
 }
 
 /**
- * 複数のベースパスに対して同じコンテンツのsitemapエントリを生成するヘルパー関数
+ * Helper function to generate sitemap entries for the same content across multiple base paths
  */
 const createEntriesForPaths = (
   basePaths: string[],
@@ -34,7 +34,7 @@ const createEntriesForPaths = (
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const microCMS = new MicroCMSAPI(createMicroCMSClient())
 
-  // 静的ページ（英語版）
+  // Static pages (English version)
   const staticRoutes = [
     '',
     '/about',
@@ -48,7 +48,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/writing',
   ]
 
-  // 静的ページ（日本語版）
+  // Static pages (Japanese version)
   const jaStaticRoutes = [
     '/ja',
     '/ja/about',
@@ -62,8 +62,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/ja/writing',
   ]
 
-  // 静的ページのsitemapエントリ
-  // lastModifiedは省略（ビルドごとに日付が変わらないようにする）
+  // Sitemap entries for static pages
+  // lastModified is omitted (to prevent date changes on each build)
   const staticPages: MetadataRoute.Sitemap = [
     ...staticRoutes.map((route) => ({
       url: `${SITE_CONFIG.url}${route}`,
@@ -77,7 +77,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })),
   ]
 
-  // ブログ記事（WordPress API、日本語のみ）
+  // Blog posts (WordPress API, Japanese only)
   let blogPages: MetadataRoute.Sitemap = []
   try {
     const allThoughts = await loadAllThoughts('ja')
@@ -91,7 +91,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('Error loading blog posts for sitemap:', error)
   }
 
-  // プロジェクト
+  // Projects
   let projectPages: MetadataRoute.Sitemap = []
   try {
     const projects = await microCMS.listAllProjects()
@@ -109,7 +109,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('Error loading projects for sitemap:', error)
   }
 
-  // 製品ニュース（WordPress API products）
+  // Product news (WordPress API products)
   let productNewsPages: MetadataRoute.Sitemap = []
   try {
     const allProducts = await loadAllProducts()
@@ -127,7 +127,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     console.error('Error loading product news for sitemap:', error)
   }
 
-  // Dev Notes（WordPress API、日本語のみ）
+  // Dev Notes (WordPress API, Japanese only)
   let devNotesPages: MetadataRoute.Sitemap = []
   try {
     const allDevNotes = await loadAllDevNotes()

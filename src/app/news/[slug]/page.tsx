@@ -60,12 +60,12 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ slu
     notFound()
   }
 
-  // JSON-LDを生成
+  // Generate JSON-LD
   const thought = productToThought(product)
   const blogPostingJsonLd = generateBlogPostingJsonLd(thought, 'en', '/news')
   const breadcrumbJsonLd = generateBlogBreadcrumbJsonLd(thought, 'en', '/news')
 
-  // 前後の記事と関連記事を取得
+  // Get adjacent and related articles
   const [adjacentProducts, relatedArticles] = await Promise.all([
     getAdjacentProducts(product),
     getRelatedProducts(product, 4),

@@ -17,8 +17,8 @@ export default async function BlogCategoryPageNumber({
   params: Promise<{ name: string; number: string }>
 }) {
   const { name, number } = await params
-  // Next.jsのApp Routerでは、URLパラメータは自動的にデコードされる
-  // ただし、URLエンコードされた文字列がそのまま渡される場合もあるので、両方試す
+  // In Next.js App Router, URL parameters are automatically decoded
+  // However, URL-encoded strings may be passed as-is, so try both
   const decodedName = name.includes('%') ? decodeURIComponent(name) : name
   const pageNumber = parseInt(number, 10)
 
@@ -35,11 +35,11 @@ export default async function BlogCategoryPageNumber({
     notFound()
   }
 
-  // カテゴリ名を取得（最初の記事のカテゴリから）
+  // Get category name (from the first article's category)
   const categoryName =
     result.items[0]?.categories?.find((cat) => cat.slug === decodedName)?.name || decodedName
 
-  // basePathにはエンコードされたslugを使用（Next.jsのparamsはデコード済みなので再エンコード）
+  // Use encoded slug for basePath (Next.js params are already decoded, so re-encode)
   const encodedSlug = encodeURIComponent(decodedName)
   const basePath = `/blog/category/${encodedSlug}`
 

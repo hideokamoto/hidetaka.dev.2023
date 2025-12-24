@@ -1,6 +1,7 @@
 import { loadDevNotes } from './devnotes'
 import { loadDevToPosts } from './devto'
 import { loadQiitaPosts } from './qiita'
+import { extractTechTagsFromTexts } from './tagUtils'
 import type { FeedDataSource, FeedItem } from './types'
 import { loadWPPosts } from './wordpress'
 import { loadZennPosts } from './zenn'
@@ -93,14 +94,18 @@ export const loadBlogPosts = async (
       : { items: [], totalPages: 0, totalItems: 0, currentPage: 1 }
 
     // BlogItemをFeedItemに変換
-    const devNotesPosts: FeedItem[] = devNotesResult.items.map((item) => ({
-      id: item.id,
-      title: item.title,
-      href: item.href,
-      description: item.description,
-      datetime: item.datetime,
-      dataSource: sourceDevNotes,
-    }))
+    const devNotesPosts: FeedItem[] = devNotesResult.items.map((item) => {
+      const tags = extractTechTagsFromTexts([item.title, item.description])
+      return {
+        id: item.id,
+        title: item.title,
+        href: item.href,
+        description: item.description,
+        datetime: item.datetime,
+        dataSource: sourceDevNotes,
+        tags: tags.length > 0 ? tags : undefined,
+      }
+    })
 
     // hasMore情報をデータソース名でマッピング
     const hasMoreBySource: Record<string, boolean> = {}
@@ -110,12 +115,53 @@ export const loadBlogPosts = async (
     if (devto.hasMore) hasMoreBySource['Dev.to'] = true
     if (devNotesResult.totalPages > 1) hasMoreBySource['Dev Notes'] = true
 
+    // 各データソースの記事にタグを追加
+    const wpItemsWithTags = wp.items.map((item) => {
+      const tags = extractTechTagsFromTexts([item.title, item.description])
+      return {
+        ...item,
+        tags: tags.length > 0 ? tags : undefined,
+      }
+    })
+
+    const devtoItemsWithTags = devto.items.map((item) => {
+      const tags = extractTechTagsFromTexts([item.title, item.description])
+      return {
+        ...item,
+        tags: tags.length > 0 ? tags : undefined,
+      }
+    })
+
+    const zennItemsWithTags = zenn.items.map((item) => {
+      const tags = extractTechTagsFromTexts([item.title, item.description])
+      return {
+        ...item,
+        tags: tags.length > 0 ? tags : undefined,
+      }
+    })
+
+    const qiitaItemsWithTags = qiita.items.map((item) => {
+      const tags = extractTechTagsFromTexts([item.title, item.description])
+      return {
+        ...item,
+        tags: tags.length > 0 ? tags : undefined,
+      }
+    })
+
+    const stripePostsWithTags = stripePosts.map((item) => {
+      const tags = extractTechTagsFromTexts([item.title, item.description])
+      return {
+        ...item,
+        tags: tags.length > 0 ? tags : undefined,
+      }
+    })
+
     const allPosts = [
-      ...wp.items,
-      ...devto.items,
-      ...zenn.items,
-      ...qiita.items,
-      ...stripePosts,
+      ...wpItemsWithTags,
+      ...devtoItemsWithTags,
+      ...zennItemsWithTags,
+      ...qiitaItemsWithTags,
+      ...stripePostsWithTags,
       ...devNotesPosts,
     ]
 

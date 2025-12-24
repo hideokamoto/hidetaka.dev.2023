@@ -8,7 +8,7 @@ export const metadata = {
   title: 'Blog',
 }
 
-// ISR: 30分ごとにページを再検証（WordPressから毎日1〜2記事更新）
+// ISR: Revalidate page every 30 minutes (1-2 articles updated daily from WordPress)
 export const revalidate = 1800
 
 export default async function BlogPage() {

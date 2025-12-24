@@ -30,7 +30,7 @@ export default async function SpeakingDetailPage({
     notFound()
   }
 
-  // 前後の記事と関連記事を取得
+  // Get adjacent and related articles
   const [{ previous, next }, relatedEvents] = await Promise.all([
     getAdjacentEvents(event),
     getRelatedEvents(event, 4, 'en'),

@@ -12,10 +12,11 @@ import PageHeader from '@/components/ui/PageHeader'
 import SearchBar from '@/components/ui/SearchBar'
 import SidebarLayout from '@/components/ui/SidebarLayout'
 import Tag from '@/components/ui/Tag'
-import type { FeedItem } from '@/libs/dataSources/types'
+import type { FeedItem, TechTag } from '@/libs/dataSources/types'
 
 type WritingItem = FeedItem
 type FilterDataSource = string | null
+type FilterTag = string | null
 
 // 統一されたWritingカードコンポーネント
 function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string }) {
@@ -57,6 +58,21 @@ function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string })
                 {item.dataSource.name}
               </Tag>
             )}
+            {/* Tech Tags */}
+            {item.tags && item.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {item.tags.slice(0, 3).map((tag) => (
+                  <Tag key={tag.slug} variant={tag.color as any} size="sm">
+                    {tag.name}
+                  </Tag>
+                ))}
+                {item.tags.length > 3 && (
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    +{item.tags.length - 3}
+                  </span>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Title */}
@@ -97,7 +113,10 @@ function Sidebar({
   onSearchChange,
   filterDataSource,
   onFilterDataSourceChange,
+  filterTag,
+  onFilterTagChange,
   availableDataSources,
+  availableTags,
   dataSourceMap,
   counts,
   lang,
@@ -106,17 +125,22 @@ function Sidebar({
   onSearchChange: (value: string) => void
   filterDataSource: FilterDataSource
   onFilterDataSourceChange: (source: FilterDataSource) => void
+  filterTag: FilterTag
+  onFilterTagChange: (tag: FilterTag) => void
   availableDataSources: string[]
+  availableTags: TechTag[]
   dataSourceMap: Map<string, string>
   counts: {
     all: number
     external: number
     byDataSource: Record<string, number>
+    byTag: Record<string, number>
   }
   lang: string
 }) {
   const searchPlaceholder = lang === 'ja' ? '検索...' : 'Search...'
   const sourceTitle = lang === 'ja' ? 'データソース' : 'Source'
+  const tagTitle = lang === 'ja' ? '技術タグ' : 'Tech Tags'
   const allText = lang === 'ja' ? 'すべて' : 'All'
 
   return (
@@ -180,6 +204,38 @@ function Sidebar({
           </nav>
         </div>
       )}
+
+      {/* 技術タグフィルター */}
+      {availableTags.length > 0 && (
+        <div>
+          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
+            {tagTitle}
+          </h3>
+          <nav className="space-y-1">
+            <FilterItem
+              active={filterTag === null}
+              onClick={() => onFilterTagChange(null)}
+              count={counts.all}
+            >
+              {allText}
+            </FilterItem>
+            {availableTags.map((tag) => (
+              <FilterItem
+                key={tag.slug}
+                active={filterTag === tag.slug}
+                onClick={() => onFilterTagChange(tag.slug)}
+                count={counts.byTag[tag.slug] || 0}
+              >
+                <span className="flex items-center gap-2">
+                  <Tag variant={tag.color as any} size="sm">
+                    {tag.name}
+                  </Tag>
+                </span>
+              </FilterItem>
+            ))}
+          </nav>
+        </div>
+      )}
     </div>
   )
 }
@@ -195,6 +251,7 @@ export default function WritingPageContent({
 }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [filterDataSource, setFilterDataSource] = useState<FilterDataSource>(null)
+  const [filterTag, setFilterTag] = useState<FilterTag>(null)
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
 
   // 全記事を統合
@@ -221,6 +278,21 @@ export default function WritingPageContent({
     return map
   }, [externalArticles])
 
+  // 利用可能な技術タグを取得
+  const availableTags = useMemo(() => {
+    const tagMap = new Map<string, TechTag>()
+    externalArticles.forEach((article) => {
+      if (article.tags) {
+        article.tags.forEach((tag) => {
+          if (!tagMap.has(tag.slug)) {
+            tagMap.set(tag.slug, tag)
+          }
+        })
+      }
+    })
+    return Array.from(tagMap.values()).sort((a, b) => a.name.localeCompare(b.name))
+  }, [externalArticles])
+
   // 検索フィルター関数
   const matchesSearch = (item: WritingItem): boolean => {
     if (!searchQuery.trim()) return true
@@ -239,6 +311,11 @@ export default function WritingPageContent({
         if (!item.dataSource || item.dataSource.name !== filterDataSource) return false
       }
 
+      // タグフィルター
+      if (filterTag !== null) {
+        if (!item.tags || !item.tags.some((tag) => tag.slug === filterTag)) return false
+      }
+
       return true
     })
 
@@ -251,11 +328,12 @@ export default function WritingPageContent({
     })
 
     return items
-  }, [allItems, filterDataSource, matchesSearch])
+  }, [allItems, filterDataSource, filterTag, matchesSearch])
 
   // カウント計算
   const counts = useMemo(() => {
     const byDataSource: Record<string, number> = {}
+    const byTag: Record<string, number> = {}
 
     // データソース別カウント（20件以上ある場合は「20+」として扱う）
     availableDataSources.forEach((source) => {
@@ -266,12 +344,21 @@ export default function WritingPageContent({
       byDataSource[source] = hasMoreBySource[source] ? 21 : count
     })
 
+    // タグ別カウント
+    availableTags.forEach((tag) => {
+      const count = externalArticles.filter(
+        (article) => article.tags && article.tags.some((t) => t.slug === tag.slug),
+      ).length
+      byTag[tag.slug] = count
+    })
+
     return {
       all: allItems.length,
       external: externalArticles.length,
       byDataSource,
+      byTag,
     }
-  }, [allItems, externalArticles, availableDataSources, hasMoreBySource])
+  }, [allItems, externalArticles, availableDataSources, availableTags, hasMoreBySource])
 
   // テキスト
   const title = lang === 'ja' ? 'Writing' : 'Writing'
@@ -285,13 +372,15 @@ export default function WritingPageContent({
   const activeFilterCount = useMemo(() => {
     let count = 0
     if (filterDataSource !== null) count++
+    if (filterTag !== null) count++
     return count
-  }, [filterDataSource])
+  }, [filterDataSource, filterTag])
 
   // フィルターグループを構築
   const filterGroups = useMemo<FilterGroup[]>(() => {
     const allText = lang === 'ja' ? 'すべて' : 'All'
     const sourceTitle = lang === 'ja' ? 'データソース' : 'Source'
+    const tagTitle = lang === 'ja' ? '技術タグ' : 'Tech Tags'
 
     const groups: FilterGroup[] = []
 
@@ -319,8 +408,39 @@ export default function WritingPageContent({
       })
     }
 
+    // 技術タグフィルター
+    if (availableTags.length > 0) {
+      groups.push({
+        title: tagTitle,
+        items: [
+          {
+            id: 'tag-all',
+            label: allText,
+            active: filterTag === null,
+            count: counts.all,
+            onClick: () => setFilterTag(null),
+          },
+          ...availableTags.map((tag) => ({
+            id: `tag-${tag.slug}`,
+            label: tag.name,
+            active: filterTag === tag.slug,
+            count: counts.byTag[tag.slug] || 0,
+            onClick: () => setFilterTag(tag.slug),
+          })),
+        ],
+      })
+    }
+
     return groups
-  }, [lang, filterDataSource, availableDataSources, counts, dataSourceMap.get])
+  }, [
+    lang,
+    filterDataSource,
+    filterTag,
+    availableDataSources,
+    availableTags,
+    counts,
+    dataSourceMap.get,
+  ])
 
   return (
     <>
@@ -362,7 +482,10 @@ export default function WritingPageContent({
                 onSearchChange={setSearchQuery}
                 filterDataSource={filterDataSource}
                 onFilterDataSourceChange={setFilterDataSource}
+                filterTag={filterTag}
+                onFilterTagChange={setFilterTag}
                 availableDataSources={availableDataSources}
+                availableTags={availableTags}
                 dataSourceMap={dataSourceMap}
                 counts={counts}
                 lang={lang}
@@ -377,6 +500,25 @@ export default function WritingPageContent({
                     <UnifiedWritingCard key={item.href} item={item} lang={lang} />
                   ))}
                 </div>
+
+                {/* 関連記事セクション（タグベース） */}
+                {filterTag && (
+                  <div className="mt-16 pt-16 border-t border-zinc-200 dark:border-zinc-800">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6">
+                      {lang === 'ja' ? '同じタグの記事' : 'Related Articles'}
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+                      {filteredItems
+                        .filter(
+                          (item) => item.tags && item.tags.some((tag) => tag.slug === filterTag),
+                        )
+                        .slice(0, 4)
+                        .map((item) => (
+                          <UnifiedWritingCard key={item.href} item={item} lang={lang} />
+                        ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* 外部動線セクション */}
                 {availableDataSources.length > 0 && (

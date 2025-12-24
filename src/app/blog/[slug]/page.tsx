@@ -29,7 +29,7 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
     notFound()
   }
 
-  // 関連記事を取得
+  // Get related articles
   const relatedArticles = await getRelatedThoughts(thought, 4, 'en')
 
   const blogPostingJsonLd = generateBlogPostingJsonLd(thought, 'en', '/blog')

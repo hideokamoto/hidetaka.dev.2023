@@ -2,7 +2,7 @@ import type { NextRequest } from 'next/server'
 import { SITE_CONFIG } from '@/config'
 import type { WPThought } from '@/libs/dataSources/types'
 
-// getCloudflareContextを動的インポートで取得（OpenNextのビルドプロセスで正しく解決されるように）
+// Get getCloudflareContext via dynamic import (so it resolves correctly in OpenNext build process)
 async function getCloudflareContext(
   options: { async: true } | { async?: false } = { async: false },
 ) {
@@ -27,7 +27,7 @@ async function getCloudflareContext(
 }
 
 /**
- * WordPressのdev-notes投稿タイプ用のサムネイル画像生成API
+ * Thumbnail image generation API for WordPress dev-notes post type
  */
 export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -38,7 +38,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       return new Response('Invalid post ID', { status: 404 })
     }
 
-    // WordPress REST APIから記事を取得
+    // Fetch article from WordPress REST API
     const wpResponse = await fetch(
       `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes/${postId}?_fields=id,title`,
     )

@@ -3,6 +3,12 @@ export type FeedDataSource = {
   name: string
   color: string
 }
+export type TechTag = {
+  name: string
+  slug: string
+  color: string
+}
+
 export type FeedItem = {
   id?: string
   title: string
@@ -11,6 +17,7 @@ export type FeedItem = {
   datetime: string
   dataSource: FeedDataSource
   image?: string
+  tags?: TechTag[]
 }
 export type Category = {
   id: number
