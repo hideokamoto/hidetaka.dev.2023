@@ -58,23 +58,26 @@ function MobileNavItem({
   children,
   isActive,
   onClick,
+  badge,
 }: {
   href: string
   children: React.ReactNode
   isActive?: boolean
   onClick?: () => void
+  badge?: string
 }) {
   return (
     <Link
       href={href}
       onClick={onClick}
-      className={`block px-4 py-3 text-base font-medium rounded-lg transition-all ${
+      className={`block px-4 py-3 text-base font-medium rounded-lg transition-all flex items-center gap-2 ${
         isActive
           ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'
           : 'text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-500/5'
       }`}
     >
       {children}
+      {badge && <span className="text-sm">{badge}</span>}
     </Link>
   )
 }
@@ -83,21 +86,24 @@ function DesktopNavItem({
   href,
   children,
   isActive,
+  badge,
 }: {
   href: string
   children: React.ReactNode
   isActive?: boolean
+  badge?: string
 }) {
   return (
     <Link
       href={href}
-      className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+      className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-all flex items-center gap-1.5 ${
         isActive
           ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'
           : 'text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-500/5'
       }`}
     >
       {children}
+      {badge && <span className="text-xs">{badge}</span>}
       {isActive && (
         <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-0.5 w-6 bg-indigo-600 dark:bg-indigo-400 rounded-full" />
       )}
@@ -117,6 +123,7 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
     { path: 'blog', label: lang === 'ja' ? 'ブログ' : 'Blog' },
     { path: 'news', label: lang === 'ja' ? 'News' : 'News' },
     { path: 'speaking', label: lang === 'ja' ? 'Speaking' : 'Speaking' },
+    { path: 'premium', label: lang === 'ja' ? 'Premium' : 'Premium', badge: '🔒' },
   ]
 
   useEffect(() => {
@@ -176,6 +183,7 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
                     href={itemPath}
                     isActive={isActive}
                     onClick={onClose}
+                    badge={item.badge}
                   >
                     {item.label}
                   </MobileNavItem>
@@ -231,6 +239,7 @@ function DesktopNavigation() {
     { path: 'blog', label: lang === 'ja' ? 'ブログ' : 'Blog' },
     { path: 'news', label: lang === 'ja' ? 'ニュース' : 'News' },
     { path: 'speaking', label: lang === 'ja' ? 'Speaking' : 'Speaking' },
+    { path: 'premium', label: lang === 'ja' ? 'Premium' : 'Premium', badge: '🔒' },
   ]
 
   return (
@@ -239,7 +248,7 @@ function DesktopNavigation() {
         const itemPath = getPathnameWithLangType(item.path, lang)
         const isActive = pathname === itemPath || pathname.startsWith(`${itemPath}/`)
         return (
-          <DesktopNavItem key={item.path} href={itemPath} isActive={isActive}>
+          <DesktopNavItem key={item.path} href={itemPath} isActive={isActive} badge={item.badge}>
             {item.label}
           </DesktopNavItem>
         )

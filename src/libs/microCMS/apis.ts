@@ -1,6 +1,11 @@
 import dayjs from 'dayjs'
 import { MICROCMS_MOCK_BOOKs, MICROCMS_MOCK_EVENTs } from './mocks'
-import type { MicroCMSClient, MicroCMSEventsRecord, MicroCMSProjectsRecord } from './types'
+import type {
+  MicroCMSClient,
+  MicroCMSEventsRecord,
+  MicroCMSPremiumPostRecord,
+  MicroCMSProjectsRecord,
+} from './types'
 
 export class MicroCMSAPI {
   private readonly client: MicroCMSClient
@@ -149,5 +154,57 @@ export class MicroCMSAPI {
       },
     })
     return events
+  }
+
+  /**
+   * Premiumコンテンツを取得（認証済みユーザーのみ）
+   */
+  public async listPremiumPosts(lang: string): Promise<MicroCMSPremiumPostRecord[]> {
+    if (!this.client) {
+      return []
+    }
+    try {
+      const { contents } = await this.client.get<{
+        contents: MicroCMSPremiumPostRecord[]
+      }>({
+        endpoint: 'premium-posts',
+        queries: {
+          orders: '-publishedAt',
+          filters: `lang[equals]${lang}`,
+          limit: 100,
+        },
+      })
+      return contents
+    } catch (error) {
+      console.warn('Failed to fetch premium posts:', error)
+      return []
+    }
+  }
+
+  /**
+   * Premiumコンテンツをslugで取得
+   */
+  public async getPremiumPostBySlug(
+    slug: string,
+    lang: string,
+  ): Promise<MicroCMSPremiumPostRecord | null> {
+    if (!this.client) {
+      return null
+    }
+    try {
+      const { contents } = await this.client.get<{
+        contents: MicroCMSPremiumPostRecord[]
+      }>({
+        endpoint: 'premium-posts',
+        queries: {
+          filters: `slug[equals]${slug}[and]lang[equals]${lang}`,
+          limit: 1,
+        },
+      })
+      return contents[0] || null
+    } catch (error) {
+      console.warn('Failed to fetch premium post by slug:', error)
+      return null
+    }
   }
 }

@@ -47,4 +47,15 @@ export type MicroCMSProjectsRecord = MicroCMSRecord & {
   architecture?: string
 }
 
+export type MicroCMSPremiumPostRecord = MicroCMSRecord & {
+  title: string
+  slug: string
+  content: string
+  excerpt?: string
+  published_at?: string
+  lang: ['Japanese' | 'English']
+  isPaid: boolean
+  image?: MicroCMSImageObject
+}
+
 export type MicroCMSClient = Pick<ReturnType<typeof createClient>, 'get' | 'getAllContents'>
