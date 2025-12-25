@@ -405,7 +405,9 @@ describe('DateDisplay Utils', () => {
       it('should include year in output for all formats', () => {
         fc.assert(
           fc.property(
-            fc.date({ min: new Date('1900-01-01'), max: new Date('2100-12-31') }),
+            fc.date({ min: new Date('1900-01-01'), max: new Date('2100-12-31') }).filter((date) => {
+              return !Number.isNaN(date.getTime())
+            }),
             fc.string({ minLength: 0, maxLength: 20 }),
             fc.constantFrom('short', 'long', 'month-year' as const),
             (date, lang, format) => {

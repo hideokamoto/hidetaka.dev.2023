@@ -313,14 +313,21 @@ describe('getPathnameWithLangType', () => {
               fc.oneof(
                 fc.constant('ja'),
                 fc
-                  .tuple(fc.constant('ja'), fc.string({ minLength: 1, maxLength: 1 }))
+                  .tuple(
+                    fc.constant('ja'),
+                    fc.string({ minLength: 1, maxLength: 1 }).filter((c) => c !== 'e'),
+                  )
                   .map(([prefix, suffix]) => prefix + suffix),
                 fc
-                  .tuple(fc.constant('ja'), fc.string({ minLength: 10, maxLength: 20 }))
+                  .tuple(
+                    fc.constant('ja'),
+                    fc.string({ minLength: 10, maxLength: 20 }).filter((s) => !s.includes('en')),
+                  )
                   .map(([prefix, suffix]) => prefix + suffix),
               ),
               (targetPath, lang) => {
                 const result = getPathnameWithLangType(targetPath, lang)
+                // "ja"で始まり"en"を含まない文字列の場合、日本語プレフィックスが付く
                 expect(result).toMatch(/^\/ja-JP\//)
               },
             ),
@@ -335,7 +342,10 @@ describe('getPathnameWithLangType', () => {
               fc.string({ minLength: 0, maxLength: 100 }),
               fc.oneof(
                 fc
-                  .tuple(fc.constant('ja'), fc.string({ minLength: 0, maxLength: 10 }))
+                  .tuple(
+                    fc.constant('ja'),
+                    fc.string({ minLength: 0, maxLength: 10 }).filter((s) => !s.includes('en')),
+                  )
                   .map(([prefix, suffix]) => prefix + suffix),
                 fc
                   .tuple(fc.constant('en'), fc.string({ minLength: 0, maxLength: 10 }))
@@ -349,7 +359,7 @@ describe('getPathnameWithLangType', () => {
               ),
               (targetPath, lang) => {
                 const result = getPathnameWithLangType(targetPath, lang)
-                if (/ja/.test(lang)) {
+                if (/ja/.test(lang) && !/en/.test(lang)) {
                   expect(result).toMatch(/^\/ja-JP\//)
                 } else if (/en/.test(lang)) {
                   expect(result).toBe(`/${targetPath}`)
