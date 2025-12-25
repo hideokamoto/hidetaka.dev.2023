@@ -1,3 +1,4 @@
+import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
 import {
   formatDateDisplay,
@@ -216,6 +217,288 @@ describe('DateDisplay Utils', () => {
       expect(parseDateAndFormat('2024-01-01', 'en', 'short')).toBeTruthy()
       expect(parseDateAndFormat('2024-12-31', 'en', 'short')).toBeTruthy()
       expect(parseDateAndFormat('2024-02-29', 'en', 'short')).toBeTruthy() // Leap year
+    })
+  })
+
+  describe('property-based tests', () => {
+    describe('parseDate', () => {
+      it('should return Date object when input is Date', () => {
+        fc.assert(
+          fc.property(
+            fc.date({ min: new Date('1900-01-01'), max: new Date('2100-12-31') }),
+            (date) => {
+              const result = parseDate(date)
+              expect(result).toBe(date)
+              expect(result).toBeInstanceOf(Date)
+            },
+          ),
+        )
+      })
+
+      it('should return Date object when input is string', () => {
+        fc.assert(
+          fc.property(
+            fc.date({ min: new Date('1900-01-01'), max: new Date('2100-12-31') }).map((date) => {
+              const year = date.getUTCFullYear()
+              const month = String(date.getUTCMonth() + 1).padStart(2, '0')
+              const day = String(date.getUTCDate()).padStart(2, '0')
+              return `${year}-${month}-${day}`
+            }),
+            (dateStr) => {
+              const result = parseDate(dateStr)
+              expect(result).toBeInstanceOf(Date)
+            },
+          ),
+        )
+      })
+    })
+
+    describe('isValidDate', () => {
+      it('should return true for valid dates', () => {
+        fc.assert(
+          fc.property(
+            fc.date({ min: new Date('1900-01-01'), max: new Date('2100-12-31') }).filter((date) => {
+              return !Number.isNaN(date.getTime())
+            }),
+            (date) => {
+              expect(isValidDate(date)).toBe(true)
+            },
+          ),
+        )
+      })
+
+      it('should return false for invalid dates', () => {
+        fc.assert(
+          fc.property(
+            fc.string().filter((s) => {
+              const date = new Date(s)
+              return Number.isNaN(date.getTime())
+            }),
+            (invalidStr) => {
+              const invalidDate = new Date(invalidStr)
+              expect(isValidDate(invalidDate)).toBe(false)
+            },
+          ),
+        )
+      })
+    })
+
+    describe('getDateLocale', () => {
+      describe('common language codes', () => {
+        it('should return "ja-JP" for common Japanese language codes', () => {
+          fc.assert(
+            fc.property(
+              fc.constantFrom('ja', 'ja-JP', 'japanese', 'ja_JP', 'ja-JP-u-ca-japanese'),
+              (lang) => {
+                expect(getDateLocale(lang)).toBe('ja-JP')
+              },
+            ),
+          )
+        })
+
+        it('should return "en-US" for common non-Japanese language codes', () => {
+          fc.assert(
+            fc.property(
+              fc.constantFrom(
+                'en',
+                'en-US',
+                'en-GB',
+                'en-CA',
+                'fr',
+                'de',
+                'es',
+                'it',
+                'pt',
+                'zh',
+                'ko',
+              ),
+              (lang) => {
+                expect(getDateLocale(lang)).toBe('en-US')
+              },
+            ),
+          )
+        })
+      })
+
+      describe('boundary value tests', () => {
+        it('should handle edge cases: empty string, single character, long strings', () => {
+          fc.assert(
+            fc.property(
+              fc.oneof(
+                fc.constant(''),
+                fc.string({ minLength: 1, maxLength: 1 }),
+                fc.string({ minLength: 50, maxLength: 100 }).filter((s) => !s.startsWith('ja')),
+              ),
+              (lang) => {
+                const result = getDateLocale(lang)
+                if (lang.startsWith('ja')) {
+                  expect(result).toBe('ja-JP')
+                } else {
+                  expect(result).toBe('en-US')
+                }
+              },
+            ),
+          )
+        })
+
+        it('should handle "ja" prefix with various suffixes (boundary cases)', () => {
+          fc.assert(
+            fc.property(
+              fc.oneof(
+                fc.constant('ja'),
+                fc
+                  .tuple(fc.constant('ja'), fc.string({ minLength: 1, maxLength: 1 }))
+                  .map(([prefix, suffix]) => prefix + suffix),
+                fc
+                  .tuple(fc.constant('ja'), fc.string({ minLength: 10, maxLength: 20 }))
+                  .map(([prefix, suffix]) => prefix + suffix),
+              ),
+              (lang) => {
+                expect(getDateLocale(lang)).toBe('ja-JP')
+              },
+            ),
+          )
+        })
+      })
+
+      describe('special characters and various string patterns', () => {
+        it('should handle special characters in language codes', () => {
+          fc.assert(
+            fc.property(
+              fc.oneof(
+                fc
+                  .tuple(fc.constant('ja'), fc.string({ minLength: 0, maxLength: 10 }))
+                  .map(([prefix, suffix]) => prefix + suffix),
+                fc
+                  .tuple(
+                    fc.string({ minLength: 1, maxLength: 1 }).filter((c) => c !== 'j'),
+                    fc.string({ minLength: 0, maxLength: 10 }),
+                  )
+                  .map(([first, rest]) => first + rest),
+              ),
+              (lang) => {
+                const result = getDateLocale(lang)
+                if (lang.startsWith('ja')) {
+                  expect(result).toBe('ja-JP')
+                } else {
+                  expect(result).toBe('en-US')
+                }
+              },
+            ),
+          )
+        })
+      })
+    })
+
+    describe('formatDateDisplay', () => {
+      it('should return a non-empty string for any valid date', () => {
+        fc.assert(
+          fc.property(
+            fc.date({ min: new Date('1900-01-01'), max: new Date('2100-12-31') }),
+            fc.string({ minLength: 0, maxLength: 20 }),
+            fc.constantFrom('short', 'long', 'month-year' as const),
+            (date, lang, format) => {
+              const result = formatDateDisplay(date, lang, format)
+              expect(typeof result).toBe('string')
+              expect(result.length).toBeGreaterThan(0)
+            },
+          ),
+        )
+      })
+
+      it('should include year in output for all formats', () => {
+        fc.assert(
+          fc.property(
+            fc.date({ min: new Date('1900-01-01'), max: new Date('2100-12-31') }).filter((date) => {
+              return !Number.isNaN(date.getTime())
+            }),
+            fc.string({ minLength: 0, maxLength: 20 }),
+            fc.constantFrom('short', 'long', 'month-year' as const),
+            (date, lang, format) => {
+              const result = formatDateDisplay(date, lang, format)
+              // month-year format uses UTC timezone, others use local timezone
+              const year =
+                format === 'month-year'
+                  ? date.getUTCFullYear().toString()
+                  : date.getFullYear().toString()
+              expect(result).toContain(year)
+            },
+          ),
+        )
+      })
+
+      it('should be consistent for same date, lang, and format', () => {
+        fc.assert(
+          fc.property(
+            fc.date({ min: new Date('1900-01-01'), max: new Date('2100-12-31') }),
+            fc.string({ minLength: 0, maxLength: 20 }),
+            fc.constantFrom('short', 'long', 'month-year' as const),
+            (date, lang, format) => {
+              const result1 = formatDateDisplay(date, lang, format)
+              const result2 = formatDateDisplay(date, lang, format)
+              expect(result1).toBe(result2)
+            },
+          ),
+        )
+      })
+    })
+
+    describe('parseDateAndFormat', () => {
+      it('should return string or null for any input', () => {
+        fc.assert(
+          fc.property(
+            fc.oneof(
+              fc.date({ min: new Date('1900-01-01'), max: new Date('2100-12-31') }),
+              fc.string({ minLength: 0, maxLength: 100 }),
+            ),
+            fc.string({ minLength: 0, maxLength: 20 }),
+            fc.constantFrom('short', 'long', 'month-year' as const),
+            (date, lang, format) => {
+              const result = parseDateAndFormat(date, lang, format)
+              expect(result === null || typeof result === 'string').toBe(true)
+            },
+          ),
+        )
+      })
+
+      it('should return null for invalid date strings', () => {
+        fc.assert(
+          fc.property(
+            fc.string().filter((s) => {
+              const date = new Date(s)
+              return Number.isNaN(date.getTime())
+            }),
+            fc.string({ minLength: 0, maxLength: 20 }),
+            fc.constantFrom('short', 'long', 'month-year' as const),
+            (invalidStr, lang, format) => {
+              const result = parseDateAndFormat(invalidStr, lang, format)
+              expect(result).toBe(null)
+            },
+          ),
+        )
+      })
+
+      it('should return non-null string for valid dates', () => {
+        fc.assert(
+          fc.property(
+            fc.date({ min: new Date('1900-01-01'), max: new Date('2100-12-31') }),
+            fc.string({ minLength: 0, maxLength: 20 }),
+            fc.constantFrom('short', 'long', 'month-year' as const),
+            (date, lang, format) => {
+              // 有効な日付であることを確認
+              if (Number.isNaN(date.getTime())) {
+                return
+              }
+              const result = parseDateAndFormat(date, lang, format)
+              expect(result).not.toBe(null)
+              if (result !== null) {
+                expect(typeof result).toBe('string')
+                expect(result.length).toBeGreaterThan(0)
+              }
+            },
+          ),
+        )
+      })
     })
   })
 })
