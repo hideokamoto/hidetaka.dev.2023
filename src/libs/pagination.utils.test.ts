@@ -277,7 +277,7 @@ describe('Pagination Utils', () => {
         )
       })
 
-      describe('実際に使用される言語コード', () => {
+      describe('common language codes', () => {
         it('should return Japanese text for common Japanese language codes', () => {
           fc.assert(
             fc.property(
@@ -315,19 +315,18 @@ describe('Pagination Utils', () => {
         })
       })
 
-      describe('境界値テスト', () => {
+      describe('boundary value tests', () => {
         it('should handle edge cases: empty string, single character, long strings', () => {
           fc.assert(
             fc.property(
               fc.oneof(
                 fc.constant(''),
                 fc.string({ minLength: 1, maxLength: 1 }),
-                fc.string({ minLength: 50, maxLength: 100 }),
+                fc.string({ minLength: 50, maxLength: 100 }).filter((s) => !s.startsWith('ja')),
               ),
               fc.constantFrom('prev', 'next', 'page' as const),
               (lang, key) => {
                 const result = getPaginationText(lang, key)
-                // 空文字列や長い文字列は「ja」で始まらないので英語を返す
                 const expectedEnglish = {
                   prev: 'Previous',
                   next: 'Next',
@@ -366,7 +365,7 @@ describe('Pagination Utils', () => {
         })
       })
 
-      describe('特殊文字を含む文字列', () => {
+      describe('special characters and various string patterns', () => {
         it('should handle special characters and various string patterns', () => {
           fc.assert(
             fc.property(

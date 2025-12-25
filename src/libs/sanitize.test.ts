@@ -54,8 +54,10 @@ describe('removeHtmlTags', () => {
   })
 
   describe('property-based tests', () => {
-    // HTMLタグを含まない文字列を生成
-    const plainText = fc.string({ minLength: 0, maxLength: 100 })
+    // HTMLタグを含まない文字列を生成（<と>を含まない）
+    const plainText = fc
+      .string({ minLength: 0, maxLength: 100 })
+      .filter((s) => !s.includes('<') && !s.includes('>'))
 
     // HTMLタグを含む可能性のある文字列を生成
     const htmlString = fc.string({ minLength: 0, maxLength: 200 })
@@ -75,7 +77,7 @@ describe('removeHtmlTags', () => {
       fc.assert(
         fc.property(htmlString, (str) => {
           const result1 = removeHtmlTags(str)
-          const result2 = removeHtmlTags(result1 as string)
+          const result2 = removeHtmlTags(result1)
           expect(result1).toBe(result2)
         }),
       )
@@ -104,7 +106,7 @@ describe('removeHtmlTags', () => {
       )
     })
 
-    describe('実際に使用されるHTMLタグ', () => {
+    describe('common HTML tags', () => {
       it('should remove common HTML tags', () => {
         fc.assert(
           fc.property(
@@ -153,7 +155,7 @@ describe('removeHtmlTags', () => {
       })
     })
 
-    describe('境界値テスト', () => {
+    describe('boundary value tests', () => {
       it('should remove HTML tags with various nesting depths', () => {
         fc.assert(
           fc.property(

@@ -228,7 +228,12 @@ describe('sortByEventDate', () => {
     it('should handle events with same date', () => {
       fc.assert(
         fc.property(
-          fc.string({ minLength: 1 }),
+          fc.date({ min: new Date('1900-01-01'), max: new Date('2100-12-31') }).map((d) => {
+            const year = d.getUTCFullYear()
+            const month = String(d.getUTCMonth() + 1).padStart(2, '0')
+            const day = String(d.getUTCDate()).padStart(2, '0')
+            return `${year}-${month}-${day}`
+          }),
           fc.array(fc.string({ minLength: 1 }), { minLength: 2, maxLength: 10 }),
           (dateStr, ids) => {
             const events: MicroCMSEventsRecord[] = ids.map((id) => createMockEvent(id, dateStr))

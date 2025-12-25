@@ -284,7 +284,7 @@ describe('DateDisplay Utils', () => {
     })
 
     describe('getDateLocale', () => {
-      describe('実際に使用される言語コード', () => {
+      describe('common language codes', () => {
         it('should return "ja-JP" for common Japanese language codes', () => {
           fc.assert(
             fc.property(
@@ -320,18 +320,22 @@ describe('DateDisplay Utils', () => {
         })
       })
 
-      describe('境界値テスト', () => {
+      describe('boundary value tests', () => {
         it('should handle edge cases: empty string, single character, long strings', () => {
           fc.assert(
             fc.property(
               fc.oneof(
                 fc.constant(''),
                 fc.string({ minLength: 1, maxLength: 1 }),
-                fc.string({ minLength: 50, maxLength: 100 }),
+                fc.string({ minLength: 50, maxLength: 100 }).filter((s) => !s.startsWith('ja')),
               ),
               (lang) => {
                 const result = getDateLocale(lang)
-                expect(result).toBe('en-US') // 空文字列や長い文字列は「ja」で始まらない
+                if (lang.startsWith('ja')) {
+                  expect(result).toBe('ja-JP')
+                } else {
+                  expect(result).toBe('en-US')
+                }
               },
             ),
           )
@@ -357,7 +361,7 @@ describe('DateDisplay Utils', () => {
         })
       })
 
-      describe('特殊文字を含む文字列', () => {
+      describe('special characters and various string patterns', () => {
         it('should handle special characters in language codes', () => {
           fc.assert(
             fc.property(
@@ -412,7 +416,11 @@ describe('DateDisplay Utils', () => {
             fc.constantFrom('short', 'long', 'month-year' as const),
             (date, lang, format) => {
               const result = formatDateDisplay(date, lang, format)
-              const year = date.getFullYear().toString()
+              // month-year format uses UTC timezone, others use local timezone
+              const year =
+                format === 'month-year'
+                  ? date.getUTCFullYear().toString()
+                  : date.getFullYear().toString()
               expect(result).toContain(year)
             },
           ),
