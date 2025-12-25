@@ -27,19 +27,21 @@ export const logger = {
 
     // Sentryにエラーを送信
     if (context?.error instanceof Error) {
-      Sentry.captureException(context.error, {
+      const { error, ...restContext } = context
+      Sentry.captureException(error, {
         extra: {
           message,
-          ...Object.fromEntries(Object.entries(context).filter(([key]) => key !== 'error')),
+          ...restContext,
         },
       })
     } else if (context?.error) {
       // Errorインスタンスでない場合はErrorオブジェクトに変換
+      const { error: originalError, ...restContext } = context
       const error = new Error(message)
       Sentry.captureException(error, {
         extra: {
-          originalError: context.error,
-          ...Object.fromEntries(Object.entries(context).filter(([key]) => key !== 'error')),
+          originalError,
+          ...restContext,
         },
       })
     } else {

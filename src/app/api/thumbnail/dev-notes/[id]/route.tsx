@@ -1,8 +1,8 @@
-import * as Sentry from '@sentry/nextjs'
 import type { NextRequest } from 'next/server'
 import { SITE_CONFIG } from '@/config'
 import type { WPThought } from '@/libs/dataSources/types'
 import { logger } from '@/libs/logger'
+import { captureThumbnailError } from '@/libs/sentry'
 
 // getCloudflareContextを動的インポートで取得（OpenNextのビルドプロセスで正しく解決されるように）
 async function getCloudflareContext(
@@ -118,17 +118,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
     })
 
     // Sentryに直接送信（より詳細なコンテキスト）
-    if (error instanceof Error) {
-      Sentry.captureException(error, {
-        tags: {
-          route: 'thumbnail',
-          contentType: 'dev-notes',
-        },
-        extra: {
-          postId: id,
-        },
-      })
-    }
+    captureThumbnailError(error, 'dev-notes', id)
 
     return new Response('Failed to generate image', { status: 500 })
   }
