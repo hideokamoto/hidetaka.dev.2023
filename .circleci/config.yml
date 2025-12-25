@@ -1,0 +1,156 @@
+version: 2.1
+
+# 再利用可能なジョブ定義
+orbs:
+  node: circleci/node@5.1.0
+
+# ワークフロー定義
+workflows:
+  ci:
+    jobs:
+      - lint
+      - test
+      - build
+      - cf-build
+      - deploy-production:
+          requires:
+            - lint
+            - test
+            - build
+            - cf-build
+          filters:
+            branches:
+              only: main
+      - deploy-branch:
+          requires:
+            - lint
+            - test
+            - build
+            - cf-build
+          filters:
+            branches:
+              ignore: main
+
+# ジョブ定義
+jobs:
+  lint:
+    docker:
+      - image: cimg/node:22.1.0
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Run linter
+          command: npm run lint:check
+
+  test:
+    docker:
+      - image: cimg/node:22.1.0
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Run unit tests
+          command: npm run test
+      - run:
+          name: Run tests with coverage
+          command: npm run test:coverage
+      - store_artifacts:
+          path: coverage
+          destination: coverage
+
+  build:
+    docker:
+      - image: cimg/node:22.1.0
+    environment:
+      MICROCMS_API_MODE: mock
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Build Next.js
+          command: npm run build
+
+  cf-build:
+    docker:
+      - image: cimg/node:22.1.0
+    environment:
+      MICROCMS_API_MODE: mock
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Build for Cloudflare
+          command: npm run cf:build
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .open-next
+
+  deploy-production:
+    docker:
+      - image: cimg/node:22.1.0
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Deploy to Production
+          command: |
+            # ワークスペースからビルド成果物を取得済みなので、再度ビルドは不要
+            # ただし、念のためビルドを実行（最新のコードで確実にビルド）
+            npm run cf:build
+            npx wrangler deploy
+          environment:
+            CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
+            CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID}
+      - run:
+          name: Output deployment URL
+          command: |
+            echo "✅ Deployment completed!"
+            echo "Production URL: https://hidetaka-dev-workers.${CLOUDFLARE_ACCOUNT_ID}.workers.dev"
+
+  deploy-branch:
+    docker:
+      - image: cimg/node:22.1.0
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Setup branch name
+          command: |
+            # ブランチ名を取得（スラッシュをハイフンに変換、最大長制限）
+            BRANCH_NAME=$(echo "${CIRCLE_BRANCH}" | sed 's/\//-/g' | sed 's/_/-/g' | tr '[:upper:]' '[:lower:]' | cut -c1-50)
+            echo "export BRANCH_NAME=${BRANCH_NAME}" >> $BASH_ENV
+            echo "export WORKER_NAME=hidetaka-dev-workers-${BRANCH_NAME}" >> $BASH_ENV
+            echo "Deploying branch: ${CIRCLE_BRANCH} as ${WORKER_NAME}"
+      - run:
+          name: Deploy to Branch Preview
+          command: |
+            source $BASH_ENV
+            npm run cf:build
+            # ブランチ名を含むWorker名でデプロイ
+            # --nameオプションでWorker名を上書き（wrangler.jsoncのnameは無視される）
+            npx wrangler deploy --name ${WORKER_NAME}
+          environment:
+            CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
+            CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID}
+      - run:
+          name: Output deployment URL
+          command: |
+            source $BASH_ENV
+            echo "✅ Deployment completed!"
+            echo "Worker name: ${WORKER_NAME}"
+            echo "Preview URL: https://${WORKER_NAME}.${CLOUDFLARE_ACCOUNT_ID}.workers.dev"
+            echo ""
+            echo "Note: This is a branch preview deployment."
+            echo "The worker will be automatically cleaned up when the branch is deleted."
