@@ -1,5 +1,5 @@
-import type { NextRequest } from 'next/server'
 import * as Sentry from '@sentry/nextjs'
+import type { NextRequest } from 'next/server'
 import { SITE_CONFIG } from '@/config'
 import type { WPThought } from '@/libs/dataSources/types'
 import { logger } from '@/libs/logger'

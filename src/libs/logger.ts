@@ -30,9 +30,7 @@ export const logger = {
       Sentry.captureException(context.error, {
         extra: {
           message,
-          ...Object.fromEntries(
-            Object.entries(context).filter(([key]) => key !== 'error'),
-          ),
+          ...Object.fromEntries(Object.entries(context).filter(([key]) => key !== 'error')),
         },
       })
     } else if (context?.error) {
@@ -41,9 +39,7 @@ export const logger = {
       Sentry.captureException(error, {
         extra: {
           originalError: context.error,
-          ...Object.fromEntries(
-            Object.entries(context).filter(([key]) => key !== 'error'),
-          ),
+          ...Object.fromEntries(Object.entries(context).filter(([key]) => key !== 'error')),
         },
       })
     } else {
