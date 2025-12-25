@@ -7,6 +7,9 @@
     "cloudflare-observability": {
       "command": "npx",
       "args": ["mcp-remote", "https://observability.mcp.cloudflare.com/mcp"]
+    },
+    "Sentry": {
+      "url": "https://mcp.sentry.dev/mcp/wp-kyoto/hidetaka-dev"
     }
   }
 }
