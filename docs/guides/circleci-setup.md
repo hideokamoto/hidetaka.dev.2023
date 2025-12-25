@@ -110,12 +110,25 @@ CircleCIで以下の環境変数を設定する必要があります：
 
 ### デプロイコマンド
 
+ブランチデプロイでは、`wrangler versions upload`を使用してバージョンをアップロードし、`wrangler versions deploy`でデプロイします：
+
 ```bash
-# ブランチ名を含むWorker名でデプロイ
+# 1. バージョンをアップロード
+npx wrangler versions upload --name ${WORKER_NAME}
+
+# 2. アップロードしたバージョンをデプロイ
+VERSION_ID=$(npx wrangler versions list --name ${WORKER_NAME} --json | jq -r '.[0].id')
+npx wrangler versions deploy ${VERSION_ID} --name ${WORKER_NAME} --percentage 100
+```
+
+**注意**: Durable Objectsのマイグレーションを含むWorkerの場合、`wrangler versions upload`は使用できません。その場合は`wrangler deploy`を使用します：
+
+```bash
+# Durable Objectsがある場合
 npx wrangler deploy --name ${WORKER_NAME}
 ```
 
-`--name` オプションを使用することで、`wrangler.jsonc` の `name` フィールドを上書きできます。
+CircleCIの設定では、自動的に`wrangler versions upload`を試行し、失敗した場合は`wrangler deploy`にフォールバックします。
 
 ## デプロイURL
 
