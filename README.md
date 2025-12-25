@@ -28,6 +28,30 @@ cp .env.example .env.local
 npm run dev
 ```
 
+## CI/CD
+
+このプロジェクトはCircleCIを使用してCI/CDパイプラインを実行しています。
+
+### CircleCIの設定
+
+- **設定ファイル**: `.circleci/config.yml`
+- **詳細ドキュメント**: [docs/guides/circleci-setup.md](./docs/guides/circleci-setup.md)
+
+### 自動デプロイ
+
+- **mainブランチ**: 本番環境（`hidetaka-dev-workers`）に自動デプロイ
+- **その他のブランチ**: ブランチ名を含むWorker名でプレビュー環境に自動デプロイ
+  - 例: `feature/new-feature` → `hidetaka-dev-workers-feature-new-feature`
+
+### CircleCI環境変数の設定
+
+CircleCIで以下の環境変数を設定する必要があります：
+
+1. **CLOUDFLARE_API_TOKEN**: Cloudflare APIトークン
+2. **CLOUDFLARE_ACCOUNT_ID**: CloudflareアカウントID
+
+詳細は [CircleCI設定ガイド](./docs/guides/circleci-setup.md) を参照してください。
+
 ## ビルドとデプロイ
 
 ### ローカルビルド
@@ -38,6 +62,8 @@ npm run build
 ### Cloudflare Workersへのデプロイ
 
 このプロジェクトは`@opennextjs/cloudflare`を使用してCloudflare Workersにデプロイします。
+
+**注意**: CircleCIが設定されている場合、mainブランチへのpushで自動的にデプロイされます。
 
 #### 前提条件
 
