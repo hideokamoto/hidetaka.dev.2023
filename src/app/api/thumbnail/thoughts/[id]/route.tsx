@@ -2,7 +2,6 @@ import type { NextRequest } from 'next/server'
 import { SITE_CONFIG } from '@/config'
 import type { WPThought } from '@/libs/dataSources/types'
 import { logger } from '@/libs/logger'
-import { captureThumbnailError } from '@/libs/sentry'
 
 // @see https://opennext.js.org/cloudflare/get-started#9-remove-any-export-const-runtime--edge-if-present
 // export const runtime = 'edge'
@@ -142,10 +141,6 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       error,
       postId: id,
     })
-
-    // Sentryに直接送信（より詳細なコンテキスト）
-    captureThumbnailError(error, 'thoughts', id)
-
     return new Response('Failed to generate image', { status: 500 })
   }
 }
