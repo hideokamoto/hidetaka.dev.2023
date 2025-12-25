@@ -121,15 +121,6 @@ VERSION_ID=$(npx wrangler versions list --name ${WORKER_NAME} --json | jq -r '.[
 npx wrangler versions deploy ${VERSION_ID} --name ${WORKER_NAME} --percentage 100
 ```
 
-**注意**: Durable Objectsのマイグレーションを含むWorkerの場合、`wrangler versions upload`は使用できません。その場合は`wrangler deploy`を使用します：
-
-```bash
-# Durable Objectsがある場合
-npx wrangler deploy --name ${WORKER_NAME}
-```
-
-CircleCIの設定では、自動的に`wrangler versions upload`を試行し、失敗した場合は`wrangler deploy`にフォールバックします。
-
 ## デプロイURL
 
 ### 本番環境

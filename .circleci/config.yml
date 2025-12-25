@@ -140,28 +140,9 @@ jobs:
           command: |
             source $BASH_ENV
             npm run cf:build
-            
-            # ブランチデプロイ: wrangler versions uploadを使用（ブランチデプロイ用コマンド）
-            # まず、ブランチ名を含むWorker名でバージョンをアップロード
-            echo "Deploying branch preview: ${WORKER_NAME}"
-            echo "Attempting to upload version using wrangler versions upload..."
-            
-            # wrangler versions uploadを試行（Durable Objectsがある場合は失敗する）
-            if npx wrangler versions upload --name ${WORKER_NAME} 2>&1 | grep -q "migration"; then
-              echo "Durable Objects detected - falling back to wrangler deploy"
-              # Durable Objectsがある場合はwrangler deployを使用
-              npx wrangler deploy --name ${WORKER_NAME}
-            else
-              # バージョンのアップロードに成功した場合、デプロイする
-              VERSION_ID=$(npx wrangler versions list --name ${WORKER_NAME} --json 2>/dev/null | jq -r '.[0].id // empty')
-              if [ -n "$VERSION_ID" ] && [ "$VERSION_ID" != "null" ]; then
-                echo "Deploying version ${VERSION_ID} to 100%"
-                npx wrangler versions deploy ${VERSION_ID} --name ${WORKER_NAME} --percentage 100
-              else
-                echo "Warning: Could not find version ID, using direct deploy"
-                npx wrangler deploy --name ${WORKER_NAME}
-              fi
-            fi
+            npx wrangler versions upload --name ${WORKER_NAME}
+            VERSION_ID=$(npx wrangler versions list --name ${WORKER_NAME} --json | jq -r '.[0].id')
+            npx wrangler versions deploy ${VERSION_ID} --name ${WORKER_NAME} --percentage 100
           environment:
             CLOUDFLARE_API_TOKEN: ${CLOUDFLARE_API_TOKEN}
             CLOUDFLARE_ACCOUNT_ID: ${CLOUDFLARE_ACCOUNT_ID}
