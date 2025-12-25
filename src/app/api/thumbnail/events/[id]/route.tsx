@@ -1,4 +1,5 @@
 import type { NextRequest } from 'next/server'
+import * as Sentry from '@sentry/nextjs'
 import { SITE_CONFIG } from '@/config'
 import type { WPEvent } from '@/libs/dataSources/types'
 import { logger } from '@/libs/logger'
@@ -136,6 +137,20 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       error,
       postId: id,
     })
+
+    // Sentryに直接送信（より詳細なコンテキスト）
+    if (error instanceof Error) {
+      Sentry.captureException(error, {
+        tags: {
+          route: 'thumbnail',
+          contentType: 'events',
+        },
+        extra: {
+          postId: id,
+        },
+      })
+    }
+
     return new Response('Failed to generate image', { status: 500 })
   }
 }

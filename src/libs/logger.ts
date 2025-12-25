@@ -3,6 +3,8 @@
  * 環境に応じた適切なロギングを提供
  */
 
+import * as Sentry from '@sentry/nextjs'
+
 const isDevelopment = process.env.NODE_ENV === 'development'
 
 export const logger = {
@@ -18,11 +20,39 @@ export const logger = {
 
   /**
    * エラーログを出力（本番環境でも記録）
-   * エラー情報は常に記録し、将来的には外部ロギングサービスに送信可能
+   * エラー情報は常に記録し、Sentryに自動的に送信
    */
   error: (message: string, context?: Record<string, unknown>) => {
     console.error('[ERROR]', message, context)
-    // TODO: 将来的には外部ロギングサービス（Sentry等）に送信
+
+    // Sentryにエラーを送信
+    if (context?.error instanceof Error) {
+      Sentry.captureException(context.error, {
+        extra: {
+          message,
+          ...Object.fromEntries(
+            Object.entries(context).filter(([key]) => key !== 'error'),
+          ),
+        },
+      })
+    } else if (context?.error) {
+      // Errorインスタンスでない場合はErrorオブジェクトに変換
+      const error = new Error(message)
+      Sentry.captureException(error, {
+        extra: {
+          originalError: context.error,
+          ...Object.fromEntries(
+            Object.entries(context).filter(([key]) => key !== 'error'),
+          ),
+        },
+      })
+    } else {
+      // エラーオブジェクトがない場合はメッセージのみを送信
+      Sentry.captureMessage(message, {
+        level: 'error',
+        extra: context,
+      })
+    }
   },
 
   /**
