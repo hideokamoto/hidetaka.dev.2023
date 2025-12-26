@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
+import CTAButton from '@/components/ui/CTAButton'
 import DateDisplay from '@/components/ui/DateDisplay'
 import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
@@ -120,6 +121,23 @@ export default function SpeakingDetailPage({
           lang={lang}
           className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700"
         />
+
+        {/* 登壇依頼CTA */}
+        <div className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700">
+          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 rounded-xl p-8 text-center">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">
+              {lang === 'ja' ? '登壇依頼をお待ちしています' : 'Interested in Having Me Speak?'}
+            </h2>
+            <p className="text-slate-600 dark:text-slate-400 mb-6 max-w-2xl mx-auto">
+              {lang === 'ja'
+                ? 'イベントやカンファレンスへの登壇をご依頼いただける場合は、お気軽にお問い合わせください。'
+                : 'If you would like me to speak at your event or conference, please feel free to reach out.'}
+            </p>
+            <CTAButton href={lang === 'ja' ? '/ja/speaking-request' : '/speaking-request'}>
+              {lang === 'ja' ? '登壇依頼はこちら' : 'Request Speaking Engagement'}
+            </CTAButton>
+          </div>
+        </div>
 
         {/* プロフィールカード */}
         <ProfileCard lang={lang} imageSrc="/images/profile.jpg" className="mt-12" />
