@@ -34,7 +34,7 @@ async function handleMarkdownRequest(request: NextRequest): Promise<Response> {
 
     // 元のHTMLページをフェッチ
     // 元のリクエストヘッダーを元に新しいHeadersオブジェクトを作成
-    const htmlUrl = new URL(htmlPath, request.url)
+    const htmlUrl = new URL(`${htmlPath}${request.nextUrl.search}`, request.nextUrl.origin)
     const requestHeaders = new Headers(request.headers)
 
     // Acceptヘッダーを上書きしてHTMLを要求
