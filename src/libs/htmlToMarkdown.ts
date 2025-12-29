@@ -5,27 +5,19 @@
 
 import TurndownService from 'turndown'
 
-// Turndownインスタンスを作成（シングルトンパターン）
-let turndownInstance: TurndownService | null = null
-
-function getTurndownService(): TurndownService {
-  if (!turndownInstance) {
-    turndownInstance = new TurndownService({
-      headingStyle: 'atx', // # スタイルの見出し
-      hr: '---', // 水平線のスタイル
-      bulletListMarker: '-', // 箇条書きのマーカー
-      codeBlockStyle: 'fenced', // ```スタイルのコードブロック
-      emDelimiter: '*', // イタリックのデリミタ
-    })
-  }
-  return turndownInstance
-}
+// Turndownインスタンスをモジュールスコープで生成
+const turndownService = new TurndownService({
+  headingStyle: 'atx', // # スタイルの見出し
+  hr: '---', // 水平線のスタイル
+  bulletListMarker: '-', // 箇条書きのマーカー
+  codeBlockStyle: 'fenced', // ```スタイルのコードブロック
+  emDelimiter: '*', // イタリックのデリミタ
+})
 
 /**
  * HTMLタグをMarkdownに変換
  */
 export function htmlToMarkdown(html: string): string {
-  const turndownService = getTurndownService()
   return turndownService.turndown(html)
 }
 
@@ -44,7 +36,7 @@ export function formatArticleAsMarkdown(options: {
   const parts: string[] = []
 
   // タイトル
-  parts.push(`# ${title}\n`)
+  parts.push(`# ${title}`)
 
   // メタ情報
   const metaParts: string[] = []
@@ -60,11 +52,11 @@ export function formatArticleAsMarkdown(options: {
   }
 
   parts.push(metaParts.join(' | '))
-  parts.push('\n---\n')
+  parts.push('---')
 
   // 本文
   const markdownContent = htmlToMarkdown(content)
   parts.push(markdownContent)
 
-  return parts.join('\n')
+  return parts.join('\n\n')
 }
