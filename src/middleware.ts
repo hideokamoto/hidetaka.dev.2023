@@ -33,11 +33,16 @@ async function handleMarkdownRequest(request: NextRequest): Promise<Response> {
     const htmlPath = pathname.replace(/\.md$/, '')
 
     // 元のHTMLページをフェッチ
-    // 元のリクエストヘッダーを元に新しいHeadersオブジェクトを作成
+    // セキュリティ上、必要最小限のヘッダーのみを転送
     const htmlUrl = new URL(`${htmlPath}${request.nextUrl.search}`, request.nextUrl.origin)
-    const requestHeaders = new Headers(request.headers)
+    const requestHeaders = new Headers()
 
-    // Acceptヘッダーを上書きしてHTMLを要求
+    // 安全なヘッダーのみを転送
+    const userAgent = request.headers.get('User-Agent')
+    const acceptLanguage = request.headers.get('Accept-Language')
+
+    if (userAgent) requestHeaders.set('User-Agent', userAgent)
+    if (acceptLanguage) requestHeaders.set('Accept-Language', acceptLanguage)
     requestHeaders.set('Accept', 'text/html')
 
     const htmlResponse = await fetch(htmlUrl.toString(), {
@@ -49,7 +54,11 @@ async function handleMarkdownRequest(request: NextRequest): Promise<Response> {
     }
 
     // HTMLを取得
-    const html = await htmlResponse.text()
+    let html = await htmlResponse.text()
+
+    // 相対URLを絶対URLに解決するため、<base>タグを追加
+    const baseTag = `<base href="${htmlUrl.origin}${htmlPath}">`
+    html = html.replace(/<head>/i, `<head>${baseTag}`)
 
     // HTMLをMarkdownに変換
     const markdown = convertHtmlToMarkdown(html)
