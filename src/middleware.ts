@@ -45,7 +45,7 @@ async function handleMarkdownRequest(request: NextRequest): Promise<Response> {
     })
 
     if (!htmlResponse.ok) {
-      return new Response('Page not found', { status: 404 })
+      return new Response(htmlResponse.statusText, { status: htmlResponse.status })
     }
 
     // HTMLを取得
