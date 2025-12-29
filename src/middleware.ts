@@ -17,7 +17,7 @@ export function middleware(request: NextRequest) {
       const [, langPrefix, slug] = blogMatch
       const newUrl = new URL(request.url)
       newUrl.pathname = `/api/markdown/blog/${slug}`
-      // 元のパス情報を保持するために、言語プレフィックスをヘッダーに追加
+      // 元のパス情報を保持するために、言語プレフィックスをクエリパラメータに追加
       if (langPrefix) {
         newUrl.searchParams.set('lang', 'ja')
       }
