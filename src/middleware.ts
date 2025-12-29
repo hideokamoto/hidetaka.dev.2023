@@ -3,6 +3,9 @@ import { NextResponse } from 'next/server'
 import TurndownService from 'turndown'
 import { createRedirectRules, RedirectRuleEngine } from '@/libs/middleware/redirectRules'
 
+// 定数定義
+const MARKDOWN_CACHE_SECONDS = 3600 // 1時間
+
 // リダイレクトルールエンジンを初期化（シングルトン）
 const redirectEngine = new RedirectRuleEngine(createRedirectRules())
 
@@ -23,37 +26,42 @@ function convertHtmlToMarkdown(html: string): string {
  * .md拡張子のリクエストを処理し、HTMLをMarkdownに変換して返す
  */
 async function handleMarkdownRequest(request: NextRequest): Promise<Response> {
-  const { pathname } = request.nextUrl
+  try {
+    const { pathname } = request.nextUrl
 
-  // .mdを除去して元のHTMLパスを取得
-  const htmlPath = pathname.replace(/\.md$/, '')
+    // .mdを除去して元のHTMLパスを取得
+    const htmlPath = pathname.replace(/\.md$/, '')
 
-  // 元のHTMLページをフェッチ
-  const htmlUrl = new URL(htmlPath, request.url)
-  const htmlResponse = await fetch(htmlUrl.toString(), {
-    headers: {
-      Accept: 'text/html',
-    },
-  })
+    // 元のHTMLページをフェッチ
+    const htmlUrl = new URL(htmlPath, request.url)
+    const htmlResponse = await fetch(htmlUrl.toString(), {
+      headers: {
+        Accept: 'text/html',
+      },
+    })
 
-  if (!htmlResponse.ok) {
-    return new Response('Page not found', { status: 404 })
+    if (!htmlResponse.ok) {
+      return new Response('Page not found', { status: 404 })
+    }
+
+    // HTMLを取得
+    const html = await htmlResponse.text()
+
+    // HTMLをMarkdownに変換
+    const markdown = convertHtmlToMarkdown(html)
+
+    // Markdownレスポンスを返す
+    return new Response(markdown, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/markdown; charset=utf-8',
+        'Cache-Control': `public, max-age=${MARKDOWN_CACHE_SECONDS}`,
+      },
+    })
+  } catch (error) {
+    console.error('Failed to convert HTML to Markdown:', error)
+    return new Response('Internal Server Error', { status: 500 })
   }
-
-  // HTMLを取得
-  const html = await htmlResponse.text()
-
-  // HTMLをMarkdownに変換
-  const markdown = convertHtmlToMarkdown(html)
-
-  // Markdownレスポンスを返す
-  return new Response(markdown, {
-    status: 200,
-    headers: {
-      'Content-Type': 'text/markdown; charset=utf-8',
-      'Cache-Control': 'public, max-age=3600',
-    },
-  })
 }
 
 export async function middleware(request: NextRequest) {
