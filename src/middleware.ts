@@ -6,14 +6,16 @@ import { createRedirectRules, RedirectRuleEngine } from '@/libs/middleware/redir
 // リダイレクトルールエンジンを初期化（シングルトン）
 const redirectEngine = new RedirectRuleEngine(createRedirectRules())
 
+// TurndownServiceを初期化（シングルトン）
+const turndownService = new TurndownService({
+  headingStyle: 'atx',
+  codeBlockStyle: 'fenced',
+})
+
 /**
  * HTMLをMarkdownに変換するユーティリティ関数
  */
 function convertHtmlToMarkdown(html: string): string {
-  const turndownService = new TurndownService({
-    headingStyle: 'atx',
-    codeBlockStyle: 'fenced',
-  })
   return turndownService.turndown(html)
 }
 
@@ -30,7 +32,6 @@ async function handleMarkdownRequest(request: NextRequest): Promise<Response> {
   const htmlUrl = new URL(htmlPath, request.url)
   const htmlResponse = await fetch(htmlUrl.toString(), {
     headers: {
-      ...Object.fromEntries(request.headers),
       Accept: 'text/html',
     },
   })
