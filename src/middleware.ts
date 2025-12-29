@@ -33,11 +33,15 @@ async function handleMarkdownRequest(request: NextRequest): Promise<Response> {
     const htmlPath = pathname.replace(/\.md$/, '')
 
     // 元のHTMLページをフェッチ
+    // 元のリクエストヘッダーを元に新しいHeadersオブジェクトを作成
     const htmlUrl = new URL(htmlPath, request.url)
+    const requestHeaders = new Headers(request.headers)
+
+    // Acceptヘッダーを上書きしてHTMLを要求
+    requestHeaders.set('Accept', 'text/html')
+
     const htmlResponse = await fetch(htmlUrl.toString(), {
-      headers: {
-        Accept: 'text/html',
-      },
+      headers: requestHeaders,
     })
 
     if (!htmlResponse.ok) {
@@ -66,7 +70,7 @@ async function handleMarkdownRequest(request: NextRequest): Promise<Response> {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  const baseUrl = request.url.split(request.nextUrl.pathname)[0]
+  const baseUrl = request.nextUrl.origin
 
   // .md拡張子のリクエストを処理
   if (pathname.endsWith('.md')) {
