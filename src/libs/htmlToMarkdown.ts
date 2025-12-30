@@ -36,24 +36,30 @@ export function formatArticleAsMarkdown(options: {
 
   const parts: string[] = []
 
-  // タイトル
-  parts.push(`# ${title}`)
-
-  // メタ情報
-  const metaParts: string[] = []
-  metaParts.push(`**Published:** ${dayjs(date).format('YYYY-MM-DD')}`)
+  // YAML frontmatter
+  const frontmatter: string[] = []
+  frontmatter.push('---')
+  // タイトルに特殊文字が含まれる可能性があるため、クォートで囲む
+  frontmatter.push(`title: "${title.replace(/"/g, '\\"')}"`)
+  frontmatter.push(`date: ${dayjs(date).format('YYYY-MM-DD')}`)
 
   if (categories && categories.length > 0) {
-    const categoryNames = categories.map((c) => c.name).join(', ')
-    metaParts.push(`**Categories:** ${categoryNames}`)
+    if (categories.length === 1) {
+      frontmatter.push(`categories: "${categories[0].name.replace(/"/g, '\\"')}"`)
+    } else {
+      frontmatter.push('categories:')
+      categories.forEach((c) => {
+        frontmatter.push(`  - "${c.name.replace(/"/g, '\\"')}"`)
+      })
+    }
   }
 
   if (url) {
-    metaParts.push(`**URL:** ${url}`)
+    frontmatter.push(`url: ${url}`)
   }
 
-  parts.push(metaParts.join(' | '))
-  parts.push('---')
+  frontmatter.push('---')
+  parts.push(frontmatter.join('\n'))
 
   // 本文
   const markdownContent = htmlToMarkdown(content)
