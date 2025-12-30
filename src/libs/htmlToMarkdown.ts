@@ -3,6 +3,7 @@
  * WordPressのHTML記事をMarkdownに変換する
  */
 
+import dayjs from 'dayjs'
 import TurndownService from 'turndown'
 
 // Turndownインスタンスをモジュールスコープで生成
@@ -40,7 +41,7 @@ export function formatArticleAsMarkdown(options: {
 
   // メタ情報
   const metaParts: string[] = []
-  metaParts.push(`**Published:** ${new Date(date).toLocaleDateString('ja-JP')}`)
+  metaParts.push(`**Published:** ${dayjs(date).format('YYYY-MM-DD')}`)
 
   if (categories && categories.length > 0) {
     const categoryNames = categories.map((c) => c.name).join(', ')
