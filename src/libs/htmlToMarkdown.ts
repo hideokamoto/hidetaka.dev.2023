@@ -55,7 +55,7 @@ export function formatArticleAsMarkdown(options: {
   }
 
   if (url) {
-    frontmatter.push(`url: ${url}`)
+    frontmatter.push(`url: "${url.replace(/"/g, '\\"')}"`)
   }
 
   frontmatter.push('---')
