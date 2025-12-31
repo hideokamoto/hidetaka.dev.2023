@@ -23,6 +23,19 @@ export function middleware(request: NextRequest) {
       }
       return NextResponse.rewrite(newUrl)
     }
+
+    // /news/<slug>.md または /ja/news/<slug>.md のパターンをマッチ
+    const newsMatch = pathname.match(/^(\/ja)?\/news\/(.+)\.md$/)
+    if (newsMatch) {
+      const [, langPrefix, slug] = newsMatch
+      const newUrl = new URL(request.url)
+      newUrl.pathname = `/api/markdown/news/${slug}`
+      // 元のパス情報を保持するために、言語プレフィックスをクエリパラメータに追加
+      if (langPrefix) {
+        newUrl.searchParams.set('lang', 'ja')
+      }
+      return NextResponse.rewrite(newUrl)
+    }
   }
 
   // /ja-JP/* を /ja/* にリダイレクト（特別なルール）
