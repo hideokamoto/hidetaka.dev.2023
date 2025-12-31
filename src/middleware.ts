@@ -9,6 +9,22 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const baseUrl = request.url.split(request.nextUrl.pathname)[0]
 
+  // .md拡張子のリクエストをMarkdown APIにrewrite
+  if (pathname.endsWith('.md')) {
+    // /blog/<slug>.md または /ja/blog/<slug>.md のパターンをマッチ
+    const blogMatch = pathname.match(/^(\/ja)?\/blog\/(.+)\.md$/)
+    if (blogMatch) {
+      const [, langPrefix, slug] = blogMatch
+      const newUrl = new URL(request.url)
+      newUrl.pathname = `/api/markdown/blog/${slug}`
+      // 元のパス情報を保持するために、言語プレフィックスをクエリパラメータに追加
+      if (langPrefix) {
+        newUrl.searchParams.set('lang', 'ja')
+      }
+      return NextResponse.rewrite(newUrl)
+    }
+  }
+
   // /ja-JP/* を /ja/* にリダイレクト（特別なルール）
   if (pathname.startsWith('/ja-JP')) {
     const newPath = pathname.replace('/ja-JP', '/ja')
