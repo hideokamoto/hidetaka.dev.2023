@@ -23,6 +23,15 @@ export function middleware(request: NextRequest) {
       }
       return NextResponse.rewrite(newUrl)
     }
+
+    // /ja/writing/dev-notes/<slug>.md のパターンをマッチ
+    const devNotesMatch = pathname.match(/^\/ja\/writing\/dev-notes\/(.+)\.md$/)
+    if (devNotesMatch) {
+      const [, slug] = devNotesMatch
+      const newUrl = new URL(request.url)
+      newUrl.pathname = `/api/markdown/dev-notes/${slug}`
+      return NextResponse.rewrite(newUrl)
+    }
   }
 
   // /ja-JP/* を /ja/* にリダイレクト（特別なルール）
