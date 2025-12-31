@@ -24,18 +24,11 @@ export async function GET(
   }
 
   // paramsが空の場合は、request.urlから抽出
-  // rewrite後のURL（/api/markdown/dev-notes/...）または元のURL（/ja/writing/dev-notes/...）の両方に対応
+  // middlewareでrewriteされるため、常に /api/markdown/dev-notes/<slug> の形式
   if (!slug) {
-    // rewrite後のURLから抽出を試みる
-    let pathMatch = url.pathname.match(/\/api\/markdown\/dev-notes\/(.+)$/)
+    const pathMatch = url.pathname.match(/\/api\/markdown\/dev-notes\/(.+)$/)
     if (pathMatch) {
       slug = pathMatch[1]
-    } else {
-      // 元のURLから抽出を試みる（/ja/writing/dev-notes/...）
-      pathMatch = url.pathname.match(/\/ja\/writing\/dev-notes\/(.+)\.md$/)
-      if (pathMatch) {
-        slug = pathMatch[1]
-      }
     }
   }
 
