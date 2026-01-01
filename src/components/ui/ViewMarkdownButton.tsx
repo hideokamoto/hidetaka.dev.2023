@@ -1,5 +1,5 @@
-import { getCTAButtonStyles } from '@/libs/componentStyles.utils'
 import { SITE_CONFIG } from '@/config'
+import { getCTAButtonStyles } from '@/libs/componentStyles.utils'
 
 /**
  * Props for the ViewMarkdownButton component
