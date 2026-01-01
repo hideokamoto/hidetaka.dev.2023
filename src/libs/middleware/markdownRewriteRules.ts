@@ -119,9 +119,9 @@ export function createMarkdownRewriteRules(): MarkdownRewriteRule[] {
 
     // /writing/dev-notes/<slug>.md または /ja/writing/dev-notes/<slug>.md → /api/markdown/dev-notes/{slug}
     new RegexMarkdownRewriteRule(
-      /^(?:\/ja)?\/writing\/dev-notes\/(.+)\.md$/,
+      /^(\/ja)?\/writing\/dev-notes\/(.+)\.md$/,
       '/api/markdown/dev-notes/{slug}',
-      false, // 言語プレフィックスは不要（非キャプチャグループのため）
+      false, // 言語プレフィックスは不要（dev-notesは言語に依存しない）
     ),
 
     // /news/<slug>.md または /ja/news/<slug>.md → /api/markdown/news/{slug}
