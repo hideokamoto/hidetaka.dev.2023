@@ -1,41 +1,32 @@
 import type { NextRequest } from 'next/server'
 import { NextResponse } from 'next/server'
+import {
+  createMarkdownRewriteRules,
+  MarkdownRewriteRuleEngine,
+} from '@/libs/middleware/markdownRewriteRules'
 import { createRedirectRules, RedirectRuleEngine } from '@/libs/middleware/redirectRules'
 
 // リダイレクトルールエンジンを初期化（シングルトン）
 const redirectEngine = new RedirectRuleEngine(createRedirectRules())
+// Markdownリライトルールエンジンを初期化（シングルトン）
+const markdownRewriteEngine = new MarkdownRewriteRuleEngine(createMarkdownRewriteRules())
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const baseUrl = request.url.split(request.nextUrl.pathname)[0]
 
   // .md拡張子のリクエストをMarkdown APIにrewrite
-  if (pathname.endsWith('.md')) {
-    // /blog/<slug>.md または /ja/blog/<slug>.md のパターンをマッチ
-    const blogMatch = pathname.match(/^(\/ja)?\/blog\/(.+)\.md$/)
-    if (blogMatch) {
-      const [, langPrefix, slug] = blogMatch
-      const newUrl = new URL(request.url)
-      newUrl.pathname = `/api/markdown/blog/${slug}`
-      // 元のパス情報を保持するために、言語プレフィックスをクエリパラメータに追加
-      if (langPrefix) {
-        newUrl.searchParams.set('lang', 'ja')
+  if (pathname.endsWith('.md') && markdownRewriteEngine.shouldRewrite(pathname)) {
+    const { pathname: rewritePath, searchParams } = markdownRewriteEngine.getRewritePath(pathname)
+    const newUrl = new URL(request.url)
+    newUrl.pathname = rewritePath
+    // 言語プレフィックスがある場合はクエリパラメータに追加
+    if (searchParams) {
+      for (const [key, value] of Object.entries(searchParams)) {
+        newUrl.searchParams.set(key, value)
       }
-      return NextResponse.rewrite(newUrl)
     }
-
-    // /news/<slug>.md または /ja/news/<slug>.md のパターンをマッチ
-    const newsMatch = pathname.match(/^(\/ja)?\/news\/(.+)\.md$/)
-    if (newsMatch) {
-      const [, langPrefix, slug] = newsMatch
-      const newUrl = new URL(request.url)
-      newUrl.pathname = `/api/markdown/news/${slug}`
-      // 元のパス情報を保持するために、言語プレフィックスをクエリパラメータに追加
-      if (langPrefix) {
-        newUrl.searchParams.set('lang', 'ja')
-      }
-      return NextResponse.rewrite(newUrl)
-    }
+    return NextResponse.rewrite(newUrl)
   }
 
   // /ja-JP/* を /ja/* にリダイレクト（特別なルール）
