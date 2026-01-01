@@ -6,6 +6,7 @@ import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
 import SocialShareButtons from '@/components/ui/SocialShareButtons'
 import Tag from '@/components/ui/Tag'
+import ViewMarkdownButton from '@/components/ui/ViewMarkdownButton'
 import { SITE_CONFIG } from '@/config'
 import type { BlogItem, WPThought } from '@/libs/dataSources/types'
 
@@ -105,6 +106,14 @@ export default function DevNoteDetailPage({
             </div>
           )}
         </div>
+
+        {/* Markdownボタン */}
+        <ViewMarkdownButton
+          slug={note.slug}
+          basePath={basePath}
+          title={note.title.rendered}
+          language="ja"
+        />
 
         {/* コンテンツ */}
         <div
