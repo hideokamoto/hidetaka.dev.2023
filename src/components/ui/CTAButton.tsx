@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { getCTAButtonStyles } from '@/libs/componentStyles.utils'
-import type { CTAButtonVariant } from '@/libs/componentStyles.utils'
+
+import { getCTAButtonStyles, type CTAButtonVariant } from '@/libs/componentStyles.utils'
 
 type CTAButtonProps = {
   href: string
