@@ -44,7 +44,7 @@ function getBlogMarkdownRewritePath(pathname: string): {
   pathname: string
   searchParams?: Record<string, string>
 } {
-  const match = pathname.match(/^(\/ja)?\/blog\/(.+)$/)
+  const match = pathname.match(/^(\/ja)?\/blog\/([^/]+)$/)
   if (!match) {
     throw new Error(`Failed to extract slug from pathname: ${pathname}`)
   }
