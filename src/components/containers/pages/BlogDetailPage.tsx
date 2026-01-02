@@ -6,6 +6,7 @@ import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
 import SocialShareButtons from '@/components/ui/SocialShareButtons'
 import Tag from '@/components/ui/Tag'
+import ViewMarkdownButton from '@/components/ui/ViewMarkdownButton'
 import { SITE_CONFIG } from '@/config'
 import type { BlogItem, WPThought } from '@/libs/dataSources/types'
 
@@ -123,6 +124,14 @@ export default function BlogDetailPage({
             </div>
           )}
         </div>
+
+        {/* Markdownボタン */}
+        <ViewMarkdownButton
+          slug={thought.slug}
+          basePath={basePath}
+          title={thought.title.rendered}
+          language={lang}
+        />
 
         {/* コンテンツ */}
         <div

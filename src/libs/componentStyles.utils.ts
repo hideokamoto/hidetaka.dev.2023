@@ -82,3 +82,26 @@ const SECTION_HEADER_ALIGN_STYLES = {
 export function getSectionHeaderAlignStyles(align: SectionHeaderAlign): string {
   return SECTION_HEADER_ALIGN_STYLES[align]
 }
+
+// CTA Button component types
+export type CTAButtonVariant = 'primary' | 'secondary'
+
+// CTA Button style constants (defined at module level for performance)
+const CTA_BUTTON_BASE_STYLES =
+  'group inline-flex items-center gap-2 rounded-lg px-8 py-3.5 text-base font-bold shadow-lg transition-all hover:scale-105 hover:shadow-xl'
+
+const CTA_BUTTON_VARIANT_STYLES = {
+  primary:
+    'bg-indigo-600 text-white shadow-indigo-500/30 hover:bg-indigo-700 hover:shadow-indigo-500/40 dark:bg-indigo-500 dark:hover:bg-indigo-400',
+  secondary:
+    'border border-zinc-200 bg-white text-zinc-900 shadow-zinc-500/20 hover:bg-zinc-50 hover:shadow-zinc-500/30 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:hover:bg-zinc-800',
+} as const
+
+/**
+ * Get complete styles for CTA Button component
+ * @param variant - Button variant type
+ * @returns Combined base and variant styles
+ */
+export function getCTAButtonStyles(variant: CTAButtonVariant): string {
+  return `${CTA_BUTTON_BASE_STYLES} ${CTA_BUTTON_VARIANT_STYLES[variant]}`
+}

@@ -3,6 +3,7 @@ import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
+import ViewMarkdownButton from '@/components/ui/ViewMarkdownButton'
 import type { WPProduct } from '@/libs/dataSources/products'
 import type { BlogItem } from '@/libs/dataSources/types'
 
@@ -78,6 +79,14 @@ export default function NewsDetailPage({
             className="text-sm font-medium text-slate-600 dark:text-slate-400"
           />
         </div>
+
+        {/* Markdownボタン */}
+        <ViewMarkdownButton
+          slug={product.slug}
+          basePath={basePath}
+          title={product.title.rendered}
+          language={lang}
+        />
 
         {/* コンテンツ */}
         <div

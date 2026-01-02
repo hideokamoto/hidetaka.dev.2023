@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { getBadgeStyles, getSectionHeaderAlignStyles, getTagStyles } from './componentStyles.utils'
+import {
+  getBadgeStyles,
+  getCTAButtonStyles,
+  getSectionHeaderAlignStyles,
+  getTagStyles,
+} from './componentStyles.utils'
 
 describe('Component Styles Utils', () => {
   describe('getBadgeStyles', () => {
@@ -140,6 +145,47 @@ describe('Component Styles Utils', () => {
       expect(getSectionHeaderAlignStyles('left')).toContain('text-')
       expect(getSectionHeaderAlignStyles('center')).toContain('text-')
       expect(getSectionHeaderAlignStyles('right')).toContain('text-')
+    })
+  })
+
+  describe('getCTAButtonStyles', () => {
+    it('should return primary variant styles with base tokens', () => {
+      const styles = getCTAButtonStyles('primary')
+
+      // Base tokens
+      expect(styles).toContain('inline-flex')
+      expect(styles).toContain('gap-2')
+      expect(styles).toContain('rounded-lg')
+      expect(styles).toContain('px-8')
+      expect(styles).toContain('font-bold')
+
+      // Primary variant tokens
+      expect(styles).toContain('bg-indigo-600')
+      expect(styles).toContain('text-white')
+      expect(styles).toContain('hover:bg-indigo-700')
+      expect(styles).toContain('dark:bg-indigo-500')
+      expect(styles).toContain('dark:hover:bg-indigo-400')
+    })
+
+    it('should return secondary variant styles with base tokens', () => {
+      const styles = getCTAButtonStyles('secondary')
+
+      // Base tokens
+      expect(styles).toContain('inline-flex')
+      expect(styles).toContain('gap-2')
+      expect(styles).toContain('rounded-lg')
+      expect(styles).toContain('px-8')
+      expect(styles).toContain('font-bold')
+
+      // Secondary variant tokens
+      expect(styles).toContain('border-zinc-200')
+      expect(styles).toContain('bg-white')
+      expect(styles).toContain('text-zinc-900')
+      expect(styles).toContain('hover:bg-zinc-50')
+      expect(styles).toContain('dark:border-zinc-700')
+      expect(styles).toContain('dark:bg-zinc-900')
+      expect(styles).toContain('dark:text-white')
+      expect(styles).toContain('dark:hover:bg-zinc-800')
     })
   })
 })
