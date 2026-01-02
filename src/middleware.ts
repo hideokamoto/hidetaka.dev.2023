@@ -18,7 +18,7 @@ const markdownRewriteEngine = new MarkdownRewriteRuleEngine(createMarkdownRewrit
  */
 function acceptsMarkdown(request: NextRequest): boolean {
   const acceptHeader = request.headers.get('accept') || ''
-  return acceptHeader.includes('text/markdown')
+  return /(^|,\s*)text\/markdown($|;|,)/.test(acceptHeader)
 }
 
 /**
