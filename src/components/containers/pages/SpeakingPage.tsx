@@ -463,6 +463,18 @@ function createYearFilterGroup(
   }
 }
 
+/**
+ * Render the Speaking page content with searchable, filterable, and paginated-ready event listings.
+ *
+ * Renders a hero with localized title/description and a CTA, a responsive search and filter UI (desktop sidebar + mobile drawer),
+ * and a list of unified event cards merged from microCMS and WordPress sources. Filters include type, place, and year; search
+ * matches title, description, session title, and place. Events are shown newest-first and links are resolved per event source.
+ *
+ * @param lang - Locale code used for text content and local routing (e.g., 'ja' for Japanese)
+ * @param events - Array of unified event objects (announcements and reports) to display and filter
+ * @param basePath - Base path used to build internal links for report events
+ * @returns The page's React element tree containing the hero, filter controls, and filtered event grid (or an empty-state message)
+ */
 export default function SpeakingPageContent({
   lang,
   events,
