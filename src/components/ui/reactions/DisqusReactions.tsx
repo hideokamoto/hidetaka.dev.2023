@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import Script from 'next/script'
 
 type DisqusReactionsProps = {
   url: string
@@ -10,11 +10,21 @@ type DisqusReactionsProps = {
   className?: string
 }
 
+declare global {
+  interface Window {
+    disqus_config?: () => void
+    DISQUS?: {
+      reset: (options: { reload: boolean }) => void
+    }
+  }
+}
+
 /**
  * Disqus Reactions コンポーネント
  *
  * 記事に対して絵文字リアクション（👍❤️😂など）を付けられる機能を提供します。
  * Disqusのコメントシステムに付属するReactions機能を使用します。
+ * Next.jsの<Script>コンポーネントを使用して最適化された読み込みを実現します。
  *
  * @see https://disqus.com/
  *
@@ -28,50 +38,36 @@ export default function DisqusReactions({
   shortname = 'hidetaka-dev-poc', // PoC用のプレースホルダー
   className = '',
 }: DisqusReactionsProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const scriptLoadedRef = useRef(false)
-
-  useEffect(() => {
-    // スクリプトが既に読み込まれている場合はスキップ
-    if (scriptLoadedRef.current) {
-      return
-    }
-
+  const handleScriptLoad = () => {
     // Disqus設定をwindowオブジェクトに追加
     if (typeof window !== 'undefined') {
-      ;(window as any).disqus_config = function () {
+      window.disqus_config = function () {
+        // @ts-expect-error - Disqus API
         this.page.url = url
+        // @ts-expect-error - Disqus API
         this.page.identifier = identifier
+        // @ts-expect-error - Disqus API
         this.page.title = title
       }
-    }
 
-    // Disqusスクリプトを動的に読み込む
-    const script = document.createElement('script')
-    script.src = `https://${shortname}.disqus.com/embed.js`
-    script.async = true
-    script.setAttribute('data-timestamp', String(+new Date()))
-
-    script.onload = () => {
-      scriptLoadedRef.current = true
-    }
-
-    // スクリプトを読み込む前にコンテナが存在することを確認
-    if (containerRef.current) {
-      document.head.appendChild(script)
-    }
-
-    return () => {
-      // クリーンアップ: スクリプトを削除
-      if (script.parentNode) {
-        script.parentNode.removeChild(script)
+      // 既にロードされている場合はリセット
+      if (window.DISQUS) {
+        window.DISQUS.reset({
+          reload: true,
+        })
       }
     }
-  }, [url, identifier, title, shortname])
+  }
 
   return (
     <div className={className}>
-      <div id="disqus_thread" ref={containerRef}>
+      <Script
+        src={`https://${shortname}.disqus.com/embed.js`}
+        strategy="lazyOnload"
+        onLoad={handleScriptLoad}
+        data-timestamp={String(+new Date())}
+      />
+      <div id="disqus_thread">
         {/* Disqusが読み込まれない場合のフォールバック */}
         <noscript>
           <p className="text-sm text-slate-600 dark:text-slate-400">

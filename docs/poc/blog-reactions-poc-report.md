@@ -16,7 +16,8 @@ songmuさんのブログ（https://blog.song.mu/）で使用されている3つ�
 
 **実装方法:**
 - 公式の埋め込みスクリプト（`https://s.hatena.ne.jp/js/HatenaStar.js`）を使用
-- クライアントコンポーネントとして実装
+- Next.jsの`<Script>`コンポーネントで最適化された読み込み
+- `strategy="lazyOnload"`で遅延読み込み
 - 記事のURLとタイトルを指定するだけで動作
 
 **本番環境での設定:**
@@ -37,7 +38,8 @@ songmuさんのブログ（https://blog.song.mu/）で使用されている3つ�
 
 **実装方法:**
 - Disqusの公式埋め込みスクリプトを使用
-- クライアントコンポーネントとして実装
+- Next.jsの`<Script>`コンポーネントで最適化された読み込み
+- `strategy="lazyOnload"`で遅延読み込み
 - 記事のURL、識別子、タイトルを指定
 
 **本番環境での設定:**
@@ -129,15 +131,24 @@ songmuさんのブログ（https://blog.song.mu/）で使用されている3つ�
 
 ### コンポーネント設計
 
+**Next.js最適化:**
+- ✅ **`next/script`の`<Script>`コンポーネントを使用**
+  - はてなスターとDisqusで`next/script`を活用
+  - `strategy="lazyOnload"`で遅延読み込み
+  - パフォーマンス最適化とバンドルサイズ削減
+  - 重複ロードの自動防止
+  - スクリプトの読み込み順序を制御
+
 **クライアントコンポーネント:**
 - すべてのリアクションコンポーネントは`'use client'`ディレクティブを使用
-- 外部スクリプトの動的ロードに`useEffect`を使用
-- 状態管理に`useState`を使用
+- 外部スクリプトの読み込みに`next/script`を使用（`useEffect`の手動管理は不要）
+- Webmentionのデータ取得に`useState`と`useEffect`を使用
 
-**純粋性:**
+**型安全性:**
 - propsのみに依存
 - 再利用可能な設計
 - TypeScriptで型安全
+- `declare global`でWindow型を拡張（はてなスター・Disqus用）
 
 **スタイリング:**
 - TailwindCSSのユーティリティクラスを使用
@@ -337,3 +348,12 @@ docs/poc/
 **作成日:** 2026-01-03
 **作成者:** Claude Code
 **PoC対象:** ブログリアクション機能（はてなスター、Disqus、Webmention）
+
+## 更新履歴
+
+- **2026-01-03 (初版)**: 初回PoC実装（はてなスター、Disqus、Webmention）
+- **2026-01-03 (v2)**: Next.jsの`next/script`を使った最適化実装に変更
+  - `useEffect`での手動スクリプト管理から`<Script>`コンポーネントへ移行
+  - `strategy="lazyOnload"`で遅延読み込みを実現
+  - パフォーマンス向上とバンドルサイズ削減
+  - TypeScript型定義を`declare global`で追加
