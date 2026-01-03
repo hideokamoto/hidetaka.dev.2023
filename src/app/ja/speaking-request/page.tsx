@@ -7,6 +7,13 @@ export const metadata = {
   description: 'イベントやカンファレンスへの登壇依頼はこちらからお願いします。',
 }
 
+/**
+ * Renders the Japanese speaking request page with a header and an embedded HubSpot form.
+ *
+ * The HubSpot form's `formId` is taken from NEXT_PUBLIC_HUBSPOT_SPEAKING_FORM_ID (falls back to an empty string if undefined) and `portalId` from NEXT_PUBLIC_HUBSPOT_PORTAL_ID.
+ *
+ * @returns The page's JSX element.
+ */
 export default function SpeakingRequestPage() {
   return (
     <section className="pt-12 sm:pt-16 pb-8 sm:pb-12 bg-white dark:bg-zinc-900">
@@ -27,4 +34,3 @@ export default function SpeakingRequestPage() {
     </section>
   )
 }
-

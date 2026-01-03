@@ -19,6 +19,17 @@ type SpeakingDetailPageProps = {
   relatedEvents?: BlogItem[]
 }
 
+/**
+ * Renders the speaking event detail page with metadata, full content, social sharing, a speaking-request CTA, profile, related events, and previous/next navigation.
+ *
+ * @param event - WordPress event object containing at least `id`, `date`, `slug`, `title.rendered`, and `content.rendered`
+ * @param lang - Language code used for localized labels (e.g., `'ja'` for Japanese)
+ * @param basePath - Base path for the speaking list used to build breadcrumb and navigation links
+ * @param previousEvent - Optional previous event used for navigation
+ * @param nextEvent - Optional next event used for navigation
+ * @param relatedEvents - Optional list of related blog/event items shown under "Other Recent Events"
+ * @returns The React element for the speaking event detail page
+ */
 export default function SpeakingDetailPage({
   event,
   lang,

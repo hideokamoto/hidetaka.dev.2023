@@ -10,6 +10,15 @@ type HubSpotFormProps = {
   className?: string
 }
 
+/**
+ * Render a HubSpot form container and load/initialize HubSpot's forms script to mount the form.
+ *
+ * @param formId - The HubSpot form GUID to render.
+ * @param portalId - Optional HubSpot portal ID. If omitted, falls back to `process.env.NEXT_PUBLIC_HUBSPOT_PORTAL_ID`.
+ * @param region - HubSpot region to use (e.g., `'na1'`); defaults to `'na1'`.
+ * @param className - Optional additional CSS class(es) applied to the form container.
+ * @returns A React element containing the HubSpot form container, or `null` if `formId` is falsy.
+ */
 export default function HubSpotForm({
   formId,
   portalId,
@@ -98,4 +107,3 @@ declare global {
     }
   }
 }
-

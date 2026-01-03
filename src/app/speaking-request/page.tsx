@@ -7,6 +7,16 @@ export const metadata = {
   description: 'Request Hidetaka Okamoto to speak at your event or conference.',
 }
 
+/**
+ * Renders the Speaking Request page with a header and embedded HubSpot form.
+ *
+ * Displays a PageHeader prompting users to request a speaking engagement and
+ * a centered HubSpot form. The form is configured using the
+ * NEXT_PUBLIC_HUBSPOT_SPEAKING_FORM_ID and NEXT_PUBLIC_HUBSPOT_PORTAL_ID
+ * environment variables.
+ *
+ * @returns The React element for the Speaking Request page.
+ */
 export default function SpeakingRequestPage() {
   return (
     <section className="pt-12 sm:pt-16 pb-8 sm:pb-12 bg-white dark:bg-zinc-900">
@@ -27,4 +37,3 @@ export default function SpeakingRequestPage() {
     </section>
   )
 }
-
