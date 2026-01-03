@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
+import CTAButton from '@/components/ui/CTAButton'
 import DateDisplay from '@/components/ui/DateDisplay'
 import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
@@ -18,6 +19,17 @@ type SpeakingDetailPageProps = {
   relatedEvents?: BlogItem[]
 }
 
+/**
+ * Renders the speaking event detail page with metadata, full content, social sharing, a speaking-request CTA, profile, related events, and previous/next navigation.
+ *
+ * @param event - WordPress event object containing at least `id`, `date`, `slug`, `title.rendered`, and `content.rendered`
+ * @param lang - Language code used for localized labels (e.g., `'ja'` for Japanese)
+ * @param basePath - Base path for the speaking list used to build breadcrumb and navigation links
+ * @param previousEvent - Optional previous event used for navigation
+ * @param nextEvent - Optional next event used for navigation
+ * @param relatedEvents - Optional list of related blog/event items shown under "Other Recent Events"
+ * @returns The React element for the speaking event detail page
+ */
 export default function SpeakingDetailPage({
   event,
   lang,
@@ -120,6 +132,23 @@ export default function SpeakingDetailPage({
           lang={lang}
           className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700"
         />
+
+        {/* 登壇依頼CTA */}
+        <div className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700">
+          <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 rounded-xl p-8 text-center">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">
+              {lang === 'ja' ? '登壇依頼をお待ちしています' : 'Interested in Having Me Speak?'}
+            </h2>
+            <p className="text-slate-600 dark:text-slate-400 mb-6 max-w-2xl mx-auto">
+              {lang === 'ja'
+                ? 'イベントやカンファレンスへの登壇をご依頼いただける場合は、お気軽にお問い合わせください。'
+                : 'If you would like me to speak at your event or conference, please feel free to reach out.'}
+            </p>
+            <CTAButton href={lang === 'ja' ? '/ja/speaking-request' : '/speaking-request'}>
+              {lang === 'ja' ? '登壇依頼はこちら' : 'Request Speaking Engagement'}
+            </CTAButton>
+          </div>
+        </div>
 
         {/* プロフィールカード */}
         <ProfileCard lang={lang} imageSrc="/images/profile.jpg" className="mt-12" />
