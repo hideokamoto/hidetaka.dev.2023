@@ -4,6 +4,7 @@ import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
+import BlogReactions from '@/components/ui/reactions/BlogReactions'
 import SocialShareButtons from '@/components/ui/SocialShareButtons'
 import Tag from '@/components/ui/Tag'
 import ViewMarkdownButton from '@/components/ui/ViewMarkdownButton'
@@ -150,6 +151,15 @@ export default function BlogDetailPage({
 
         {/* プロフィールカード */}
         <ProfileCard lang={lang} imageSrc="/images/profile.jpg" className="mt-12" />
+
+        {/* リアクション機能 */}
+        <BlogReactions
+          url={new URL(`${basePath}/${thought.slug}`, SITE_CONFIG.url).toString()}
+          title={thought.title.rendered}
+          slug={thought.slug}
+          lang={lang}
+          className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700"
+        />
 
         {/* 関連記事 */}
         <RelatedArticles articles={relatedArticles} lang={lang} />
