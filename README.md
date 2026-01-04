@@ -20,7 +20,10 @@ npm install
 2. 環境変数の設定:
 ```bash
 cp .env.example .env.local
-# .env.localにMICROCMS_API_KEYを設定
+# .env.localに以下の環境変数を設定:
+# - MICROCMS_API_KEY: microCMS APIキー
+# - OG_IMAGE_GEN_AUTH_TOKEN: OG画像生成の認証トークン
+# - NEXT_PUBLIC_ENABLE_HATENA_STAR: はてなスター機能の有効化 (true/false)
 ```
 
 3. 開発サーバーの起動:
@@ -114,11 +117,17 @@ npm run cf:preview
 ```toml
 # 本番環境
 [env.production]
-vars = { MICROCMS_API_KEY = "your-production-api-key" }
+vars = {
+  MICROCMS_API_KEY = "your-production-api-key",
+  NEXT_PUBLIC_ENABLE_HATENA_STAR = "true"
+}
 
 # 非本番環境（例: staging）
 [env.staging]
-vars = { MICROCMS_API_KEY = "your-staging-api-key" }
+vars = {
+  MICROCMS_API_KEY = "your-staging-api-key",
+  NEXT_PUBLIC_ENABLE_HATENA_STAR = "false"
+}
 ```
 
 **方法2: Cloudflareダッシュボードで設定**

@@ -48,7 +48,7 @@ export default function PrivacyPolicyPage() {
             プライバシーポリシー
           </h1>
           <p className="mt-4 text-base text-zinc-600 dark:text-zinc-400">
-            最終更新日: 2025年12月2日
+            最終更新日: 2026年1月4日
           </p>
         </header>
 
@@ -129,6 +129,40 @@ export default function PrivacyPolicyPage() {
               </a>
               をご覧ください。
             </p>
+
+            <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3 mt-6">
+              2.3 はてなスター
+            </h3>
+            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+              当サイトの日本語版ブログページでは、はてなスターを使用しています。
+              はてなスターは、株式会社はてなが提供するサービスで、記事に対して軽い反応（スター）を付けることができる機能です。
+            </p>
+            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+              はてなスターのご利用には、はてなアカウントが必要です。
+              はてなスターの利用規約やプライバシーポリシーについては、以下のリンクをご確認ください：
+            </p>
+            <ul className="list-disc list-inside text-zinc-700 dark:text-zinc-300 mb-4 space-y-2">
+              <li>
+                <a
+                  href="https://www.hatena.ne.jp/rule/rule"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-indigo-600 dark:text-indigo-400 hover:underline"
+                >
+                  はてな利用規約
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://policies.hatena.ne.jp/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-indigo-600 dark:text-indigo-400 hover:underline"
+                >
+                  はてなプライバシーポリシー
+                </a>
+              </li>
+            </ul>
           </section>
 
           <section className="mb-8">
@@ -184,6 +218,9 @@ export default function PrivacyPolicyPage() {
               </li>
               <li>
                 <strong>Microsoft Clarity:</strong> ユーザー行動分析
+              </li>
+              <li>
+                <strong>はてなスター:</strong> ブログリアクション機能（日本語版のみ）
               </li>
             </ul>
             <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">

@@ -4,6 +4,7 @@ import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
+import BlogReactions from '@/components/ui/reactions/BlogReactions'
 import SocialShareButtons from '@/components/ui/SocialShareButtons'
 import Tag from '@/components/ui/Tag'
 import ViewMarkdownButton from '@/components/ui/ViewMarkdownButton'
@@ -36,6 +37,10 @@ export default function BlogDetailPage({
   const ogImageUrl = `/api/thumbnail/thoughts/${thought.id}`
   const OG_IMAGE_WIDTH = 1200
   const OG_IMAGE_HEIGHT = 630
+
+  // はてなスター機能の有効化判定
+  // 環境変数で制御し、かつ日本語ページでのみ表示
+  const enableHatenaStar = process.env.NEXT_PUBLIC_ENABLE_HATENA_STAR === 'true' && lang === 'ja'
 
   return (
     <Container className="mt-16 sm:mt-32">
@@ -150,6 +155,18 @@ export default function BlogDetailPage({
 
         {/* プロフィールカード */}
         <ProfileCard lang={lang} imageSrc="/images/profile.jpg" className="mt-12" />
+
+        {/* リアクション機能 */}
+        <BlogReactions
+          url={new URL(`${basePath}/${thought.slug}`, SITE_CONFIG.url).toString()}
+          title={thought.title.rendered}
+          slug={thought.slug}
+          lang={lang}
+          enableHatenaStar={enableHatenaStar}
+          enableDisqus={false}
+          enableWebmention={false}
+          className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700"
+        />
 
         {/* 関連記事 */}
         <RelatedArticles articles={relatedArticles} lang={lang} />
