@@ -2,24 +2,28 @@ import type { AvailabilityResult, SummarizeOptions } from './types'
 import { DEFAULT_MAX_LENGTH } from './types'
 
 /**
+ * Summarizer API が利用可能かチェックする
+ * @returns true if available, false otherwise
+ */
+function isSummarizerAvailable(): boolean {
+  return typeof window !== 'undefined' && typeof Summarizer !== 'undefined'
+}
+
+/**
  * Summarizer を作成する
  * @param locale 言語（'ja' または 'en'）
  */
 export async function createSummarizer(locale: string): Promise<Summarizer> {
-  if (typeof window === 'undefined') {
-    throw new Error('AI API is not available in non-browser environment')
-  }
-
-  if (typeof Summarizer === 'undefined') {
+  if (!isSummarizerAvailable()) {
     throw new Error('Summarizer API is not available')
   }
 
-  const outputLanguage = locale === 'en' ? 'en' : 'ja'
+  const outputLanguage = locale.startsWith('ja') ? 'ja' : 'en'
   const options: SummarizerCreateOptions = {
     type: 'tldr',
     format: 'markdown',
     length: 'medium',
-    sharedContext: outputLanguage,
+    outputLanguage: outputLanguage,
   }
 
   return await Summarizer.create(options)
@@ -32,16 +36,12 @@ export async function createSummarizer(locale: string): Promise<Summarizer> {
  */
 export async function checkSummarizerAvailability(locale?: string): Promise<AvailabilityResult> {
   // Feature Detection: Summarizer APIが存在するか
-  if (typeof window === 'undefined') {
-    return 'unavailable'
-  }
-
-  if (typeof Summarizer === 'undefined') {
+  if (!isSummarizerAvailable()) {
     return 'unavailable'
   }
 
   try {
-    const outputLanguage = locale === 'en' ? 'en' : 'ja'
+    const outputLanguage = locale?.startsWith('ja') ? 'ja' : 'en'
     const availability = await Summarizer.availability({
       type: 'tldr',
       format: 'markdown',
