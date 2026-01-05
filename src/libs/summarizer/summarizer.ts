@@ -81,6 +81,7 @@ export async function summarizeTextStream(
     const reader = stream.getReader()
 
     try {
+      let accumulatedText = ''
       while (true) {
         // キャンセルされた場合は中断
         if (signal?.aborted) {
@@ -91,7 +92,8 @@ export async function summarizeTextStream(
         const { done, value } = await reader.read()
         if (done) break
 
-        onChunk(value)
+        accumulatedText += value
+        onChunk(accumulatedText)
       }
     } finally {
       reader.releaseLock()
