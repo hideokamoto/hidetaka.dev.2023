@@ -28,7 +28,7 @@ function acceptsMarkdown(request: NextRequest): boolean {
  */
 function isBlogPostUrl(pathname: string): boolean {
   // ブログ記事URLのパターン: /blog/[slug] または /ja/blog/[slug]
-  const blogPostPattern = /^\/(?:ja)?\/blog\/[^/]+$/
+  const blogPostPattern = /^\/(?:ja\/)?blog\/[^/]+$/
   // ページネーション、カテゴリページを除外
   const excludedPattern = /\/(page|category)\//
 
