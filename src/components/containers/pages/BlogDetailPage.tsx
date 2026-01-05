@@ -163,8 +163,6 @@ export default function BlogDetailPage({
           slug={thought.slug}
           lang={lang}
           enableHatenaStar={enableHatenaStar}
-          enableDisqus={false}
-          enableWebmention={false}
           className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700"
         />
 
