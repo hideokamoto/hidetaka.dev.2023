@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
+import ArticleSummary from '@/components/ui/ArticleSummary'
 import DateDisplay from '@/components/ui/DateDisplay'
 import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
@@ -87,6 +88,9 @@ export default function NewsDetailPage({
           title={product.title.rendered}
           language={lang}
         />
+
+        {/* 記事要約 (Built-in AI) */}
+        <ArticleSummary content={product.content.rendered} locale={lang} className="mt-6" />
 
         {/* コンテンツ */}
         <div
