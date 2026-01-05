@@ -36,6 +36,28 @@ function isBlogPostUrl(pathname: string): boolean {
 }
 
 /**
+ * dev-notesのURLかどうかを判定
+ * @param pathname パス
+ * @returns dev-notes URLの場合true
+ */
+function isDevNoteUrl(pathname: string): boolean {
+  // dev-notes URLのパターン: /writing/dev-notes/[slug] または /ja/writing/dev-notes/[slug]
+  const devNotePattern = /^\/(?:ja\/)?writing\/dev-notes\/[^/]+$/
+  return devNotePattern.test(pathname)
+}
+
+/**
+ * ニュース記事のURLかどうかを判定
+ * @param pathname パス
+ * @returns ニュース記事URLの場合true
+ */
+function isNewsUrl(pathname: string): boolean {
+  // ニュース記事URLのパターン: /news/[slug] または /ja/news/[slug]
+  const newsPattern = /^\/(?:ja\/)?news\/[^/]+$/
+  return newsPattern.test(pathname)
+}
+
+/**
  * ブログ記事URLからslugを抽出し、APIパスに変換
  * @param pathname パス
  * @returns リライト先のパスとクエリパラメータ
@@ -66,29 +88,114 @@ function getBlogMarkdownRewritePath(pathname: string): {
 }
 
 /**
+ * dev-notes URLからslugを抽出し、APIパスに変換
+ * @param pathname パス
+ * @returns リライト先のパスとクエリパラメータ
+ */
+function getDevNoteMarkdownRewritePath(pathname: string): {
+  pathname: string
+  searchParams?: Record<string, string>
+} {
+  const match = pathname.match(/^(\/ja)?\/writing\/dev-notes\/([^/]+)$/)
+  if (!match) {
+    throw new Error(`Failed to extract slug from pathname: ${pathname}`)
+  }
+
+  const [, langPrefix, slug] = match
+  const rewritePath = `/api/markdown/dev-notes/${slug}`
+
+  // 言語プレフィックスがある場合はクエリパラメータに追加
+  if (langPrefix) {
+    return {
+      pathname: rewritePath,
+      searchParams: { lang: 'ja' },
+    }
+  }
+
+  return {
+    pathname: rewritePath,
+  }
+}
+
+/**
+ * ニュース記事URLからslugを抽出し、APIパスに変換
+ * @param pathname パス
+ * @returns リライト先のパスとクエリパラメータ
+ */
+function getNewsMarkdownRewritePath(pathname: string): {
+  pathname: string
+  searchParams?: Record<string, string>
+} {
+  const match = pathname.match(/^(\/ja)?\/news\/([^/]+)$/)
+  if (!match) {
+    throw new Error(`Failed to extract slug from pathname: ${pathname}`)
+  }
+
+  const [, langPrefix, slug] = match
+  const rewritePath = `/api/markdown/news/${slug}`
+
+  // 言語プレフィックスがある場合はクエリパラメータに追加
+  if (langPrefix) {
+    return {
+      pathname: rewritePath,
+      searchParams: { lang: 'ja' },
+    }
+  }
+
+  return {
+    pathname: rewritePath,
+  }
+}
+
+/**
  * Content Negotiationの処理：Acceptヘッダーに基づいてMarkdownをrewrite
  * @param request リクエスト
  * @param pathname パス
  * @returns rewriteレスポンスまたはnull
  */
 function handleContentNegotiation(request: NextRequest, pathname: string): NextResponse | null {
-  if (acceptsMarkdown(request) && isBlogPostUrl(pathname)) {
-    const { pathname: rewritePath, searchParams } = getBlogMarkdownRewritePath(pathname)
-    const newUrl = new URL(request.url)
-    newUrl.pathname = rewritePath
-    // 言語プレフィックスがある場合はクエリパラメータに追加
-    if (searchParams) {
-      for (const [key, value] of Object.entries(searchParams)) {
-        newUrl.searchParams.set(key, value)
-      }
-    }
-    const response = NextResponse.rewrite(newUrl)
-    // キャッシュの適切な分離を確保するため、Varyヘッダーを設定
-    response.headers.set('Vary', 'Accept')
-    return response
+  if (!acceptsMarkdown(request)) {
+    return null
   }
 
-  return null
+  let rewritePath: string
+  let searchParams: Record<string, string> | undefined
+
+  // ブログ記事の処理
+  if (isBlogPostUrl(pathname)) {
+    const result = getBlogMarkdownRewritePath(pathname)
+    rewritePath = result.pathname
+    searchParams = result.searchParams
+  }
+  // dev-notes記事の処理
+  else if (isDevNoteUrl(pathname)) {
+    const result = getDevNoteMarkdownRewritePath(pathname)
+    rewritePath = result.pathname
+    searchParams = result.searchParams
+  }
+  // ニュース記事の処理
+  else if (isNewsUrl(pathname)) {
+    const result = getNewsMarkdownRewritePath(pathname)
+    rewritePath = result.pathname
+    searchParams = result.searchParams
+  }
+  // マッチしたコンテンツタイプがない場合は処理を続行
+  else {
+    return null
+  }
+
+  const newUrl = new URL(request.url)
+  newUrl.pathname = rewritePath
+  // 言語プレフィックスがある場合はクエリパラメータに追加
+  if (searchParams) {
+    for (const [key, value] of Object.entries(searchParams)) {
+      newUrl.searchParams.set(key, value)
+    }
+  }
+  const response = NextResponse.rewrite(newUrl)
+  // キャッシュの適切な分離を確保するため、Varyヘッダーを設定
+  response.headers.set('Vary', 'Accept')
+  return response
 }
 
 /**
