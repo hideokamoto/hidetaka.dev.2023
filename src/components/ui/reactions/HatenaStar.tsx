@@ -1,7 +1,6 @@
 'use client'
 
 import Script from 'next/script'
-import { cn } from '@/libs/utils'
 
 type HatenaStarProps = {
   url: string
@@ -47,7 +46,7 @@ export default function HatenaStar({ url, title, className = '' }: HatenaStarPro
         onLoad={handleScriptLoad}
       />
 
-      <div className={cn('hatena-star-wrapper', className)}>
+      <div className={className}>
         <div className="hatena-star-container">
           <span className="hatena-star-uri hidden">{url}</span>
           <span className="hatena-star-title hidden">{title}</span>
