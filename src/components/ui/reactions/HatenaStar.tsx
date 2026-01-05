@@ -1,7 +1,7 @@
 'use client'
 
 import Script from 'next/script'
-import { useEffect, useRef, useState } from 'react'
+import { cn } from '@/libs/utils'
 
 type HatenaStarProps = {
   url: string
@@ -18,12 +18,9 @@ type HatenaStarProps = {
  * @see https://developer.hatena.ne.jp/ja/documents/star/embed
  */
 export default function HatenaStar({ url, title, className = '' }: HatenaStarProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const [isScriptLoaded, setIsScriptLoaded] = useState(false)
-
-  useEffect(() => {
-    // スクリプトが読み込まれた後に設定を初期化
-    if (isScriptLoaded && typeof window !== 'undefined' && (window as any).Hatena?.Star) {
+  const handleScriptLoad = () => {
+    // スクリプト読み込み後にはてなスターを初期化
+    if (typeof window !== 'undefined' && (window as any).Hatena?.Star) {
       ;(window as any).Hatena.Star.SiteConfig = {
         entryNodes: {
           'div.hatena-star-container': {
@@ -39,7 +36,7 @@ export default function HatenaStar({ url, title, className = '' }: HatenaStarPro
         ;(window as any).Hatena.Star.EntryLoader.loadEntries()
       }
     }
-  }, [isScriptLoaded])
+  }
 
   return (
     <>
@@ -47,17 +44,13 @@ export default function HatenaStar({ url, title, className = '' }: HatenaStarPro
       <Script
         src="https://s.hatena.ne.jp/js/HatenaStar.js"
         strategy="lazyOnload"
-        onLoad={() => setIsScriptLoaded(true)}
+        onLoad={handleScriptLoad}
       />
 
-      <div className={`hatena-star-wrapper ${className}`}>
-        <div className="hatena-star-container" ref={containerRef}>
-          <span className="hatena-star-uri" style={{ display: 'none' }}>
-            {url}
-          </span>
-          <span className="hatena-star-title" style={{ display: 'none' }}>
-            {title}
-          </span>
+      <div className={cn('hatena-star-wrapper', className)}>
+        <div className="hatena-star-container">
+          <span className="hatena-star-uri hidden">{url}</span>
+          <span className="hatena-star-title hidden">{title}</span>
           <span className="hatena-star-star" />
         </div>
       </div>
