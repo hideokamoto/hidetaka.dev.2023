@@ -48,7 +48,7 @@ export default function PrivacyPolicyPage() {
             Privacy Policy
           </h1>
           <p className="mt-4 text-base text-zinc-600 dark:text-zinc-400">
-            Last updated: December 2, 2025
+            Last updated: January 4, 2026
           </p>
         </header>
 
@@ -131,6 +131,40 @@ export default function PrivacyPolicyPage() {
               </a>
               .
             </p>
+
+            <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3 mt-6">
+              2.3 Hatena Star
+            </h3>
+            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+              We use Hatena Star on Japanese blog pages. Hatena Star is a service provided by Hatena
+              Co., Ltd. that allows users to add lightweight reactions (stars) to articles.
+            </p>
+            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+              A Hatena account is required to use Hatena Star. For terms of service and privacy
+              policy, please refer to:
+            </p>
+            <ul className="list-disc list-inside text-zinc-700 dark:text-zinc-300 mb-4 space-y-2">
+              <li>
+                <a
+                  href="https://www.hatena.ne.jp/rule/rule"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-indigo-600 dark:text-indigo-400 hover:underline"
+                >
+                  Hatena Terms of Service
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://policies.hatena.ne.jp/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-indigo-600 dark:text-indigo-400 hover:underline"
+                >
+                  Hatena Privacy Policy
+                </a>
+              </li>
+            </ul>
           </section>
 
           <section className="mb-8">
@@ -188,6 +222,9 @@ export default function PrivacyPolicyPage() {
               </li>
               <li>
                 <strong>Microsoft Clarity:</strong> User behavior analytics
+              </li>
+              <li>
+                <strong>Hatena Star:</strong> Blog reaction feature (Japanese pages only)
               </li>
             </ul>
             <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
