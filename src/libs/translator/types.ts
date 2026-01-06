@@ -18,6 +18,15 @@ export type TranslatorOptions = {
 }
 
 /**
+ * Translator作成オプション（signal付き）
+ */
+export type TranslatorCreateOptions = {
+  sourceLanguage: string
+  targetLanguage: string
+  signal?: AbortSignal
+}
+
+/**
  * 翻訳実行オプション
  */
 export type TranslatorTranslateOptions = {

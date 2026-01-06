@@ -80,7 +80,7 @@ export default function BlogTranslation({
                 intervalId = null
               }
             }
-          }, 1000) // 1秒ごとにチェック
+          }, 2000) // 2秒ごとにチェック（ArticleSummaryと統一）
         }
       }
     }
@@ -95,7 +95,42 @@ export default function BlogTranslation({
     }
   }, [sourceLanguage, targetLanguage])
 
-  // 利用できない場合は何も表示しない
+  // メモリリーク対策: コンポーネントのアンマウント時にMapをクリア
+  useEffect(() => {
+    return () => {
+      setOriginalTextNodes(new Map())
+    }
+  }, [])
+
+  // 開発環境ではデバッグ情報を表示
+  if (process.env.NODE_ENV === 'development' && availability === 'unavailable') {
+    return (
+      <div className={`mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg ${className}`}>
+        <p className="text-sm text-yellow-800 dark:text-yellow-200 mb-2">
+          ⚠️ Translator API Debug Info
+        </p>
+        <details className="text-xs text-yellow-700 dark:text-yellow-300">
+          <summary className="cursor-pointer mb-2">Debug details</summary>
+          <pre className="mt-2 p-2 bg-yellow-100 dark:bg-yellow-900/40 rounded overflow-auto">
+            {JSON.stringify(
+              {
+                availability,
+                sourceLanguage,
+                targetLanguage,
+                locale,
+                translatorInWindow: typeof window !== 'undefined' && 'Translator' in window,
+                userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'N/A',
+              },
+              null,
+              2,
+            )}
+          </pre>
+        </details>
+      </div>
+    )
+  }
+
+  // 利用できない場合は何も表示しない（本番環境）
   if (availability === 'unavailable') {
     return null
   }
@@ -172,9 +207,17 @@ export default function BlogTranslation({
           // キャンセルされた場合は元に戻す
           handleRestore()
         } else {
-          setError(text.error)
+          // 開発環境では詳細なエラーを表示
+          const errorMessage =
+            process.env.NODE_ENV === 'development'
+              ? `${text.error}: ${err.message}`
+              : text.error
+          setError(errorMessage)
           console.error('Translation error:', err)
         }
+      } else {
+        setError(text.error)
+        console.error('Translation error:', err)
       }
     } finally {
       setIsTranslating(false)
@@ -206,7 +249,8 @@ export default function BlogTranslation({
           <button
             type="button"
             onClick={handleTranslate}
-            disabled={availability === 'downloadable' || availability === 'downloading'}
+            disabled={availability === 'downloading'}
+            aria-label={text.translateButton}
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-400 disabled:cursor-not-allowed rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-zinc-900"
           >
             <svg
@@ -231,6 +275,7 @@ export default function BlogTranslation({
           <button
             type="button"
             onClick={handleCancel}
+            aria-label={text.cancelButton}
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-zinc-900"
           >
             {text.cancelButton}
@@ -241,6 +286,7 @@ export default function BlogTranslation({
           <button
             type="button"
             onClick={handleRestore}
+            aria-label={text.restoreButton}
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-slate-600 hover:bg-slate-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 dark:focus:ring-offset-zinc-900"
           >
             <svg
@@ -263,7 +309,7 @@ export default function BlogTranslation({
       </div>
 
       {/* ダウンロード中の警告 */}
-      {(availability === 'downloadable' || availability === 'downloading') && (
+      {availability === 'downloading' && (
         <p className="text-sm text-amber-600 dark:text-amber-400 mb-4">⚠️ {text.downloading}</p>
       )}
 
