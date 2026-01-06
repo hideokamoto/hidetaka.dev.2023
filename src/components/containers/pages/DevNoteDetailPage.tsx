@@ -13,8 +13,6 @@ import { SITE_CONFIG } from '@/config'
 import type { BlogItem, WPThought } from '@/libs/dataSources/types'
 import { DETAIL_PAGE_SECTION_CLASS } from '@/libs/utils/detailPageStyles'
 
-const PAGE_LANG = 'ja' as const
-
 type DevNoteDetailPageProps = {
   note: WPThought
   basePath: string
