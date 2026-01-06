@@ -1,4 +1,4 @@
-import type { AvailabilityResult, TranslatorOptions, TranslatorTranslateOptions } from './types'
+import type { AvailabilityResult, TranslatorTranslateOptions } from './types'
 
 /**
  * Translator API が利用可能かチェックする
@@ -89,6 +89,7 @@ export async function createTranslator(
  * @param options 翻訳オプション (signal)
  * @returns 翻訳されたテキスト
  * @throws AbortError - 翻訳がキャンセルされた場合
+ * @throws Error - その他のエラー
  */
 export async function translate(
   translator: Translator,
@@ -99,16 +100,8 @@ export async function translate(
     return ''
   }
 
-  try {
-    const result = await translator.translate(text, options)
-    return result
-  } catch (error) {
-    // エラーハンドリング
-    if (error instanceof Error) {
-      if (error.name === 'AbortError') {
-        throw error // AbortErrorはそのまま再スロー
-      }
-    }
-    throw error
-  }
+  // Re-throw the error. The caller is expected to handle it.
+  // `AbortError` is handled in the UI component.
+  const result = await translator.translate(text, options)
+  return result
 }

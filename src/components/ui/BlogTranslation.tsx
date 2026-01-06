@@ -7,6 +7,7 @@ import { checkTranslatorAvailability, createTranslator, translate } from '@/libs
 type BlogTranslationProps = {
   locale: string
   contentSelector: string
+  translatableElementsSelector?: string
   className?: string
 }
 
@@ -35,6 +36,7 @@ const UI_TEXT = {
 export default function BlogTranslation({
   locale,
   contentSelector,
+  translatableElementsSelector = 'h1, h2, h3, h4, p, li',
   className = '',
 }: BlogTranslationProps) {
   const [availability, setAvailability] = useState<AvailabilityResult>('unavailable')
@@ -42,7 +44,7 @@ export default function BlogTranslation({
   const [isTranslated, setIsTranslated] = useState(false)
   const [error, setError] = useState('')
   const [abortController, setAbortController] = useState<AbortController | null>(null)
-  const [originalContent, setOriginalContent] = useState<Map<Element, string>>(new Map())
+  const [originalTextNodes, setOriginalTextNodes] = useState<Map<Node, string>>(new Map())
 
   const isJapanese = locale.startsWith('ja')
   const text = isJapanese ? UI_TEXT.ja : UI_TEXT.en
@@ -54,22 +56,22 @@ export default function BlogTranslation({
   // 機能の利用可能性をチェック
   useEffect(() => {
     let intervalId: NodeJS.Timeout | null = null
-    let isMounted = true
+    let cancelled = false
 
     const checkAvailability = async () => {
       const result = await checkTranslatorAvailability(sourceLanguage, targetLanguage)
-      if (isMounted) {
-        setAvailability(result)
-      }
+      if (cancelled) return
+
+      setAvailability(result)
 
       // downloading または downloadable の場合、定期的に再チェック
       if (result === 'downloading' || result === 'downloadable') {
         if (!intervalId) {
           intervalId = setInterval(async () => {
             const newResult = await checkTranslatorAvailability(sourceLanguage, targetLanguage)
-            if (isMounted) {
-              setAvailability(newResult)
-            }
+            if (cancelled) return
+
+            setAvailability(newResult)
 
             // available になったらポーリングを停止
             if (newResult === 'available' || newResult === 'unavailable') {
@@ -86,7 +88,7 @@ export default function BlogTranslation({
     checkAvailability()
 
     return () => {
-      isMounted = false
+      cancelled = true
       if (intervalId) {
         clearInterval(intervalId)
       }
@@ -112,33 +114,52 @@ export default function BlogTranslation({
         throw new Error('Content container not found')
       }
 
-      // 翻訳対象の要素を選択 (h1, h2, h3, h4, p, li)
-      const elements = container.querySelectorAll('h1, h2, h3, h4, p, li')
+      // 翻訳対象の要素を選択
+      const elements = container.querySelectorAll(translatableElementsSelector)
 
-      // 元のコンテンツを保存
-      const contentMap = new Map<Element, string>()
+      // 元のテキストノードの内容を保存
+      const textNodesMap = new Map<Node, string>()
+
+      // 各要素内のテキストノードを収集
       for (const element of elements) {
-        contentMap.set(element, element.innerHTML)
+        // TreeWalkerを使用してテキストノードのみを取得
+        const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, {
+          acceptNode: (node) => {
+            // 空白のみのノードはスキップ
+            if (!node.textContent?.trim()) {
+              return NodeFilter.FILTER_REJECT
+            }
+            return NodeFilter.FILTER_ACCEPT
+          },
+        })
+
+        let node = walker.nextNode()
+        while (node) {
+          if (node.textContent) {
+            textNodesMap.set(node, node.textContent)
+          }
+          node = walker.nextNode()
+        }
       }
-      setOriginalContent(contentMap)
+
+      setOriginalTextNodes(textNodesMap)
 
       // Translator を作成
       const translator = await createTranslator(sourceLanguage, targetLanguage, controller.signal)
 
       try {
-        // 各要素を翻訳
-        for (const element of elements) {
+        // 各テキストノードを翻訳
+        for (const [node, originalText] of textNodesMap.entries()) {
           if (controller.signal.aborted) {
             break
           }
 
-          const textContent = element.textContent || ''
-          if (textContent.trim()) {
-            const translatedText = await translate(translator, textContent, {
-              signal: controller.signal,
-            })
-            element.textContent = translatedText
-          }
+          const translatedText = await translate(translator, originalText, {
+            signal: controller.signal,
+          })
+
+          // テキストノードの内容を翻訳結果で置き換え
+          node.textContent = translatedText
         }
 
         setIsTranslated(true)
@@ -168,13 +189,13 @@ export default function BlogTranslation({
   }
 
   const handleRestore = () => {
-    // 元のコンテンツに戻す
-    for (const [element, originalHtml] of originalContent.entries()) {
-      element.innerHTML = originalHtml
+    // 元のテキストノードの内容に戻す
+    for (const [node, originalText] of originalTextNodes.entries()) {
+      node.textContent = originalText
     }
     setIsTranslated(false)
     setError('')
-    setOriginalContent(new Map())
+    setOriginalTextNodes(new Map())
   }
 
   return (
