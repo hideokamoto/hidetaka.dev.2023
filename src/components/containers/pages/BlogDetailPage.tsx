@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
 import ArticleSummary from '@/components/ui/ArticleSummary'
+import BlogTranslation from '@/components/ui/BlogTranslation'
 import DateDisplay from '@/components/ui/DateDisplay'
 import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
@@ -141,6 +142,9 @@ export default function BlogDetailPage({
 
         {/* 記事要約 (Built-in AI) */}
         <ArticleSummary content={thought.content.rendered} locale={lang} className="mt-6" />
+
+        {/* 翻訳 (Built-in AI) */}
+        <BlogTranslation locale={lang} contentSelector="article" className="mt-6" />
 
         {/* コンテンツ */}
         <div
