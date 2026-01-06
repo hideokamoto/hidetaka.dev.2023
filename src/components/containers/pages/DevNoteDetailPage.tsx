@@ -26,6 +26,7 @@ export default function DevNoteDetailPage({
   nextNote,
   relatedArticles = [],
 }: DevNoteDetailPageProps) {
+  const lang = 'ja'
   const date = new Date(note.date)
 
   // OG画像のURLを生成
@@ -90,7 +91,7 @@ export default function DevNoteDetailPage({
         <div className="mb-10 flex flex-col gap-4">
           <DateDisplay
             date={date}
-            lang="ja"
+            lang={lang}
             format="long"
             className="text-sm font-medium text-slate-600 dark:text-slate-400"
           />
@@ -113,11 +114,11 @@ export default function DevNoteDetailPage({
           slug={note.slug}
           basePath={basePath}
           title={note.title.rendered}
-          language="ja"
+          language={lang}
         />
 
         {/* 記事要約 (Built-in AI) */}
-        <ArticleSummary content={note.content.rendered} locale="ja" className="mt-6" />
+        <ArticleSummary content={note.content.rendered} locale={lang} className="mt-6" />
 
         {/* コンテンツ */}
         <div
@@ -130,15 +131,15 @@ export default function DevNoteDetailPage({
         <SocialShareButtons
           url={new URL(`${basePath}/${note.slug}`, SITE_CONFIG.url).toString()}
           title={note.title.rendered}
-          lang="ja"
+          lang={lang}
           className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700"
         />
 
         {/* プロフィールカード */}
-        <ProfileCard lang="ja" imageSrc="/images/profile.jpg" className="mt-12" />
+        <ProfileCard lang={lang} imageSrc="/images/profile.jpg" className="mt-12" />
 
         {/* 関連記事 */}
-        <RelatedArticles articles={relatedArticles} lang="ja" />
+        <RelatedArticles articles={relatedArticles} lang={lang} />
 
         {/* 前後の記事へのナビゲーション */}
         {(previousNote || nextNote) && (
