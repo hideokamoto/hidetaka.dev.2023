@@ -60,15 +60,21 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ slu
     notFound()
   }
 
+  const lang = 'ja'
+
+  // はてなスター機能の有効化判定
+  // 環境変数で制御し、かつ日本語ページでのみ表示
+  const enableHatenaStar = process.env.NEXT_PUBLIC_ENABLE_HATENA_STAR === 'true' && lang === 'ja'
+
   // JSON-LDを生成
   const thought = productToThought(product)
-  const blogPostingJsonLd = generateBlogPostingJsonLd(thought, 'ja', '/ja/news')
-  const breadcrumbJsonLd = generateBlogBreadcrumbJsonLd(thought, 'ja', '/ja/news')
+  const blogPostingJsonLd = generateBlogPostingJsonLd(thought, lang, '/ja/news')
+  const breadcrumbJsonLd = generateBlogBreadcrumbJsonLd(thought, lang, '/ja/news')
 
   // 前後の記事と関連記事を取得
   const [adjacentProducts, relatedArticles] = await Promise.all([
     getAdjacentProducts(product),
-    getRelatedProducts(product, 4, 'ja'),
+    getRelatedProducts(product, 4, lang),
   ])
 
   return (
@@ -77,11 +83,12 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ slu
       <JsonLd data={breadcrumbJsonLd} />
       <NewsDetailPageContent
         product={product}
-        lang="ja"
+        lang={lang}
         basePath="/ja/news"
         previousProduct={adjacentProducts.previous}
         nextProduct={adjacentProducts.next}
         relatedArticles={relatedArticles}
+        enableHatenaStar={enableHatenaStar}
       />
     </>
   )

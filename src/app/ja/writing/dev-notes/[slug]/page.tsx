@@ -31,6 +31,11 @@ export default async function DevNoteDetailPage({ params }: { params: Promise<{ 
   }
 
   const basePath = '/ja/writing/dev-notes'
+  const lang = 'ja'
+
+  // はてなスター機能の有効化判定
+  // 環境変数で制御し、かつ日本語ページでのみ表示
+  const enableHatenaStar = process.env.NEXT_PUBLIC_ENABLE_HATENA_STAR === 'true' && lang === 'ja'
 
   // JSON-LDを生成
   const blogPostingJsonLd = generateDevNoteJsonLd(note, basePath)
@@ -52,6 +57,8 @@ export default async function DevNoteDetailPage({ params }: { params: Promise<{ 
         previousNote={adjacentNotes.previous}
         nextNote={adjacentNotes.next}
         relatedArticles={relatedArticles}
+        lang={lang}
+        enableHatenaStar={enableHatenaStar}
       />
     </>
   )

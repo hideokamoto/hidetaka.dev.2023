@@ -4,7 +4,10 @@ import ArticleSummary from '@/components/ui/ArticleSummary'
 import DateDisplay from '@/components/ui/DateDisplay'
 import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
+import BlogReactions from '@/components/ui/reactions/BlogReactions'
+import SocialShareButtons from '@/components/ui/SocialShareButtons'
 import ViewMarkdownButton from '@/components/ui/ViewMarkdownButton'
+import { SITE_CONFIG } from '@/config'
 import type { WPProduct } from '@/libs/dataSources/products'
 import type { BlogItem } from '@/libs/dataSources/types'
 
@@ -15,6 +18,7 @@ type NewsDetailPageProps = {
   previousProduct?: WPProduct | null
   nextProduct?: WPProduct | null
   relatedArticles?: BlogItem[]
+  enableHatenaStar: boolean
 }
 
 export default function NewsDetailPage({
@@ -24,6 +28,7 @@ export default function NewsDetailPage({
   previousProduct,
   nextProduct,
   relatedArticles = [],
+  enableHatenaStar,
 }: NewsDetailPageProps) {
   const date = new Date(product.date)
   const newsLabel = lang === 'ja' ? 'ニュース' : 'News'
@@ -101,6 +106,24 @@ export default function NewsDetailPage({
 
         {/* プロフィールカード */}
         <ProfileCard lang={lang} imageSrc="/images/profile.jpg" className="mt-12" />
+
+        {/* SNS共有ボタン */}
+        <SocialShareButtons
+          url={new URL(`${basePath}/${product.slug}`, SITE_CONFIG.url).toString()}
+          title={product.title.rendered}
+          lang={lang}
+          className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700"
+        />
+
+        {/* リアクション機能 */}
+        <BlogReactions
+          url={new URL(`${basePath}/${product.slug}`, SITE_CONFIG.url).toString()}
+          title={product.title.rendered}
+          slug={product.slug}
+          lang={lang}
+          enableHatenaStar={enableHatenaStar}
+          className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700"
+        />
 
         {/* 関連記事 */}
         <RelatedArticles articles={relatedArticles} lang={lang} />
