@@ -49,6 +49,7 @@ export default async function DevNoteDetailPage({ params }: { params: Promise<{ 
       <DevNoteDetailPageContent
         note={note}
         basePath={basePath}
+        lang="ja"
         previousNote={adjacentNotes.previous}
         nextNote={adjacentNotes.next}
         relatedArticles={relatedArticles}

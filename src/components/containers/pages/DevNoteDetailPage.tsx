@@ -11,9 +11,12 @@ import ViewMarkdownButton from '@/components/ui/ViewMarkdownButton'
 import { SITE_CONFIG } from '@/config'
 import type { BlogItem, WPThought } from '@/libs/dataSources/types'
 
+const PAGE_LANG = 'ja' as const
+
 type DevNoteDetailPageProps = {
   note: WPThought
   basePath: string
+  lang?: string
   previousNote?: WPThought | null
   nextNote?: WPThought | null
   relatedArticles?: BlogItem[]
@@ -22,11 +25,11 @@ type DevNoteDetailPageProps = {
 export default function DevNoteDetailPage({
   note,
   basePath,
+  lang = PAGE_LANG,
   previousNote,
   nextNote,
   relatedArticles = [],
 }: DevNoteDetailPageProps) {
-  const lang = 'ja'
   const date = new Date(note.date)
 
   // OG画像のURLを生成
