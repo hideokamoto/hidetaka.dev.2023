@@ -11,6 +11,8 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Permissions-Policy',
+            // Chrome Translator API を使用するために必要
+            // Chrome 131以降で利用可能（実験的機能）
             value: 'translator=(self)',
           },
         ],

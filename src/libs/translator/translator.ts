@@ -1,4 +1,8 @@
-import type { AvailabilityResult, TranslatorTranslateOptions } from './types'
+import type {
+  AvailabilityResult,
+  TranslatorCreateOptions,
+  TranslatorTranslateOptions,
+} from './types'
 
 /**
  * Translator API が利用可能かチェックする
@@ -20,6 +24,9 @@ export async function checkTranslatorAvailability(
 ): Promise<AvailabilityResult> {
   // Feature Detection: Translator APIが存在するか
   if (!isTranslatorAvailable()) {
+    if (process.env.NODE_ENV === 'development') {
+      console.debug('[Translator] API not available in window object')
+    }
     return 'unavailable'
   }
 
@@ -29,9 +36,24 @@ export async function checkTranslatorAvailability(
       targetLanguage,
     })
 
+    if (process.env.NODE_ENV === 'development') {
+      console.debug('[Translator] Availability check result:', availability, {
+        sourceLanguage,
+        targetLanguage,
+      })
+    }
+
     return availability as AvailabilityResult
   } catch (error) {
     console.error('Translator availability check failed:', error)
+    if (process.env.NODE_ENV === 'development') {
+      console.error('[Translator] Error details:', {
+        error,
+        sourceLanguage,
+        targetLanguage,
+        translatorAvailable: isTranslatorAvailable(),
+      })
+    }
     return 'unavailable'
   }
 }

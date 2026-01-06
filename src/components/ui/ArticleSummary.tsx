@@ -129,7 +129,7 @@ export default function ArticleSummary({ content, locale, className = '' }: Arti
           <button
             type="button"
             onClick={handleSummarize}
-            disabled={availability === 'downloadable' || availability === 'downloading'}
+            disabled={availability === 'downloading'}
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-400 disabled:cursor-not-allowed rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-zinc-900"
           >
             <svg
@@ -162,7 +162,7 @@ export default function ArticleSummary({ content, locale, className = '' }: Arti
       </div>
 
       {/* ダウンロード中の警告 */}
-      {(availability === 'downloadable' || availability === 'downloading') && (
+      {availability === 'downloading' && (
         <p className="text-sm text-amber-600 dark:text-amber-400 mb-4">⚠️ {text.downloading}</p>
       )}
 
