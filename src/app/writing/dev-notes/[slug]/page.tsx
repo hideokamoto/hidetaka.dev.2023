@@ -8,6 +8,7 @@ import {
 } from '@/libs/dataSources/devnotes'
 import { generateDevNoteBreadcrumbJsonLd, generateDevNoteJsonLd } from '@/libs/jsonLd'
 import { generateDevNoteMetadata } from '@/libs/metadata'
+import { shouldEnableHatenaStar } from '@/libs/utils/hatenaStar'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
@@ -31,6 +32,10 @@ export default async function DevNoteDetailPage({ params }: { params: Promise<{ 
   }
 
   const basePath = '/writing/dev-notes'
+  const lang = 'en'
+
+  // はてなスター機能の有効化判定
+  const enableHatenaStar = shouldEnableHatenaStar(lang)
 
   // JSON-LDを生成
   const blogPostingJsonLd = generateDevNoteJsonLd(note, basePath)
@@ -49,10 +54,11 @@ export default async function DevNoteDetailPage({ params }: { params: Promise<{ 
       <DevNoteDetailPageContent
         note={note}
         basePath={basePath}
-        lang="en"
+        lang={lang}
         previousNote={adjacentNotes.previous}
         nextNote={adjacentNotes.next}
         relatedArticles={relatedArticles}
+        enableHatenaStar={enableHatenaStar}
       />
     </>
   )
