@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect } from 'react'
+import { DarkModeScript } from '@/components/DarkModeScript'
+import { logger } from '@/libs/logger'
 
 export default function GlobalError({
   error,
@@ -10,17 +12,19 @@ export default function GlobalError({
   reset: () => void
 }) {
   useEffect(() => {
-    // Use console.error directly since we can't import logger in global-error
-    console.error('[GLOBAL ERROR]', error.message, {
+    logger.error(`Global error: ${error.message}`, {
       stack: error.stack,
       digest: error.digest,
     })
   }, [error])
 
   return (
-    <html lang="en">
-      <body>
-        <div className="flex min-h-screen items-center justify-center px-4 bg-zinc-50 dark:bg-black">
+    <html lang="en" className="h-full antialiased">
+      <head>
+        <DarkModeScript />
+      </head>
+      <body className="flex h-full flex-col bg-zinc-50 dark:bg-black">
+        <div className="flex flex-grow items-center justify-center px-4">
           <div className="text-center max-w-md">
             <div className="mb-8">
               <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">
@@ -38,7 +42,7 @@ export default function GlobalError({
             <button
               type="button"
               onClick={reset}
-              className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+              className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-zinc-900"
             >
               Try again
             </button>
