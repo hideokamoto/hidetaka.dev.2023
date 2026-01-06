@@ -42,3 +42,4 @@ coverage/
 *.tsbuildinfo
 .envrc
 RELEASE_NOTES_*.md
+docs/reports/
