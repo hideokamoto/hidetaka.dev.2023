@@ -49,7 +49,7 @@ export async function checkSummarizerAvailability(locale?: string): Promise<Avai
       outputLanguage: outputLanguage,
     })
 
-    return availability
+    return availability as AvailabilityResult
   } catch (error) {
     console.error('Summarizer availability check failed:', error)
     return 'unavailable'
