@@ -25,6 +25,7 @@ export default function ErrorBoundary({
       resetLabel="もう一度試す"
       onReset={reset}
       errorDigest={error.digest}
+      errorIdLabel="エラーID:"
     />
   )
 }
