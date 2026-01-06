@@ -9,6 +9,7 @@ import SocialShareButtons from '@/components/ui/SocialShareButtons'
 import ViewMarkdownButton from '@/components/ui/ViewMarkdownButton'
 import { SITE_CONFIG } from '@/config'
 import type { BlogItem, WPEvent } from '@/libs/dataSources/types'
+import { DETAIL_PAGE_SECTION_CLASS } from '@/libs/utils/detailPageStyles'
 
 type EventDetailPageProps = {
   event: WPEvent
@@ -111,7 +112,7 @@ export default function EventDetailPage({
           url={new URL(`${basePath}/${event.slug}`, SITE_CONFIG.url).toString()}
           title={event.title.rendered}
           lang={lang}
-          className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700"
+          className={DETAIL_PAGE_SECTION_CLASS}
         />
 
         {/* リアクション機能 */}
@@ -121,7 +122,7 @@ export default function EventDetailPage({
           slug={event.slug}
           lang={lang}
           enableHatenaStar={enableHatenaStar}
-          className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700"
+          className={DETAIL_PAGE_SECTION_CLASS}
         />
 
         {/* 関連記事 */}

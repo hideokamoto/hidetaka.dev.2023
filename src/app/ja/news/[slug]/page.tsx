@@ -11,6 +11,7 @@ import {
 import type { WPThought } from '@/libs/dataSources/types'
 import { generateBlogBreadcrumbJsonLd, generateBlogPostingJsonLd } from '@/libs/jsonLd'
 import { generateBlogPostMetadata } from '@/libs/metadata'
+import { shouldEnableHatenaStar } from '@/libs/utils/hatenaStar'
 
 // WPProductをWPThoughtに変換するヘルパー関数
 function productToThought(product: WPProduct): WPThought {
@@ -63,8 +64,7 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ slu
   const lang = 'ja'
 
   // はてなスター機能の有効化判定
-  // 環境変数で制御し、かつ日本語ページでのみ表示
-  const enableHatenaStar = process.env.NEXT_PUBLIC_ENABLE_HATENA_STAR === 'true' && lang === 'ja'
+  const enableHatenaStar = shouldEnableHatenaStar(lang)
 
   // JSON-LDを生成
   const thought = productToThought(product)

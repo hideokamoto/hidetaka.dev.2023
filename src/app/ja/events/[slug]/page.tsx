@@ -6,24 +6,13 @@ import {
   getRelatedEvents,
   getWPEventBySlug,
 } from '@/libs/dataSources/events'
-import type { WPThought } from '@/libs/dataSources/types'
+import type { WPEvent, WPThought } from '@/libs/dataSources/types'
 import { generateBlogBreadcrumbJsonLd, generateBlogPostingJsonLd } from '@/libs/jsonLd'
 import { generateBlogPostMetadata } from '@/libs/metadata'
+import { shouldEnableHatenaStar } from '@/libs/utils/hatenaStar'
 
 // WPEventをWPThoughtに変換するヘルパー関数
-function eventToThought(event: {
-  id: number
-  title: { rendered: string }
-  date: string
-  date_gmt: string
-  modified: string
-  modified_gmt: string
-  excerpt: { rendered: string }
-  content: { rendered: string }
-  link: string
-  slug: string
-  featured_media?: number
-}): WPThought {
+function eventToThought(event: WPEvent): WPThought {
   return {
     id: event.id,
     title: event.title,
@@ -67,8 +56,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ sl
   const basePath = '/ja/events'
 
   // はてなスター機能の有効化判定
-  // 環境変数で制御し、かつ日本語ページでのみ表示
-  const enableHatenaStar = process.env.NEXT_PUBLIC_ENABLE_HATENA_STAR === 'true' && lang === 'ja'
+  const enableHatenaStar = shouldEnableHatenaStar(lang)
 
   // JSON-LDを生成
   const thought = eventToThought(event)

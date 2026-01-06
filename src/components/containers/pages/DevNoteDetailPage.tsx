@@ -11,6 +11,7 @@ import Tag from '@/components/ui/Tag'
 import ViewMarkdownButton from '@/components/ui/ViewMarkdownButton'
 import { SITE_CONFIG } from '@/config'
 import type { BlogItem, WPThought } from '@/libs/dataSources/types'
+import { DETAIL_PAGE_SECTION_CLASS } from '@/libs/utils/detailPageStyles'
 
 type DevNoteDetailPageProps = {
   note: WPThought
@@ -95,7 +96,7 @@ export default function DevNoteDetailPage({
         <div className="mb-10 flex flex-col gap-4">
           <DateDisplay
             date={date}
-            lang="ja"
+            lang={lang}
             format="long"
             className="text-sm font-medium text-slate-600 dark:text-slate-400"
           />
@@ -118,11 +119,11 @@ export default function DevNoteDetailPage({
           slug={note.slug}
           basePath={basePath}
           title={note.title.rendered}
-          language="ja"
+          language={lang}
         />
 
         {/* 記事要約 (Built-in AI) */}
-        <ArticleSummary content={note.content.rendered} locale="ja" className="mt-6" />
+        <ArticleSummary content={note.content.rendered} locale={lang} className="mt-6" />
 
         {/* コンテンツ */}
         <div
@@ -135,12 +136,12 @@ export default function DevNoteDetailPage({
         <SocialShareButtons
           url={new URL(`${basePath}/${note.slug}`, SITE_CONFIG.url).toString()}
           title={note.title.rendered}
-          lang="ja"
-          className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700"
+          lang={lang}
+          className={DETAIL_PAGE_SECTION_CLASS}
         />
 
         {/* プロフィールカード */}
-        <ProfileCard lang="ja" imageSrc="/images/profile.jpg" className="mt-12" />
+        <ProfileCard lang={lang} imageSrc="/images/profile.jpg" className="mt-12" />
 
         {/* リアクション機能 */}
         <BlogReactions
@@ -149,11 +150,11 @@ export default function DevNoteDetailPage({
           slug={note.slug}
           lang={lang}
           enableHatenaStar={enableHatenaStar}
-          className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700"
+          className={DETAIL_PAGE_SECTION_CLASS}
         />
 
         {/* 関連記事 */}
-        <RelatedArticles articles={relatedArticles} lang="ja" />
+        <RelatedArticles articles={relatedArticles} lang={lang} />
 
         {/* 前後の記事へのナビゲーション */}
         {(previousNote || nextNote) && (

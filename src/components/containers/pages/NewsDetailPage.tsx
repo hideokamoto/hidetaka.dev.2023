@@ -10,6 +10,7 @@ import ViewMarkdownButton from '@/components/ui/ViewMarkdownButton'
 import { SITE_CONFIG } from '@/config'
 import type { WPProduct } from '@/libs/dataSources/products'
 import type { BlogItem } from '@/libs/dataSources/types'
+import { DETAIL_PAGE_SECTION_CLASS } from '@/libs/utils/detailPageStyles'
 
 type NewsDetailPageProps = {
   product: WPProduct
@@ -112,7 +113,7 @@ export default function NewsDetailPage({
           url={new URL(`${basePath}/${product.slug}`, SITE_CONFIG.url).toString()}
           title={product.title.rendered}
           lang={lang}
-          className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700"
+          className={DETAIL_PAGE_SECTION_CLASS}
         />
 
         {/* リアクション機能 */}
@@ -122,7 +123,7 @@ export default function NewsDetailPage({
           slug={product.slug}
           lang={lang}
           enableHatenaStar={enableHatenaStar}
-          className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700"
+          className={DETAIL_PAGE_SECTION_CLASS}
         />
 
         {/* 関連記事 */}
