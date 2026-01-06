@@ -54,10 +54,10 @@ export default async function DevNoteDetailPage({ params }: { params: Promise<{ 
       <DevNoteDetailPageContent
         note={note}
         basePath={basePath}
+        lang={lang}
         previousNote={adjacentNotes.previous}
         nextNote={adjacentNotes.next}
         relatedArticles={relatedArticles}
-        lang={lang}
         enableHatenaStar={enableHatenaStar}
       />
     </>

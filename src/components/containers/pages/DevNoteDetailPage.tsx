@@ -16,20 +16,20 @@ import { DETAIL_PAGE_SECTION_CLASS } from '@/libs/utils/detailPageStyles'
 type DevNoteDetailPageProps = {
   note: WPThought
   basePath: string
+  lang: string
   previousNote?: WPThought | null
   nextNote?: WPThought | null
   relatedArticles?: BlogItem[]
-  lang: string
   enableHatenaStar: boolean
 }
 
 export default function DevNoteDetailPage({
   note,
   basePath,
+  lang,
   previousNote,
   nextNote,
   relatedArticles = [],
-  lang,
   enableHatenaStar,
 }: DevNoteDetailPageProps) {
   const date = new Date(note.date)
