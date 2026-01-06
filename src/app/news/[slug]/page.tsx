@@ -11,6 +11,7 @@ import {
 import type { WPThought } from '@/libs/dataSources/types'
 import { generateBlogBreadcrumbJsonLd, generateBlogPostingJsonLd } from '@/libs/jsonLd'
 import { generateBlogPostMetadata } from '@/libs/metadata'
+import { shouldEnableHatenaStar } from '@/libs/utils/hatenaStar'
 
 // WPProductをWPThoughtに変換するヘルパー関数
 function productToThought(product: WPProduct): WPThought {
@@ -60,10 +61,15 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ slu
     notFound()
   }
 
+  const lang = 'en'
+
+  // はてなスター機能の有効化判定
+  const enableHatenaStar = shouldEnableHatenaStar(lang)
+
   // JSON-LDを生成
   const thought = productToThought(product)
-  const blogPostingJsonLd = generateBlogPostingJsonLd(thought, 'en', '/news')
-  const breadcrumbJsonLd = generateBlogBreadcrumbJsonLd(thought, 'en', '/news')
+  const blogPostingJsonLd = generateBlogPostingJsonLd(thought, lang, '/news')
+  const breadcrumbJsonLd = generateBlogBreadcrumbJsonLd(thought, lang, '/news')
 
   // 前後の記事と関連記事を取得
   const [adjacentProducts, relatedArticles] = await Promise.all([
@@ -77,11 +83,12 @@ export default async function NewsDetailPage({ params }: { params: Promise<{ slu
       <JsonLd data={breadcrumbJsonLd} />
       <NewsDetailPageContent
         product={product}
-        lang="en"
+        lang={lang}
         basePath="/news"
         previousProduct={adjacentProducts.previous}
         nextProduct={adjacentProducts.next}
         relatedArticles={relatedArticles}
+        enableHatenaStar={enableHatenaStar}
       />
     </>
   )

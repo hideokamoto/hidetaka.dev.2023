@@ -112,6 +112,7 @@ export const getRelatedEvents = async (
   currentEvent: WPEvent,
   limit: number = 4,
   lang: 'en' | 'ja' = 'en',
+  basePath?: string,
 ): Promise<BlogItem[]> => {
   try {
     // 現在の記事を除外して最新のイベント記事を取得
@@ -126,13 +127,13 @@ export const getRelatedEvents = async (
     const events: WPEvent[] = await response.json()
 
     // BlogItem型に変換
-    const basePath = lang === 'ja' ? '/ja/event-reports' : '/event-reports'
+    const eventBasePath = basePath || (lang === 'ja' ? '/ja/event-reports' : '/event-reports')
     const items: BlogItem[] = events.map((event) => ({
       id: event.id.toString(),
       title: event.title.rendered,
       description: event.excerpt.rendered.replace(/<[^>]*>/g, '').substring(0, 150),
       datetime: event.date,
-      href: `${basePath}/${event.slug}`,
+      href: `${eventBasePath}/${event.slug}`,
     }))
 
     return items
