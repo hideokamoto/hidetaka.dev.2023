@@ -1,11 +1,7 @@
 import { notFound } from 'next/navigation'
 import EventDetailPageContent from '@/components/containers/pages/EventDetailPage'
 import JsonLd from '@/components/JsonLd'
-import {
-  getAdjacentEvents,
-  getRelatedEvents,
-  getWPEventBySlug,
-} from '@/libs/dataSources/events'
+import { getAdjacentEvents, getRelatedEvents, getWPEventBySlug } from '@/libs/dataSources/events'
 import type { WPEvent, WPThought } from '@/libs/dataSources/types'
 import { generateBlogBreadcrumbJsonLd, generateBlogPostingJsonLd } from '@/libs/jsonLd'
 import { generateBlogPostMetadata } from '@/libs/metadata'
@@ -85,4 +81,3 @@ export default async function EventDetailPage({ params }: { params: Promise<{ sl
     </>
   )
 }
-

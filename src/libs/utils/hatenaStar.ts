@@ -5,4 +5,3 @@
 export function shouldEnableHatenaStar(lang: string): boolean {
   return process.env.NEXT_PUBLIC_ENABLE_HATENA_STAR === 'true' && lang === 'ja'
 }
-
