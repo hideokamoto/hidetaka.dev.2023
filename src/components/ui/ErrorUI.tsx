@@ -4,6 +4,7 @@ type ErrorUIProps = {
   resetLabel: string
   onReset: () => void
   errorDigest?: string
+  className?: string
 }
 
 export default function ErrorUI({
@@ -12,9 +13,12 @@ export default function ErrorUI({
   resetLabel,
   onReset,
   errorDigest,
+  className = '',
 }: ErrorUIProps) {
   return (
-    <div className="flex min-h-screen items-center justify-center px-4 bg-zinc-50 dark:bg-black">
+    <div
+      className={`flex min-h-screen items-center justify-center px-4 bg-zinc-50 dark:bg-black ${className}`}
+    >
       <div className="text-center max-w-md">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">{title}</h1>
