@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import type { AvailabilityResult } from '@/libs/translator'
 import { checkTranslatorAvailability, createTranslator, translate } from '@/libs/translator'
+import { isJapanese } from '@/libs/urlUtils/lang.util'
+import { cn } from '@/libs/utils/cn'
 
 type BlogTranslationProps = {
   locale: string
@@ -23,7 +25,7 @@ const UI_TEXT = {
     translationNote: '※ この翻訳はブラウザのAI機能を使用しています',
   },
   en: {
-    translateButton: 'Translate to English',
+    translateButton: 'Translate to Japanese',
     cancelButton: 'Cancel',
     restoreButton: 'Restore Original',
     translating: 'Translating...',
@@ -46,12 +48,12 @@ export default function BlogTranslation({
   const [abortController, setAbortController] = useState<AbortController | null>(null)
   const [originalTextNodes, setOriginalTextNodes] = useState<Map<Node, string>>(new Map())
 
-  const isJapanese = locale.startsWith('ja')
-  const text = isJapanese ? UI_TEXT.ja : UI_TEXT.en
+  const isJa = isJapanese(locale)
+  const text = isJa ? UI_TEXT.ja : UI_TEXT.en
 
   // 翻訳の方向を決定（日本語ページなら ja→en、英語ページなら en→ja）
-  const sourceLanguage = isJapanese ? 'ja' : 'en'
-  const targetLanguage = isJapanese ? 'en' : 'ja'
+  const sourceLanguage = isJa ? 'ja' : 'en'
+  const targetLanguage = isJa ? 'en' : 'ja'
 
   // 機能の利用可能性をチェック
   useEffect(() => {
@@ -69,7 +71,13 @@ export default function BlogTranslation({
         if (!intervalId) {
           intervalId = setInterval(async () => {
             const newResult = await checkTranslatorAvailability(sourceLanguage, targetLanguage)
-            if (cancelled) return
+            if (cancelled) {
+              if (intervalId) {
+                clearInterval(intervalId)
+                intervalId = null
+              }
+              return
+            }
 
             setAvailability(newResult)
 
@@ -105,7 +113,12 @@ export default function BlogTranslation({
   // 開発環境ではデバッグ情報を表示
   if (process.env.NODE_ENV === 'development' && availability === 'unavailable') {
     return (
-      <div className={`mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg ${className}`}>
+      <div
+        className={cn(
+          'mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg',
+          className,
+        )}
+      >
         <p className="text-sm text-yellow-800 dark:text-yellow-200 mb-2">
           ⚠️ Translator API Debug Info
         </p>
@@ -209,9 +222,7 @@ export default function BlogTranslation({
         } else {
           // 開発環境では詳細なエラーを表示
           const errorMessage =
-            process.env.NODE_ENV === 'development'
-              ? `${text.error}: ${err.message}`
-              : text.error
+            process.env.NODE_ENV === 'development' ? `${text.error}: ${err.message}` : text.error
           setError(errorMessage)
           console.error('Translation error:', err)
         }
@@ -234,7 +245,10 @@ export default function BlogTranslation({
   const handleRestore = () => {
     // 元のテキストノードの内容に戻す
     for (const [node, originalText] of originalTextNodes.entries()) {
-      node.textContent = originalText
+      // DOMがまだ接続されているか確認
+      if (node.isConnected) {
+        node.textContent = originalText
+      }
     }
     setIsTranslated(false)
     setError('')
@@ -242,7 +256,7 @@ export default function BlogTranslation({
   }
 
   return (
-    <div className={`mb-6 ${className}`}>
+    <div className={cn('mb-6', className)}>
       {/* 翻訳ボタン */}
       <div className="flex items-center gap-3 mb-4">
         {!isTranslated && !isTranslating && (
@@ -315,7 +329,11 @@ export default function BlogTranslation({
 
       {/* ローディング状態 */}
       {isTranslating && (
-        <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 mb-4">
+        <div
+          role="status"
+          aria-live="polite"
+          className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 mb-4"
+        >
           <svg className="animate-spin size-4" fill="none" viewBox="0 0 24 24" aria-hidden="true">
             <circle
               className="opacity-25"
