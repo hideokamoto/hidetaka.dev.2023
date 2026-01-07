@@ -26,7 +26,13 @@ export const changeLanguageURL = (
     return `/${targetLang}${pathname}`
   }
   const replaceTarget = targetLang === 'en-US' ? '' : `/${targetLang}`
-  return pathname.replace(/^\/(\w{2})-([\w-]{2,})/, replaceTarget)
+  const result = pathname.replace(/^\/(\w{2})-([\w-]{2,})/, replaceTarget)
+
+  // Ensure result always starts with / and handle edge cases
+  const trimmed = result.trim()
+  if (!trimmed) return '/'
+  if (!trimmed.startsWith('/')) return `/${trimmed}`
+  return trimmed
 }
 export const getPathnameWithLangType = (targetPath: string, lang: string): string => {
   if (/en/.test(lang)) return `/${targetPath}`
