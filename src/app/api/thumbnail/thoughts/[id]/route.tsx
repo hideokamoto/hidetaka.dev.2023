@@ -6,6 +6,10 @@ import { logger } from '@/libs/logger'
 // @see https://opennext.js.org/cloudflare/get-started#9-remove-any-export-const-runtime--edge-if-present
 // export const runtime = 'edge'
 
+// Wranglerのローカル開発セッションエラーメッセージ
+// Service Bindingがローカル開発セッションを見つけられない場合のエラーメッセージ
+const WRANGLER_LOCAL_DEV_SESSION_ERROR = "Couldn't find a local dev session"
+
 // getCloudflareContextを動的インポートで取得（OpenNextのビルドプロセスで正しく解決されるように）
 async function getCloudflareContext(
   options: { async: true } | { async?: false } = { async: false },
@@ -116,11 +120,13 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
           .clone()
           .text()
           .catch(() => '')
-        if (responseBodyText.includes("Couldn't find a local dev session")) {
+        if (responseBodyText.includes(WRANGLER_LOCAL_DEV_SESSION_ERROR)) {
+          // 通常のfetchにフォールバック
           response = await fetch(ogImageUrl, { headers })
         }
       }
     } else {
+      // Service Bindingが利用できない場合は通常のfetchを使用
       response = await fetch(ogImageUrl, { headers })
     }
 
