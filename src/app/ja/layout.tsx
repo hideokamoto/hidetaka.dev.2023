@@ -1,0 +1,68 @@
+import type { Metadata } from 'next'
+import { SITE_DESCRIPTION_JA, SITE_TITLE_JA } from '@/consts'
+import '../globals.css'
+import { ClarityAnalytics } from '@/components/ClarityAnalytics'
+import { DarkModeScript } from '@/components/DarkModeScript'
+import GoogleAnalytics from '@/components/GoogleAnalytics'
+import Footer from '@/components/tailwindui/Footer'
+import Header from '@/components/tailwindui/Header'
+
+export const metadata: Metadata = {
+  title: SITE_TITLE_JA,
+  description: SITE_DESCRIPTION_JA,
+  metadataBase: new URL('https://hidetaka.dev'),
+  openGraph: {
+    title: SITE_TITLE_JA,
+    description: SITE_DESCRIPTION_JA,
+    url: 'https://hidetaka.dev/ja',
+    siteName: 'Hidetaka.dev',
+    images: [
+      {
+        url: '/images/profile.jpg',
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: 'ja_JP',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: SITE_TITLE_JA,
+    description: SITE_DESCRIPTION_JA,
+    images: ['/images/profile.jpg'],
+  },
+  icons: {
+    icon: [
+      { url: '/favicons/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicons/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: [{ url: '/favicons/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
+  },
+  manifest: '/favicons/site.webmanifest',
+}
+
+export default function JapaneseLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="ja" className="h-full antialiased">
+      <head>
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="/projects/rss.xml" />
+      </head>
+      <body className="flex h-full flex-col bg-zinc-50 font-japanese japanese-typography dark:bg-black">
+        <GoogleAnalytics gaId="G-RV8PYHHYHN" />
+        <DarkModeScript />
+        <ClarityAnalytics />
+        <div className="fixed inset-0 flex justify-center sm:px-8">
+          <div className="flex w-full max-w-7xl lg:px-8">
+            <div className="w-full bg-white ring-1 ring-zinc-100 dark:bg-zinc-900 dark:ring-zinc-300/20" />
+          </div>
+        </div>
+        <div className="relative">
+          <Header />
+          <main>{children}</main>
+          <Footer />
+        </div>
+      </body>
+    </html>
+  )
+}

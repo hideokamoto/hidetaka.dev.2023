@@ -109,3 +109,13 @@
   @apply bg-zinc-100 dark:bg-zinc-800 font-bold text-zinc-900 dark:text-zinc-100;
 }
 
+/* Japanese typography utilities */
+@layer utilities {
+  .japanese-typography {
+    text-autospace: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    line-break: strict;
+  }
+}
+
