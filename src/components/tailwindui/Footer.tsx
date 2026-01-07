@@ -3,33 +3,14 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { SITE_CONFIG } from '@/config'
+import {
+  changeLanguageURL,
+  getLanguageFromURL,
+  getPathnameWithLangType,
+} from '@/libs/urlUtils/lang.util'
 import GitHubIcon from './SocialIcons/GitHub'
 import LinkedInIcon from './SocialIcons/LinkedIn'
 import TwitterIcon from './SocialIcons/Twitter'
-
-function getLanguageFromURL(pathname: string) {
-  if (pathname.startsWith('/ja/') || pathname === '/ja') {
-    return 'ja'
-  }
-  return 'en'
-}
-
-function getPathnameWithLangType(targetPath: string, lang: string): string {
-  if (lang === 'en' || !lang || lang === '') return `/${targetPath}`
-  if (lang === 'ja') return `/ja/${targetPath}`
-  return `/${lang}/${targetPath}`
-}
-
-function changeLanguageURL(pathname: string, targetLang: 'en' | 'ja' = 'en'): string {
-  const lang = getLanguageFromURL(pathname)
-  if (lang === targetLang) return pathname
-
-  if (targetLang === 'en') {
-    return pathname.replace(/^\/ja/, '') || '/'
-  } else {
-    return `/ja${pathname}`
-  }
-}
 
 function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (

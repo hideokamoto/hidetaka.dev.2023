@@ -3,32 +3,13 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import {
+  changeLanguageURL,
+  getLanguageFromURL,
+  getPathnameWithLangType,
+} from '@/libs/urlUtils/lang.util'
 import Container from './Container'
 import ModeToggle from './Headers/ModeToggle'
-
-function getLanguageFromURL(pathname: string) {
-  if (pathname.startsWith('/ja/') || pathname === '/ja') {
-    return 'ja'
-  }
-  return 'en'
-}
-
-function getPathnameWithLangType(targetPath: string, lang: string): string {
-  if (lang === 'en' || !lang || lang === '') return `/${targetPath}`
-  if (lang === 'ja') return `/ja/${targetPath}`
-  return `/${lang}/${targetPath}`
-}
-
-function changeLanguageURL(pathname: string, targetLang: 'en' | 'ja' = 'en'): string {
-  const lang = getLanguageFromURL(pathname)
-  if (lang === targetLang) return pathname
-
-  if (targetLang === 'en') {
-    return pathname.replace(/^\/ja/, '') || '/'
-  } else {
-    return `/ja${pathname}`
-  }
-}
 
 function MenuIcon({ isOpen }: { isOpen: boolean }) {
   return (
