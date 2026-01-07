@@ -344,8 +344,7 @@ export default function BlogTranslation({
 
       {/* ローディング状態 */}
       {isTranslating && (
-        <div
-          role="status"
+        <output
           aria-live="polite"
           className="mt-3 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400"
         >
@@ -365,7 +364,7 @@ export default function BlogTranslation({
             />
           </svg>
           {text.translating}
-        </div>
+        </output>
       )}
 
       {/* 翻訳完了メッセージ */}
