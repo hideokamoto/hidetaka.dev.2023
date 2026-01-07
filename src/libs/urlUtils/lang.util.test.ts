@@ -303,7 +303,8 @@ describe('getPathnameWithLangType', () => {
                 const result = getPathnameWithLangType(targetPath, lang)
                 expect(result).toMatch(/^\//)
                 // Verify the result matches expected patterns
-                if (/en/i.test(lang) && !/ja/i.test(lang)) {
+                // Implementation checks /en/i first, then /ja/i, then falls back to /${lang}/
+                if (/en/i.test(lang)) {
                   expect(result).toBe(`/${targetPath}`)
                 } else if (/ja/i.test(lang)) {
                   expect(result).toBe(`/ja/${targetPath}`)

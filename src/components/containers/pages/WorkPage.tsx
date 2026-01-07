@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import FilterItem from '@/components/ui/FilterItem'
@@ -17,6 +17,46 @@ import type { WordPressPluginDetail } from '@/libs/dataSources/wporg'
 import type { MicroCMSProjectsRecord } from '@/libs/microCMS/types'
 
 type FilterCategory = 'all' | 'projects' | 'open-source' | 'books' | 'oss-contribution'
+
+type OSSItem =
+  | { type: 'project'; data: MicroCMSProjectsRecord }
+  | { type: 'npm'; data: NPMRegistrySearchResult }
+  | { type: 'wordpress'; data: WordPressPluginDetail }
+
+// OSSアイテムをフィルタリングするヘルパー関数
+export function filterOSSItem(item: OSSItem, matchesSearch: (text: string) => boolean): boolean {
+  if (item.type === 'project') {
+    const p = item.data
+    return (
+      matchesSearch(p.title) ||
+      (p.about && matchesSearch(p.about.replace(/<[^>]*>/g, ''))) ||
+      p.tags?.some((tag) => matchesSearch(tag))
+    )
+  }
+  if (item.type === 'npm') {
+    const pkg = item.data.package
+    return (
+      matchesSearch(pkg.name) ||
+      (typeof pkg.description === 'string' && matchesSearch(pkg.description))
+    )
+  }
+  const plugin = item.data
+  return (
+    matchesSearch(plugin.name) ||
+    (plugin.short_description ? matchesSearch(plugin.short_description) : false)
+  )
+}
+
+// OSSアイテムの日付を取得するヘルパー関数
+function getOSSItemDate(item: OSSItem): string {
+  if (item.type === 'project') {
+    return item.data.published_at || ''
+  }
+  if (item.type === 'npm') {
+    return item.data.package.date
+  }
+  return item.data.added
+}
 
 // 統一されたWorkカードコンポーネント（プロジェクト用）
 function UnifiedProjectCard({ project, lang }: { project: MicroCMSProjectsRecord; lang: string }) {
@@ -311,18 +351,24 @@ export default function WorkPageContent({
   })
 
   // オープンソース（owned_oss + NPM + WordPress）
-  const allOSSItems = [
-    ...ownedOSSProjects.map((p) => ({ type: 'project' as const, data: p })),
-    ...npmPackages.map((p) => ({ type: 'npm' as const, data: p })),
-    ...wpPlugins.map((p) => ({ type: 'wordpress' as const, data: p })),
-  ]
+  const allOSSItems = useMemo(
+    () => [
+      ...ownedOSSProjects.map((p) => ({ type: 'project' as const, data: p })),
+      ...npmPackages.map((p) => ({ type: 'npm' as const, data: p })),
+      ...wpPlugins.map((p) => ({ type: 'wordpress' as const, data: p })),
+    ],
+    [ownedOSSProjects, npmPackages, wpPlugins],
+  )
 
   // 検索フィルター関数
-  const matchesSearch = (text: string): boolean => {
-    if (!searchQuery.trim()) return true
-    const query = searchQuery.toLowerCase()
-    return text.toLowerCase().includes(query)
-  }
+  const matchesSearch = useCallback(
+    (text: string): boolean => {
+      if (!searchQuery.trim()) return true
+      const query = searchQuery.toLowerCase()
+      return text.toLowerCase().includes(query)
+    },
+    [searchQuery],
+  )
 
   // フィルターと検索を適用
   const filteredProjects = useMemo(() => {
@@ -356,25 +402,7 @@ export default function WorkPageContent({
   const filteredOSS = useMemo(() => {
     if (filterCategory !== 'all' && filterCategory !== 'open-source') return []
 
-    return allOSSItems.filter((item) => {
-      if (item.type === 'project') {
-        const p = item.data as MicroCMSProjectsRecord
-        return (
-          matchesSearch(p.title) ||
-          (p.about && matchesSearch(p.about.replace(/<[^>]*>/g, ''))) ||
-          p.tags?.some((tag) => matchesSearch(tag))
-        )
-      } else if (item.type === 'npm') {
-        const pkg = (item.data as NPMRegistrySearchResult).package
-        return matchesSearch(pkg.name) || (pkg.description && matchesSearch(pkg.description))
-      } else {
-        const plugin = item.data as WordPressPluginDetail
-        return (
-          matchesSearch(plugin.name) ||
-          (plugin.short_description && matchesSearch(plugin.short_description))
-        )
-      }
-    })
+    return allOSSItems.filter((item) => filterOSSItem(item, matchesSearch))
   }, [filterCategory, allOSSItems, matchesSearch])
 
   const filteredOSSContributions = useMemo(() => {
@@ -405,33 +433,26 @@ export default function WorkPageContent({
   })
 
   filteredOSS.sort((a, b) => {
-    const dateA =
-      a.type === 'project'
-        ? (a.data as MicroCMSProjectsRecord).published_at || ''
-        : a.type === 'npm'
-          ? (a.data as NPMRegistrySearchResult).package.date
-          : (a.data as WordPressPluginDetail).added
-    const dateB =
-      b.type === 'project'
-        ? (b.data as MicroCMSProjectsRecord).published_at || ''
-        : b.type === 'npm'
-          ? (b.data as NPMRegistrySearchResult).package.date
-          : (b.data as WordPressPluginDetail).added
+    const dateA = getOSSItemDate(a)
+    const dateB = getOSSItemDate(b)
     return new Date(dateB).getTime() - new Date(dateA).getTime()
   })
 
   // カウント計算
-  const counts = {
-    all:
-      mainProjects.length +
-      allOSSItems.length +
-      ossContributionProjects.length +
-      booksProjects.length,
-    projects: mainProjects.length,
-    'open-source': allOSSItems.length,
-    books: booksProjects.length,
-    'oss-contribution': ossContributionProjects.length,
-  }
+  const counts = useMemo(
+    () => ({
+      all:
+        mainProjects.length +
+        allOSSItems.length +
+        ossContributionProjects.length +
+        booksProjects.length,
+      projects: mainProjects.length,
+      'open-source': allOSSItems.length,
+      books: booksProjects.length,
+      'oss-contribution': ossContributionProjects.length,
+    }),
+    [mainProjects.length, allOSSItems.length, ossContributionProjects.length, booksProjects.length],
+  )
 
   // テキスト
   const title = lang === 'ja' ? '制作物' : 'Work'

@@ -49,30 +49,33 @@ export default function ArticleSummary({ content, locale, className = '' }: Arti
     let intervalId: NodeJS.Timeout | null = null
     let isMounted = true
 
+    const handlePollResult = (newResult: AvailabilityResult) => {
+      if (!isMounted) return
+      setAvailability(newResult)
+      if (newResult === 'available' || newResult === 'unavailable') {
+        if (intervalId) {
+          clearInterval(intervalId)
+          intervalId = null
+        }
+      }
+    }
+
+    const startPolling = () => {
+      if (intervalId) return
+      intervalId = setInterval(async () => {
+        const newResult = await checkSummarizerAvailability(locale)
+        handlePollResult(newResult)
+      }, 2000)
+    }
+
     const checkAvailability = async () => {
       const result = await checkSummarizerAvailability(locale)
       if (isMounted) {
         setAvailability(result)
       }
 
-      // downloading または downloadable の場合、定期的に再チェック
       if (result === 'downloading' || result === 'downloadable') {
-        if (!intervalId) {
-          intervalId = setInterval(async () => {
-            const newResult = await checkSummarizerAvailability(locale)
-            if (isMounted) {
-              setAvailability(newResult)
-            }
-
-            // available になったらポーリングを停止
-            if (newResult === 'available' || newResult === 'unavailable') {
-              if (intervalId) {
-                clearInterval(intervalId)
-                intervalId = null
-              }
-            }
-          }, 2000) // 2秒ごとにチェック
-        }
+        startPolling()
       }
     }
 

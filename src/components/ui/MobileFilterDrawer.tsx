@@ -96,8 +96,8 @@ export default function MobileFilterDrawer({
               </div>
 
               {/* フィルターグループ */}
-              {filterGroups.map((group, groupIndex) => (
-                <div key={groupIndex}>
+              {filterGroups.map((group) => (
+                <div key={group.title}>
                   <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
                     {group.title}
                   </h3>
