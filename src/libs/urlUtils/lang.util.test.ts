@@ -332,9 +332,7 @@ describe('getPathnameWithLangType', () => {
                 fc
                   .tuple(
                     fc.constant('ja'),
-                    fc
-                      .string({ minLength: 10, maxLength: 20 })
-                      .filter((s) => !/en/i.test(s)),
+                    fc.string({ minLength: 10, maxLength: 20 }).filter((s) => !/en/i.test(s)),
                   )
                   .map(([prefix, suffix]) => prefix + suffix),
               ),
@@ -356,9 +354,7 @@ describe('getPathnameWithLangType', () => {
                 fc
                   .tuple(
                     fc.constant('ja'),
-                    fc
-                      .string({ minLength: 0, maxLength: 10 })
-                      .filter((s) => !/en/i.test(s)),
+                    fc.string({ minLength: 0, maxLength: 10 }).filter((s) => !/en/i.test(s)),
                   )
                   .map(([prefix, suffix]) => prefix + suffix),
                 fc
