@@ -10,11 +10,11 @@ module.exports = {
 		extend: {
 			fontFamily: {
 				japanese: [
-					'"Helvetica Neue"',
-					'Arial',
+					'"Noto Sans JP"',
 					'"Hiragino Kaku Gothic ProN"',
 					'"Hiragino Sans"',
-					'"Noto Sans JP"',
+					'"Helvetica Neue"',
+					'Arial',
 					'sans-serif',
 				],
 			},
