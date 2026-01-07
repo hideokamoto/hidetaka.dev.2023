@@ -112,7 +112,10 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 
       // Service Bindingが503エラーを返し、ローカル開発セッションが見つからない場合は通常のfetchにフォールバック
       if (!response.ok && response.status === 503) {
-        const responseBodyText = await response.clone().text().catch(() => '')
+        const responseBodyText = await response
+          .clone()
+          .text()
+          .catch(() => '')
         if (responseBodyText.includes("Couldn't find a local dev session")) {
           response = await fetch(ogImageUrl, { headers })
         }
