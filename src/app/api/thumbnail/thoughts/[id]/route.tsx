@@ -36,6 +36,64 @@ async function getCloudflareContext(
   }
 }
 
+// WordPress APIからthoughtを取得
+async function fetchThoughtFromWordPress(postId: number): Promise<{ title: string }> {
+  const wpResponse = await fetch(
+    `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs/${postId}?_fields=id,title`,
+  )
+
+  if (!wpResponse.ok) {
+    if (wpResponse.status === 404) {
+      throw new Response('Post not found', { status: 404 })
+    }
+    logger.error('WordPress API error', {
+      status: wpResponse.status,
+      statusText: wpResponse.statusText,
+      postId,
+    })
+    throw new Response('Failed to fetch post', { status: wpResponse.status })
+  }
+
+  const thought: WPThought = await wpResponse.json()
+
+  if (!thought.title?.rendered) {
+    throw new Response('Post title not found', { status: 500 })
+  }
+
+  return { title: thought.title.rendered }
+}
+
+// Service Bindingのフォールバック付きでOG画像を生成
+async function generateOGImageWithFallback(
+  _title: string,
+  ogImageGenerator: { fetch: typeof fetch } | undefined,
+  ogImageUrl: URL,
+  headers: Headers,
+): Promise<Response> {
+  const fallbackFetch = () => fetch(ogImageUrl, { headers })
+  let response: Response
+
+  if (ogImageGenerator) {
+    response = await ogImageGenerator.fetch(ogImageUrl, { headers })
+
+    // Service Bindingが503エラーを返し、ローカル開発セッションが見つからない場合は通常のfetchにフォールバック
+    if (response.status === 503) {
+      const responseBodyText = await response
+        .clone()
+        .text()
+        .catch(() => '')
+      if (responseBodyText.includes(WRANGLER_LOCAL_DEV_SESSION_ERROR)) {
+        response = await fallbackFetch()
+      }
+    }
+  } else {
+    // Service Bindingが利用できない場合は通常のfetchを使用
+    response = await fallbackFetch()
+  }
+
+  return response
+}
+
 /**
  * WordPressのthoughts投稿タイプ用のサムネイル画像生成API
  *
@@ -57,31 +115,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       return new Response('Invalid post ID', { status: 404 })
     }
 
-    // WordPress REST APIから記事を取得
-    const wpResponse = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs/${postId}?_fields=id,title`,
-    )
-
-    if (!wpResponse.ok) {
-      if (wpResponse.status === 404) {
-        return new Response('Post not found', { status: 404 })
-      }
-      logger.error('WordPress API error', {
-        status: wpResponse.status,
-        statusText: wpResponse.statusText,
-        postId,
-      })
-      return new Response('Failed to fetch post', { status: wpResponse.status })
-    }
-
-    const thought: WPThought = await wpResponse.json()
-
-    // タイトルが存在しない場合はエラー
-    if (!thought.title?.rendered) {
-      return new Response('Post title not found', { status: 500 })
-    }
-
-    const title = thought.title.rendered
+    const { title } = await fetchThoughtFromWordPress(postId)
     logger.log('Generating thumbnail for post', { postId, title })
 
     // OpenNextのCloudflareアダプターでは、getCloudflareContext()経由でbindingsにアクセス
@@ -108,27 +142,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       headers.set('Authorization', `Bearer ${authToken}`)
     }
 
-    // Service Bindingが利用可能な場合はそれを使用、そうでない場合は通常のfetchを使用
-    // 開発環境（Next.js dev server）ではService Bindingがローカル開発セッションを見つけられないため、通常のfetchにフォールバック
-    let response: Response
-    if (ogImageGenerator) {
-      response = await ogImageGenerator.fetch(ogImageUrl, { headers })
-
-      // Service Bindingが503エラーを返し、ローカル開発セッションが見つからない場合は通常のfetchにフォールバック
-      if (!response.ok && response.status === 503) {
-        const responseBodyText = await response
-          .clone()
-          .text()
-          .catch(() => '')
-        if (responseBodyText.includes(WRANGLER_LOCAL_DEV_SESSION_ERROR)) {
-          // 通常のfetchにフォールバック
-          response = await fetch(ogImageUrl, { headers })
-        }
-      }
-    } else {
-      // Service Bindingが利用できない場合は通常のfetchを使用
-      response = await fetch(ogImageUrl, { headers })
-    }
+    const response = await generateOGImageWithFallback(title, ogImageGenerator, ogImageUrl, headers)
 
     // エラーハンドリング
     if (!response.ok) {
@@ -157,6 +171,9 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       headers: responseHeaders,
     })
   } catch (error) {
+    if (error instanceof Response) {
+      return error
+    }
     logger.error('Error generating thumbnail image', {
       error,
       postId: id,
