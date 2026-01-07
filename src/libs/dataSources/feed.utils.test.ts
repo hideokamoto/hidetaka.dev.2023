@@ -2,22 +2,6 @@ import { describe, expect, it, vi } from 'vitest'
 import { loadFeedPosts, processAtomFeed, processRSSFeed } from './feed.utils'
 import type { ZennFeed } from './types'
 
-// RSSフィードのアイテム型定義
-type RSSItem = {
-  title: string
-  description: string
-  pubDate: string
-  link: string
-}
-
-// Atomフィードのエントリ型定義
-type AtomEntry = {
-  title: string
-  content: string
-  updated: string
-  url: string
-}
-
 describe('processRSSFeed', () => {
   it('should process RSS feed with array of items', () => {
     const parsedItem = {
