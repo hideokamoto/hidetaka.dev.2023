@@ -22,6 +22,14 @@ describe('getLanguageFromURL', () => {
   it('should handle paths with multiple segments', () => {
     expect(getLanguageFromURL('/ja/blog/post-1')).toBe('ja')
   })
+
+  it('should handle uppercase /JA/ paths', () => {
+    expect(getLanguageFromURL('/JA/about')).toBe('ja')
+  })
+
+  it('should handle mixed case paths', () => {
+    expect(getLanguageFromURL('/Ja/blog')).toBe('ja')
+  })
 })
 
 describe('changeLanguageURL', () => {
@@ -71,6 +79,20 @@ describe('changeLanguageURL', () => {
     it('should handle Japanese root path to English', () => {
       expect(changeLanguageURL('/ja/', 'en')).toBe('/')
     })
+
+    it('should handle uppercase /JA/ prefix removal', () => {
+      expect(changeLanguageURL('/JA/about', 'en')).toBe('/about')
+    })
+
+    it('should handle mixed case /Ja/ prefix removal', () => {
+      expect(changeLanguageURL('/Ja/blog', 'en')).toBe('/blog')
+    })
+  })
+
+  describe('input validation', () => {
+    it('should throw error if pathname does not start with /', () => {
+      expect(() => changeLanguageURL('about', 'ja')).toThrow('pathname must start with /')
+    })
   })
 })
 
@@ -113,6 +135,32 @@ describe('getPathnameWithLangType', () => {
     })
   })
 
+  describe('case-insensitive language codes', () => {
+    it('should handle uppercase EN language code', () => {
+      expect(getPathnameWithLangType('about', 'EN')).toBe('/about')
+    })
+
+    it('should handle uppercase JA language code', () => {
+      expect(getPathnameWithLangType('about', 'JA')).toBe('/ja/about')
+    })
+
+    it('should handle mixed case En language code', () => {
+      expect(getPathnameWithLangType('blog', 'En')).toBe('/blog')
+    })
+
+    it('should handle mixed case Ja language code', () => {
+      expect(getPathnameWithLangType('blog', 'Ja')).toBe('/ja/blog')
+    })
+
+    it('should handle uppercase EN-US language code', () => {
+      expect(getPathnameWithLangType('work', 'EN-US')).toBe('/work')
+    })
+
+    it('should handle uppercase JA-JP language code', () => {
+      expect(getPathnameWithLangType('work', 'JA-JP')).toBe('/ja/work')
+    })
+  })
+
   describe('property-based tests', () => {
     describe('getLanguageFromURL', () => {
       it('should return "en" when pathname does not start with /ja/', () => {
@@ -144,7 +192,7 @@ describe('getPathnameWithLangType', () => {
       it('should return a string for any pathname and target language', () => {
         fc.assert(
           fc.property(
-            fc.string({ minLength: 0, maxLength: 200 }),
+            fc.string({ minLength: 1, maxLength: 200 }).filter((s) => s.startsWith('/')),
             fc.constantFrom('en', 'ja' as const),
             (pathname, targetLang) => {
               const result = changeLanguageURL(pathname, targetLang)
@@ -157,9 +205,7 @@ describe('getPathnameWithLangType', () => {
       it('should be idempotent when converting to the same language', () => {
         fc.assert(
           fc.property(
-            fc.string({ minLength: 0, maxLength: 200 }).filter((s) => {
-              return s === '/' || s.startsWith('/') || s === ''
-            }),
+            fc.string({ minLength: 1, maxLength: 200 }).filter((s) => s.startsWith('/')),
             fc.constantFrom('en', 'ja' as const),
             (pathname, targetLang) => {
               const result1 = changeLanguageURL(pathname, targetLang)
@@ -256,7 +302,12 @@ describe('getPathnameWithLangType', () => {
               (targetPath, lang) => {
                 const result = getPathnameWithLangType(targetPath, lang)
                 expect(result).toMatch(/^\//)
-                if (!/ja/.test(lang) && !/en/.test(lang)) {
+                // Verify the result matches expected patterns
+                if (/en/i.test(lang) && !/ja/i.test(lang)) {
+                  expect(result).toBe(`/${targetPath}`)
+                } else if (/ja/i.test(lang)) {
+                  expect(result).toBe(`/ja/${targetPath}`)
+                } else {
                   expect(result).toBe(`/${lang}/${targetPath}`)
                 }
               },

@@ -5,7 +5,8 @@
  * @returns `'ja'` if `pathname` starts with `/ja/` or is exactly `/ja`, `'en'` otherwise
  */
 export function getLanguageFromURL(pathname: string) {
-  if (pathname.startsWith('/ja/') || pathname === '/ja') {
+  const lowerPathname = pathname.toLowerCase()
+  if (lowerPathname.startsWith('/ja/') || lowerPathname === '/ja') {
     return 'ja'
   }
   return 'en'
@@ -23,17 +24,20 @@ export function isJapanese(locale?: string): boolean {
 }
 
 export const changeLanguageURL = (pathname: string, targetLang: 'en' | 'ja' = 'en'): string => {
+  if (!pathname.startsWith('/')) {
+    throw new Error('pathname must start with /')
+  }
   const lang = getLanguageFromURL(pathname)
   if (lang === targetLang) return pathname
 
   if (targetLang === 'en') {
-    return pathname.replace(/^\/ja/, '') || '/'
+    return pathname.replace(/^\/ja/i, '') || '/'
   } else {
     return `/ja${pathname}`
   }
 }
 export const getPathnameWithLangType = (targetPath: string, lang: string): string => {
-  if (/en/.test(lang)) return `/${targetPath}`
-  if (/ja/.test(lang)) return `/ja/${targetPath}`
+  if (/en/i.test(lang)) return `/${targetPath}`
+  if (/ja/i.test(lang)) return `/ja/${targetPath}`
   return `/${lang}/${targetPath}`
 }
