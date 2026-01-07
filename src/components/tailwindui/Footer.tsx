@@ -3,34 +3,22 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { SITE_CONFIG } from '@/config'
+import {
+  changeLanguageURL,
+  getLanguageFromURL,
+  getPathnameWithLangType,
+} from '@/libs/urlUtils/lang.util'
 import GitHubIcon from './SocialIcons/GitHub'
 import LinkedInIcon from './SocialIcons/LinkedIn'
 import TwitterIcon from './SocialIcons/Twitter'
 
-function getLanguageFromURL(pathname: string) {
-  if (pathname.startsWith('/ja/') || pathname === '/ja') {
-    return 'ja'
-  }
-  return 'en'
-}
-
-function getPathnameWithLangType(targetPath: string, lang: string): string {
-  if (lang === 'en' || !lang || lang === '') return `/${targetPath}`
-  if (lang === 'ja') return `/ja/${targetPath}`
-  return `/${lang}/${targetPath}`
-}
-
-function changeLanguageURL(pathname: string, targetLang: 'en' | 'ja' = 'en'): string {
-  const lang = getLanguageFromURL(pathname)
-  if (lang === targetLang) return pathname
-
-  if (targetLang === 'en') {
-    return pathname.replace(/^\/ja/, '') || '/'
-  } else {
-    return `/ja${pathname}`
-  }
-}
-
+/**
+ * Renders a styled navigation link used in the footer navigation.
+ *
+ * @param href - Destination URL or path for the link
+ * @param children - Visible label or content for the link
+ * @returns A Next.js `Link` element styled for footer navigation
+ */
 function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <Link
