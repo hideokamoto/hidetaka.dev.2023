@@ -12,6 +12,13 @@ import GitHubIcon from './SocialIcons/GitHub'
 import LinkedInIcon from './SocialIcons/LinkedIn'
 import TwitterIcon from './SocialIcons/Twitter'
 
+/**
+ * Renders a styled navigation link used in the footer navigation.
+ *
+ * @param href - Destination URL or path for the link
+ * @param children - Visible label or content for the link
+ * @returns A Next.js `Link` element styled for footer navigation
+ */
 function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <Link

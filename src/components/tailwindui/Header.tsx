@@ -11,6 +11,12 @@ import {
 import Container from './Container'
 import ModeToggle from './Headers/ModeToggle'
 
+/**
+ * Render a menu icon that switches between hamburger and close states.
+ *
+ * @param isOpen - When `true`, displays the close ("X") icon; when `false`, displays the hamburger menu icon.
+ * @returns The SVG element representing the current menu icon state.
+ */
 function MenuIcon({ isOpen }: { isOpen: boolean }) {
   return (
     <svg
