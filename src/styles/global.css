@@ -2,3 +2,12 @@
 @import "tailwindcss/components";
 /*@import './prism.css';*/
 @import "tailwindcss/utilities";
+
+@layer utilities {
+  .japanese-typography {
+    text-autospace: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    line-break: strict;
+  }
+}

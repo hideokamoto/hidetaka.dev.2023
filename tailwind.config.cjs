@@ -7,7 +7,18 @@ module.exports = {
 	],
 	darkMode: 'class',
 	theme: {
-		extend: {},
+		extend: {
+			fontFamily: {
+				japanese: [
+					'"Helvetica Neue"',
+					'Arial',
+					'"Hiragino Kaku Gothic ProN"',
+					'"Hiragino Sans"',
+					'"Noto Sans JP"',
+					'sans-serif',
+				],
+			},
+		},
 	},
 	plugins: [],
 }

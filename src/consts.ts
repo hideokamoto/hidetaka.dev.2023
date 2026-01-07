@@ -3,6 +3,8 @@
 
 export const SITE_TITLE = 'Hidetaka.dev | Hidetaka Okamoto portfolio website'
 export const SITE_DESCRIPTION = 'The portfolio website of Hidetaka Okamoto'
+export const SITE_TITLE_JA = 'Hidetaka.dev | Hidetaka Okamoto ポートフォリオサイト'
+export const SITE_DESCRIPTION_JA = 'Hidetaka Okamoto のポートフォリオサイト'
 
 /**
  * ISR revalidation periods (in seconds)
