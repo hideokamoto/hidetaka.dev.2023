@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { headers } from 'next/headers'
 import { SITE_DESCRIPTION, SITE_TITLE } from '@/consts'
 import './globals.css'
 import { ClarityAnalytics } from '@/components/ClarityAnalytics'
@@ -42,13 +43,19 @@ export const metadata: Metadata = {
   manifest: '/favicons/site.webmanifest',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const headersList = await headers()
+  const pathname = headersList.get('x-pathname') || ''
+  const isJapanese = pathname.startsWith('/ja')
+
+  const bodyClasses = `flex h-full flex-col bg-zinc-50 dark:bg-black${isJapanese ? ' font-japanese japanese-typography' : ''}`
+
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang={isJapanese ? 'ja' : 'en'} className="h-full antialiased">
       <head>
         <link rel="alternate" type="application/rss+xml" title="RSS" href="/projects/rss.xml" />
       </head>
-      <body className="flex h-full flex-col bg-zinc-50 dark:bg-black">
+      <body className={bodyClasses}>
         <GoogleAnalytics gaId="G-RV8PYHHYHN" />
         <DarkModeScript />
         <ClarityAnalytics />

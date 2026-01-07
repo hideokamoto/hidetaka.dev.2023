@@ -249,7 +249,10 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(redirectUrl))
   }
 
-  return NextResponse.next()
+  // パス情報をヘッダーに追加してロケール検出に利用
+  const response = NextResponse.next()
+  response.headers.set('x-pathname', pathname)
+  return response
 }
 
 export const config = {
