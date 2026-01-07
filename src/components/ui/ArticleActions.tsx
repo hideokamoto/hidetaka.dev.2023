@@ -57,7 +57,7 @@ export default function ArticleActions({
           </svg>
         </summary>
 
-        <div className="mt-3 flex flex-col gap-3 sm:mt-0 sm:flex sm:flex-row sm:flex-wrap sm:items-start">
+        <div className="mt-3 flex flex-col gap-3 sm:mt-0 sm:!flex sm:flex-row sm:flex-wrap sm:items-start">
           <ViewMarkdownButton slug={slug} basePath={basePath} title={title} language={lang} />
           <ArticleSummary content={contentHtml} locale={lang} />
           {showTranslation && (
