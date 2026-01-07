@@ -24,7 +24,7 @@ type OSSItem =
   | { type: 'wordpress'; data: WordPressPluginDetail }
 
 // OSSアイテムをフィルタリングするヘルパー関数
-function filterOSSItem(item: OSSItem, matchesSearch: (text: string) => boolean): boolean {
+export function filterOSSItem(item: OSSItem, matchesSearch: (text: string) => boolean): boolean {
   if (item.type === 'project') {
     const p = item.data
     return (
@@ -35,12 +35,15 @@ function filterOSSItem(item: OSSItem, matchesSearch: (text: string) => boolean):
   }
   if (item.type === 'npm') {
     const pkg = item.data.package
-    return matchesSearch(pkg.name) || (pkg.description && matchesSearch(pkg.description))
+    return (
+      matchesSearch(pkg.name) ||
+      (typeof pkg.description === 'string' && matchesSearch(pkg.description))
+    )
   }
   const plugin = item.data
   return (
     matchesSearch(plugin.name) ||
-    (plugin.short_description && matchesSearch(plugin.short_description))
+    (plugin.short_description ? matchesSearch(plugin.short_description) : false)
   )
 }
 

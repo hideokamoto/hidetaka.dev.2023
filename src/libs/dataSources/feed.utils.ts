@@ -20,7 +20,7 @@ type AtomEntry = {
 }
 
 // RSSフィードを処理するヘルパー関数
-const processRSSFeed = <T>(parsedItem: {
+export const processRSSFeed = <T>(parsedItem: {
   rss: {
     channel: {
       title: string
@@ -48,7 +48,7 @@ const processRSSFeed = <T>(parsedItem: {
 }
 
 // Atomフィードを処理するヘルパー関数
-const processAtomFeed = <T>(parsedItem: {
+export const processAtomFeed = <T>(parsedItem: {
   feed: {
     title: string
     link: string
