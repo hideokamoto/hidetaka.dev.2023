@@ -105,6 +105,16 @@ function DesktopNavItem({
   )
 }
 
+/**
+ * Render the mobile slide-in navigation panel and backdrop when the mobile menu is open.
+ *
+ * Disables background scrolling while open and restores it when closed or on unmount. The menu
+ * displays localized navigation links and a language switcher derived from the current URL.
+ *
+ * @param isOpen - Whether the mobile menu is visible
+ * @param onClose - Callback invoked to request closing the menu (called by backdrop, close buttons, and nav item clicks)
+ * @returns The mobile menu JSX when `isOpen` is true, `null` otherwise
+ */
 function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const pathname = usePathname()
   const lang = getLanguageFromURL(pathname)
@@ -135,17 +145,11 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
   return (
     <>
       {/* Backdrop */}
-      <div
-        role="button"
-        tabIndex={0}
-        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
+      <button
+        type="button"
         onClick={onClose}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            onClose()
-          }
-        }}
+        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
+        aria-label="Close menu"
       />
 
       {/* Menu Panel */}
