@@ -94,13 +94,21 @@ export default function Footer() {
                     Navigation
                   </h3>
                   <nav className="flex flex-col gap-4">
-                    <NavLink href={getPathnameWithLangType('about', lang)}>About</NavLink>
-                    <NavLink href={getPathnameWithLangType('work', lang)}>Work</NavLink>
-                    <NavLink href={getPathnameWithLangType('writing', lang)}>Writing</NavLink>
+                    <NavLink href={getPathnameWithLangType('about', lang)}>
+                      {lang === 'ja' ? '概要' : 'About'}
+                    </NavLink>
+                    <NavLink href={getPathnameWithLangType('work', lang)}>
+                      {lang === 'ja' ? '制作物' : 'Work'}
+                    </NavLink>
+                    <NavLink href={getPathnameWithLangType('writing', lang)}>
+                      {lang === 'ja' ? '執筆' : 'Writing'}
+                    </NavLink>
                     <NavLink href={getPathnameWithLangType('blog', lang)}>
                       {lang === 'ja' ? 'ブログ' : 'Blog'}
                     </NavLink>
-                    <NavLink href={getPathnameWithLangType('speaking', lang)}>Speaking</NavLink>
+                    <NavLink href={getPathnameWithLangType('speaking', lang)}>
+                      {lang === 'ja' ? '登壇' : 'Speaking'}
+                    </NavLink>
                     <NavLink href={getPathnameWithLangType('privacy', lang)}>
                       {lang === 'ja' ? 'プライバシーポリシー' : 'Privacy Policy'}
                     </NavLink>
@@ -113,8 +121,12 @@ export default function Footer() {
                     Language
                   </h3>
                   <nav className="flex flex-col gap-4">
-                    <NavLink href={changeLanguageURL(pathname, 'ja')}>Japanese</NavLink>
-                    <NavLink href={changeLanguageURL(pathname, 'en')}>English</NavLink>
+                    <NavLink href={changeLanguageURL(pathname, 'ja')}>
+                      {lang === 'ja' ? '日本語' : 'Japanese'}
+                    </NavLink>
+                    <NavLink href={changeLanguageURL(pathname, 'en')}>
+                      {lang === 'ja' ? '英語' : 'English'}
+                    </NavLink>
                   </nav>
                 </div>
 
