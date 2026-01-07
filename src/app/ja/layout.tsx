@@ -37,5 +37,9 @@ export const metadata: Metadata = {
 }
 
 export default function JapaneseLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>
+  return (
+    <div lang="ja" className="font-japanese japanese-typography">
+      {children}
+    </div>
+  )
 }

@@ -55,9 +55,9 @@ export default function MobileFilterDrawer({
       {/* Backdrop */}
       <button
         type="button"
-        onClick={onClose}
         className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
-        aria-label="Close filter"
+        onClick={onClose}
+        aria-label="Close filter drawer"
       />
 
       {/* Drawer Panel */}
