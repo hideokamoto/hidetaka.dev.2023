@@ -1,14 +1,13 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
-import ArticleSummary from '@/components/ui/ArticleSummary'
+import ArticleActions from '@/components/ui/ArticleActions'
 import DateDisplay from '@/components/ui/DateDisplay'
 import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
 import BlogReactions from '@/components/ui/reactions/BlogReactions'
 import SocialShareButtons from '@/components/ui/SocialShareButtons'
 import Tag from '@/components/ui/Tag'
-import ViewMarkdownButton from '@/components/ui/ViewMarkdownButton'
 import { SITE_CONFIG } from '@/config'
 import type { BlogItem, WPThought } from '@/libs/dataSources/types'
 import { DETAIL_PAGE_SECTION_CLASS } from '@/libs/utils/detailPageStyles'
@@ -114,16 +113,14 @@ export default function DevNoteDetailPage({
           )}
         </div>
 
-        {/* Markdownボタン */}
-        <ViewMarkdownButton
+        {/* 記事アクション（Markdown / 要約） */}
+        <ArticleActions
+          lang={lang}
           slug={note.slug}
           basePath={basePath}
           title={note.title.rendered}
-          language={lang}
+          contentHtml={note.content.rendered}
         />
-
-        {/* 記事要約 (Built-in AI) */}
-        <ArticleSummary content={note.content.rendered} locale={lang} className="mt-6" />
 
         {/* コンテンツ */}
         <div

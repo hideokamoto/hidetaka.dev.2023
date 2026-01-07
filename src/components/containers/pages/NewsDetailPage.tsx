@@ -1,12 +1,11 @@
 import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
-import ArticleSummary from '@/components/ui/ArticleSummary'
+import ArticleActions from '@/components/ui/ArticleActions'
 import DateDisplay from '@/components/ui/DateDisplay'
 import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
 import BlogReactions from '@/components/ui/reactions/BlogReactions'
 import SocialShareButtons from '@/components/ui/SocialShareButtons'
-import ViewMarkdownButton from '@/components/ui/ViewMarkdownButton'
 import { SITE_CONFIG } from '@/config'
 import type { WPProduct } from '@/libs/dataSources/products'
 import type { BlogItem } from '@/libs/dataSources/types'
@@ -87,16 +86,14 @@ export default function NewsDetailPage({
           />
         </div>
 
-        {/* Markdownボタン */}
-        <ViewMarkdownButton
+        {/* 記事アクション（Markdown / 要約） */}
+        <ArticleActions
+          lang={lang}
           slug={product.slug}
           basePath={basePath}
           title={product.title.rendered}
-          language={lang}
+          contentHtml={product.content.rendered}
         />
-
-        {/* 記事要約 (Built-in AI) */}
-        <ArticleSummary content={product.content.rendered} locale={lang} className="mt-6" />
 
         {/* コンテンツ */}
         <div

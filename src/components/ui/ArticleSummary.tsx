@@ -1,8 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { getActionButtonStyles } from '@/libs/componentStyles.utils'
 import type { AvailabilityResult } from '@/libs/summarizer'
 import { checkSummarizerAvailability, summarizeTextStream } from '@/libs/summarizer'
+import { cn } from '@/libs/utils/cn'
 
 type ArticleSummaryProps = {
   content: string
@@ -13,18 +15,20 @@ type ArticleSummaryProps = {
 // i18n対応のUIテキスト
 const UI_TEXT = {
   ja: {
-    button: '記事を要約',
+    button: '記事を要約（Chromeのみ）',
     cancel: 'キャンセル',
     loading: '要約を生成中...',
     downloading: 'AIモデルをダウンロード中です。初回のみ時間がかかります。',
+    unavailable: 'Chrome（最新版）のBuilt-in AIが必要です。',
     error: '要約の生成中にエラーが発生しました。',
     summaryTitle: '📝 要約',
   },
   en: {
-    button: 'Summarize Article',
+    button: 'Summarize (Chrome only)',
     cancel: 'Cancel',
     loading: 'Generating summary...',
     downloading: 'Downloading AI model. This may take a while on first use.',
+    unavailable: 'Requires Chrome (latest) built-in AI.',
     error: 'An error occurred while generating the summary.',
     summaryTitle: '📝 Summary',
   },
@@ -83,11 +87,19 @@ export default function ArticleSummary({ content, locale, className = '' }: Arti
   }, [locale])
 
   // 利用できない場合は何も表示しない
-  if (availability === 'unavailable') {
-    return null
-  }
+  const isExpanded = Boolean(
+    availability === 'unavailable' ||
+      availability === 'downloading' ||
+      isLoading ||
+      error ||
+      summary,
+  )
 
   const handleSummarize = async () => {
+    if (availability === 'unavailable') {
+      return
+    }
+
     setIsLoading(true)
     setError('')
     setSummary('')
@@ -122,15 +134,16 @@ export default function ArticleSummary({ content, locale, className = '' }: Arti
   }
 
   return (
-    <div className={`mb-6 ${className}`}>
+    <div className={cn('w-full', !isExpanded && 'sm:w-auto', isExpanded && 'sm:w-full', className)}>
       {/* 要約ボタン */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-3">
         {!summary && !isLoading && (
           <button
             type="button"
             onClick={handleSummarize}
-            disabled={availability === 'downloading'}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-400 disabled:cursor-not-allowed rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-zinc-900"
+            disabled={availability === 'downloading' || availability === 'unavailable'}
+            aria-label={text.button}
+            className={getActionButtonStyles('primary')}
           >
             <svg
               className="size-4"
@@ -154,21 +167,27 @@ export default function ArticleSummary({ content, locale, className = '' }: Arti
           <button
             type="button"
             onClick={handleCancel}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-zinc-900"
+            aria-label={text.cancel}
+            className={getActionButtonStyles('danger')}
           >
             {text.cancel}
           </button>
         )}
       </div>
 
+      {/* 利用できない場合の注記 */}
+      {availability === 'unavailable' && (
+        <p className="mt-2 text-xs text-slate-600 dark:text-slate-400">{text.unavailable}</p>
+      )}
+
       {/* ダウンロード中の警告 */}
       {availability === 'downloading' && (
-        <p className="text-sm text-amber-600 dark:text-amber-400 mb-4">⚠️ {text.downloading}</p>
+        <p className="mt-2 text-sm text-amber-600 dark:text-amber-400">⚠️ {text.downloading}</p>
       )}
 
       {/* ローディング状態 */}
       {isLoading && (
-        <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400 mb-4">
+        <div className="mt-3 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
           <svg className="animate-spin size-4" fill="none" viewBox="0 0 24 24" aria-hidden="true">
             <circle
               className="opacity-25"
@@ -190,14 +209,14 @@ export default function ArticleSummary({ content, locale, className = '' }: Arti
 
       {/* エラーメッセージ */}
       {error && (
-        <div className="p-4 mb-4 text-sm text-red-700 bg-red-50 dark:bg-red-900/20 dark:text-red-400 rounded-lg">
+        <div className="mt-3 rounded-lg bg-red-50 p-4 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400">
           {error}
         </div>
       )}
 
       {/* 要約結果 */}
       {summary && (
-        <div className="p-6 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
+        <div className="mt-3 rounded-lg border border-indigo-200 bg-indigo-50 p-6 dark:border-indigo-800 dark:bg-indigo-900/20">
           <h3 className="text-lg font-semibold text-indigo-900 dark:text-indigo-100 mb-3">
             {text.summaryTitle}
           </h3>
