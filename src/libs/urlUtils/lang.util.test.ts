@@ -3,77 +3,95 @@ import { describe, expect, it } from 'vitest'
 import { changeLanguageURL, getLanguageFromURL, getPathnameWithLangType } from './lang.util'
 
 describe('getLanguageFromURL', () => {
-  it('should extract ja from ja-JP URL', () => {
-    expect(getLanguageFromURL('/ja-JP/about')).toBe('ja')
+  it('should extract ja from /ja/ URL', () => {
+    expect(getLanguageFromURL('/ja/about')).toBe('ja')
   })
 
-  it('should extract ja from ja-jp URL (lowercase)', () => {
-    expect(getLanguageFromURL('/ja-jp/blog')).toBe('ja')
+  it('should extract ja from /ja path', () => {
+    expect(getLanguageFromURL('/ja')).toBe('ja')
   })
 
-  it('should extract en from en-US URL', () => {
-    expect(getLanguageFromURL('/en-US/about')).toBe('en')
+  it('should return en for root path', () => {
+    expect(getLanguageFromURL('/')).toBe('en')
   })
 
-  it('should return en-US for root path', () => {
-    expect(getLanguageFromURL('/')).toBe('en-US')
-  })
-
-  it('should return en-US for English paths without locale code', () => {
-    expect(getLanguageFromURL('/about')).toBe('en-US')
+  it('should return en for English paths without locale code', () => {
+    expect(getLanguageFromURL('/about')).toBe('en')
   })
 
   it('should handle paths with multiple segments', () => {
-    expect(getLanguageFromURL('/ja-JP/blog/post-1')).toBe('ja')
+    expect(getLanguageFromURL('/ja/blog/post-1')).toBe('ja')
+  })
+
+  it('should handle uppercase /JA/ paths', () => {
+    expect(getLanguageFromURL('/JA/about')).toBe('ja')
+  })
+
+  it('should handle mixed case paths', () => {
+    expect(getLanguageFromURL('/Ja/blog')).toBe('ja')
   })
 })
 
 describe('changeLanguageURL', () => {
-  describe('converting to Japanese (ja-JP)', () => {
-    it('should add ja-JP prefix to English URL', () => {
-      expect(changeLanguageURL('/about', 'ja-JP')).toBe('/ja-JP/about')
+  describe('converting to Japanese (ja)', () => {
+    it('should add /ja prefix to English URL', () => {
+      expect(changeLanguageURL('/about', 'ja')).toBe('/ja/about')
     })
 
-    it('should add ja-JP prefix to root path', () => {
-      expect(changeLanguageURL('/', 'ja-JP')).toBe('/ja-JP/')
+    it('should add /ja prefix to root path', () => {
+      expect(changeLanguageURL('/', 'ja')).toBe('/ja/')
     })
 
     it('should handle multi-segment paths', () => {
-      expect(changeLanguageURL('/blog/post-1', 'ja-JP')).toBe('/ja-JP/blog/post-1')
+      expect(changeLanguageURL('/blog/post-1', 'ja')).toBe('/ja/blog/post-1')
     })
   })
 
-  describe('converting to English (en-US)', () => {
-    it('should remove ja-JP prefix', () => {
-      expect(changeLanguageURL('/ja-JP/about', 'en-US')).toBe('/about')
+  describe('converting to English (en)', () => {
+    it('should remove /ja prefix', () => {
+      expect(changeLanguageURL('/ja/about', 'en')).toBe('/about')
     })
 
-    it('should remove ja-JP prefix from multi-segment path', () => {
-      expect(changeLanguageURL('/ja-JP/blog/post-1', 'en-US')).toBe('/blog/post-1')
+    it('should remove /ja prefix from multi-segment path', () => {
+      expect(changeLanguageURL('/ja/blog/post-1', 'en')).toBe('/blog/post-1')
     })
 
-    it('should remove ja-jp prefix (lowercase)', () => {
-      expect(changeLanguageURL('/ja-jp/about', 'en-US')).toBe('/about')
+    it('should handle root path correctly', () => {
+      expect(changeLanguageURL('/ja/', 'en')).toBe('/')
     })
   })
 
   describe('same language (no change)', () => {
     it('should not change English URL when already English', () => {
-      expect(changeLanguageURL('/about', 'en-US')).toBe('/about')
+      expect(changeLanguageURL('/about', 'en')).toBe('/about')
     })
 
     it('should not change Japanese URL when already Japanese', () => {
-      expect(changeLanguageURL('/ja-JP/about', 'ja-JP')).toBe('/ja-JP/about')
+      expect(changeLanguageURL('/ja/about', 'ja')).toBe('/ja/about')
     })
   })
 
   describe('edge cases', () => {
     it('should handle root path to Japanese', () => {
-      expect(changeLanguageURL('/', 'ja-JP')).toBe('/ja-JP/')
+      expect(changeLanguageURL('/', 'ja')).toBe('/ja/')
     })
 
     it('should handle Japanese root path to English', () => {
-      expect(changeLanguageURL('/ja-JP/', 'en-US')).toBe('/')
+      expect(changeLanguageURL('/ja/', 'en')).toBe('/')
+    })
+
+    it('should handle uppercase /JA/ prefix removal', () => {
+      expect(changeLanguageURL('/JA/about', 'en')).toBe('/about')
+    })
+
+    it('should handle mixed case /Ja/ prefix removal', () => {
+      expect(changeLanguageURL('/Ja/blog', 'en')).toBe('/blog')
+    })
+  })
+
+  describe('input validation', () => {
+    it('should throw error if pathname does not start with /', () => {
+      expect(() => changeLanguageURL('about', 'ja')).toThrow('pathname must start with /')
     })
   })
 })
@@ -94,16 +112,16 @@ describe('getPathnameWithLangType', () => {
   })
 
   describe('Japanese language', () => {
-    it('should return path with /ja-JP/ prefix for "ja"', () => {
-      expect(getPathnameWithLangType('about', 'ja')).toBe('/ja-JP/about')
+    it('should return path with /ja/ prefix for "ja"', () => {
+      expect(getPathnameWithLangType('about', 'ja')).toBe('/ja/about')
     })
 
-    it('should return path with /ja-JP/ prefix for "ja-JP"', () => {
-      expect(getPathnameWithLangType('blog', 'ja-JP')).toBe('/ja-JP/blog')
+    it('should return path with /ja/ prefix for "ja-JP"', () => {
+      expect(getPathnameWithLangType('blog', 'ja-JP')).toBe('/ja/blog')
     })
 
     it('should handle any string containing "ja"', () => {
-      expect(getPathnameWithLangType('work', 'japanese')).toBe('/ja-JP/work')
+      expect(getPathnameWithLangType('work', 'japanese')).toBe('/ja/work')
     })
   })
 
@@ -117,64 +135,56 @@ describe('getPathnameWithLangType', () => {
     })
   })
 
+  describe('case-insensitive language codes', () => {
+    it('should handle uppercase EN language code', () => {
+      expect(getPathnameWithLangType('about', 'EN')).toBe('/about')
+    })
+
+    it('should handle uppercase JA language code', () => {
+      expect(getPathnameWithLangType('about', 'JA')).toBe('/ja/about')
+    })
+
+    it('should handle mixed case En language code', () => {
+      expect(getPathnameWithLangType('blog', 'En')).toBe('/blog')
+    })
+
+    it('should handle mixed case Ja language code', () => {
+      expect(getPathnameWithLangType('blog', 'Ja')).toBe('/ja/blog')
+    })
+
+    it('should handle uppercase EN-US language code', () => {
+      expect(getPathnameWithLangType('work', 'EN-US')).toBe('/work')
+    })
+
+    it('should handle uppercase JA-JP language code', () => {
+      expect(getPathnameWithLangType('work', 'JA-JP')).toBe('/ja/work')
+    })
+  })
+
   describe('property-based tests', () => {
     describe('getLanguageFromURL', () => {
-      it('should return "en-US" when pathname does not start with language code', () => {
+      it('should return "en" when pathname does not start with /ja/', () => {
         fc.assert(
           fc.property(
             fc
               .string({ minLength: 0, maxLength: 100 })
-              .filter((s) => s === '/' || !s.startsWith('/') || !/^\/[a-z]{2}-[a-z-]+/i.test(s)),
+              .filter((s) => !s.startsWith('/ja/') && s !== '/ja'),
             (pathname) => {
               const result = getLanguageFromURL(pathname)
-              expect(result).toBe('en-US')
+              expect(result).toBe('en')
             },
           ),
         )
       })
 
-      describe('common language code formats', () => {
-        it('should extract 2-letter language code from common language code formats', () => {
-          fc.assert(
-            fc.property(
-              fc.constantFrom('ja', 'en', 'fr', 'de', 'es', 'it', 'pt', 'zh', 'ko', 'ru'),
-              fc.constantFrom('JP', 'US', 'GB', 'CA', 'FR', 'DE', 'ES'),
-              fc.string({ minLength: 0, maxLength: 50 }),
-              (langCode, region, path) => {
-                const pathname = `/${langCode}-${region}${path ? `/${path}` : ''}`
-                const result = getLanguageFromURL(pathname)
-                // 実装では大文字小文字が保持される可能性があるので、小文字に変換して比較
-                expect(result.toLowerCase()).toBe(langCode.toLowerCase())
-              },
-            ),
-          )
-        })
-      })
-
-      describe('境界値テスト', () => {
-        it('should extract 2-letter language code from various pathname formats', () => {
-          fc.assert(
-            fc.property(
-              fc
-                .tuple(
-                  fc.string({ minLength: 2, maxLength: 2 }).filter((c) => /^[a-z]{2}$/i.test(c)),
-                  fc.string({ minLength: 2, maxLength: 10 }).filter((s) => /^[\w-]+$/.test(s)),
-                )
-                .map(([langCode, region]) => ({ langCode, region })),
-              fc.string({ minLength: 0, maxLength: 50 }),
-              ({ langCode, region }, path) => {
-                const pathname = `/${langCode}-${region}${path ? `/${path}` : ''}`
-                const result = getLanguageFromURL(pathname)
-                // 正規表現がマッチする場合のみ、言語コードが抽出される
-                if (/^\/(\w{2})-([\w-]{2,})/.test(pathname)) {
-                  expect(result.toLowerCase()).toBe(langCode.toLowerCase())
-                } else {
-                  expect(result).toBe('en-US')
-                }
-              },
-            ),
-          )
-        })
+      it('should return "ja" when pathname starts with /ja/', () => {
+        fc.assert(
+          fc.property(fc.string({ minLength: 1, maxLength: 100 }), (path) => {
+            const pathname = `/ja/${path}`
+            const result = getLanguageFromURL(pathname)
+            expect(result).toBe('ja')
+          }),
+        )
       })
     })
 
@@ -182,8 +192,8 @@ describe('getPathnameWithLangType', () => {
       it('should return a string for any pathname and target language', () => {
         fc.assert(
           fc.property(
-            fc.string({ minLength: 0, maxLength: 200 }),
-            fc.constantFrom('en-US', 'ja-JP' as const),
+            fc.string({ minLength: 1, maxLength: 200 }).filter((s) => s.startsWith('/')),
+            fc.constantFrom('en', 'ja' as const),
             (pathname, targetLang) => {
               const result = changeLanguageURL(pathname, targetLang)
               expect(typeof result).toBe('string')
@@ -195,12 +205,8 @@ describe('getPathnameWithLangType', () => {
       it('should be idempotent when converting to the same language', () => {
         fc.assert(
           fc.property(
-            fc.string({ minLength: 0, maxLength: 200 }).filter((s) => {
-              // 既に言語コードで始まっているパス、またはルートパス、または通常のパス
-              // 実装の制約を考慮して、有効なパス名のみをテスト
-              return s === '/' || s.startsWith('/') || s === ''
-            }),
-            fc.constantFrom('en-US', 'ja-JP' as const),
+            fc.string({ minLength: 1, maxLength: 200 }).filter((s) => s.startsWith('/')),
+            fc.constantFrom('en', 'ja' as const),
             (pathname, targetLang) => {
               const result1 = changeLanguageURL(pathname, targetLang)
               const result2 = changeLanguageURL(result1, targetLang)
@@ -215,11 +221,10 @@ describe('getPathnameWithLangType', () => {
           fc.property(
             fc
               .string({ minLength: 1, maxLength: 100 })
-              .filter((s) => s.startsWith('/') && !/^\/[a-z]{2}-[a-z-]+/i.test(s)),
-            fc.constantFrom('en-US', 'ja-JP' as const),
+              .filter((s) => s.startsWith('/') && !s.startsWith('/ja/')),
+            fc.constantFrom('en', 'ja' as const),
             (pathname, targetLang) => {
               const result = changeLanguageURL(pathname, targetLang)
-              // パスの構造が保持される（言語プレフィックス以外）
               expect(result).toMatch(/^\//)
               expect(result.length).toBeGreaterThan(0)
             },
@@ -244,36 +249,14 @@ describe('getPathnameWithLangType', () => {
       })
 
       describe('common language codes', () => {
-        it('should return path with /ja-JP/ prefix for common Japanese language codes', () => {
+        it('should return path with /ja/ prefix for common Japanese language codes', () => {
           fc.assert(
             fc.property(
               fc.string({ minLength: 0, maxLength: 100 }),
               fc.constantFrom('ja', 'ja-JP', 'japanese', 'ja_JP'),
               (targetPath, lang) => {
                 const result = getPathnameWithLangType(targetPath, lang)
-                expect(result).toMatch(/^\/ja-JP\//)
-              },
-            ),
-          )
-        })
-
-        it('should handle case-sensitivity: uppercase language codes expose bug', () => {
-          fc.assert(
-            fc.property(
-              fc.string({ minLength: 0, maxLength: 100 }),
-              fc.constantFrom('JA', 'JA-JP', 'Ja', 'Ja-JP', 'EN', 'EN-US'),
-              (targetPath, lang) => {
-                const result = getPathnameWithLangType(targetPath, lang)
-                // Note: Current implementation uses case-sensitive regex (/ja/ and /en/)
-                // Uppercase 'JA' won't match /ja/, so it returns /JA/targetPath instead of /ja-JP/targetPath
-                // This test exposes the bug - the function should handle case-insensitive language codes
-                if (/JA/i.test(lang) && !/EN/i.test(lang)) {
-                  // Current buggy behavior: uppercase 'JA' returns /JA/targetPath
-                  expect(result).toBe(`/${lang}/${targetPath}`)
-                } else if (/EN/i.test(lang)) {
-                  // Current buggy behavior: uppercase 'EN' returns /EN/targetPath instead of /targetPath
-                  expect(result).toBe(`/${lang}/${targetPath}`)
-                }
+                expect(result).toMatch(/^\/ja\//)
               },
             ),
           )
@@ -319,8 +302,12 @@ describe('getPathnameWithLangType', () => {
               (targetPath, lang) => {
                 const result = getPathnameWithLangType(targetPath, lang)
                 expect(result).toMatch(/^\//)
-                // 空文字列や長い文字列は「ja」や「en」を含まない可能性が高い
-                if (!/ja/.test(lang) && !/en/.test(lang)) {
+                // Verify the result matches expected patterns
+                if (/en/i.test(lang) && !/ja/i.test(lang)) {
+                  expect(result).toBe(`/${targetPath}`)
+                } else if (/ja/i.test(lang)) {
+                  expect(result).toBe(`/ja/${targetPath}`)
+                } else {
                   expect(result).toBe(`/${lang}/${targetPath}`)
                 }
               },
@@ -337,20 +324,21 @@ describe('getPathnameWithLangType', () => {
                 fc
                   .tuple(
                     fc.constant('ja'),
-                    fc.string({ minLength: 1, maxLength: 1 }).filter((c) => c !== 'e'),
+                    fc
+                      .string({ minLength: 1, maxLength: 1 })
+                      .filter((c) => c.toLowerCase() !== 'e'),
                   )
                   .map(([prefix, suffix]) => prefix + suffix),
                 fc
                   .tuple(
                     fc.constant('ja'),
-                    fc.string({ minLength: 10, maxLength: 20 }).filter((s) => !s.includes('en')),
+                    fc.string({ minLength: 10, maxLength: 20 }).filter((s) => !/en/i.test(s)),
                   )
                   .map(([prefix, suffix]) => prefix + suffix),
               ),
               (targetPath, lang) => {
                 const result = getPathnameWithLangType(targetPath, lang)
-                // "ja"で始まり"en"を含まない文字列の場合、日本語プレフィックスが付く
-                expect(result).toMatch(/^\/ja-JP\//)
+                expect(result).toMatch(/^\/ja\//)
               },
             ),
           )
@@ -366,7 +354,7 @@ describe('getPathnameWithLangType', () => {
                 fc
                   .tuple(
                     fc.constant('ja'),
-                    fc.string({ minLength: 0, maxLength: 10 }).filter((s) => !s.includes('en')),
+                    fc.string({ minLength: 0, maxLength: 10 }).filter((s) => !/en/i.test(s)),
                   )
                   .map(([prefix, suffix]) => prefix + suffix),
                 fc
@@ -374,16 +362,18 @@ describe('getPathnameWithLangType', () => {
                   .map(([prefix, suffix]) => prefix + suffix),
                 fc
                   .tuple(
-                    fc.string({ minLength: 1, maxLength: 1 }).filter((c) => c !== 'j' && c !== 'e'),
+                    fc
+                      .string({ minLength: 1, maxLength: 1 })
+                      .filter((c) => c.toLowerCase() !== 'j' && c.toLowerCase() !== 'e'),
                     fc.string({ minLength: 0, maxLength: 10 }),
                   )
                   .map(([first, rest]) => first + rest),
               ),
               (targetPath, lang) => {
                 const result = getPathnameWithLangType(targetPath, lang)
-                if (/ja/.test(lang) && !/en/.test(lang)) {
-                  expect(result).toMatch(/^\/ja-JP\//)
-                } else if (/en/.test(lang)) {
+                if (/ja/i.test(lang) && !/en/i.test(lang)) {
+                  expect(result).toMatch(/^\/ja\//)
+                } else if (/en/i.test(lang)) {
                   expect(result).toBe(`/${targetPath}`)
                 } else {
                   expect(result).toBe(`/${lang}/${targetPath}`)

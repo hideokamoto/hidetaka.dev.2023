@@ -1,50 +1,43 @@
+/**
+ * Determine the language code indicated by a URL pathname.
+ *
+ * @param pathname - The URL pathname to inspect (should start with `/`)
+ * @returns `'ja'` if `pathname` starts with `/ja/` or is exactly `/ja`, `'en'` otherwise
+ */
 export function getLanguageFromURL(pathname: string) {
-  // ja,en,es
-  //const langCodeMatch = pathname.match(/\/([a-z]{2}-?[a-z]{0,2})/);
-  // ja-JP, en-US
-  const langCodeMatch = pathname.match(/^\/(\w{2})-([\w-]{2,})/)
-  return langCodeMatch ? langCodeMatch[1] : 'en-US'
+  const lowerPathname = pathname.toLowerCase()
+  if (lowerPathname.startsWith('/ja/') || lowerPathname === '/ja') {
+    return 'ja'
+  }
+  return 'en'
 }
 
 /**
- * ロケールが日本語かどうかを判定
- * @param locale - ロケール文字列（例: 'ja', 'ja-JP', 'en', 'en-US'）
- * @returns 日本語の場合はtrue、それ以外はfalse
+ * Determine whether a locale represents Japanese.
+ *
+ * @param locale - Locale string (e.g., "ja", "ja-JP", "en", "en-US"); optional
+ * @returns `true` if `locale` starts with `"ja"`, `false` otherwise
  */
 export function isJapanese(locale?: string): boolean {
   if (!locale) return false
   return /^ja/.test(locale)
 }
 
-export const changeLanguageURL = (
-  pathname: string,
-  targetLang: 'en-US' | 'ja-JP' = 'en-US',
-): string => {
-  // Normalize pathname: trim and ensure it starts with /
-  let normalized = pathname.trim()
-  if (!normalized) return targetLang === 'en-US' ? '/' : `/${targetLang}/`
-  if (!normalized.startsWith('/')) normalized = `/${normalized}`
-
-  const lang = getLanguageFromURL(normalized)
-  if (lang === targetLang) return normalized
-
-  if (lang === 'en-US') {
-    // Adding language prefix to English URL
-    if (normalized === '/') return `/${targetLang}/`
-    return `/${targetLang}${normalized}`
+export const changeLanguageURL = (pathname: string, targetLang: 'en' | 'ja' = 'en'): string => {
+  if (!pathname.startsWith('/')) {
+    throw new Error('pathname must start with /')
   }
+  const lang = getLanguageFromURL(pathname)
+  if (lang === targetLang) return pathname
 
-  // Removing or replacing existing language prefix
-  const replaceTarget = targetLang === 'en-US' ? '' : `/${targetLang}`
-  const result = normalized.replace(/^\/(\w{2})-([\w-]{2,})/, replaceTarget)
-
-  // Ensure result always starts with / and handle edge cases
-  if (!result || result === '') return '/'
-  if (!result.startsWith('/')) return `/${result}`
-  return result
+  if (targetLang === 'en') {
+    return pathname.replace(/^\/ja/i, '') || '/'
+  } else {
+    return `/ja${pathname}`
+  }
 }
 export const getPathnameWithLangType = (targetPath: string, lang: string): string => {
-  if (/en/.test(lang)) return `/${targetPath}`
-  if (/ja/.test(lang)) return `/ja-JP/${targetPath}`
+  if (/en/i.test(lang)) return `/${targetPath}`
+  if (/ja/i.test(lang)) return `/ja/${targetPath}`
   return `/${lang}/${targetPath}`
 }

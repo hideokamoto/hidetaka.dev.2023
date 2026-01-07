@@ -8,6 +8,19 @@ type HatenaStarProps = {
   className?: string
 }
 
+declare global {
+  interface Window {
+    Hatena?: {
+      Star: {
+        SiteConfig?: Record<string, unknown>
+        EntryLoader?: {
+          loadEntries(): void
+        }
+      }
+    }
+  }
+}
+
 /**
  * はてなスター (Hatena Star) コンポーネント
  *
@@ -19,8 +32,8 @@ type HatenaStarProps = {
 export default function HatenaStar({ url, title, className = '' }: HatenaStarProps) {
   const handleScriptLoad = () => {
     // スクリプト読み込み後にはてなスターを初期化
-    if (typeof window !== 'undefined' && (window as any).Hatena?.Star) {
-      ;(window as any).Hatena.Star.SiteConfig = {
+    if (typeof window !== 'undefined' && window.Hatena?.Star) {
+      window.Hatena.Star.SiteConfig = {
         entryNodes: {
           'div.hatena-star-container': {
             uri: 'span.hatena-star-uri',
@@ -31,8 +44,8 @@ export default function HatenaStar({ url, title, className = '' }: HatenaStarPro
       }
 
       // スターを初期化
-      if ((window as any).Hatena.Star.EntryLoader) {
-        ;(window as any).Hatena.Star.EntryLoader.loadEntries()
+      if (window.Hatena.Star.EntryLoader) {
+        window.Hatena.Star.EntryLoader.loadEntries()
       }
     }
   }
