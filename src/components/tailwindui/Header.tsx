@@ -135,17 +135,11 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
   return (
     <>
       {/* Backdrop */}
-      <div
-        role="button"
-        tabIndex={0}
-        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
+      <button
+        type="button"
         onClick={onClose}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            onClose()
-          }
-        }}
+        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
+        aria-label="Close menu"
       />
 
       {/* Menu Panel */}
