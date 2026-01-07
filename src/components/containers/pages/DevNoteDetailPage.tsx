@@ -113,13 +113,15 @@ export default function DevNoteDetailPage({
           )}
         </div>
 
-        {/* 記事アクション（Markdown / 要約） */}
+        {/* 記事アクション（Markdown / 要約 / 翻訳） */}
         <ArticleActions
           lang={lang}
           slug={note.slug}
           basePath={basePath}
           title={note.title.rendered}
           contentHtml={note.content.rendered}
+          showTranslation
+          translationContentSelector="article"
         />
 
         {/* コンテンツ */}

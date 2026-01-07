@@ -86,13 +86,15 @@ export default function NewsDetailPage({
           />
         </div>
 
-        {/* 記事アクション（Markdown / 要約） */}
+        {/* 記事アクション（Markdown / 要約 / 翻訳） */}
         <ArticleActions
           lang={lang}
           slug={product.slug}
           basePath={basePath}
           title={product.title.rendered}
           contentHtml={product.content.rendered}
+          showTranslation
+          translationContentSelector="article"
         />
 
         {/* コンテンツ */}
