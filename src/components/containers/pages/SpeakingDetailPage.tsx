@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
-import ArticleSummary from '@/components/ui/ArticleSummary'
+import ArticleActions from '@/components/ui/ArticleActions'
 import DateDisplay from '@/components/ui/DateDisplay'
 import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
@@ -107,8 +107,17 @@ export default function SpeakingDetailPage({
           </div>
         </div>
 
-        {/* 記事要約 (Built-in AI) */}
-        <ArticleSummary content={event.content.rendered} locale={lang} className="mt-6" />
+        {/* 記事アクション（Markdown / 要約 / 翻訳） */}
+        <ArticleActions
+          lang={lang}
+          slug={event.slug}
+          basePath={basePath}
+          title={event.title.rendered}
+          contentHtml={event.content.rendered}
+          showTranslation
+          translationContentSelector="article"
+          className="mt-6"
+        />
 
         {/* コンテンツ */}
         <div
