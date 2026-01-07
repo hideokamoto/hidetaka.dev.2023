@@ -33,7 +33,7 @@ export default function ArticleActions({
     <section className={cn(DETAIL_PAGE_SECTION_CLASS, className)} aria-label={summaryLabel}>
       {/* 
         スマホ: <details>でドロップダウン
-        PC: summaryを隠し、アクションは常時表示 (UAのdisplay:noneをsm:flexで上書き)
+        PC: summaryを隠し、アクションは常時表示（UAのdisplay:noneは詳細度の高いセレクタで上書き）
       */}
       <details className="group">
         <summary
@@ -57,7 +57,7 @@ export default function ArticleActions({
           </svg>
         </summary>
 
-        <div className="mt-3 flex flex-col gap-3 sm:mt-0 sm:flex sm:flex-row sm:flex-wrap sm:items-start">
+        <div className="mt-3 flex flex-col gap-3 sm:mt-0 sm:flex sm:flex-row sm:flex-wrap sm:items-start sm:[details:not([open])_>_&]:flex">
           <ViewMarkdownButton slug={slug} basePath={basePath} title={title} language={lang} />
           <ArticleSummary content={contentHtml} locale={lang} />
           {showTranslation && (
