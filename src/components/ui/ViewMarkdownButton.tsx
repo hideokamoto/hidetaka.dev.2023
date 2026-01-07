@@ -1,5 +1,6 @@
 import { SITE_CONFIG } from '@/config'
-import { getCTAButtonStyles } from '@/libs/componentStyles.utils'
+import { getActionButtonStyles } from '@/libs/componentStyles.utils'
+import { cn } from '@/libs/utils/cn'
 
 /**
  * Props for the ViewMarkdownButton component
@@ -57,21 +58,18 @@ export default function ViewMarkdownButton({
   const markdownUrl = new URL(`${basePath}/${slug}.md`, SITE_CONFIG.url).toString()
 
   // Get button styles from utility
-  const buttonStyles = getCTAButtonStyles('secondary')
-  const wrapperStyles = 'mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700'
+  const buttonStyles = getActionButtonStyles('secondary')
 
   return (
-    <div className={wrapperStyles + (className ? ` ${className}` : '')}>
-      <a
-        href={markdownUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        title={`${buttonText}: ${title}`}
-        className={buttonStyles}
-      >
-        {buttonText}
-        <span className="transition-transform group-hover:translate-x-1">→</span>
-      </a>
-    </div>
+    <a
+      href={markdownUrl}
+      target="_blank"
+      rel="noopener noreferrer"
+      title={`${buttonText}: ${title}`}
+      className={cn(buttonStyles, className)}
+    >
+      {buttonText}
+      <span className="transition-transform group-hover:translate-x-0.5">→</span>
+    </a>
   )
 }

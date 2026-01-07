@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { getActionButtonStyles } from '@/libs/componentStyles.utils'
 import type { AvailabilityResult } from '@/libs/translator'
 import { checkTranslatorAvailability, createTranslator, translate } from '@/libs/translator'
 import { isJapanese } from '@/libs/urlUtils/lang.util'
@@ -16,20 +17,22 @@ type BlogTranslationProps = {
 // i18n対応のUIテキスト
 const UI_TEXT = {
   ja: {
-    translateButton: '日本語を英語に翻訳',
+    translateButton: '日本語を英語に翻訳（Chromeのみ）',
     cancelButton: 'キャンセル',
     restoreButton: '元に戻す',
     translating: '翻訳中...',
     downloading: 'AIモデルをダウンロード中です。初回のみ時間がかかります。',
+    unavailable: 'Chrome（最新版）のBuilt-in AIが必要です。',
     error: '翻訳中にエラーが発生しました。',
     translationNote: '※ この翻訳はブラウザのAI機能を使用しています',
   },
   en: {
-    translateButton: 'Translate to Japanese',
+    translateButton: 'Translate (Chrome only)',
     cancelButton: 'Cancel',
     restoreButton: 'Restore Original',
     translating: 'Translating...',
     downloading: 'Downloading AI model. This may take a while on first use.',
+    unavailable: 'Requires Chrome (latest) built-in AI.',
     error: 'An error occurred during translation.',
     translationNote: '※ This translation is powered by built-in browser AI',
   },
@@ -143,12 +146,19 @@ export default function BlogTranslation({
     )
   }
 
-  // 利用できない場合は何も表示しない（本番環境）
-  if (availability === 'unavailable') {
-    return null
-  }
+  const isExpanded = Boolean(
+    availability === 'unavailable' ||
+      availability === 'downloading' ||
+      isTranslating ||
+      isTranslated ||
+      error,
+  )
 
   const handleTranslate = async () => {
+    if (availability === 'unavailable') {
+      return
+    }
+
     setIsTranslating(true)
     setError('')
 
@@ -256,16 +266,16 @@ export default function BlogTranslation({
   }
 
   return (
-    <div className={cn('mb-6', className)}>
+    <div className={cn('w-full', !isExpanded && 'sm:w-auto', isExpanded && 'sm:w-full', className)}>
       {/* 翻訳ボタン */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-3">
         {!isTranslated && !isTranslating && (
           <button
             type="button"
             onClick={handleTranslate}
-            disabled={availability === 'downloading'}
+            disabled={availability === 'downloading' || availability === 'unavailable'}
             aria-label={text.translateButton}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-400 disabled:cursor-not-allowed rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-zinc-900"
+            className={getActionButtonStyles('primary')}
           >
             <svg
               className="size-4"
@@ -290,7 +300,7 @@ export default function BlogTranslation({
             type="button"
             onClick={handleCancel}
             aria-label={text.cancelButton}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-zinc-900"
+            className={getActionButtonStyles('danger')}
           >
             {text.cancelButton}
           </button>
@@ -301,7 +311,7 @@ export default function BlogTranslation({
             type="button"
             onClick={handleRestore}
             aria-label={text.restoreButton}
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-slate-600 hover:bg-slate-700 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 dark:focus:ring-offset-zinc-900"
+            className={getActionButtonStyles('neutral')}
           >
             <svg
               className="size-4"
@@ -322,9 +332,14 @@ export default function BlogTranslation({
         )}
       </div>
 
+      {/* 利用できない場合の注記 */}
+      {availability === 'unavailable' && (
+        <p className="mt-2 text-xs text-slate-600 dark:text-slate-400">{text.unavailable}</p>
+      )}
+
       {/* ダウンロード中の警告 */}
       {availability === 'downloading' && (
-        <p className="text-sm text-amber-600 dark:text-amber-400 mb-4">⚠️ {text.downloading}</p>
+        <p className="mt-2 text-sm text-amber-600 dark:text-amber-400">⚠️ {text.downloading}</p>
       )}
 
       {/* ローディング状態 */}
@@ -351,14 +366,14 @@ export default function BlogTranslation({
 
       {/* 翻訳完了メッセージ */}
       {isTranslated && (
-        <div className="p-4 mb-4 text-sm text-indigo-700 bg-indigo-50 dark:bg-indigo-900/20 dark:text-indigo-300 rounded-lg">
+        <div className="mt-3 rounded-lg bg-indigo-50 p-4 text-sm text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-300">
           {text.translationNote}
         </div>
       )}
 
       {/* エラーメッセージ */}
       {error && (
-        <div className="p-4 mb-4 text-sm text-red-700 bg-red-50 dark:bg-red-900/20 dark:text-red-400 rounded-lg">
+        <div className="mt-3 rounded-lg bg-red-50 p-4 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400">
           {error}
         </div>
       )}
