@@ -324,13 +324,17 @@ describe('getPathnameWithLangType', () => {
                 fc
                   .tuple(
                     fc.constant('ja'),
-                    fc.string({ minLength: 1, maxLength: 1 }).filter((c) => c !== 'e'),
+                    fc
+                      .string({ minLength: 1, maxLength: 1 })
+                      .filter((c) => c.toLowerCase() !== 'e'),
                   )
                   .map(([prefix, suffix]) => prefix + suffix),
                 fc
                   .tuple(
                     fc.constant('ja'),
-                    fc.string({ minLength: 10, maxLength: 20 }).filter((s) => !s.includes('en')),
+                    fc
+                      .string({ minLength: 10, maxLength: 20 })
+                      .filter((s) => !/en/i.test(s)),
                   )
                   .map(([prefix, suffix]) => prefix + suffix),
               ),
@@ -352,7 +356,9 @@ describe('getPathnameWithLangType', () => {
                 fc
                   .tuple(
                     fc.constant('ja'),
-                    fc.string({ minLength: 0, maxLength: 10 }).filter((s) => !s.includes('en')),
+                    fc
+                      .string({ minLength: 0, maxLength: 10 })
+                      .filter((s) => !/en/i.test(s)),
                   )
                   .map(([prefix, suffix]) => prefix + suffix),
                 fc
@@ -360,16 +366,18 @@ describe('getPathnameWithLangType', () => {
                   .map(([prefix, suffix]) => prefix + suffix),
                 fc
                   .tuple(
-                    fc.string({ minLength: 1, maxLength: 1 }).filter((c) => c !== 'j' && c !== 'e'),
+                    fc
+                      .string({ minLength: 1, maxLength: 1 })
+                      .filter((c) => c.toLowerCase() !== 'j' && c.toLowerCase() !== 'e'),
                     fc.string({ minLength: 0, maxLength: 10 }),
                   )
                   .map(([first, rest]) => first + rest),
               ),
               (targetPath, lang) => {
                 const result = getPathnameWithLangType(targetPath, lang)
-                if (/ja/.test(lang) && !/en/.test(lang)) {
+                if (/ja/i.test(lang) && !/en/i.test(lang)) {
                   expect(result).toMatch(/^\/ja\//)
-                } else if (/en/.test(lang)) {
+                } else if (/en/i.test(lang)) {
                   expect(result).toBe(`/${targetPath}`)
                 } else {
                   expect(result).toBe(`/${lang}/${targetPath}`)
