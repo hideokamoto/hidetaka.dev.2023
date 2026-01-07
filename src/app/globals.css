@@ -111,6 +111,10 @@
 
 /* Japanese typography utilities */
 @layer utilities {
+  .font-japanese {
+    font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Helvetica Neue", Arial, sans-serif;
+  }
+
   .japanese-typography {
     text-autospace: normal;
     overflow-wrap: anywhere;

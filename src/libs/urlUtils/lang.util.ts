@@ -20,13 +20,28 @@ export const changeLanguageURL = (
   pathname: string,
   targetLang: 'en-US' | 'ja-JP' = 'en-US',
 ): string => {
-  const lang = getLanguageFromURL(pathname)
-  if (lang === targetLang) return pathname
+  // Normalize pathname: trim and ensure it starts with /
+  let normalized = pathname.trim()
+  if (!normalized) return targetLang === 'en-US' ? '/' : `/${targetLang}/`
+  if (!normalized.startsWith('/')) normalized = `/${normalized}`
+
+  const lang = getLanguageFromURL(normalized)
+  if (lang === targetLang) return normalized
+
   if (lang === 'en-US') {
-    return `/${targetLang}${pathname}`
+    // Adding language prefix to English URL
+    if (normalized === '/') return `/${targetLang}/`
+    return `/${targetLang}${normalized}`
   }
+
+  // Removing or replacing existing language prefix
   const replaceTarget = targetLang === 'en-US' ? '' : `/${targetLang}`
-  return pathname.replace(/^\/(\w{2})-([\w-]{2,})/, replaceTarget)
+  const result = normalized.replace(/^\/(\w{2})-([\w-]{2,})/, replaceTarget)
+
+  // Ensure result always starts with / and handle edge cases
+  if (!result || result === '') return '/'
+  if (!result.startsWith('/')) return `/${result}`
+  return result
 }
 export const getPathnameWithLangType = (targetPath: string, lang: string): string => {
   if (/en/.test(lang)) return `/${targetPath}`
