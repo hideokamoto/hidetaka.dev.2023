@@ -105,3 +105,27 @@ const CTA_BUTTON_VARIANT_STYLES = {
 export function getCTAButtonStyles(variant: CTAButtonVariant): string {
   return `${CTA_BUTTON_BASE_STYLES} ${CTA_BUTTON_VARIANT_STYLES[variant]}`
 }
+
+// Action Button component types (smaller than CTA buttons; used for article actions, etc.)
+export type ActionButtonVariant = 'primary' | 'secondary' | 'danger' | 'neutral'
+
+// Action Button style constants (defined at module level for performance)
+const ACTION_BUTTON_BASE_STYLES =
+  'group inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto dark:focus:ring-offset-zinc-900'
+
+const ACTION_BUTTON_VARIANT_STYLES = {
+  primary: 'bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-indigo-500',
+  secondary:
+    'border border-zinc-200 bg-white text-zinc-900 hover:bg-zinc-50 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:hover:bg-zinc-800',
+  danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
+  neutral: 'bg-slate-600 text-white hover:bg-slate-700 focus:ring-slate-500',
+} as const
+
+/**
+ * Get complete styles for Action Button component
+ * @param variant - Button variant type
+ * @returns Combined base and variant styles
+ */
+export function getActionButtonStyles(variant: ActionButtonVariant): string {
+  return `${ACTION_BUTTON_BASE_STYLES} ${ACTION_BUTTON_VARIANT_STYLES[variant]}`
+}
