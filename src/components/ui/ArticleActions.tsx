@@ -29,27 +29,17 @@ export default function ArticleActions({
   const isJa = lang.startsWith('ja')
   const summaryLabel = isJa ? 'この記事の操作' : 'Article actions'
 
-  const actions = (
-    <>
-      <ViewMarkdownButton slug={slug} basePath={basePath} title={title} language={lang} />
-      <ArticleSummary content={contentHtml} locale={lang} />
-      {showTranslation && (
-        <BlogTranslation locale={lang} contentSelector={translationContentSelector} />
-      )}
-    </>
-  )
-
   return (
     <section className={cn(DETAIL_PAGE_SECTION_CLASS, className)} aria-label={summaryLabel}>
       {/* 
         スマホ: <details>でドロップダウン
-        PC: <details>は使わず、アクションは常時表示（UAの <details> 挙動に依存しない）
+        PC: summaryを隠し、アクションは常時表示（UAのdisplay:noneは詳細度の高いセレクタで上書き）
       */}
-      <details className="group sm:hidden">
+      <details className="group">
         <summary
           className={cn(
             getActionButtonStyles('secondary'),
-            '[&::-webkit-details-marker]:hidden justify-between',
+            '[&::-webkit-details-marker]:hidden justify-between sm:hidden',
           )}
         >
           <span>{summaryLabel}</span>
@@ -67,12 +57,14 @@ export default function ArticleActions({
           </svg>
         </summary>
 
-        <div className="mt-3 flex flex-col gap-3">{actions}</div>
+        <div className="mt-3 flex flex-col gap-3 sm:mt-0 sm:flex sm:flex-row sm:flex-wrap sm:items-start sm:[details:not([open])_>_&]:flex">
+          <ViewMarkdownButton slug={slug} basePath={basePath} title={title} language={lang} />
+          <ArticleSummary content={contentHtml} locale={lang} />
+          {showTranslation && (
+            <BlogTranslation locale={lang} contentSelector={translationContentSelector} />
+          )}
+        </div>
       </details>
-
-      <div className="mt-3 hidden flex-col gap-3 sm:mt-0 sm:flex sm:flex-row sm:flex-wrap sm:items-start">
-        {actions}
-      </div>
     </section>
   )
 }
