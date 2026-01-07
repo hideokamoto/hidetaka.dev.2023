@@ -88,12 +88,9 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
         OG_IMAGE_GEN_AUTH_TOKEN?: string
       }
     }
+
     const typedEnv = context.env
     const ogImageGenerator = typedEnv.OG_IMAGE_GENERATOR
-    if (!ogImageGenerator) {
-      logger.error('OG_IMAGE_GENERATOR Service Binding is not available')
-      return new Response('Service Binding not available', { status: 500 })
-    }
 
     // 新しいWorkerのエンドポイントURLを構築
     const ogImageUrl = new URL('https://cf-ogp-image-gen-worker.wp-kyoto.workers.dev/generate')
@@ -107,8 +104,22 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
       headers.set('Authorization', `Bearer ${authToken}`)
     }
 
-    // Service Binding経由でOG画像生成Workerを呼び出す
-    const response = await ogImageGenerator.fetch(ogImageUrl, { headers })
+    // Service Bindingが利用可能な場合はそれを使用、そうでない場合は通常のfetchを使用
+    // 開発環境（Next.js dev server）ではService Bindingがローカル開発セッションを見つけられないため、通常のfetchにフォールバック
+    let response: Response
+    if (ogImageGenerator) {
+      response = await ogImageGenerator.fetch(ogImageUrl, { headers })
+
+      // Service Bindingが503エラーを返し、ローカル開発セッションが見つからない場合は通常のfetchにフォールバック
+      if (!response.ok && response.status === 503) {
+        const responseBodyText = await response.clone().text().catch(() => '')
+        if (responseBodyText.includes("Couldn't find a local dev session")) {
+          response = await fetch(ogImageUrl, { headers })
+        }
+      }
+    } else {
+      response = await fetch(ogImageUrl, { headers })
+    }
 
     // エラーハンドリング
     if (!response.ok) {
