@@ -23,6 +23,105 @@ export type UnifiedEvent =
   | (MicroCMSEventsRecord & { type: 'announcement'; source: 'microcms' })
   | (WPEvent & { type: 'report'; source: 'wordpress' })
 
+// イベントリンクコンポーネント
+function EventLinks({
+  event,
+  lang,
+  link,
+  isInternalLink,
+}: {
+  event: UnifiedEvent
+  lang: string
+  link: string
+  isInternalLink: boolean
+}) {
+  const isAnnouncement = event.type === 'announcement'
+
+  if (isInternalLink) {
+    return (
+      <Link
+        href={link}
+        className="flex items-center text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {lang === 'ja' ? '記事を読む' : 'Read Article'}
+        <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+          />
+        </svg>
+      </Link>
+    )
+  }
+
+  return (
+    <>
+      <a
+        href={link}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {isAnnouncement
+          ? lang === 'ja'
+            ? 'イベントページ'
+            : 'Event Page'
+          : lang === 'ja'
+            ? '記事を読む'
+            : 'Read Article'}
+        <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+          />
+        </svg>
+      </a>
+      {isAnnouncement && event.slide_url && (
+        <a
+          href={event.slide_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+        >
+          {lang === 'ja' ? 'スライド' : 'Slides'}
+          <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+            />
+          </svg>
+        </a>
+      )}
+      {isAnnouncement && event.blog_url && (
+        <a
+          href={event.blog_url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+        >
+          {lang === 'ja' ? 'ブログ' : 'Blog'}
+          <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+            />
+          </svg>
+        </a>
+      )}
+    </>
+  )
+}
+
 // 統一されたSpeakingカードコンポーネント
 function UnifiedSpeakingCard({
   event,
@@ -37,7 +136,7 @@ function UnifiedSpeakingCard({
   const isReport = event.type === 'report'
 
   // 日付の取得
-  const date = isAnnouncement ? new Date(event.date) : new Date(event.date)
+  const date = new Date(event.date)
   const year = date.getFullYear().toString()
 
   // タイトルの取得
@@ -111,90 +210,7 @@ function UnifiedSpeakingCard({
 
           {/* Links */}
           <div className="flex items-center gap-4 mt-2">
-            {link && isInternalLink ? (
-              <Link
-                href={link}
-                className="flex items-center text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {lang === 'ja' ? '記事を読む' : 'Read Article'}
-                <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                  />
-                </svg>
-              </Link>
-            ) : (
-              link && (
-                <a
-                  href={link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  {isAnnouncement
-                    ? lang === 'ja'
-                      ? 'イベントページ'
-                      : 'Event Page'
-                    : lang === 'ja'
-                      ? '記事を読む'
-                      : 'Read Article'}
-                  <svg
-                    className="ml-1 h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                    />
-                  </svg>
-                </a>
-              )
-            )}
-            {isAnnouncement && event.slide_url && (
-              <a
-                href={event.slide_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
-              >
-                {lang === 'ja' ? 'スライド' : 'Slides'}
-                <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                  />
-                </svg>
-              </a>
-            )}
-            {isAnnouncement && event.blog_url && (
-              <a
-                href={event.blog_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
-              >
-                {lang === 'ja' ? 'ブログ' : 'Blog'}
-                <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                  />
-                </svg>
-              </a>
-            )}
+            {link && <EventLinks event={event} lang={lang} link={link} isInternalLink={isInternalLink} />}
           </div>
         </div>
       </div>
@@ -526,29 +542,25 @@ export default function SpeakingPageContent({
     [searchQuery],
   )
 
-  // フィルターと検索を適用
-  const filteredEvents = useMemo(() => {
-    let items = events.filter((event) => {
-      // タイプフィルター
+  // フィルター適用のヘルパー関数
+  const matchesFilters = useCallback(
+    (event: UnifiedEvent): boolean => {
       if (filterType !== null && event.type !== filterType) return false
-
-      // 場所フィルター（告知のみ）
-      if (filterPlace !== null) {
-        if (event.type !== 'announcement' || event.place !== filterPlace) return false
-      }
-
-      // 年フィルター
+      if (filterPlace !== null && (event.type !== 'announcement' || event.place !== filterPlace))
+        return false
       if (filterYear !== null) {
         const date = new Date(event.date)
         if (Number.isNaN(date.getTime()) || date.getFullYear().toString() !== filterYear)
           return false
       }
-
       return true
-    })
+    },
+    [filterType, filterPlace, filterYear],
+  )
 
-    // 検索フィルター
-    items = items.filter(matchesSearch)
+  // フィルターと検索を適用
+  const filteredEvents = useMemo(() => {
+    const items = events.filter((event) => matchesFilters(event) && matchesSearch(event))
 
     // 日付順にソート（新しい順）
     items.sort((a, b) => {
@@ -558,7 +570,7 @@ export default function SpeakingPageContent({
     })
 
     return items
-  }, [events, filterType, filterPlace, filterYear, matchesSearch])
+  }, [events, matchesFilters, matchesSearch])
 
   // カウント計算
   const counts = useMemo(() => {

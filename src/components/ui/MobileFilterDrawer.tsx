@@ -53,17 +53,11 @@ export default function MobileFilterDrawer({
   return (
     <>
       {/* Backdrop */}
-      <div
-        role="button"
-        tabIndex={0}
-        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
+      <button
+        type="button"
         onClick={onClose}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault()
-            onClose()
-          }
-        }}
+        className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
+        aria-label="Close filter"
       />
 
       {/* Drawer Panel */}
@@ -102,8 +96,8 @@ export default function MobileFilterDrawer({
               </div>
 
               {/* フィルターグループ */}
-              {filterGroups.map((group, groupIndex) => (
-                <div key={groupIndex}>
+              {filterGroups.map((group) => (
+                <div key={group.title}>
                   <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
                     {group.title}
                   </h3>

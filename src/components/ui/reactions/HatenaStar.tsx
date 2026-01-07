@@ -19,7 +19,9 @@ type HatenaStarProps = {
 export default function HatenaStar({ url, title, className = '' }: HatenaStarProps) {
   const handleScriptLoad = () => {
     // スクリプト読み込み後にはてなスターを初期化
+    // biome-ignore lint/suspicious/noExplicitAny: Hatena Star APIは外部ライブラリのため型定義がない
     if (typeof window !== 'undefined' && (window as any).Hatena?.Star) {
+      // biome-ignore lint/suspicious/noExplicitAny: Hatena Star APIは外部ライブラリのため型定義がない
       ;(window as any).Hatena.Star.SiteConfig = {
         entryNodes: {
           'div.hatena-star-container': {
@@ -31,7 +33,9 @@ export default function HatenaStar({ url, title, className = '' }: HatenaStarPro
       }
 
       // スターを初期化
+      // biome-ignore lint/suspicious/noExplicitAny: Hatena Star APIは外部ライブラリのため型定義がない
       if ((window as any).Hatena.Star.EntryLoader) {
+        // biome-ignore lint/suspicious/noExplicitAny: Hatena Star APIは外部ライブラリのため型定義がない
         ;(window as any).Hatena.Star.EntryLoader.loadEntries()
       }
     }

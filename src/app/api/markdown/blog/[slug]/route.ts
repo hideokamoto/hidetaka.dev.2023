@@ -8,6 +8,24 @@ type Params = {
   slug: string
 }
 
+function extractSlugFromUrl(url: URL): string | null {
+  // rewrite後のURLから抽出を試みる
+  const rewriteMatch = url.pathname.match(/\/api\/markdown\/blog\/(.+)$/)
+  if (rewriteMatch) {
+    return rewriteMatch[1]
+  }
+  // 元のURLから抽出を試みる（/ja/blog/... または /blog/...）
+  const originalMatch = url.pathname.match(/\/(?:ja\/)?blog\/(.+)\.md$/)
+  return originalMatch ? originalMatch[1] : null
+}
+
+function determineLanguage(url: URL): 'ja' | 'en' {
+  const lang = url.searchParams.get('lang')
+  if (lang === 'ja') return 'ja'
+  if (url.pathname.includes('/ja/blog/')) return 'ja'
+  return 'en'
+}
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<Params> },
@@ -15,28 +33,12 @@ export async function GET(
   // middlewareでrewriteされた場合、paramsが正しく解決されない可能性があるため、
   // request.urlから直接slugを抽出する
   const url = new URL(request.url)
-  let slug: string | null = null
-
-  // まずparamsから取得を試みる
   const resolvedParams = await params
-  if (resolvedParams.slug) {
-    slug = resolvedParams.slug
-  }
+  let slug: string | null = resolvedParams.slug || null
 
   // paramsが空の場合は、request.urlから抽出
-  // rewrite後のURL（/api/markdown/blog/...）または元のURL（/ja/blog/...）の両方に対応
   if (!slug) {
-    // rewrite後のURLから抽出を試みる
-    let pathMatch = url.pathname.match(/\/api\/markdown\/blog\/(.+)$/)
-    if (pathMatch) {
-      slug = pathMatch[1]
-    } else {
-      // 元のURLから抽出を試みる（/ja/blog/... または /blog/...）
-      pathMatch = url.pathname.match(/\/(?:ja\/)?blog\/(.+)\.md$/)
-      if (pathMatch) {
-        slug = pathMatch[1]
-      }
-    }
+    slug = extractSlugFromUrl(url)
   }
 
   if (!slug) {
@@ -48,17 +50,7 @@ export async function GET(
     })
   }
 
-  // URLクエリパラメータから言語を判定
-  // middlewareでrewriteされた場合、request.urlは元のURLを指す可能性があるため、
-  // クエリパラメータとpathnameの両方から判定する
-  let lang = url.searchParams.get('lang')
-  if (!lang) {
-    // pathnameから言語を判定（/ja/blog/... の場合は日本語）
-    if (url.pathname.includes('/ja/blog/')) {
-      lang = 'ja'
-    }
-  }
-  const isJapanese = lang === 'ja'
+  const isJapanese = determineLanguage(url) === 'ja'
 
   // 記事を取得
   const thought = await getThoughtBySlug(slug, isJapanese ? 'ja' : 'en')

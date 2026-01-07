@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import FilterItem from '@/components/ui/FilterItem'
@@ -222,14 +222,17 @@ export default function WritingPageContent({
   }, [externalArticles])
 
   // 検索フィルター関数
-  const matchesSearch = (item: WritingItem): boolean => {
-    if (!searchQuery.trim()) return true
-    const query = searchQuery.toLowerCase()
-    const title = item.title.toLowerCase()
-    const description = removeHtmlTags(item.description || '').toLowerCase()
+  const matchesSearch = useCallback(
+    (item: WritingItem): boolean => {
+      if (!searchQuery.trim()) return true
+      const query = searchQuery.toLowerCase()
+      const title = item.title.toLowerCase()
+      const description = removeHtmlTags(item.description || '').toLowerCase()
 
-    return title.includes(query) || description.includes(query)
-  }
+      return title.includes(query) || description.includes(query)
+    },
+    [searchQuery],
+  )
 
   // フィルターと検索を適用
   const filteredItems = useMemo(() => {

@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import FilterItem from '@/components/ui/FilterItem'
@@ -311,18 +311,24 @@ export default function WorkPageContent({
   })
 
   // オープンソース（owned_oss + NPM + WordPress）
-  const allOSSItems = [
-    ...ownedOSSProjects.map((p) => ({ type: 'project' as const, data: p })),
-    ...npmPackages.map((p) => ({ type: 'npm' as const, data: p })),
-    ...wpPlugins.map((p) => ({ type: 'wordpress' as const, data: p })),
-  ]
+  const allOSSItems = useMemo(
+    () => [
+      ...ownedOSSProjects.map((p) => ({ type: 'project' as const, data: p })),
+      ...npmPackages.map((p) => ({ type: 'npm' as const, data: p })),
+      ...wpPlugins.map((p) => ({ type: 'wordpress' as const, data: p })),
+    ],
+    [ownedOSSProjects, npmPackages, wpPlugins],
+  )
 
   // 検索フィルター関数
-  const matchesSearch = (text: string): boolean => {
-    if (!searchQuery.trim()) return true
-    const query = searchQuery.toLowerCase()
-    return text.toLowerCase().includes(query)
-  }
+  const matchesSearch = useCallback(
+    (text: string): boolean => {
+      if (!searchQuery.trim()) return true
+      const query = searchQuery.toLowerCase()
+      return text.toLowerCase().includes(query)
+    },
+    [searchQuery],
+  )
 
   // フィルターと検索を適用
   const filteredProjects = useMemo(() => {
@@ -421,17 +427,20 @@ export default function WorkPageContent({
   })
 
   // カウント計算
-  const counts = {
-    all:
-      mainProjects.length +
-      allOSSItems.length +
-      ossContributionProjects.length +
-      booksProjects.length,
-    projects: mainProjects.length,
-    'open-source': allOSSItems.length,
-    books: booksProjects.length,
-    'oss-contribution': ossContributionProjects.length,
-  }
+  const counts = useMemo(
+    () => ({
+      all:
+        mainProjects.length +
+        allOSSItems.length +
+        ossContributionProjects.length +
+        booksProjects.length,
+      projects: mainProjects.length,
+      'open-source': allOSSItems.length,
+      books: booksProjects.length,
+      'oss-contribution': ossContributionProjects.length,
+    }),
+    [mainProjects.length, allOSSItems.length, ossContributionProjects.length, booksProjects.length],
+  )
 
   // テキスト
   const title = lang === 'ja' ? '制作物' : 'Work'

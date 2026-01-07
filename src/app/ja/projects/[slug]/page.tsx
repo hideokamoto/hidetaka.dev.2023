@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Container from '@/components/tailwindui/Container'
 import { MicroCMSAPI } from '@/libs/microCMS/apis'
 import { createMicroCMSClient } from '@/libs/microCMS/client'
@@ -102,7 +103,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
             <div className="shadow-lg px-8 py-8">
               {project.image && (
                 <>
-                  <img
+                  <Image
                     src={project.image.url}
                     alt={project.title}
                     className="w-full rounded-lg object-cover"
