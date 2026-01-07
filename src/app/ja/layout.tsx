@@ -1,11 +1,5 @@
 import type { Metadata } from 'next'
 import { SITE_DESCRIPTION_JA, SITE_TITLE_JA } from '@/consts'
-import '../globals.css'
-import { ClarityAnalytics } from '@/components/ClarityAnalytics'
-import { DarkModeScript } from '@/components/DarkModeScript'
-import GoogleAnalytics from '@/components/GoogleAnalytics'
-import Footer from '@/components/tailwindui/Footer'
-import Header from '@/components/tailwindui/Header'
 
 export const metadata: Metadata = {
   title: SITE_TITLE_JA,
@@ -43,26 +37,5 @@ export const metadata: Metadata = {
 }
 
 export default function JapaneseLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="ja" className="h-full antialiased">
-      <head>
-        <link rel="alternate" type="application/rss+xml" title="RSS" href="/projects/rss.xml" />
-      </head>
-      <body className="flex h-full flex-col bg-zinc-50 font-japanese japanese-typography dark:bg-black">
-        <GoogleAnalytics gaId="G-RV8PYHHYHN" />
-        <DarkModeScript />
-        <ClarityAnalytics />
-        <div className="fixed inset-0 flex justify-center sm:px-8">
-          <div className="flex w-full max-w-7xl lg:px-8">
-            <div className="w-full bg-white ring-1 ring-zinc-100 dark:bg-zinc-900 dark:ring-zinc-300/20" />
-          </div>
-        </div>
-        <div className="relative">
-          <Header />
-          <main>{children}</main>
-          <Footer />
-        </div>
-      </body>
-    </html>
-  )
+  return <>{children}</>
 }
