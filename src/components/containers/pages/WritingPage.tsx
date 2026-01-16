@@ -26,6 +26,21 @@ function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string })
   const date = new Date(datetime)
   const imageUrl = item.image
 
+  // サイト内リンクかどうかを判定
+  const isInternalLink = (() => {
+    // 相対パス（/で始まる）は常にサイト内リンク
+    if (href.startsWith('/')) return true
+
+    try {
+      // URLをパースしてホスト名をチェック
+      const url = new URL(href)
+      return url.hostname === 'hidetaka.dev' || url.hostname === 'www.hidetaka.dev'
+    } catch {
+      // パースに失敗した場合（相対パスの可能性）はサイト内リンクとして扱う
+      return true
+    }
+  })()
+
   const CardContent = (
     <article className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all hover:border-indigo-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700">
       {/* Image - Top (if available) */}
@@ -84,7 +99,12 @@ function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string })
     </article>
   )
 
-  return (
+  // サイト内リンクの場合は同じタブで開き、外部リンクは別タブで開く
+  return isInternalLink ? (
+    <a href={href} className="group block">
+      {CardContent}
+    </a>
+  ) : (
     <a href={href} target="_blank" rel="noopener noreferrer" className="group block">
       {CardContent}
     </a>
