@@ -12,10 +12,24 @@ export default function ErrorBoundary({
   reset: () => void
 }) {
   useEffect(() => {
+    // Log error to console and Sentry via logger
     logger.error(`Application error: ${error.message}`, {
       stack: error.stack,
       digest: error.digest,
     })
+
+    // Also capture directly to Sentry with additional context
+    import('@/libs/sentry/client')
+      .then(({ captureException }) => {
+        captureException(error, {
+          digest: error.digest,
+          location: 'ErrorBoundary',
+          page: window.location.pathname,
+        })
+      })
+      .catch((sentryError) => {
+        console.error('[ErrorBoundary] Failed to capture error to Sentry:', sentryError)
+      })
   }, [error])
 
   return (
