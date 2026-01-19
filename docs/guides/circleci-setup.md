@@ -16,7 +16,7 @@ This document provides comprehensive documentation for the CircleCI CI/CD pipeli
 
 The CircleCI pipeline implements a sequential build-test-deploy workflow with the following job dependency structure:
 
-```
+```text
 ┌──────┐
 │ lint │
 └───┬──┘
@@ -238,7 +238,9 @@ Both `test` and `cf-build` run in parallel after `lint` passes, reducing total w
 
 Environment variables must be configured in CircleCI project settings:
 
-**Settings → hidetaka.dev → Environment Variables**
+### CircleCI Settings Path
+
+Navigate to: Settings → hidetaka.dev → Environment Variables
 
 ### Required Variables
 
@@ -349,20 +351,21 @@ export WORKER_NAME="hidetaka-dev-preview-${BRANCH_NAME}"
 
 ### Cleanup Process
 
-**1. List All Workers**
+#### Step 1: List All Workers
 
 ```bash
 npx wrangler list
 ```
 
 Output:
-```
+
+```text
 hidetaka-dev
 hidetaka-dev-preview-claude-feature-a
 hidetaka-dev-preview-claude-feature-b
 ```
 
-**2. Delete Preview Worker**
+#### Step 2: Delete Preview Worker
 
 ```bash
 npx wrangler delete --name hidetaka-dev-preview-claude-feature-a
@@ -374,7 +377,7 @@ Or with environment variable:
 WORKER_NAME="hidetaka-dev-preview-claude-feature-a" npx wrangler delete
 ```
 
-**3. Verify Deletion**
+#### Step 3: Verify Deletion
 
 ```bash
 npx wrangler list
@@ -557,7 +560,7 @@ BRANCH_NAME=$(echo "${CIRCLE_BRANCH}" | sed 's/[^a-zA-Z0-9-]/-/g' | cut -c1-30)
 **Cause:** CircleCI not connected to repository or workflow disabled
 
 **Solution:**
-1. Check CircleCI project setup: https://app.circleci.com/
+1. Check CircleCI project setup: [https://app.circleci.com/](https://app.circleci.com/)
 2. Verify repository connection: Project Settings → Overview
 3. Check if workflows are enabled: Project Settings → Advanced
 4. Ensure `.circleci/config.yml` exists in repository root
@@ -606,16 +609,16 @@ npm install --package-lock-only
 
 ### Getting Help
 
-**CircleCI Status:** https://status.circleci.com/
+**CircleCI Status:** [https://status.circleci.com/](https://status.circleci.com/)
 
-**CircleCI Docs:** https://circleci.com/docs/
+**CircleCI Docs:** [https://circleci.com/docs/](https://circleci.com/docs/)
 
-**Wrangler Docs:** https://developers.cloudflare.com/workers/wrangler/
+**Wrangler Docs:** [https://developers.cloudflare.com/workers/wrangler/](https://developers.cloudflare.com/workers/wrangler/)
 
 **Support Channels:**
-- CircleCI Community: https://discuss.circleci.com/
-- Cloudflare Discord: https://discord.gg/cloudflaredev
-- GitHub Issues: https://github.com/hideokamoto/hidetaka.dev.2023/issues
+- CircleCI Community: [https://discuss.circleci.com/](https://discuss.circleci.com/)
+- Cloudflare Discord: [https://discord.gg/cloudflaredev](https://discord.gg/cloudflaredev)
+- GitHub Issues: [https://github.com/hideokamoto/hidetaka.dev.2023/issues](https://github.com/hideokamoto/hidetaka.dev.2023/issues)
 
 ---
 
@@ -630,11 +633,11 @@ npm install --package-lock-only
 
 ### External References
 
-- **CircleCI Orbs:** https://circleci.com/developer/orbs
-- **CircleCI Node Orb:** https://circleci.com/developer/orbs/orb/circleci/node
-- **Wrangler CLI:** https://developers.cloudflare.com/workers/wrangler/commands/
-- **OpenNext Cloudflare:** https://opennext.js.org/cloudflare
-- **Next.js Deployment:** https://nextjs.org/docs/deployment
+- **CircleCI Orbs:** [https://circleci.com/developer/orbs](https://circleci.com/developer/orbs)
+- **CircleCI Node Orb:** [https://circleci.com/developer/orbs/orb/circleci/node](https://circleci.com/developer/orbs/orb/circleci/node)
+- **Wrangler CLI:** [https://developers.cloudflare.com/workers/wrangler/commands/](https://developers.cloudflare.com/workers/wrangler/commands/)
+- **OpenNext Cloudflare:** [https://opennext.js.org/cloudflare](https://opennext.js.org/cloudflare)
+- **Next.js Deployment:** [https://nextjs.org/docs/deployment](https://nextjs.org/docs/deployment)
 
 ---
 

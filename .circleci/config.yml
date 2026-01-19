@@ -81,8 +81,16 @@ jobs:
           name: Deploy preview environment
           command: |
             # Generate unique worker name from branch
-            BRANCH_NAME=$(echo "${CIRCLE_BRANCH}" | sed 's/[^a-zA-Z0-9-]/-/g' | cut -c1-50)
+            # Cloudflare limit: 63 chars total
+            # Prefix "hidetaka-dev-preview-" is 21 chars, so max branch name is 42 chars
+            BRANCH_NAME=$(echo "${CIRCLE_BRANCH}" | sed 's/[^a-zA-Z0-9-]/-/g' | cut -c1-42)
             export WORKER_NAME="hidetaka-dev-preview-${BRANCH_NAME}"
+
+            # Ensure WORKER_NAME is not empty
+            if [ -z "${WORKER_NAME}" ] || [ "${WORKER_NAME}" = "hidetaka-dev-preview-" ]; then
+              echo "Error: Generated worker name is empty or invalid"
+              exit 1
+            fi
 
             # Deploy using versions API
             npx wrangler versions upload
@@ -104,12 +112,14 @@ workflows:
       - deploy-production:
           requires:
             - cf-build
+            - test
           filters:
             branches:
               only: main
       - deploy-branch:
           requires:
             - cf-build
+            - test
           filters:
             branches:
               ignore: main

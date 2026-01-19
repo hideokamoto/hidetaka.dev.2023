@@ -160,7 +160,7 @@ npx wrangler secret put MICROCMS_API_KEY --env staging
 
 ### パイプライン概要
 
-```
+```text
 lint → test → cf-build → deploy
 ```
 
