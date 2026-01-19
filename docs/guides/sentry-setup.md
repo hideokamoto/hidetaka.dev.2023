@@ -11,7 +11,7 @@ The project uses dual Sentry SDKs to provide error tracking across different run
 
 ## Architecture
 
-```
+```text
 src/libs/sentry/
 ├── client.ts        # Browser SDK (@sentry/browser)
 ├── server.ts        # Workers SDK (@sentry/cloudflare)

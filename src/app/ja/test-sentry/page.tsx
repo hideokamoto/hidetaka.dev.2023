@@ -1,23 +1,23 @@
 /**
- * Development-only Sentry testing page
+ * 開発専用Sentryテストページ（日本語版）
  *
- * This page provides a UI for testing Sentry error tracking.
- * Only accessible in development mode.
+ * このページはSentryエラートラッキングのテスト用UIを提供します。
+ * 開発モードでのみアクセス可能です。
  */
 
-import SentryTestClient from '@/components/sentry/SentryTestClient'
+import SentryTestClient from '@/components/sentry/SentryTestClient.ja'
 
 export default async function TestSentryPage() {
-  // Check if we're in development mode
+  // 開発モードかどうかを確認
   if (process.env.NODE_ENV !== 'development') {
     return (
       <div className="flex min-h-screen items-center justify-center px-4">
         <div className="text-center max-w-md">
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
-            Not Available in Production
+            本番環境では利用できません
           </h1>
           <p className="text-slate-600 dark:text-slate-400">
-            This test page is only available in development mode.
+            このテストページは開発モードでのみ利用可能です。
           </p>
         </div>
       </div>

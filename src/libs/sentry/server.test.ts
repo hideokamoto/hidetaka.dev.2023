@@ -89,11 +89,7 @@ describe('Sentry Server Functions', () => {
 
       captureException(testError, context)
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        '[Sentry] Server error:',
-        testError,
-        context,
-      )
+      expect(consoleErrorSpy).toHaveBeenCalledWith('[Sentry] Server error:', testError, context)
     })
 
     it('should attempt to send to Sentry in production with DSN', async () => {

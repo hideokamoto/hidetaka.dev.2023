@@ -26,7 +26,7 @@ type SeverityLevel = 'fatal' | 'error' | 'warning' | 'log' | 'info' | 'debug'
  * Note: For Cloudflare Workers with Next.js/OpenNext, initialization happens
  * at the Workers handler level, not in application code.
  */
-let isInitialized = false
+const isInitialized = false
 
 /**
  * Initialize Sentry for Cloudflare Workers context
