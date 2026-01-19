@@ -1,0 +1,115 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@5
+
+executors:
+  default:
+    docker:
+      - image: cimg/node:22.1
+    resource_class: small
+
+jobs:
+  lint:
+    executor: default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Run Biome lint check
+          command: npm run lint:check
+          no_output_timeout: 5m
+
+  test:
+    executor: default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Run tests with coverage
+          command: npm run test:coverage
+          no_output_timeout: 10m
+      - store_artifacts:
+          path: coverage
+          destination: coverage
+
+  cf-build:
+    executor: default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Build for Cloudflare Workers
+          command: npm run cf:build
+          no_output_timeout: 10m
+          environment:
+            MICROCMS_API_MODE: mock
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .open-next
+      - store_artifacts:
+          path: .open-next
+          destination: build-output
+
+  deploy-production:
+    executor: default
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Deploy to production
+          command: |
+            export WORKER_NAME="hidetaka-dev"
+            npx wrangler deploy
+
+  deploy-branch:
+    executor: default
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Deploy preview environment
+          command: |
+            # Generate unique worker name from branch
+            BRANCH_NAME=$(echo "${CIRCLE_BRANCH}" | sed 's/[^a-zA-Z0-9-]/-/g' | cut -c1-50)
+            export WORKER_NAME="hidetaka-dev-preview-${BRANCH_NAME}"
+
+            # Deploy using versions API
+            npx wrangler versions upload
+            npx wrangler versions deploy
+
+            # Output preview URL
+            echo "Preview deployment: https://${WORKER_NAME}.workers.dev"
+
+workflows:
+  build-test-deploy:
+    jobs:
+      - lint
+      - test:
+          requires:
+            - lint
+      - cf-build:
+          requires:
+            - lint
+      - deploy-production:
+          requires:
+            - cf-build
+          filters:
+            branches:
+              only: main
+      - deploy-branch:
+          requires:
+            - cf-build
+          filters:
+            branches:
+              ignore: main

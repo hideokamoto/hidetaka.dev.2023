@@ -154,6 +154,71 @@ npx wrangler secret put MICROCMS_API_KEY --env staging
 - `npm run cf:deploy:production` - ビルド後、本番環境にデプロイ（明示的）
 - `npm run cf:deploy:staging` - ビルド後、非本番環境（staging）にデプロイ
 
+## CI/CD パイプライン
+
+このプロジェクトはCircleCIを使用して自動化されたCI/CDパイプラインを実装しています。
+
+### パイプライン概要
+
+```
+lint → test → cf-build → deploy
+```
+
+1. **lint** - Biomeによるコード品質チェック
+2. **test** - Vitestによるユニットテスト実行
+3. **cf-build** - Cloudflare Workers用のビルド
+4. **deploy** - 本番環境またはプレビュー環境へのデプロイ
+
+### Free プランの最適化
+
+CircleCIの無料プラン（6,000ビルド分/月）を効率的に使用するため、以下の最適化を実施:
+
+- **Small リソースクラス** (1 vCPU, 2GB RAM)
+- **自動キャッシュ** - node orbによる`node_modules/`の自動キャッシュ
+- **1日のワークスペース保持** - ビルド成果物の効率的な共有
+- **並列実行** - `test`と`cf-build`を並列実行して時間短縮
+
+### 必須環境変数
+
+CircleCIプロジェクト設定で以下の環境変数を設定する必要があります:
+
+| 変数名 | 説明 |
+|--------|------|
+| `CLOUDFLARE_API_TOKEN` | Cloudflare Workers デプロイ用APIトークン |
+| `CLOUDFLARE_ACCOUNT_ID` | CloudflareアカウントID |
+| `MICROCMS_API_KEY` | microCMS APIキー |
+| `OG_IMAGE_GEN_AUTH_TOKEN` | OG画像生成認証トークン |
+
+### デプロイ戦略
+
+- **本番デプロイ** (`main`ブランチ): `wrangler deploy`を使用
+- **プレビューデプロイ** (その他のブランチ): `wrangler versions`を使用
+
+各ブランチはユニークなWorker名で自動デプロイされます:
+- 本番: `hidetaka-dev`
+- プレビュー: `hidetaka-dev-preview-{branch-name}`
+
+### プレビュー環境のクリーンアップ
+
+プレビューWorkerは自動削除されないため、定期的な手動クリーンアップが必要です:
+
+```bash
+# 全Workerの一覧表示
+npx wrangler list
+
+# プレビューWorkerの削除
+npx wrangler delete --name hidetaka-dev-preview-{branch-name}
+```
+
+**推奨スケジュール:**
+- 週次: マージ済みブランチのプレビューを削除
+- 月次: 使用されていないプレビューWorkerを監査して削除
+
+### 詳細ドキュメント
+
+CircleCIセットアップの詳細については、以下を参照してください:
+- [CircleCIセットアップガイド](docs/guides/circleci-setup.md) - パイプライン構成、ジョブ詳細、トラブルシューティング
+
 ## プロジェクト構造
 
 ```
