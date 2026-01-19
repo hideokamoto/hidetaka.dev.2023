@@ -30,6 +30,9 @@ const IGNORED_ERRORS = [
 /**
  * Initialize Sentry for browser context
  * Should only be called in browser environment
+ *
+ * Note: Sentry is only initialized in production mode.
+ * In development, errors are logged to console only.
  */
 export function initSentry(): void {
   const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN
@@ -37,6 +40,13 @@ export function initSentry(): void {
   // Skip initialization if DSN is not configured
   if (!dsn) {
     console.warn('[Sentry] Browser DSN not configured, skipping initialization')
+    return
+  }
+
+  // Skip initialization in development mode
+  if (process.env.NODE_ENV !== 'production') {
+    console.log('[Sentry] Development mode detected, skipping Sentry initialization')
+    console.log('[Sentry] Errors will be logged to console only')
     return
   }
 
@@ -57,21 +67,13 @@ export function initSentry(): void {
     // Ignore common non-actionable errors
     ignoreErrors: IGNORED_ERRORS,
 
-    // Enable debug mode in development
-    debug: process.env.NODE_ENV === 'development',
-
     // Configure beforeSend to add additional context
-    beforeSend(event, hint) {
+    beforeSend(event, _hint) {
       // Add custom tags
       if (event.tags) {
         event.tags.runtime = 'browser'
       } else {
         event.tags = { runtime: 'browser' }
-      }
-
-      // In development, log the event for debugging
-      if (process.env.NODE_ENV === 'development') {
-        console.log('[Sentry] Capturing browser error:', event, hint)
       }
 
       return event

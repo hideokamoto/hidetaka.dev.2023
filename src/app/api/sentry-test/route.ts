@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
   switch (type) {
     case 'error':
-      // Test logger.error which should send to Sentry in production
+      // Test logger.error (server-side, development-only, not sent to Sentry)
       logger.error('Test error from Sentry test route', {
         testType: 'error',
         timestamp: new Date().toISOString(),
@@ -37,13 +37,13 @@ export async function GET(request: NextRequest) {
       })
       return NextResponse.json({
         success: true,
-        message: 'Test error logged via logger.error()',
+        message: 'Test error logged via logger.error() on server-side',
         type: 'error',
-        note: 'Check console and Sentry (in production) for the error',
+        note: 'Development-only test. Server-side errors are not sent to Sentry. Check console for logs. This route returns 403 in production.',
       })
 
     case 'warning':
-      // Test logger.warn which should send to Sentry in production
+      // Test logger.warn (server-side, development-only, not sent to Sentry)
       logger.warn('Test warning from Sentry test route', {
         testType: 'warning',
         timestamp: new Date().toISOString(),
@@ -51,9 +51,9 @@ export async function GET(request: NextRequest) {
       })
       return NextResponse.json({
         success: true,
-        message: 'Test warning logged via logger.warn()',
+        message: 'Test warning logged via logger.warn() on server-side',
         type: 'warning',
-        note: 'Check console and Sentry (in production) for the warning',
+        note: 'Development-only test. Server-side warnings are not sent to Sentry. Check console for logs. This route returns 403 in production.',
       })
 
     case 'exception':
@@ -61,9 +61,12 @@ export async function GET(request: NextRequest) {
       throw new Error('Test exception from Sentry test route')
 
     default:
-      return NextResponse.json({
-        error: 'Invalid test type',
-        validTypes: ['error', 'warning', 'exception'],
-      })
+      return NextResponse.json(
+        {
+          error: 'Invalid test type',
+          validTypes: ['error', 'warning', 'exception'],
+        },
+        { status: 400 },
+      )
   }
 }

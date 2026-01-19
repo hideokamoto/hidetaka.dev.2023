@@ -16,20 +16,9 @@ export default function ErrorBoundary({
     logger.error(`Application error: ${error.message}`, {
       stack: error.stack,
       digest: error.digest,
+      location: 'ErrorBoundary (Japanese)',
+      page: window.location.pathname,
     })
-
-    // Also capture directly to Sentry with additional context
-    import('@/libs/sentry/client')
-      .then(({ captureException }) => {
-        captureException(error, {
-          digest: error.digest,
-          location: 'ErrorBoundary (Japanese)',
-          page: window.location.pathname,
-        })
-      })
-      .catch((sentryError) => {
-        console.error('[ErrorBoundary] Failed to capture error to Sentry:', sentryError)
-      })
   }, [error])
 
   return (

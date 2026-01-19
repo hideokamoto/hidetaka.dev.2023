@@ -16,20 +16,9 @@ export default function GlobalError({
     logger.error(`Global error: ${error.message}`, {
       stack: error.stack,
       digest: error.digest,
+      location: 'GlobalError',
+      page: window.location.pathname,
     })
-
-    // Also capture directly to Sentry with additional context
-    import('@/libs/sentry/client')
-      .then(({ captureException }) => {
-        captureException(error, {
-          digest: error.digest,
-          location: 'GlobalError',
-          page: window.location.pathname,
-        })
-      })
-      .catch((sentryError) => {
-        console.error('[GlobalError] Failed to capture error to Sentry:', sentryError)
-      })
   }, [error])
 
   return (
