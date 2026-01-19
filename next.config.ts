@@ -4,6 +4,10 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
+
+  // Enable source maps for production builds (required for Sentry error debugging)
+  productionBrowserSourceMaps: true,
+
   async headers() {
     return [
       {
