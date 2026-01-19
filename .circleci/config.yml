@@ -86,7 +86,7 @@ jobs:
 
             # プレビューURLを出力
             echo "========================================"
-            echo "Preview URL: https://${BRANCH_ALIAS}-hidetaka-dev.workers.dev"
+            echo "Preview URL: https://${BRANCH_ALIAS}-hidetaka-dev-workers.workers.dev"
             echo "========================================"
 
 workflows:

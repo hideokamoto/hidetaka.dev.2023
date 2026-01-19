@@ -132,7 +132,7 @@ vars = {
 
 **方法2: Cloudflareダッシュボードで設定**
 1. Cloudflareダッシュボードにログイン
-2. Workers & Pages > hidetaka-dev を選択
+2. Workers & Pages > hidetaka-dev-workers を選択
 3. Settings > Variables で環境変数を設定
 4. 環境ごとに異なる値を設定できます
 
@@ -192,19 +192,19 @@ CircleCIプロジェクト設定で以下の環境変数を設定する必要が
 ### デプロイ戦略
 
 **Cloudflare Workers Buildsと同じアーキテクチャ:**
-- 単一Worker (`hidetaka-dev`) でバージョン管理
+- 単一Worker (`hidetaka-dev-workers`) でバージョン管理
 - プレビューエイリアスによるブランチ分離
 - 手動クリーンアップ不要
 
 **本番デプロイ** (`main`ブランチ):
 - コマンド: `wrangler versions deploy`
-- URL: `https://hidetaka-dev.workers.dev`
+- URL: `https://hidetaka-dev-workers.workers.dev`
 - バージョンベースのデプロイで本番トラフィックを管理
 
 **プレビューデプロイ** (その他のブランチ):
 - コマンド: `wrangler versions upload --preview-alias`
-- URL: `https://{branch-alias}-hidetaka-dev.workers.dev`
-- 例: `feature/new-ui` → `https://feature-new-ui-hidetaka-dev.workers.dev`
+- URL: `https://{branch-alias}-hidetaka-dev-workers.workers.dev`
+- 例: `feature/new-ui` → `https://feature-new-ui-hidetaka-dev-workers.workers.dev`
 - 同じブランチへの追加コミットでもURLは変わらない
 
 ### プレビュー管理

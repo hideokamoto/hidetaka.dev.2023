@@ -138,7 +138,7 @@ The CircleCI pipeline implements a sequential build-test-deploy workflow with th
 - `wrangler versions deploy` - Deploys the latest version to production
 
 **Architecture:**
-- Uses single worker: `hidetaka-dev`
+- Uses single worker: `hidetaka-dev-workers`
 - Version-based deployment for production traffic
 - No impact on preview deployments
 
@@ -155,7 +155,7 @@ The CircleCI pipeline implements a sequential build-test-deploy workflow with th
   - Truncate to 50 characters
   - Format: `{branch-alias}`
 - Run `npx wrangler versions upload --preview-alias "${BRANCH_ALIAS}"`
-- Echo preview URL: `https://{BRANCH_ALIAS}-hidetaka-dev.workers.dev`
+- Echo preview URL: `https://{BRANCH_ALIAS}-hidetaka-dev-workers.workers.dev`
 
 **Branch Filter:** Runs on all branches except `main`
 
@@ -174,8 +174,8 @@ The CircleCI pipeline implements a sequential build-test-deploy workflow with th
 - No separate workers created
 
 **Architecture:**
-- Uses single worker: `hidetaka-dev`
-- Preview alias per branch: `{branch-alias}-hidetaka-dev.workers.dev`
+- Uses single worker: `hidetaka-dev-workers`
+- Preview alias per branch: `{branch-alias}-hidetaka-dev-workers.workers.dev`
 - Version uploaded with `--preview-alias` flag
 - No impact on production traffic
 
@@ -296,17 +296,17 @@ This CircleCI setup uses the same architecture as **Cloudflare Workers Builds** 
 
 ```text
 ┌─────────────────────────────────────────────────┐
-│ Single Worker: hidetaka-dev                     │
+│ Single Worker: hidetaka-dev-workers                     │
 └─────────────────────────────────────────────────┘
 │
 ├── Production Version (main branch)
-│   └── URL: https://hidetaka-dev.workers.dev
+│   └── URL: https://hidetaka-dev-workers.workers.dev
 │
 ├── Preview Version (feature/new-ui branch)
-│   └── URL: https://feature-new-ui-hidetaka-dev.workers.dev
+│   └── URL: https://feature-new-ui-hidetaka-dev-workers.workers.dev
 │
 └── Preview Version (fix/bug-123 branch)
-    └── URL: https://fix-bug-123-hidetaka-dev.workers.dev
+    └── URL: https://fix-bug-123-hidetaka-dev-workers.workers.dev
 ```
 
 ### Production Deployment (main branch)
@@ -319,9 +319,9 @@ This CircleCI setup uses the same architecture as **Cloudflare Workers Builds** 
 - Previous versions remain available for rollback
 - No impact on preview deployments
 
-**Worker Name:** `hidetaka-dev` (single worker)
+**Worker Name:** `hidetaka-dev-workers` (single worker)
 
-**Deployment URL:** `https://hidetaka-dev.workers.dev` or custom domain
+**Deployment URL:** `https://hidetaka-dev-workers.workers.dev` or custom domain
 
 **When It Runs:**
 - Automatically on every push to `main` branch
@@ -350,9 +350,9 @@ BRANCH_ALIAS=$(echo "${CIRCLE_BRANCH}" | sed 's/[^a-zA-Z0-9-]/-/g' | cut -c1-50)
 ```
 
 **Example Preview URLs:**
-- Branch: `feature/new-ui` → `https://feature-new-ui-hidetaka-dev.workers.dev`
-- Branch: `fix/bug-123` → `https://fix-bug-123-hidetaka-dev.workers.dev`
-- Branch: `claude/setup-circleci-config-O794P` → `https://claude-setup-circleci-config-O794P-hidetaka-dev.workers.dev`
+- Branch: `feature/new-ui` → `https://feature-new-ui-hidetaka-dev-workers.workers.dev`
+- Branch: `fix/bug-123` → `https://fix-bug-123-hidetaka-dev-workers.workers.dev`
+- Branch: `claude/setup-circleci-config-O794P` → `https://claude-setup-circleci-config-O794P-hidetaka-dev-workers.workers.dev`
 
 **When It Runs:**
 - Automatically on every push to non-main branches
@@ -370,8 +370,8 @@ BRANCH_ALIAS=$(echo "${CIRCLE_BRANCH}" | sed 's/[^a-zA-Z0-9-]/-/g' | cut -c1-50)
 |--------|-----------|---------|
 | Command | `wrangler versions deploy` | `wrangler versions upload --preview-alias` |
 | Branch | `main` only | All except `main` |
-| Worker | `hidetaka-dev` (shared) | `hidetaka-dev` (shared) |
-| URL Pattern | `hidetaka-dev.workers.dev` | `{alias}-hidetaka-dev.workers.dev` |
+| Worker | `hidetaka-dev-workers` (shared) | `hidetaka-dev-workers` (shared) |
+| URL Pattern | `hidetaka-dev-workers.workers.dev` | `{alias}-hidetaka-dev-workers.workers.dev` |
 | Traffic | 100% production | Preview only (no production impact) |
 | Cleanup | Not needed | Automatic (aliases expire when unused) |
 | Rollback | Version-based | Version-based |
@@ -385,7 +385,7 @@ BRANCH_ALIAS=$(echo "${CIRCLE_BRANCH}" | sed 's/[^a-zA-Z0-9-]/-/g' | cut -c1-50)
 
 ### How Preview Aliases Work
 
-- **Single Worker:** All deployments use the same worker (`hidetaka-dev`)
+- **Single Worker:** All deployments use the same worker (`hidetaka-dev-workers`)
 - **Version-Based:** Each deployment creates a new version with a preview alias
 - **Automatic Cleanup:** Unused preview aliases are automatically cleaned up by Cloudflare
 - **No Worker Proliferation:** You won't accumulate hundreds of workers
