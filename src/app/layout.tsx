@@ -4,6 +4,7 @@ import './globals.css'
 import { ClarityAnalytics } from '@/components/ClarityAnalytics'
 import { DarkModeScript } from '@/components/DarkModeScript'
 import GoogleAnalytics from '@/components/GoogleAnalytics'
+import AnimationInitializer from '@/components/AnimationInitializer'
 import Footer from '@/components/tailwindui/Footer'
 import Header from '@/components/tailwindui/Header'
 
@@ -46,6 +47,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className="h-full antialiased">
       <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@500&display=swap"
+          rel="stylesheet"
+        />
         <link rel="alternate" type="application/rss+xml" title="RSS" href="/projects/rss.xml" />
       </head>
       <body className="flex h-full flex-col bg-zinc-50 dark:bg-black">
@@ -61,6 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Header />
           <main>{children}</main>
           <Footer />
+          <AnimationInitializer />
         </div>
       </body>
     </html>

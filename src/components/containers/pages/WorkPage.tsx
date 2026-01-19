@@ -64,8 +64,8 @@ function UnifiedProjectCard({ project, lang }: { project: MicroCMSProjectsRecord
   const date = project.published_at ? new Date(project.published_at) : null
 
   return (
-    <Link href={href} className="group block">
-      <article className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all hover:border-indigo-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700">
+    <Link href={href} className="group block project-card">
+      <article className="card card-highlight relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all hover:border-indigo-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700">
         {/* Image - Top */}
         {project.image && (
           <div className="relative aspect-[4/3] w-full overflow-hidden">
@@ -571,9 +571,14 @@ export default function WorkPageContent({
                   <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
                     {lang === 'ja' ? 'プロジェクト' : 'Projects'}
                   </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                    {filteredProjects.map((project) => (
-                      <UnifiedProjectCard key={project.id} project={project} lang={lang} />
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8" style={{ gridAutoFlow: 'dense' }}>
+                    {filteredProjects.map((project, index) => (
+                      <div
+                        key={project.id}
+                        className={index % 3 === 2 ? 'lg:col-span-1 lg:row-span-2' : ''}
+                      >
+                        <UnifiedProjectCard project={project} lang={lang} />
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -586,9 +591,14 @@ export default function WorkPageContent({
                   <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
                     {lang === 'ja' ? '書籍' : 'Books'}
                   </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                    {filteredBooks.map((project) => (
-                      <UnifiedProjectCard key={project.id} project={project} lang={lang} />
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8" style={{ gridAutoFlow: 'dense' }}>
+                    {filteredBooks.map((project, index) => (
+                      <div
+                        key={project.id}
+                        className={index % 3 === 2 ? 'lg:col-span-1 lg:row-span-2' : ''}
+                      >
+                        <UnifiedProjectCard project={project} lang={lang} />
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -601,31 +611,44 @@ export default function WorkPageContent({
                   <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
                     {lang === 'ja' ? 'オープンソース' : 'Open Source'}
                   </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                    {filteredOSS.map((item, _index) => {
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8" style={{ gridAutoFlow: 'dense' }}>
+                    {filteredOSS.map((item, index) => {
+                      const wrapperClass = index % 3 === 2 ? 'lg:col-span-1 lg:row-span-2' : ''
                       if (item.type === 'project') {
                         return (
-                          <UnifiedProjectCard
-                            key={item.data.id}
-                            project={item.data as MicroCMSProjectsRecord}
-                            lang={lang}
-                          />
+                          <div key={item.data.id} className={wrapperClass}>
+                            <UnifiedProjectCard
+                              project={item.data as MicroCMSProjectsRecord}
+                              lang={lang}
+                            />
+                          </div>
                         )
                       } else if (item.type === 'npm') {
                         return (
-                          <UnifiedOSSCard
+                          <div
                             key={`npm-${(item.data as NPMRegistrySearchResult).package.name}`}
-                            item={{ type: 'npm', data: item.data as NPMRegistrySearchResult }}
-                            lang={lang}
-                          />
+                            className={wrapperClass}
+                          >
+                            <UnifiedOSSCard
+                              item={{ type: 'npm', data: item.data as NPMRegistrySearchResult }}
+                              lang={lang}
+                            />
+                          </div>
                         )
                       } else {
                         return (
-                          <UnifiedOSSCard
+                          <div
                             key={`wp-${(item.data as WordPressPluginDetail).slug}`}
-                            item={{ type: 'wordpress', data: item.data as WordPressPluginDetail }}
-                            lang={lang}
-                          />
+                            className={wrapperClass}
+                          >
+                            <UnifiedOSSCard
+                              item={{
+                                type: 'wordpress',
+                                data: item.data as WordPressPluginDetail,
+                              }}
+                              lang={lang}
+                            />
+                          </div>
                         )
                       }
                     })}

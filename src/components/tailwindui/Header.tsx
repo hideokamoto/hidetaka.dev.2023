@@ -275,7 +275,7 @@ export default function Header() {
   return (
     <>
       <header
-        className="relative z-50 bg-white dark:bg-zinc-900"
+        className="relative z-50 bg-white dark:bg-zinc-900 transition-all duration-300"
         style={{
           height: 'var(--header-height)',
           marginBottom: 'var(--header-mb)',
