@@ -1,119 +1,249 @@
 /**
- * Tests for server-side Sentry placeholder functions
- * These tests verify the placeholder behavior before Task 2 implementation
+ * Tests for server-side Sentry with @sentry/cloudflare
+ * These tests verify Sentry integration for Cloudflare Workers
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { captureException, captureMessage, initSentry, isSentryInitialized } from './server'
 
-describe('Sentry Server Placeholder Functions', () => {
+// Mock @sentry/cloudflare before importing the module
+vi.mock('@sentry/cloudflare', () => ({
+  captureException: vi.fn(),
+  captureMessage: vi.fn(),
+}))
+
+describe('Sentry Server Functions', () => {
   // Spy on console methods
   let consoleLogSpy: ReturnType<typeof vi.spyOn>
+  let consoleWarnSpy: ReturnType<typeof vi.spyOn>
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>
+
+  // Store original env
+  const originalEnv = { ...process.env }
 
   beforeEach(() => {
     // Create spies on console methods
     consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+    consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    // Reset module state by clearing the module cache
+    vi.resetModules()
   })
 
   afterEach(() => {
-    // Restore console methods after each test
+    // Restore console methods and env after each test
     consoleLogSpy.mockRestore()
+    consoleWarnSpy.mockRestore()
     consoleErrorSpy.mockRestore()
+    process.env = { ...originalEnv }
+    vi.clearAllMocks()
   })
 
   describe('initSentry', () => {
-    it('should log informational message about Task 2', () => {
+    it('should warn if DSN is not configured', async () => {
+      delete process.env.SENTRY_DSN
+      process.env.NODE_ENV = 'production'
+
+      const { initSentry } = await import('./server')
+      initSentry()
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        '[Sentry] Server DSN not configured, skipping initialization (errors will be logged to console)',
+      )
+    })
+
+    it('should skip initialization in development mode', async () => {
+      process.env.SENTRY_DSN = 'https://test@sentry.io/123'
+      process.env.NODE_ENV = 'development'
+
+      const { initSentry } = await import('./server')
       initSentry()
 
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        '[Sentry] Server-side initialization not yet implemented (Task 2)',
+        '[Sentry] Development mode detected, skipping Sentry initialization',
+      )
+      expect(consoleLogSpy).toHaveBeenCalledWith('[Sentry] Errors will be logged to console only')
+    })
+
+    it('should warn about OpenNext integration requirement in production', async () => {
+      process.env.SENTRY_DSN = 'https://test@sentry.io/123'
+      process.env.NODE_ENV = 'production'
+
+      const { initSentry } = await import('./server')
+      initSentry()
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        '[Sentry] Server-side Sentry for Cloudflare Workers requires OpenNext integration',
+      )
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        '[Sentry] Server errors will be logged to console and Cloudflare Workers logs',
       )
     })
   })
 
   describe('captureException', () => {
-    it('should log error to console.error with error and context', () => {
+    it('should always log error to console', async () => {
+      const { captureException } = await import('./server')
       const testError = new Error('Test error')
-      const context = {
-        userId: '123',
-        action: 'test_action',
-      }
+      const context = { userId: '123' }
 
       captureException(testError, context)
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        '[Sentry] Server error (not sent to Sentry):',
-        testError,
-        context,
-      )
+      expect(consoleErrorSpy).toHaveBeenCalledWith('[Sentry] Server error:', testError, context)
     })
 
-    it('should log error without context', () => {
-      const testError = new Error('Test error without context')
+    it('should attempt to send to Sentry in production with DSN', async () => {
+      process.env.SENTRY_DSN = 'https://test@sentry.io/123'
+      process.env.NODE_ENV = 'production'
+
+      const Sentry = await import('@sentry/cloudflare')
+      const { captureException } = await import('./server')
+
+      const testError = new Error('Test error')
+      const context = { userId: '123' }
+
+      captureException(testError, context)
+
+      expect(Sentry.captureException).toHaveBeenCalledWith(testError, {
+        extra: context,
+        tags: {
+          runtime: 'cloudflare-workers',
+          source: 'server',
+        },
+      })
+    })
+
+    it('should not send to Sentry in development', async () => {
+      process.env.SENTRY_DSN = 'https://test@sentry.io/123'
+      process.env.NODE_ENV = 'development'
+
+      const Sentry = await import('@sentry/cloudflare')
+      const { captureException } = await import('./server')
+
+      const testError = new Error('Test error')
 
       captureException(testError)
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        '[Sentry] Server error (not sent to Sentry):',
-        testError,
-        undefined,
+      expect(Sentry.captureException).not.toHaveBeenCalled()
+      expect(consoleErrorSpy).toHaveBeenCalled()
+    })
+
+    it('should handle Sentry errors gracefully', async () => {
+      process.env.SENTRY_DSN = 'https://test@sentry.io/123'
+      process.env.NODE_ENV = 'production'
+
+      const Sentry = await import('@sentry/cloudflare')
+      // Make captureException throw an error
+      vi.mocked(Sentry.captureException).mockImplementation(() => {
+        throw new Error('Sentry error')
+      })
+
+      const { captureException } = await import('./server')
+      const testError = new Error('Test error')
+
+      // Should not throw
+      expect(() => captureException(testError)).not.toThrow()
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        '[Sentry] Failed to capture exception:',
+        expect.any(Error),
       )
     })
   })
 
   describe('captureMessage', () => {
-    it('should log message with default severity (info)', () => {
-      const message = 'Test message'
+    it('should always log message to console', async () => {
+      const { captureMessage } = await import('./server')
 
-      captureMessage(message)
+      captureMessage('Test message', 'info', { component: 'test' })
 
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        '[Sentry] Server message [info] (not sent to Sentry):',
-        message,
+        '[Sentry] Server message [info]:',
+        'Test message',
+        { component: 'test' },
+      )
+    })
+
+    it('should use console.error for error and fatal levels', async () => {
+      const { captureMessage } = await import('./server')
+
+      captureMessage('Error message', 'error')
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        '[Sentry] Server message [error]:',
+        'Error message',
         undefined,
       )
     })
 
-    it('should log message with custom severity level', () => {
-      const message = 'Warning message'
-      const context = { component: 'test' }
+    it('should attempt to send to Sentry in production with DSN', async () => {
+      process.env.SENTRY_DSN = 'https://test@sentry.io/123'
+      process.env.NODE_ENV = 'production'
 
-      captureMessage(message, 'warning', context)
+      const Sentry = await import('@sentry/cloudflare')
+      const { captureMessage } = await import('./server')
 
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        '[Sentry] Server message [warning] (not sent to Sentry):',
-        message,
-        context,
-      )
+      captureMessage('Test message', 'warning', { component: 'test' })
+
+      expect(Sentry.captureMessage).toHaveBeenCalledWith('Test message', {
+        level: 'warning',
+        extra: { component: 'test' },
+        tags: {
+          runtime: 'cloudflare-workers',
+          source: 'server',
+        },
+      })
     })
 
-    it('should handle all severity levels', () => {
-      const severityLevels: Array<'fatal' | 'error' | 'warning' | 'log' | 'info' | 'debug'> = [
-        'fatal',
-        'error',
-        'warning',
-        'log',
-        'info',
-        'debug',
-      ]
+    it('should not send to Sentry in development', async () => {
+      process.env.SENTRY_DSN = 'https://test@sentry.io/123'
+      process.env.NODE_ENV = 'development'
 
-      for (const level of severityLevels) {
-        consoleLogSpy.mockClear()
-        captureMessage('Test', level)
+      const Sentry = await import('@sentry/cloudflare')
+      const { captureMessage } = await import('./server')
 
-        expect(consoleLogSpy).toHaveBeenCalledWith(
-          `[Sentry] Server message [${level}] (not sent to Sentry):`,
-          'Test',
-          undefined,
-        )
-      }
+      captureMessage('Test message')
+
+      expect(Sentry.captureMessage).not.toHaveBeenCalled()
+      expect(consoleLogSpy).toHaveBeenCalled()
+    })
+
+    it('should handle Sentry errors gracefully', async () => {
+      process.env.SENTRY_DSN = 'https://test@sentry.io/123'
+      process.env.NODE_ENV = 'production'
+
+      const Sentry = await import('@sentry/cloudflare')
+      // Make captureMessage throw an error
+      vi.mocked(Sentry.captureMessage).mockImplementation(() => {
+        throw new Error('Sentry error')
+      })
+
+      const { captureMessage } = await import('./server')
+
+      // Should not throw
+      expect(() => captureMessage('Test message')).not.toThrow()
+
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        '[Sentry] Failed to capture message:',
+        expect.any(Error),
+      )
     })
   })
 
   describe('isSentryInitialized', () => {
-    it('should return false', () => {
+    it('should always return false', async () => {
+      const { isSentryInitialized } = await import('./server')
+      expect(isSentryInitialized()).toBe(false)
+    })
+
+    it('should return false even after init is called', async () => {
+      process.env.SENTRY_DSN = 'https://test@sentry.io/123'
+      process.env.NODE_ENV = 'production'
+
+      const { initSentry, isSentryInitialized } = await import('./server')
+
+      expect(isSentryInitialized()).toBe(false)
+      initSentry()
       expect(isSentryInitialized()).toBe(false)
     })
   })

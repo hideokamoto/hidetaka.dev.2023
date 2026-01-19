@@ -16,7 +16,7 @@ vi.mock('@sentry/browser', () => ({
 
 describe('Sentry Client Functions', () => {
   // Import mocked Sentry after mocking
-  let Sentry: any
+  let Sentry: typeof import('@sentry/browser')
 
   // Spy on console methods
   let consoleLogSpy: ReturnType<typeof vi.spyOn>
