@@ -8,8 +8,8 @@ This document provides comprehensive documentation for the CircleCI CI/CD pipeli
 - [Job Descriptions](#job-descriptions)
 - [Free Plan Optimizations](#free-plan-optimizations)
 - [Environment Variables](#environment-variables)
+- [Durable Objects Constraints](#durable-objects-constraints)
 - [Deployment Strategy](#deployment-strategy)
-- [Manual Cleanup](#manual-cleanup)
 - [Troubleshooting](#troubleshooting)
 
 ## Workflow Overview
@@ -144,18 +144,15 @@ The CircleCI pipeline implements a sequential build-test-deploy workflow with th
 
 ### 5. `deploy-branch` Job
 
-**Purpose:** Deploy preview environments for feature branches using preview aliases
+**Purpose:** Upload version for testing (Durable Objects compatible)
 
 **Key Steps:**
 - Checkout code
 - Attach workspace (restore `.open-next/` from cf-build job)
 - Install npm packages
-- Generate branch alias from branch name:
-  - Sanitize branch name (replace non-alphanumeric with `-`)
-  - Truncate to 50 characters
-  - Format: `{branch-alias}`
-- Run `npx wrangler versions upload --preview-alias "${BRANCH_ALIAS}"`
-- Echo preview URL: `https://{BRANCH_ALIAS}-hidetaka-dev-workers.workers.dev`
+- Run `npx wrangler versions upload` (WITHOUT `--preview-alias`)
+- Get version ID from `wrangler versions list`
+- Output testing instructions with Version Override header
 
 **Branch Filter:** Runs on all branches except `main`
 
@@ -164,20 +161,26 @@ The CircleCI pipeline implements a sequential build-test-deploy workflow with th
 **Required Environment Variables:**
 - `CLOUDFLARE_API_TOKEN` - API token with Workers deploy permissions
 - `CLOUDFLARE_ACCOUNT_ID` - Cloudflare account ID
-- `MICROCMS_API_KEY` - microCMS API key (for preview runtime)
+- `MICROCMS_API_KEY` - microCMS API key (for testing)
 - `OG_IMAGE_GEN_AUTH_TOKEN` - OG image generation auth token
 
 **Deployment Strategy:**
-- Uses preview aliases feature (same as Cloudflare Workers Builds)
-- Single worker with multiple versions
-- Each branch gets a stable preview URL
-- No separate workers created
-
-**Architecture:**
-- Uses single worker: `hidetaka-dev-workers`
-- Preview alias per branch: `{branch-alias}-hidetaka-dev-workers.workers.dev`
-- Version uploaded with `--preview-alias` flag
+- Uploads version WITHOUT deploying to production
+- No preview URL generated (Durable Objects constraint)
+- Version must be tested using Version Override header
 - No impact on production traffic
+
+**CircleCI Output:**
+- Version ID for testing
+- curl command example with Version Override header
+- Browser testing instructions (ModHeader extension)
+- Link to documentation
+
+**Testing Workflow:**
+1. Get version ID from CircleCI logs
+2. Use Version Override header to test
+3. If tests pass, merge to `main`
+4. Production deployment happens automatically
 
 ## Free Plan Optimizations
 
@@ -288,6 +291,50 @@ Navigate to: Settings → hidetaka.dev → Environment Variables
 
 **Note:** `MICROCMS_API_MODE=mock` is set in the `cf-build` job by default to avoid API calls during builds.
 
+## Durable Objects Constraints
+
+### ⚠️ Important Limitation
+
+This project uses Durable Objects, which **prevents the generation of independent preview URLs for each branch**.
+
+### Technical Background
+
+Durable Objects require "global uniqueness" to ensure state consistency. If multiple Worker versions simultaneously access the same DO instance, data integrity could be compromised. Therefore, Cloudflare's specification disables preview URL generation via `wrangler versions upload --preview-alias` when Durable Objects are in use.
+
+### Alternative: Version Overrides
+
+Use Version Override headers to **test specific versions against the production URL**.
+
+**Testing Workflow:**
+
+```bash
+# 1. Upload version (CircleCI automatically executes)
+npx wrangler versions upload
+
+# 2. Get version ID
+npx wrangler versions list --json | jq -r '.[0].id'
+
+# 3. Test with curl
+curl https://hidetaka-dev-workers.workers.dev \
+  -H 'Cloudflare-Workers-Version-Overrides: hidetaka-dev-workers="<VERSION_ID>"'
+```
+
+**Browser Testing:**
+
+1. Install a browser extension like ModHeader
+2. Add header:
+   - Name: `Cloudflare-Workers-Version-Overrides`
+   - Value: `hidetaka-dev-workers="<VERSION_ID>"`
+3. Visit [https://hidetaka-dev-workers.workers.dev](https://hidetaka-dev-workers.workers.dev)
+
+**Workflow:**
+
+1. Push to feature branch → CircleCI uploads version
+2. Get version ID from CircleCI logs
+3. Test using Version Override header
+4. If tests pass → merge to main
+5. CircleCI automatically runs `wrangler versions deploy`
+
 ## Deployment Strategy
 
 This CircleCI setup uses the same architecture as **Cloudflare Workers Builds** with a single worker and version-based deployments.
@@ -295,19 +342,25 @@ This CircleCI setup uses the same architecture as **Cloudflare Workers Builds** 
 ### Architecture Overview
 
 ```text
-┌─────────────────────────────────────────────────┐
-│ Single Worker: hidetaka-dev-workers                     │
-└─────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────┐
+│ Single Worker: hidetaka-dev-workers               │
+│ (with Durable Objects)                            │
+└──────────────────────────────────────────────────┘
 │
-├── Production Version (main branch)
-│   └── URL: https://hidetaka-dev-workers.workers.dev
+├── Deployed Version (main branch)
+│   └── Production URL: https://hidetaka-dev-workers.workers.dev
+│   └── Receives 100% traffic
 │
-├── Preview Version (feature/new-ui branch)
-│   └── URL: https://feature-new-ui-hidetaka-dev-workers.workers.dev
+├── Uploaded Version (feature/new-ui branch)
+│   └── NOT deployed (stored only)
+│   └── Test with: Version Override header
 │
-└── Preview Version (fix/bug-123 branch)
-    └── URL: https://fix-bug-123-hidetaka-dev-workers.workers.dev
+└── Uploaded Version (fix/bug-123 branch)
+    └── NOT deployed (stored only)
+    └── Test with: Version Override header
 ```
+
+**Note:** Due to Durable Objects, branch versions are uploaded but not deployed. Testing requires Version Override headers.
 
 ### Production Deployment (main branch)
 
@@ -335,64 +388,61 @@ This CircleCI setup uses the same architecture as **Cloudflare Workers Builds** 
 
 ### Branch Preview Deployments
 
-**Command:** `npx wrangler versions upload --preview-alias "${BRANCH_ALIAS}"`
+**⚠️ Durable Objects Constraint:** Independent preview URLs cannot be generated due to Durable Objects usage.
+
+**Command:** `npx wrangler versions upload`
 
 **How It Works:**
-- Uploads new version with a preview alias
-- Creates stable URL for the branch
+- Uploads new version WITHOUT deploying to production
+- Version is stored but not served to any traffic
 - No impact on production traffic
-- Reusing same branch alias updates the preview
+- Must use Version Override header for testing
 
-**Preview Alias Generation:**
+**Testing Workflow:**
+
 ```bash
-# Sanitize and truncate branch name to 50 chars
-BRANCH_ALIAS=$(echo "${CIRCLE_BRANCH}" | sed 's/[^a-zA-Z0-9-]/-/g' | cut -c1-50)
-```
+# 1. CircleCI uploads version (automatic on push)
+npx wrangler versions upload
 
-**Example Preview URLs:**
-- Branch: `feature/new-ui` → `https://feature-new-ui-hidetaka-dev-workers.workers.dev`
-- Branch: `fix/bug-123` → `https://fix-bug-123-hidetaka-dev-workers.workers.dev`
-- Branch: `claude/setup-circleci-config-O794P` → `https://claude-setup-circleci-config-O794P-hidetaka-dev-workers.workers.dev`
+# 2. Get version ID from CircleCI logs
+VERSION_ID=$(npx wrangler versions list --json | jq -r '.[0].id')
+
+# 3. Test with Version Override header
+curl https://hidetaka-dev-workers.workers.dev \
+  -H 'Cloudflare-Workers-Version-Overrides: hidetaka-dev-workers="<VERSION_ID>"'
+```
 
 **When It Runs:**
 - Automatically on every push to non-main branches
 - After both `cf-build` and `test` jobs complete successfully
 
-**Benefits:**
-- Stable URL per branch (URL doesn't change on new commits)
-- No separate workers created
-- Automatic cleanup when alias is no longer used
-- Same architecture as Workers Builds
+**What CircleCI Outputs:**
+- Version ID for testing
+- curl command example
+- Browser testing instructions
+- Link to this documentation
+
+**Testing Complete → Merge to Main:**
+- If tests pass using Version Override header
+- Merge PR to `main` branch
+- CircleCI automatically runs `wrangler versions deploy` (production)
 
 ### Deployment Comparison
 
 | Aspect | Production | Preview |
 |--------|-----------|---------|
-| Command | `wrangler versions deploy` | `wrangler versions upload --preview-alias` |
+| Command | `wrangler versions deploy` | `wrangler versions upload` |
 | Branch | `main` only | All except `main` |
-| Worker | `hidetaka-dev-workers` (shared) | `hidetaka-dev-workers` (shared) |
-| URL Pattern | `hidetaka-dev-workers.workers.dev` | `{alias}-hidetaka-dev-workers.workers.dev` |
-| Traffic | 100% production | Preview only (no production impact) |
-| Cleanup | Not needed | Automatic (aliases expire when unused) |
-| Rollback | Version-based | Version-based |
+| Worker | `hidetaka-dev-workers` | `hidetaka-dev-workers` |
+| Access Method | Production URL | Version Override header |
+| Traffic | 100% production traffic | No traffic (test only) |
+| Cleanup | Not needed | Automatic (old versions expire) |
+| Rollback | Deploy previous version | N/A (not deployed) |
 | Migrations | Supported | Supported (same worker) |
 
-## Preview Management
+### Version Management
 
-### No Manual Cleanup Required
-
-**Great News:** Preview aliases are automatically managed by Cloudflare. You **DO NOT** need to manually clean up preview deployments.
-
-### How Preview Aliases Work
-
-- **Single Worker:** All deployments use the same worker (`hidetaka-dev-workers`)
-- **Version-Based:** Each deployment creates a new version with a preview alias
-- **Automatic Cleanup:** Unused preview aliases are automatically cleaned up by Cloudflare
-- **No Worker Proliferation:** You won't accumulate hundreds of workers
-
-### Viewing Active Versions
-
-To see all versions and preview aliases:
+**Viewing All Versions:**
 
 ```bash
 npx wrangler versions list
@@ -401,43 +451,30 @@ npx wrangler versions list
 Output example:
 
 ```text
-Version ID | Created On | Author | Message | Preview Aliases
------------|-----------|--------|---------|----------------
-abc123     | 2026-01-19| bot    | Deploy  | feature-new-ui
-def456     | 2026-01-19| bot    | Deploy  | fix-bug-123
-ghi789     | 2026-01-18| bot    | Deploy  | (production)
+Version ID | Created On | Author | Deployed | Message
+-----------|-----------|--------|----------|--------
+abc123     | 2026-01-19| bot    | Yes      | Prod v1.2.3
+def456     | 2026-01-19| bot    | No       | Feature branch
+ghi789     | 2026-01-18| bot    | No       | Bug fix branch
 ```
 
-### Managing Previews (Optional)
-
-While automatic cleanup handles most cases, you can manually manage preview aliases if needed:
-
-**List all preview aliases:**
+**Testing Non-Deployed Version:**
 
 ```bash
-npx wrangler versions list
+# Get specific version ID
+VERSION_ID="def456"
+
+# Test with curl
+curl https://hidetaka-dev-workers.workers.dev \
+  -H "Cloudflare-Workers-Version-Overrides: hidetaka-dev-workers=\"${VERSION_ID}\""
+
+# Or use browser extension (ModHeader) with same header
 ```
 
-**Remove a specific preview alias:**
-
-```bash
-# This removes the alias but keeps the version
-npx wrangler versions delete --preview-alias feature-new-ui
-```
-
-**Note:** Removing a preview alias does NOT delete the version. The version remains available for rollback and history.
-
-### Benefits of This Approach
-
-✅ **No Manual Cleanup Required** - Cloudflare handles it automatically
-
-✅ **No Worker Quota Issues** - Single worker, unlimited versions
-
-✅ **Stable Preview URLs** - Same URL for subsequent pushes to the same branch
-
-✅ **Version History** - All versions are preserved for rollback
-
-✅ **Same as Workers Builds** - Identical architecture to Cloudflare's official solution
+**Version Cleanup:**
+- Old versions are automatically cleaned up by Cloudflare
+- No manual cleanup required
+- All versions remain available for rollback for a limited time
 
 ## Troubleshooting
 

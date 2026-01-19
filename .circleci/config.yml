@@ -76,18 +76,34 @@ jobs:
       - node/install-packages:
           pkg-manager: npm
       - run:
-          name: Deploy preview environment
+          name: Upload version for testing (Durable Objects compatible)
           command: |
-            # ブランチ名をCloudflare対応形式に変換（最大50文字）
-            BRANCH_ALIAS=$(echo "${CIRCLE_BRANCH}" | sed 's/[^a-zA-Z0-9-]/-/g' | cut -c1-50)
+            # バージョンをアップロード（デプロイせず）
+            npx wrangler versions upload
 
-            # プレビューエイリアス付きでバージョンをアップロード
-            npx wrangler versions upload --preview-alias "${BRANCH_ALIAS}"
+            # バージョンIDを取得
+            VERSION_ID=$(npx wrangler versions list --json | jq -r '.[0].id')
 
-            # プレビューURLを出力
-            echo "========================================"
-            echo "Preview URL: https://${BRANCH_ALIAS}-hidetaka-dev-workers.workers.dev"
-            echo "========================================"
+            echo "=========================================="
+            echo "✅ Version uploaded: ${VERSION_ID}"
+            echo ""
+            echo "⚠️  Durable Objects使用のため、独立したプレビューURLは生成されません。"
+            echo ""
+            echo "📋 Version Overrideヘッダーでテストしてください："
+            echo ""
+            echo "【curlでのテスト】"
+            echo "curl https://hidetaka-dev-workers.workers.dev \\"
+            echo "  -H 'Cloudflare-Workers-Version-Overrides: hidetaka-dev-workers=\"${VERSION_ID}\"'"
+            echo ""
+            echo "【ブラウザでのテスト】"
+            echo "1. ブラウザ拡張（ModHeader等）をインストール"
+            echo "2. ヘッダーを追加："
+            echo "   Name: Cloudflare-Workers-Version-Overrides"
+            echo "   Value: hidetaka-dev-workers=\"${VERSION_ID}\""
+            echo "3. https://hidetaka-dev-workers.workers.dev にアクセス"
+            echo ""
+            echo "詳細: docs/guides/circleci-setup.md#durable-objects使用時の制約"
+            echo "=========================================="
 
 workflows:
   build-test-deploy:

@@ -191,33 +191,39 @@ CircleCIプロジェクト設定で以下の環境変数を設定する必要が
 
 ### デプロイ戦略
 
-**Cloudflare Workers Buildsと同じアーキテクチャ:**
-- 単一Worker (`hidetaka-dev-workers`) でバージョン管理
-- プレビューエイリアスによるブランチ分離
-- 手動クリーンアップ不要
+**単一Workerでバージョン管理:**
+- Worker名: `hidetaka-dev-workers`
+- バージョンベースのデプロイメント
+- Durable Objects対応
 
 **本番デプロイ** (`main`ブランチ):
 - コマンド: `wrangler versions deploy`
 - URL: `https://hidetaka-dev-workers.workers.dev`
-- バージョンベースのデプロイで本番トラフィックを管理
+- 本番トラフィックに100%デプロイ
 
-**プレビューデプロイ** (その他のブランチ):
-- コマンド: `wrangler versions upload --preview-alias`
-- URL: `https://{branch-alias}-hidetaka-dev-workers.workers.dev`
-- 例: `feature/new-ui` → `https://feature-new-ui-hidetaka-dev-workers.workers.dev`
-- 同じブランチへの追加コミットでもURLは変わらない
+**ブランチプレビュー** (その他のブランチ):
+- コマンド: `wrangler versions upload`
+- ⚠️ Durable Objects使用のため、独立したプレビューURLは生成されません
+- **Version Overridesヘッダーでテスト:**
+  ```bash
+  curl https://hidetaka-dev-workers.workers.dev \
+    -H 'Cloudflare-Workers-Version-Overrides: hidetaka-dev-workers="<VERSION_ID>"'
+  ```
+- 詳細: [CircleCI Setup Guide](docs/guides/circleci-setup.md#durable-objects-constraints)
 
-### プレビュー管理
+### バージョン管理
 
-✅ **手動クリーンアップ不要** - Cloudflareが自動管理
-
-プレビューエイリアスは自動的にCloudflareによって管理されるため、手動でのWorker削除は不要です。すべてのデプロイが単一のWorker上でバージョンとして管理されます。
-
-**バージョン確認 (任意):**
+**バージョン確認:**
 
 ```bash
 npx wrangler versions list
 ```
+
+**テスト方法:**
+1. CircleCIログからVersion IDを取得
+2. Version Overrideヘッダーを使用してテスト
+3. テストが成功したらmainにマージ
+4. 本番環境に自動デプロイ
 
 ### 詳細ドキュメント
 
