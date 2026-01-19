@@ -16,7 +16,10 @@ export default function CTAButton({
   className = '',
 }: CTAButtonProps) {
   const buttonStyles = getCTAButtonStyles(variant)
-  const classNames = buttonStyles + (className ? ` ${className}` : '')
+  const classNames =
+    (variant === 'primary' ? 'btn-primary ' : '') +
+    buttonStyles +
+    (className ? ` ${className}` : '')
 
   return (
     <Link href={href} className={classNames}>

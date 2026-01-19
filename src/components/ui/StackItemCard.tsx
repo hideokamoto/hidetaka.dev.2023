@@ -17,7 +17,7 @@ export default function StackItemCard({
 }: StackItemCardProps) {
   return (
     <div
-      className={`group flex flex-col items-center justify-center rounded-2xl border border-zinc-200 bg-white p-8 text-center transition-all hover:shadow-lg hover:border-indigo-200 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-800 ${className}`}
+      className={`card service-card group flex flex-col items-center justify-center rounded-2xl border border-zinc-200 bg-white p-8 text-center transition-all hover:shadow-lg hover:border-indigo-200 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-800 ${className}`}
     >
       <GradientBadge gradient={gradient}>{name}</GradientBadge>
       {focusLabel && (

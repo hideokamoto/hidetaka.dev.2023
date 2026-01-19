@@ -29,20 +29,20 @@ export default function Hero({ lang }: { lang: string }) {
       <BackgroundDecoration variant="hero" />
 
       <div className="relative mx-auto max-w-7xl px-6 py-24 sm:px-8 sm:py-32 lg:px-12 lg:py-40">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-16 lg:gap-20">
-          {/* Left: Content */}
-          <div className="flex-1 space-y-10 lg:max-w-2xl">
+        <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-16 lg:gap-20 lg:items-center lg:min-h-[80vh]">
+          {/* Left: Content (60%) */}
+          <div className="space-y-10">
             <div className="space-y-6">
               <Badge label={role} variant="indigo" />
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold leading-tight text-slate-900 dark:text-white">
+              <h1 className="text-heading-xl font-heading font-bold text-slate-900 dark:text-white">
                 {name}
               </h1>
-              <p className="text-2xl sm:text-3xl font-bold text-indigo-700 dark:text-indigo-300">
+              <p className="text-heading-lg font-heading font-semibold text-indigo-700 dark:text-indigo-300 hero-gradient">
                 {tagline}
               </p>
             </div>
 
-            <p className="text-lg leading-relaxed text-slate-600 dark:text-slate-400">
+            <p className="text-body-lg text-slate-600 dark:text-slate-400">
               {description}
             </p>
 
@@ -74,8 +74,10 @@ export default function Hero({ lang }: { lang: string }) {
             </div>
           </div>
 
-          {/* Right: Image */}
-          <ProfileImage src="/images/profile.jpg" alt={name} size="lg" />
+          {/* Right: Image (40%) */}
+          <div className="flex justify-center lg:justify-end">
+            <ProfileImage src="/images/profile.jpg" alt={name} size="lg" />
+          </div>
         </div>
       </div>
     </section>

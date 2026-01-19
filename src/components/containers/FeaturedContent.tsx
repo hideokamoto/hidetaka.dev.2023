@@ -213,8 +213,8 @@ function ProjectCard({
   }
 
   return (
-    <Link href={href} className="group block">
-      <article className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all hover:border-purple-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-purple-700">
+    <Link href={href} className="group block project-card">
+      <article className="card card-highlight relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all hover:border-purple-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-purple-700">
         {/* Image - Top, larger */}
         {project.image && (
           <div className="relative aspect-[4/3] w-full overflow-hidden">
@@ -385,7 +385,7 @@ export default async function FeaturedContent({ lang }: { lang: string }) {
                 </Link>
               </div>
 
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3" style={{ gridAutoFlow: 'dense' }}>
                 {/* Featured Project - Full width on mobile, spans 2 columns on desktop */}
                 {featuredProject && (
                   <div className="sm:col-span-2 lg:col-span-2">
@@ -393,9 +393,14 @@ export default async function FeaturedContent({ lang }: { lang: string }) {
                   </div>
                 )}
 
-                {/* Other Projects - Compact cards */}
-                {otherProjects.map((project) => (
-                  <ProjectCard key={project.id} project={project} lang={lang} />
+                {/* Other Projects - Compact cards with Masonry layout */}
+                {otherProjects.map((project, index) => (
+                  <div
+                    key={project.id}
+                    className={index === 0 && !featuredProject ? 'lg:col-span-1 lg:row-span-2' : ''}
+                  >
+                    <ProjectCard project={project} lang={lang} />
+                  </div>
                 ))}
               </div>
             </div>
