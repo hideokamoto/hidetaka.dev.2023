@@ -116,18 +116,17 @@ The CircleCI pipeline implements a sequential build-test-deploy workflow with th
 
 ### 4. `deploy-production` Job
 
-**Purpose:** Deploy to production Cloudflare Worker (main branch only)
+**Purpose:** Deploy to production using Cloudflare Workers versions (main branch only)
 
 **Key Steps:**
 - Checkout code
 - Attach workspace (restore `.open-next/` from cf-build job)
 - Install npm packages
-- Export `WORKER_NAME="hidetaka-dev"`
-- Run `npx wrangler deploy`
+- Run `npx wrangler versions deploy`
 
 **Branch Filter:** Only runs on `main` branch
 
-**Dependencies:** Requires `cf-build` job to pass
+**Dependencies:** Requires both `cf-build` and `test` jobs to pass
 
 **Required Environment Variables:**
 - `CLOUDFLARE_API_TOKEN` - API token with Workers deploy permissions
@@ -136,28 +135,31 @@ The CircleCI pipeline implements a sequential build-test-deploy workflow with th
 - `OG_IMAGE_GEN_AUTH_TOKEN` - OG image generation auth token
 
 **Deployment Command:**
-- `wrangler deploy` - Supports Durable Objects migrations and production deployment
+- `wrangler versions deploy` - Deploys the latest version to production
+
+**Architecture:**
+- Uses single worker: `hidetaka-dev`
+- Version-based deployment for production traffic
+- No impact on preview deployments
 
 ### 5. `deploy-branch` Job
 
-**Purpose:** Deploy preview environments for feature branches
+**Purpose:** Deploy preview environments for feature branches using preview aliases
 
 **Key Steps:**
 - Checkout code
 - Attach workspace (restore `.open-next/` from cf-build job)
 - Install npm packages
-- Generate unique worker name from branch name:
+- Generate branch alias from branch name:
   - Sanitize branch name (replace non-alphanumeric with `-`)
   - Truncate to 50 characters
-  - Format: `hidetaka-dev-preview-{branch}`
-- Export `WORKER_NAME` environment variable
-- Run `npx wrangler versions upload` (upload new version)
-- Run `npx wrangler versions deploy` (deploy version)
-- Echo preview URL: `https://{WORKER_NAME}.workers.dev`
+  - Format: `{branch-alias}`
+- Run `npx wrangler versions upload --preview-alias "${BRANCH_ALIAS}"`
+- Echo preview URL: `https://{BRANCH_ALIAS}-hidetaka-dev.workers.dev`
 
 **Branch Filter:** Runs on all branches except `main`
 
-**Dependencies:** Requires `cf-build` job to pass
+**Dependencies:** Requires both `cf-build` and `test` jobs to pass
 
 **Required Environment Variables:**
 - `CLOUDFLARE_API_TOKEN` - API token with Workers deploy permissions
@@ -166,9 +168,16 @@ The CircleCI pipeline implements a sequential build-test-deploy workflow with th
 - `OG_IMAGE_GEN_AUTH_TOKEN` - OG image generation auth token
 
 **Deployment Strategy:**
-- Uses `wrangler versions` API for preview deployments
-- Each branch gets a unique worker name
-- Preview URL printed to console after deployment
+- Uses preview aliases feature (same as Cloudflare Workers Builds)
+- Single worker with multiple versions
+- Each branch gets a stable preview URL
+- No separate workers created
+
+**Architecture:**
+- Uses single worker: `hidetaka-dev`
+- Preview alias per branch: `{branch-alias}-hidetaka-dev.workers.dev`
+- Version uploaded with `--preview-alias` flag
+- No impact on production traffic
 
 ## Free Plan Optimizations
 
@@ -281,140 +290,154 @@ Navigate to: Settings → hidetaka.dev → Environment Variables
 
 ## Deployment Strategy
 
+This CircleCI setup uses the same architecture as **Cloudflare Workers Builds** with a single worker and version-based deployments.
+
+### Architecture Overview
+
+```text
+┌─────────────────────────────────────────────────┐
+│ Single Worker: hidetaka-dev                     │
+└─────────────────────────────────────────────────┘
+│
+├── Production Version (main branch)
+│   └── URL: https://hidetaka-dev.workers.dev
+│
+├── Preview Version (feature/new-ui branch)
+│   └── URL: https://feature-new-ui-hidetaka-dev.workers.dev
+│
+└── Preview Version (fix/bug-123 branch)
+    └── URL: https://fix-bug-123-hidetaka-dev.workers.dev
+```
+
 ### Production Deployment (main branch)
 
-**Command:** `npx wrangler deploy`
+**Command:** `npx wrangler versions deploy`
 
-**Why `wrangler deploy`:**
-- Full deployment with migrations support
-- Handles Durable Objects migrations automatically
-- Updates production worker in-place
-- Supports custom domains and routes
-- Production-grade deployment
+**How It Works:**
+- Uploads new version to the worker
+- Deploys version to production (100% traffic)
+- Previous versions remain available for rollback
+- No impact on preview deployments
 
-**Worker Name:** `hidetaka-dev` (hardcoded)
+**Worker Name:** `hidetaka-dev` (single worker)
 
 **Deployment URL:** `https://hidetaka-dev.workers.dev` or custom domain
 
 **When It Runs:**
 - Automatically on every push to `main` branch
-- After `cf-build` job completes successfully
+- After both `cf-build` and `test` jobs complete successfully
+
+**Benefits:**
+- Version-based deployment with rollback capability
+- Compatible with Durable Objects migrations
+- No worker proliferation
+- Same architecture as Workers Builds
 
 ### Branch Preview Deployments
 
-**Commands:**
-1. `npx wrangler versions upload` - Upload new version
-2. `npx wrangler versions deploy` - Deploy version
+**Command:** `npx wrangler versions upload --preview-alias "${BRANCH_ALIAS}"`
 
-**Why `wrangler versions`:**
-- Gradual rollouts (though we deploy at 100%)
-- Version management
-- Easier rollback capability
-- Suitable for preview environments
+**How It Works:**
+- Uploads new version with a preview alias
+- Creates stable URL for the branch
+- No impact on production traffic
+- Reusing same branch alias updates the preview
 
-**Worker Name Generation:**
+**Preview Alias Generation:**
 ```bash
-BRANCH_NAME=$(echo "${CIRCLE_BRANCH}" | sed 's/[^a-zA-Z0-9-]/-/g' | cut -c1-50)
-export WORKER_NAME="hidetaka-dev-preview-${BRANCH_NAME}"
+# Sanitize and truncate branch name to 50 chars
+BRANCH_ALIAS=$(echo "${CIRCLE_BRANCH}" | sed 's/[^a-zA-Z0-9-]/-/g' | cut -c1-50)
 ```
 
-**Example Worker Names:**
-- Branch: `claude/setup-circleci-config-O794P`
-- Worker: `hidetaka-dev-preview-claude-setup-circleci-config-O794P`
-- URL: `https://hidetaka-dev-preview-claude-setup-circleci-config-O794P.workers.dev`
+**Example Preview URLs:**
+- Branch: `feature/new-ui` → `https://feature-new-ui-hidetaka-dev.workers.dev`
+- Branch: `fix/bug-123` → `https://fix-bug-123-hidetaka-dev.workers.dev`
+- Branch: `claude/setup-circleci-config-O794P` → `https://claude-setup-circleci-config-O794P-hidetaka-dev.workers.dev`
 
 **When It Runs:**
 - Automatically on every push to non-main branches
-- After `cf-build` job completes successfully
+- After both `cf-build` and `test` jobs complete successfully
 
-### Deployment Differences
+**Benefits:**
+- Stable URL per branch (URL doesn't change on new commits)
+- No separate workers created
+- Automatic cleanup when alias is no longer used
+- Same architecture as Workers Builds
 
-| Aspect | Production (`wrangler deploy`) | Preview (`wrangler versions`) |
-|--------|-------------------------------|-------------------------------|
-| Command | `wrangler deploy` | `wrangler versions upload/deploy` |
+### Deployment Comparison
+
+| Aspect | Production | Preview |
+|--------|-----------|---------|
+| Command | `wrangler versions deploy` | `wrangler versions upload --preview-alias` |
 | Branch | `main` only | All except `main` |
-| Worker Name | `hidetaka-dev` | `hidetaka-dev-preview-{branch}` |
-| Migrations | Supported | Limited support |
-| Rollback | Manual revert | Version-based |
-| Custom Domains | Supported | Not configured |
+| Worker | `hidetaka-dev` (shared) | `hidetaka-dev` (shared) |
+| URL Pattern | `hidetaka-dev.workers.dev` | `{alias}-hidetaka-dev.workers.dev` |
+| Traffic | 100% production | Preview only (no production impact) |
+| Cleanup | Not needed | Automatic (aliases expire when unused) |
+| Rollback | Version-based | Version-based |
+| Migrations | Supported | Supported (same worker) |
 
-## Manual Cleanup
+## Preview Management
 
-**Important:** Preview workers are **NOT automatically deleted** when branches are deleted or merged.
+### No Manual Cleanup Required
 
-### Why Manual Cleanup Is Needed
+**Great News:** Preview aliases are automatically managed by Cloudflare. You **DO NOT** need to manually clean up preview deployments.
 
-- Each preview deployment creates a new Cloudflare Worker
-- Workers persist even after branch deletion
-- Cloudflare Free plan has limits on number of workers
-- Old preview workers consume account quota
+### How Preview Aliases Work
 
-### Cleanup Process
+- **Single Worker:** All deployments use the same worker (`hidetaka-dev`)
+- **Version-Based:** Each deployment creates a new version with a preview alias
+- **Automatic Cleanup:** Unused preview aliases are automatically cleaned up by Cloudflare
+- **No Worker Proliferation:** You won't accumulate hundreds of workers
 
-#### Step 1: List All Workers
+### Viewing Active Versions
+
+To see all versions and preview aliases:
 
 ```bash
-npx wrangler list
+npx wrangler versions list
 ```
 
-Output:
+Output example:
 
 ```text
-hidetaka-dev
-hidetaka-dev-preview-claude-feature-a
-hidetaka-dev-preview-claude-feature-b
+Version ID | Created On | Author | Message | Preview Aliases
+-----------|-----------|--------|---------|----------------
+abc123     | 2026-01-19| bot    | Deploy  | feature-new-ui
+def456     | 2026-01-19| bot    | Deploy  | fix-bug-123
+ghi789     | 2026-01-18| bot    | Deploy  | (production)
 ```
 
-#### Step 2: Delete Preview Worker
+### Managing Previews (Optional)
+
+While automatic cleanup handles most cases, you can manually manage preview aliases if needed:
+
+**List all preview aliases:**
 
 ```bash
-npx wrangler delete --name hidetaka-dev-preview-claude-feature-a
+npx wrangler versions list
 ```
 
-Or with environment variable:
+**Remove a specific preview alias:**
 
 ```bash
-WORKER_NAME="hidetaka-dev-preview-claude-feature-a" npx wrangler delete
+# This removes the alias but keeps the version
+npx wrangler versions delete --preview-alias feature-new-ui
 ```
 
-#### Step 3: Verify Deletion
+**Note:** Removing a preview alias does NOT delete the version. The version remains available for rollback and history.
 
-```bash
-npx wrangler list
-```
+### Benefits of This Approach
 
-### Recommended Cleanup Schedule
+✅ **No Manual Cleanup Required** - Cloudflare handles it automatically
 
-- **Weekly:** Review and delete merged branch previews
-- **Monthly:** Audit all preview workers and remove unused ones
-- **After PR merge:** Delete corresponding preview worker
+✅ **No Worker Quota Issues** - Single worker, unlimited versions
 
-### Bulk Cleanup Script
+✅ **Stable Preview URLs** - Same URL for subsequent pushes to the same branch
 
-Create a script to delete all preview workers:
+✅ **Version History** - All versions are preserved for rollback
 
-```bash
-#!/bin/bash
-# cleanup-previews.sh
-
-# List all preview workers
-PREVIEW_WORKERS=$(npx wrangler list | grep "hidetaka-dev-preview-" | awk '{print $1}')
-
-# Delete each preview worker
-for WORKER in $PREVIEW_WORKERS; do
-  echo "Deleting ${WORKER}..."
-  npx wrangler delete --name "${WORKER}"
-done
-
-echo "Cleanup complete"
-```
-
-Usage:
-
-```bash
-chmod +x cleanup-previews.sh
-./cleanup-previews.sh
-```
+✅ **Same as Workers Builds** - Identical architecture to Cloudflare's official solution
 
 ## Troubleshooting
 

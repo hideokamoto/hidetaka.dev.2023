@@ -191,28 +191,33 @@ CircleCIプロジェクト設定で以下の環境変数を設定する必要が
 
 ### デプロイ戦略
 
-- **本番デプロイ** (`main`ブランチ): `wrangler deploy`を使用
-- **プレビューデプロイ** (その他のブランチ): `wrangler versions`を使用
+**Cloudflare Workers Buildsと同じアーキテクチャ:**
+- 単一Worker (`hidetaka-dev`) でバージョン管理
+- プレビューエイリアスによるブランチ分離
+- 手動クリーンアップ不要
 
-各ブランチはユニークなWorker名で自動デプロイされます:
-- 本番: `hidetaka-dev`
-- プレビュー: `hidetaka-dev-preview-{branch-name}`
+**本番デプロイ** (`main`ブランチ):
+- コマンド: `wrangler versions deploy`
+- URL: `https://hidetaka-dev.workers.dev`
+- バージョンベースのデプロイで本番トラフィックを管理
 
-### プレビュー環境のクリーンアップ
+**プレビューデプロイ** (その他のブランチ):
+- コマンド: `wrangler versions upload --preview-alias`
+- URL: `https://{branch-alias}-hidetaka-dev.workers.dev`
+- 例: `feature/new-ui` → `https://feature-new-ui-hidetaka-dev.workers.dev`
+- 同じブランチへの追加コミットでもURLは変わらない
 
-プレビューWorkerは自動削除されないため、定期的な手動クリーンアップが必要です:
+### プレビュー管理
+
+✅ **手動クリーンアップ不要** - Cloudflareが自動管理
+
+プレビューエイリアスは自動的にCloudflareによって管理されるため、手動でのWorker削除は不要です。すべてのデプロイが単一のWorker上でバージョンとして管理されます。
+
+**バージョン確認 (任意):**
 
 ```bash
-# 全Workerの一覧表示
-npx wrangler list
-
-# プレビューWorkerの削除
-npx wrangler delete --name hidetaka-dev-preview-{branch-name}
+npx wrangler versions list
 ```
-
-**推奨スケジュール:**
-- 週次: マージ済みブランチのプレビューを削除
-- 月次: 使用されていないプレビューWorkerを監査して削除
 
 ### 詳細ドキュメント
 
