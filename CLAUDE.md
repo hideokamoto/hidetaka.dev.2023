@@ -461,6 +461,7 @@ This project uses **Claude Code Hooks** to automatically enforce quality standar
   - ✅ `npm run test` - All unit tests must pass
   - ✅ `npm run lint:check` - Code must pass linting
   - ✅ `npm run format:check` - Code must be properly formatted
+  - ✅ `npm run build` - TypeScript compilation must succeed
 - **Push is BLOCKED if any check fails**
 
 **How It Works:**
@@ -479,6 +480,8 @@ git push -u origin claude/my-feature
 # ✅ Lint check passed
 # 💅 Running format check...
 # ✅ Format check passed
+# 🏗️  Running build...
+# ✅ Build passed
 # 🎉 All quality checks passed! Safe to push.
 ```
 

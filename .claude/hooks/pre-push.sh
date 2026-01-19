@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Claude Code pre-push quality gate
-# Runs test, lint, and format checks before allowing git push
+# Runs test, lint, format, and build checks before allowing git push
 
 # Support bypass via environment variable
 if [ "${SKIP_PREPUSH_CHECKS}" = "1" ]; then
@@ -49,6 +49,17 @@ if npm run format:check; then
 else
   echo -e "${RED}❌ Format check failed${NC}"
   echo -e "${YELLOW}💡 Run 'npm run format' to auto-fix issues${NC}"
+  all_passed=false
+fi
+echo ""
+
+# Run build check
+echo "🏗️  Running build..."
+if npm run build; then
+  echo -e "${GREEN}✅ Build passed${NC}"
+else
+  echo -e "${RED}❌ Build failed${NC}"
+  echo -e "${YELLOW}💡 Fix TypeScript errors and try again${NC}"
   all_passed=false
 fi
 echo ""
