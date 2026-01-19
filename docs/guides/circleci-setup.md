@@ -122,7 +122,9 @@ The CircleCI pipeline implements a sequential build-test-deploy workflow with th
 - Checkout code
 - Attach workspace (restore `.open-next/` from cf-build job)
 - Install npm packages
-- Run `npx wrangler versions deploy`
+- Run `npx wrangler versions deploy --yes --message "..."`
+  - `--yes`: Non-interactive mode (required for CI)
+  - `--message`: Deployment description with commit SHA
 
 **Branch Filter:** Only runs on `main` branch
 
@@ -150,7 +152,8 @@ The CircleCI pipeline implements a sequential build-test-deploy workflow with th
 - Checkout code
 - Attach workspace (restore `.open-next/` from cf-build job)
 - Install npm packages
-- Run `npx wrangler versions upload` (WITHOUT `--preview-alias`)
+- Run `npx wrangler versions upload --message "..."` (WITHOUT `--preview-alias`)
+  - `--message`: Version description with branch name and commit SHA
 - Get version ID from `wrangler versions list`
 - Output testing instructions with Version Override header
 

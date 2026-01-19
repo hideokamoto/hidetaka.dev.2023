@@ -65,7 +65,7 @@ jobs:
           pkg-manager: npm
       - run:
           name: Deploy to production
-          command: npx wrangler versions deploy
+          command: npx wrangler versions deploy --yes --message "Deployed by CircleCI from commit ${CIRCLE_SHA1}"
 
   deploy-branch:
     executor: default
@@ -79,7 +79,7 @@ jobs:
           name: Upload version for testing (Durable Objects compatible)
           command: |
             # バージョンをアップロード（デプロイせず）
-            npx wrangler versions upload
+            npx wrangler versions upload --message "Branch ${CIRCLE_BRANCH} - Commit ${CIRCLE_SHA1}"
 
             # バージョンIDを取得
             VERSION_ID=$(npx wrangler versions list --json | jq -r '.[0].id')
