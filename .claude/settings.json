@@ -6,7 +6,20 @@
         "hooks": [
           {
             "type": "command",
-            "command": "npm ci"
+            "command": ".claude/hooks/session-start.sh",
+            "enabled": true
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/pre-push-matcher.sh",
+            "enabled": true
           }
         ]
       }
