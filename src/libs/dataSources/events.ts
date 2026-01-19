@@ -3,16 +3,41 @@ import type { BlogItem, WPEvent } from './types'
 
 export const loadWPEvents = async (): Promise<WPEvent[]> => {
   try {
-    const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?per_page=100&orderby=date&order=desc`,
+    const allEvents: WPEvent[] = []
+    let currentPage = 1
+    let totalPages = 1
+
+    // 最初のページを取得して総ページ数を確認
+    const firstResponse = await fetch(
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?page=${currentPage}&per_page=100&orderby=date&order=desc`,
     )
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch events: ${response.status}`)
+    if (!firstResponse.ok) {
+      throw new Error(`Failed to fetch events: ${firstResponse.status}`)
     }
 
-    const events: WPEvent[] = await response.json()
-    return events
+    const firstPageEvents: WPEvent[] = await firstResponse.json()
+    allEvents.push(...firstPageEvents)
+
+    // レスポンスヘッダーから総ページ数を取得
+    totalPages = Number.parseInt(firstResponse.headers.get('X-WP-TotalPages') || '1', 10)
+
+    // 残りのページを取得
+    while (currentPage < totalPages) {
+      currentPage++
+      const response = await fetch(
+        `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?page=${currentPage}&per_page=100&orderby=date&order=desc`,
+      )
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch events: ${response.status}`)
+      }
+
+      const events: WPEvent[] = await response.json()
+      allEvents.push(...events)
+    }
+
+    return allEvents
   } catch (error) {
     logger.error('Failed to load WordPress events', {
       error,
