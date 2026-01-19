@@ -177,7 +177,7 @@ curl http://localhost:3000/api/test-sentry?type=exception
 - [ ] Browser errors appear in console (development mode)
 - [ ] Browser errors appear in Sentry dashboard (production mode)
 - [ ] Server errors appear in console (development mode)
-- [ ] Server errors appear in Sentry dashboard (production mode)
+- [ ] Server errors are attempted to be sent to Sentry (production mode, requires OpenNext integration)
 - [ ] Error context includes custom tags (`source: 'logger'`)
 - [ ] Error context includes extra data (context object)
 - [ ] Source maps are uploaded and errors show correct file/line numbers
