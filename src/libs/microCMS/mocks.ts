@@ -1,4 +1,4 @@
-import type { MicroCMSEventsRecord, MicroCMSProjectsRecord } from './types'
+import type { MicroCMSProjectsRecord } from './types'
 
 export const MICROCMS_MOCK_BOOKs: MicroCMSProjectsRecord[] = [
   {
@@ -38,34 +38,5 @@ export const MICROCMS_MOCK_BOOKs: MicroCMSProjectsRecord[] = [
     },
     lang: ['Japanese'],
     is_solo: true,
-  },
-]
-
-export const MICROCMS_MOCK_EVENTs: MicroCMSEventsRecord[] = [
-  {
-    id: 'f80mm0zspiqp',
-    createdAt: '2022-05-11T09:39:45.062Z',
-    updatedAt: '2022-05-11T09:41:04.987Z',
-    publishedAt: '2022-05-11T09:39:45.062Z',
-    revisedAt: '2022-05-11T09:41:04.987Z',
-    title: 'JP_Stripes DeepDive',
-    url: 'https://www.facebook.com/groups/jpstripes/posts/3029419883978371/',
-    date: '2022-02-10T03:15:00.000Z',
-    place: 'online',
-    slide_url: 'https://speakerdeck.com/stripehideokamoto/jpstripes-deepdive-202202',
-    session_title: 'Stripe Quotesで見積書発行から請求業務をノーコードで管理しよう',
-  },
-  {
-    id: 'q9_wbwteh',
-    createdAt: '2022-05-11T09:34:04.382Z',
-    updatedAt: '2022-05-11T09:35:50.295Z',
-    publishedAt: '2022-05-11T09:35:50.295Z',
-    revisedAt: '2022-05-11T09:35:50.295Z',
-    title: "JP_Stripes What's new 2022/01",
-    url: 'https://www.facebook.com/groups/jpstripes/posts/3009506845969675/',
-    date: '2022-01-13T03:15:00.000Z',
-    place: 'Online',
-    slide_url: 'https://speakerdeck.com/stripehideokamoto/jpstripes-whats-new-202201',
-    blog_url: 'https://qiita.com/hideokamoto/items/2775e20fd260e907ca04',
   },
 ]
