@@ -388,7 +388,7 @@ The warning is informational and won't affect functionality.
 
 This project's Sentry setup provides:
 - ✅ Browser error tracking with `@sentry/browser`
-- ✅ Server error tracking with `@sentry/cloudflare`
+- ✅ Server error tracking with `@sentry/cloudflare` (with integration caveats)
 - ✅ Unified abstraction for runtime-agnostic error capture
 - ✅ Automatic integration via logger
 - ✅ Error boundary integration
