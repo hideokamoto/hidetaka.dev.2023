@@ -1,9 +1,11 @@
 /**
  * ロギングユーティリティ
  * 環境に応じた適切なロギングを提供
+ * 本番環境ではSentryにエラーと警告を送信
  */
 
 const isDevelopment = process.env.NODE_ENV === 'development'
+const isProduction = process.env.NODE_ENV === 'production'
 
 export const logger = {
   /**
@@ -18,20 +20,70 @@ export const logger = {
 
   /**
    * エラーログを出力（本番環境でも記録）
-   * エラー情報は常に記録し、将来的には外部ロギングサービスに送信可能
+   * エラー情報は常に記録し、本番環境ではSentryに送信
+   *
+   * @param message - エラーメッセージ
+   * @param context - エラーの追加コンテキスト情報
+   *
+   * @example
+   * logger.error('API request failed', { endpoint: '/api/posts', statusCode: 500 })
+   *
+   * 動作:
+   * - すべての環境: コンソールにエラーを出力
+   * - 本番環境のみ: Sentryにエラーを送信（設定されている場合）
    */
   error: (message: string, context?: Record<string, unknown>) => {
     console.error('[ERROR]', message, context)
-    // TODO: 将来的には外部ロギングサービス（Sentry等）に送信
+
+    // 本番環境でSentryにエラーを送信（ブラウザのみ）
+    if (isProduction && typeof window !== 'undefined') {
+      // ブラウザ環境のみ：client SDKをインポート
+      import('@/libs/sentry/client')
+        .then(({ captureException }) => {
+          const error = new Error(message)
+          const enrichedContext = {
+            ...context,
+            source: 'logger',
+          }
+          captureException(error, enrichedContext)
+        })
+        .catch((sentryError) => {
+          console.warn('[Logger] Failed to send error to Sentry:', sentryError)
+        })
+    }
   },
 
   /**
-   * 警告ログを出力（開発環境でのみ）
+   * 警告ログを出力（本番環境でも記録）
    * 潜在的な問題や非推奨の使用に使用
+   *
+   * @param message - 警告メッセージ
+   * @param context - 警告の追加コンテキスト情報
+   *
+   * @example
+   * logger.warn('Deprecated API usage', { api: 'oldMethod', replacement: 'newMethod' })
+   *
+   * 動作:
+   * - すべての環境: コンソールに警告を出力
+   * - 本番環境のみ: Sentryに警告メッセージを送信（設定されている場合）
    */
-  warn: (...args: unknown[]) => {
-    if (isDevelopment) {
-      console.warn('[WARN]', ...args)
+  warn: (message: string, context?: Record<string, unknown>) => {
+    console.warn('[WARN]', message, context)
+
+    // 本番環境でSentryに警告を送信（ブラウザのみ）
+    if (isProduction && typeof window !== 'undefined') {
+      // ブラウザ環境のみ：client SDKをインポート
+      import('@/libs/sentry/client')
+        .then(({ captureMessage }) => {
+          const enrichedContext = {
+            ...context,
+            source: 'logger',
+          }
+          captureMessage(message, 'warning', enrichedContext)
+        })
+        .catch((sentryError) => {
+          console.warn('[Logger] Failed to send warning to Sentry:', sentryError)
+        })
     }
   },
 }

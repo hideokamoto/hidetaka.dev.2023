@@ -12,9 +12,12 @@ export default function GlobalError({
   reset: () => void
 }) {
   useEffect(() => {
+    // Log error to console and Sentry via logger
     logger.error(`Global error: ${error.message}`, {
       stack: error.stack,
       digest: error.digest,
+      location: 'GlobalError',
+      page: window.location.pathname,
     })
   }, [error])
 

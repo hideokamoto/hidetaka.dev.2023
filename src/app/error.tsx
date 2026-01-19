@@ -12,9 +12,12 @@ export default function ErrorBoundary({
   reset: () => void
 }) {
   useEffect(() => {
+    // Log error to console and Sentry via logger
     logger.error(`Application error: ${error.message}`, {
       stack: error.stack,
       digest: error.digest,
+      location: 'ErrorBoundary',
+      page: window.location.pathname,
     })
   }, [error])
 
