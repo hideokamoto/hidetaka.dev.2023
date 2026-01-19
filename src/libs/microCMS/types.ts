@@ -7,16 +7,6 @@ export type MicroCMSRecord = {
   publishedAt: string
   revisedAt?: string
 }
-export type MicroCMSEventsRecord = MicroCMSRecord & {
-  title: string
-  url: string
-  date: string
-  place: string
-  description?: string
-  slide_url?: string
-  blog_url?: string
-  session_title?: string
-}
 export type MicroCMSImageObject = {
   url: string
   height: number

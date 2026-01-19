@@ -9,28 +9,7 @@ import type { FeedItem } from '@/libs/dataSources/types'
 import { logger } from '@/libs/logger'
 import { MicroCMSAPI } from '@/libs/microCMS/apis'
 import { createMicroCMSClient } from '@/libs/microCMS/client'
-import type { MicroCMSEventsRecord, MicroCMSProjectsRecord } from '@/libs/microCMS/types'
-
-// ============================================================================
-// Unified Content Types & Helpers
-// ============================================================================
-
-type UnifiedContentItem =
-  | { type: 'article'; data: FeedItem }
-  | { type: 'project'; data: MicroCMSProjectsRecord }
-  | { type: 'event'; data: MicroCMSEventsRecord }
-
-function _getContentDate(item: UnifiedContentItem): Date {
-  switch (item.type) {
-    case 'article': {
-      return new Date(item.data.datetime)
-    }
-    case 'project':
-      return item.data.published_at ? new Date(item.data.published_at) : new Date(0)
-    case 'event':
-      return new Date(item.data.date)
-  }
-}
+import type { MicroCMSProjectsRecord } from '@/libs/microCMS/types'
 
 // ============================================================================
 // Content Cards
@@ -260,37 +239,6 @@ function ProjectCard({
   )
 }
 
-function EventCard({ event, lang }: { event: MicroCMSEventsRecord; lang: string }) {
-  const date = new Date(event.date)
-
-  return (
-    <a href={event.url} target="_blank" rel="noopener noreferrer" className="group block h-full">
-      <article className="flex h-full flex-col rounded-xl border border-zinc-200 bg-white p-6 transition-all hover:border-cyan-300 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-cyan-700">
-        <DateDisplay
-          date={date}
-          lang={lang}
-          format="short"
-          className="mb-3 text-xs font-semibold uppercase tracking-wider text-cyan-600 dark:text-cyan-400"
-        />
-
-        <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors mb-3">
-          {event.title}
-        </h3>
-
-        {event.place && (
-          <p className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
-            {event.place}
-          </p>
-        )}
-
-        {event.session_title && (
-          <p className="text-sm text-slate-500 dark:text-slate-400">{event.session_title}</p>
-        )}
-      </article>
-    </a>
-  )
-}
-
 // ============================================================================
 // Main Section - Unified Content Stream
 // ============================================================================
@@ -301,7 +249,6 @@ export default async function FeaturedContent({ lang }: { lang: string }) {
   // Fetch all content
   const { items: externalPosts } = await loadBlogPosts(lang === 'ja' ? 'ja' : 'en')
   const allProjects = await microCMS.listAllProjects()
-  const allEvents = await microCMS.listEndedEvents()
 
   // Prepare unified content
   const articles: FeedItem[] = externalPosts.sort((a, b) => {
@@ -316,8 +263,6 @@ export default async function FeaturedContent({ lang }: { lang: string }) {
       return new Date(dateB).getTime() - new Date(dateA).getTime()
     })
 
-  const events = allEvents.slice(0, 3)
-
   // Get featured items (most recent)
   const featuredArticle = articles[0]
   const featuredProject = projects[0]
@@ -327,7 +272,6 @@ export default async function FeaturedContent({ lang }: { lang: string }) {
   const viewAllText = lang === 'ja' ? 'すべて見る' : 'View All'
   const latestArticlesText = lang === 'ja' ? '最新記事' : 'Latest Articles'
   const featuredProjectsText = lang === 'ja' ? '注目プロジェクト' : 'Featured Projects'
-  const latestEventsText = lang === 'ja' ? '最新登壇' : 'Latest Speaking'
 
   return (
     <section className="relative py-24 sm:py-32">
@@ -396,30 +340,6 @@ export default async function FeaturedContent({ lang }: { lang: string }) {
                 {/* Other Projects - Compact cards */}
                 {otherProjects.map((project) => (
                   <ProjectCard key={project.id} project={project} lang={lang} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Latest Speaking Section */}
-          {events.length > 0 && (
-            <div>
-              <div className="flex items-center justify-between mb-12">
-                <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-                  {latestEventsText}
-                </h2>
-                <Link
-                  href={lang === 'ja' ? '/ja/speaking' : '/speaking'}
-                  className="group flex items-center gap-1.5 text-sm font-semibold text-indigo-600 transition-all hover:text-indigo-700 hover:gap-2 dark:text-indigo-400 dark:hover:text-indigo-300"
-                >
-                  <span>{viewAllText}</span>
-                  <span className="transition-transform group-hover:translate-x-0.5">→</span>
-                </Link>
-              </div>
-
-              <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {events.map((event) => (
-                  <EventCard key={event.id} event={event} lang={lang} />
                 ))}
               </div>
             </div>
