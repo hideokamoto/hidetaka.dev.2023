@@ -8,12 +8,5 @@ export const metadata = {
 export default async function SpeakingPage() {
   const wpEvents = await loadWPEvents()
 
-  // 日付でソート（新しい順）
-  const sortedEvents = wpEvents.sort((a, b) => {
-    const dateA = new Date(a.date).getTime()
-    const dateB = new Date(b.date).getTime()
-    return dateB - dateA
-  })
-
-  return <SpeakingPageContent lang="en" events={sortedEvents} basePath="/event-reports" />
+  return <SpeakingPageContent lang="en" events={wpEvents} basePath="/event-reports" />
 }
