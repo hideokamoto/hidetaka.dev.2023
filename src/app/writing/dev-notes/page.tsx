@@ -25,7 +25,7 @@ export const metadata: Metadata = {
 export const revalidate = 1800
 
 export default async function DevNotesArchive() {
-  const result = await loadDevNotes(1, 100)
+  const result = await loadDevNotes(1, 100, 'en')
 
   const jsonLd = generateBlogListJsonLd(
     result.items,
