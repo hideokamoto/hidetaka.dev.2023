@@ -4,8 +4,8 @@ import JsonLd from '@/components/JsonLd'
 import { loadDevNotes } from '@/libs/dataSources/devnotes'
 import { generateBlogListJsonLd } from '@/libs/jsonLd'
 
-const title = '開発メモ | Hidetaka.dev';
-const description = '日々の開発で気づいたことや学んだことを記録しています。';
+const title = '開発メモ | Hidetaka.dev'
+const description = '日々の開発で気づいたことや学んだことを記録しています。'
 
 export const metadata: Metadata = {
   title,
