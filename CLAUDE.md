@@ -266,7 +266,7 @@ MicroCMSProjectsRecord    // Work/projects
 ```
 
 **Secondary Sources:** Multi-source feed aggregation
-- WordPress REST API (`thoughts.ts`, `events.ts`)
+- WordPress REST API (`wordpress.ts`, `thoughts.ts`, `events.ts`)
 - Dev.to API (`devto.ts`)
 - Qiita RSS (`qiita.ts`)
 - Zenn RSS (`zenn.ts`)
