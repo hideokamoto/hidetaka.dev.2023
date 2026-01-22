@@ -4,20 +4,23 @@ import JsonLd from '@/components/JsonLd'
 import { loadDevNotes } from '@/libs/dataSources/devnotes'
 import { generateBlogListJsonLd } from '@/libs/jsonLd'
 
+const title = '開発メモ | Hidetaka.dev';
+const description = '日々の開発で気づいたことや学んだことを記録しています。';
+
 export const metadata: Metadata = {
-  title: '開発メモ | Hidetaka.dev',
-  description: '日々の開発で気づいたことや学んだことを記録しています。',
+  title,
+  description,
   openGraph: {
-    title: '開発メモ | Hidetaka.dev',
-    description: '日々の開発で気づいたことや学んだことを記録しています。',
+    title,
+    description,
     type: 'website',
     url: 'https://hidetaka.dev/ja/writing/dev-notes',
     siteName: 'Hidetaka.dev',
   },
   twitter: {
     card: 'summary_large_image',
-    title: '開発メモ | Hidetaka.dev',
-    description: '日々の開発で気づいたことや学んだことを記録しています。',
+    title,
+    description,
   },
 }
 
