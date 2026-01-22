@@ -44,7 +44,7 @@ export default async function DevNoteDetailPage({ params }: { params: Promise<{ 
   // 前後の記事と関連記事を取得
   const [adjacentNotes, relatedArticles] = await Promise.all([
     getAdjacentDevNotes(note),
-    getRelatedDevNotes(note, 4),
+    getRelatedDevNotes(note, 4, 'en'),
   ])
 
   return (

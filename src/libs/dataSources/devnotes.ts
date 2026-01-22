@@ -38,10 +38,15 @@ export const extractCategories = (note: WPThought): Category[] => {
 
 /**
  * dev-notes投稿タイプの記事を取得
+ * @param page - ページ番号（デフォルト: 1）
+ * @param perPage - 1ページあたりの記事数（デフォルト: 20）
+ * @param lang - 言語コード（'ja' または 'en'、デフォルト: 'ja'）
+ * @returns DevNotesResult - dev-notes記事のリストとメタデータ
  */
 export const loadDevNotes = async (
   page: number = 1,
   perPage: number = 20,
+  lang: string = 'ja',
 ): Promise<DevNotesResult> => {
   try {
     const response = await fetch(
@@ -61,7 +66,7 @@ export const loadDevNotes = async (
     const totalPages = Number.parseInt(response.headers.get('X-WP-TotalPages') || '0', 10)
 
     const items: BlogItem[] = notes.map((note: WPThought): BlogItem => {
-      const basePath = '/ja/writing/dev-notes'
+      const basePath = lang === 'ja' ? '/ja/writing/dev-notes' : '/writing/dev-notes'
       const href = `${basePath}/${note.slug}`
 
       return {
@@ -185,10 +190,15 @@ export const getAdjacentDevNotes = async (currentNote: WPThought): Promise<Adjac
 /**
  * 関連記事を取得（同じカテゴリの記事からランダムに選択）
  * カテゴリがない場合は、すべてのdev-notes記事から選択
+ * @param currentNote - 現在のdev-notes記事
+ * @param limit - 取得する関連記事の最大数（デフォルト: 4）
+ * @param lang - 言語コード（'ja' または 'en'、デフォルト: 'ja'）
+ * @returns BlogItem[] - 関連dev-notes記事のリスト
  */
 export const getRelatedDevNotes = async (
   currentNote: WPThought,
   limit: number = 4,
+  lang: string = 'ja',
 ): Promise<BlogItem[]> => {
   try {
     const categories = extractCategories(currentNote)
@@ -217,7 +227,7 @@ export const getRelatedDevNotes = async (
     const notes: WPThought[] = await response.json()
 
     const items: BlogItem[] = notes.map((note: WPThought): BlogItem => {
-      const basePath = '/ja/writing/dev-notes'
+      const basePath = lang === 'ja' ? '/ja/writing/dev-notes' : '/writing/dev-notes'
       const href = `${basePath}/${note.slug}`
 
       return {
@@ -250,20 +260,22 @@ export const getRelatedDevNotes = async (
 
 /**
  * すべてのdev-notes記事を取得（sitemap用）
+ * @param lang - 言語コード（'ja' または 'en'、デフォルト: 'ja'）
+ * @returns BlogItem[] - すべてのdev-notes記事のリスト
  */
-export const loadAllDevNotes = async (): Promise<BlogItem[]> => {
+export const loadAllDevNotes = async (lang: string = 'ja'): Promise<BlogItem[]> => {
   try {
     const allItems: BlogItem[] = []
     let currentPage = 1
     let totalPages = 1
 
-    const firstResult = await loadDevNotes(currentPage, 100)
+    const firstResult = await loadDevNotes(currentPage, 100, lang)
     allItems.push(...firstResult.items)
     totalPages = firstResult.totalPages
 
     while (currentPage < totalPages) {
       currentPage++
-      const result = await loadDevNotes(currentPage, 100)
+      const result = await loadDevNotes(currentPage, 100, lang)
       allItems.push(...result.items)
     }
 
