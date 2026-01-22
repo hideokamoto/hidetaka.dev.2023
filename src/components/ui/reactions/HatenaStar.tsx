@@ -44,7 +44,10 @@ export default function HatenaStar({ url, title, className = '' }: HatenaStarPro
       }
 
       // スターを初期化
-      if (window.Hatena.Star.EntryLoader) {
+      if (
+        window.Hatena.Star.EntryLoader &&
+        typeof window.Hatena.Star.EntryLoader.loadEntries === 'function'
+      ) {
         window.Hatena.Star.EntryLoader.loadEntries()
       }
     }
@@ -55,7 +58,7 @@ export default function HatenaStar({ url, title, className = '' }: HatenaStarPro
       {/* はてなスタースクリプトを Next.js の Script コンポーネントで読み込む */}
       <Script
         src="https://s.hatena.ne.jp/js/HatenaStar.js"
-        strategy="lazyOnload"
+        strategy="afterInteractive"
         onLoad={handleScriptLoad}
       />
 
