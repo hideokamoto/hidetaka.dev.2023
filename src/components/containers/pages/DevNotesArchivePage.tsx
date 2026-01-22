@@ -10,7 +10,13 @@ type DevNotesArchivePageProps = {
   items: BlogItem[]
 }
 
-// Dev-notesカードコンポーネント
+/**
+ * Dev-notesカードコンポーネント
+ * Individual dev-note card with title, date, description, and categories
+ * @param item - Blog item containing dev-note data
+ * @param lang - Language code ('ja' or 'en')
+ * @returns Card component with hover effects and category tags
+ */
 function DevNoteCard({ item, lang }: { item: BlogItem; lang: string }) {
   const date = new Date(item.datetime)
 
@@ -45,7 +51,6 @@ function DevNoteCard({ item, lang }: { item: BlogItem; lang: string }) {
             {item.description && (
               <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-3">
                 {item.description}
-                {item.description.length >= 150 ? '...' : ''}
               </p>
             )}
 
@@ -68,7 +73,12 @@ function DevNoteCard({ item, lang }: { item: BlogItem; lang: string }) {
   )
 }
 
-// 記事が見つからない場合のメッセージコンポーネント
+/**
+ * 記事が見つからない場合のメッセージコンポーネント
+ * Empty state message displayed when no dev-notes are available
+ * @param lang - Language code ('ja' or 'en')
+ * @returns Centered message component
+ */
 function NoArticlesMessage({ lang }: { lang: string }) {
   return (
     <div className="py-12 text-center">
@@ -79,6 +89,13 @@ function NoArticlesMessage({ lang }: { lang: string }) {
   )
 }
 
+/**
+ * DevNotesArchivePage - Archive page for dev-notes articles
+ * Displays a grid of development notes with title, description, date, and categories
+ * @param lang - Language code ('ja' or 'en')
+ * @param items - Array of dev-notes blog items to display
+ * @returns Page section with header and grid layout of dev-notes
+ */
 export default function DevNotesArchivePage({ lang, items }: DevNotesArchivePageProps) {
   const title = lang === 'ja' ? '開発メモ' : 'Development Notes'
   const description =
