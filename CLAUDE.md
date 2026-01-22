@@ -74,7 +74,7 @@ This is a **bilingual portfolio and developer blog** featuring:
 │   │   │   ├── blogs.ts       # Blog aggregation
 │   │   │   ├── thoughts.ts    # WordPress blog
 │   │   │   ├── wordpress.ts   # WordPress REST API
-│   │   │   ├── events.ts      # Event data sources
+│   │   │   ├── events.ts      # WordPress event data sources
 │   │   │   ├── devto.ts       # Dev.to API
 │   │   │   ├── qiita.ts       # Qiita feed
 │   │   │   ├── zenn.ts        # Zenn feed
@@ -262,13 +262,11 @@ className="group"
 
 ```typescript
 // Content Types
-MicroCMSEventsRecord      // Speaking events
 MicroCMSProjectsRecord    // Work/projects
-MicroCMSPostsRecord       // Blog posts
 ```
 
 **Secondary Sources:** Multi-source feed aggregation
-- WordPress REST API (`thoughts.ts`)
+- WordPress REST API (`thoughts.ts`, `events.ts`)
 - Dev.to API (`devto.ts`)
 - Qiita RSS (`qiita.ts`)
 - Zenn RSS (`zenn.ts`)
