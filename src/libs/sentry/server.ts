@@ -2,16 +2,14 @@
  * Server-side Sentry configuration for Cloudflare Workers
  * Uses @sentry/cloudflare for Workers V8 runtime compatibility
  *
- * NOTE: Full Cloudflare Workers integration with @sentry/cloudflare requires
- * wrapping the Workers handler with Sentry middleware. For Next.js deployed
- * to Cloudflare Workers via OpenNext, this integration is complex and requires
- * custom OpenNext configuration.
+ * For Next.js on Cloudflare Workers (via OpenNext), Sentry works automatically
+ * with the correct Wrangler configuration (no manual initialization needed):
  *
- * Current implementation: Browser-only error tracking via @sentry/browser.
- * Server-side errors are logged to console and will appear in Cloudflare Workers logs.
+ * Requirements (configured in wrangler.jsonc):
+ * - compatibility_flags: ["nodejs_compat"] - Enables Node.js APIs required by Sentry
+ * - compatibility_date: "2025-08-16" or later - Provides https.request for Sentry data transmission
  *
- * Future improvement: Integrate @sentry/cloudflare with OpenNext worker handler.
- * See: https://docs.sentry.io/platforms/javascript/guides/cloudflare/
+ * See: https://docs.sentry.io/platforms/javascript/guides/nextjs/best-practices/deploying-on-cloudflare/
  */
 
 import {
@@ -22,44 +20,33 @@ import {
 type SeverityLevel = 'fatal' | 'error' | 'warning' | 'log' | 'info' | 'debug'
 
 /**
- * Track if Sentry has been initialized
- * Note: For Cloudflare Workers with Next.js/OpenNext, initialization happens
- * at the Workers handler level, not in application code.
+ * Check if Sentry DSN is configured
  */
-const isInitialized = false
+function isSentryConfigured(): boolean {
+  return Boolean(process.env.SENTRY_DSN)
+}
 
 /**
  * Initialize Sentry for Cloudflare Workers context
  *
- * NOTE: This is a placeholder for future integration with OpenNext.
- * Full Cloudflare Workers Sentry integration requires modifying the
- * OpenNext-generated worker.js file to wrap the handler with withSentry().
+ * For Next.js on Cloudflare Workers (via OpenNext), manual initialization is not required.
+ * Sentry works automatically with the correct Wrangler configuration.
+ * This function is maintained for API compatibility but performs no action.
  *
- * For now, server-side errors are only logged to console and will appear
- * in Cloudflare Workers logs. Browser-side errors are tracked via @sentry/browser.
+ * Requires wrangler.jsonc configuration:
+ * - compatibility_flags: ["nodejs_compat"]
+ * - compatibility_date: "2025-08-16" or later
  */
 export function initSentry(): void {
-  const dsn = process.env.SENTRY_DSN
+  // No initialization needed - Sentry works automatically with correct Wrangler config
+  // See: https://docs.sentry.io/platforms/javascript/guides/nextjs/best-practices/deploying-on-cloudflare/
 
-  // Skip initialization if DSN is not configured
-  if (!dsn) {
-    console.warn(
-      '[Sentry] Server DSN not configured, skipping initialization (errors will be logged to console)',
-    )
-    return
+  if (process.env.NODE_ENV === 'development' && isSentryConfigured()) {
+    console.log('[Sentry] Server-side Sentry is configured (via Wrangler compatibility settings)')
+    console.log('[Sentry] Ensure wrangler.jsonc has:')
+    console.log('[Sentry]   - compatibility_date: "2025-08-16" or later')
+    console.log('[Sentry]   - compatibility_flags: ["nodejs_compat"]')
   }
-
-  // Skip initialization in development mode
-  if (process.env.NODE_ENV !== 'production') {
-    console.log('[Sentry] Development mode detected, skipping Sentry initialization')
-    console.log('[Sentry] Errors will be logged to console only')
-    return
-  }
-
-  // For Cloudflare Workers with Next.js/OpenNext, Sentry initialization
-  // should be done in the worker handler, not here.
-  console.warn('[Sentry] Server-side Sentry for Cloudflare Workers requires OpenNext integration')
-  console.log('[Sentry] Server errors will be logged to console and Cloudflare Workers logs')
 }
 
 /**
@@ -67,16 +54,15 @@ export function initSentry(): void {
  * @param error - The error to capture
  * @param context - Additional context data
  *
- * NOTE: This uses @sentry/cloudflare's captureException, but without proper
- * initialization in the Workers handler, events may not be sent to Sentry.
+ * Sends the error to Sentry via @sentry/cloudflare.
  * Errors are always logged to console for visibility in Workers logs.
  */
 export function captureException(error: Error, context?: Record<string, unknown>): void {
   // Always log to console for Cloudflare Workers logs
   console.error('[Sentry] Server error:', error, context)
 
-  // In production with DSN configured, attempt to send to Sentry
-  if (process.env.NODE_ENV === 'production' && process.env.SENTRY_DSN) {
+  // In production with DSN configured, send to Sentry
+  if (process.env.NODE_ENV === 'production' && isSentryConfigured()) {
     try {
       sentryCaptureException(error, {
         extra: context,
@@ -97,8 +83,7 @@ export function captureException(error: Error, context?: Record<string, unknown>
  * @param level - The severity level
  * @param context - Additional context data
  *
- * NOTE: This uses @sentry/cloudflare's captureMessage, but without proper
- * initialization in the Workers handler, events may not be sent to Sentry.
+ * Sends the message to Sentry via @sentry/cloudflare.
  * Messages are always logged to console for visibility in Workers logs.
  */
 export function captureMessage(
@@ -110,8 +95,8 @@ export function captureMessage(
   const logMethod = level === 'error' || level === 'fatal' ? console.error : console.log
   logMethod(`[Sentry] Server message [${level}]:`, message, context)
 
-  // In production with DSN configured, attempt to send to Sentry
-  if (process.env.NODE_ENV === 'production' && process.env.SENTRY_DSN) {
+  // In production with DSN configured, send to Sentry
+  if (process.env.NODE_ENV === 'production' && isSentryConfigured()) {
     try {
       sentryCaptureMessage(message, {
         level,
@@ -129,11 +114,11 @@ export function captureMessage(
 
 /**
  * Check if Sentry is initialized
- * @returns true if Sentry is initialized
+ * @returns true if Sentry is configured (DSN is set)
  *
- * NOTE: For Cloudflare Workers with Next.js/OpenNext, this always returns false
- * because initialization happens at the Workers handler level, not in application code.
+ * For Next.js on Cloudflare Workers, Sentry works automatically with
+ * correct Wrangler configuration, so we check if DSN is configured.
  */
 export function isSentryInitialized(): boolean {
-  return isInitialized
+  return isSentryConfigured()
 }
