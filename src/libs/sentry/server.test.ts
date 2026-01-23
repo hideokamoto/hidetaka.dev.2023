@@ -9,6 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 vi.mock('@sentry/cloudflare', () => ({
   captureException: vi.fn(),
   captureMessage: vi.fn(),
+  isInitialized: vi.fn(() => false), // Always returns false (no manual init)
 }))
 
 describe('Sentry Server Functions', () => {
@@ -234,32 +235,49 @@ describe('Sentry Server Functions', () => {
   })
 
   describe('isSentryInitialized', () => {
-    it('should return false when DSN is not configured', async () => {
+    it('should return false when Sentry.init() is not called', async () => {
       delete process.env.SENTRY_DSN
 
       const { isSentryInitialized } = await import('./server')
+      // Uses Sentry.isInitialized() which returns false without manual init
       expect(isSentryInitialized()).toBe(false)
     })
 
-    it('should return true when DSN is configured', async () => {
+    it('should return false even when DSN is configured (no auto-init)', async () => {
       process.env.SENTRY_DSN = 'https://test@sentry.io/123'
       process.env.NODE_ENV = 'production'
 
       const { isSentryInitialized } = await import('./server')
 
-      // Returns true if DSN is configured (regardless of initSentry call)
-      expect(isSentryInitialized()).toBe(true)
+      // Returns false because Sentry.init() is never called
+      expect(isSentryInitialized()).toBe(false)
     })
 
-    it('should return true after init is called with DSN configured', async () => {
+    it('should return false after initSentry() is called (no-op)', async () => {
       process.env.SENTRY_DSN = 'https://test@sentry.io/123'
       process.env.NODE_ENV = 'production'
 
       const { initSentry, isSentryInitialized } = await import('./server')
 
-      expect(isSentryInitialized()).toBe(true)
-      initSentry()
-      expect(isSentryInitialized()).toBe(true)
+      expect(isSentryInitialized()).toBe(false)
+      initSentry() // This is a no-op
+      expect(isSentryInitialized()).toBe(false)
+    })
+  })
+
+  describe('isSentryConfigured', () => {
+    it('should return false when DSN is not set', async () => {
+      delete process.env.SENTRY_DSN
+
+      const { isSentryConfigured } = await import('./server')
+      expect(isSentryConfigured()).toBe(false)
+    })
+
+    it('should return true when DSN is set', async () => {
+      process.env.SENTRY_DSN = 'https://test@sentry.io/123'
+
+      const { isSentryConfigured } = await import('./server')
+      expect(isSentryConfigured()).toBe(true)
     })
   })
 })

@@ -13,18 +13,12 @@
  */
 
 import {
+  isInitialized,
   captureException as sentryCaptureException,
   captureMessage as sentryCaptureMessage,
 } from '@sentry/cloudflare'
 
 type SeverityLevel = 'fatal' | 'error' | 'warning' | 'log' | 'info' | 'debug'
-
-/**
- * Check if Sentry DSN is configured
- */
-function isSentryConfigured(): boolean {
-  return Boolean(process.env.SENTRY_DSN)
-}
 
 /**
  * Initialize Sentry for Cloudflare Workers context
@@ -114,11 +108,22 @@ export function captureMessage(
 
 /**
  * Check if Sentry is initialized
- * @returns true if Sentry is configured (DSN is set)
+ * @returns true if Sentry SDK is initialized
  *
- * For Next.js on Cloudflare Workers, Sentry works automatically with
- * correct Wrangler configuration, so we check if DSN is configured.
+ * Note: For Cloudflare Workers with automatic Wrangler configuration,
+ * this will return false unless Sentry.init() is explicitly called.
+ * Use isSentryConfigured() to check if DSN is configured instead.
  */
 export function isSentryInitialized(): boolean {
-  return isSentryConfigured()
+  return isInitialized()
+}
+
+/**
+ * Check if Sentry DSN is configured
+ * @returns true if SENTRY_DSN environment variable is set
+ *
+ * This indicates whether Sentry error capture will work in production.
+ */
+export function isSentryConfigured(): boolean {
+  return Boolean(process.env.SENTRY_DSN)
 }

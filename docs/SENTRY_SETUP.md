@@ -119,11 +119,12 @@ Then trigger errors and check your Sentry dashboard.
 
 - Uses `@sentry/cloudflare` for Cloudflare Workers
 - Configured via `SENTRY_DSN` and optional `SENTRY_RELEASE` environment variables
-- Initialization via `Sentry.init()` in application code
-- Automatically captures:
-  - Server-side errors via `logger.error()`
-  - Server-side warnings via `logger.warn()`
-  - Unhandled exceptions in Workers runtime
+- **No automatic initialization** - `initSentry()` is a no-op function
+- Captures errors when explicitly called:
+  - Server-side errors via `logger.error()` → `captureException()`
+  - Server-side warnings via `logger.warn()` → `captureMessage()`
+  - Events only sent in production when `SENTRY_DSN` is present
+  - All errors/messages also logged to console
 
 **Cloudflare Workers Configuration:** `wrangler.jsonc`
 
@@ -249,26 +250,27 @@ The server-side Sentry integration for Next.js on Cloudflare Workers (via OpenNe
 }
 ```
 
-### Sentry Initialization
+### Sentry Integration Pattern
 
-Unlike traditional Cloudflare Workers where you wrap the handler with `Sentry.withSentry()`, Next.js apps deployed via OpenNext use standard initialization:
+Unlike traditional Cloudflare Workers where you wrap the handler with `Sentry.withSentry()`, Next.js apps deployed via OpenNext rely on the Wrangler runtime configuration for Sentry support.
 
-**Initialization Pattern:**
-```typescript
-import { init as sentryInit } from '@sentry/cloudflare'
+**Implementation Details:**
 
-sentryInit({
-  dsn: process.env.SENTRY_DSN,
-  release: process.env.SENTRY_RELEASE,
-  environment: process.env.NODE_ENV || 'production',
-  tracesSampleRate: 0, // Disable performance tracing
-})
-```
+1. **No Explicit Initialization**
+   - `initSentry()` in `src/libs/sentry/server.ts` is a **no-op function** (does nothing)
+   - No `Sentry.init()` is called anywhere in the application code
+   - Sentry SDK is **not automatically initialized** at app startup
 
-**Where it happens:**
-- Server-side initialization occurs in `src/libs/sentry/server.ts`
-- Called automatically when the application starts
-- Only initializes in production mode with valid DSN
+2. **Direct Error Capture**
+   - `captureException()` and `captureMessage()` from `@sentry/cloudflare` are exposed
+   - These functions work directly when called, without requiring initialization
+   - Events are only sent to Sentry in production when `SENTRY_DSN` is present
+   - All errors/messages are also logged to console (Cloudflare Workers logs)
+
+3. **Runtime Requirements**
+   - Wrangler configuration provides the necessary Node.js APIs
+   - `compatibility_date: "2025-08-16"` enables `https.request` for Sentry transmission
+   - `compatibility_flags: ["nodejs_compat"]` enables Node.js compatibility layer
 
 ### Version Metadata Binding
 
