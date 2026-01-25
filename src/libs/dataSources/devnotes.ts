@@ -1,3 +1,4 @@
+import { APIError } from '@/libs/errors'
 import { logger } from '@/libs/logger'
 import type { BlogItem, Category, WPThought } from './types'
 
@@ -57,7 +58,11 @@ export const loadDevNotes = async (
     )
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch dev-notes: ${response.status}`)
+      throw await APIError.fromResponse(response, '/wp-json/wp/v2/dev-notes', {
+        page,
+        perPage,
+        lang,
+      })
     }
 
     const notes: WPThought[] = await response.json()
@@ -113,7 +118,9 @@ export const getDevNoteBySlug = async (slug: string): Promise<WPThought | null> 
     )
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch dev-note by slug: ${response.status}`)
+      throw await APIError.fromResponse(response, '/wp-json/wp/v2/dev-notes', {
+        slug,
+      })
     }
 
     const notes: WPThought[] = await response.json()
@@ -221,7 +228,12 @@ export const getRelatedDevNotes = async (
     })
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch related dev-notes: ${response.status}`)
+      throw await APIError.fromResponse(response, '/wp-json/wp/v2/dev-notes', {
+        currentNoteId: currentNote.id,
+        categories: categories.map((c) => c.id),
+        limit,
+        lang,
+      })
     }
 
     const notes: WPThought[] = await response.json()
