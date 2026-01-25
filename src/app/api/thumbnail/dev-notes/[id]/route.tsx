@@ -1,149 +1,68 @@
 import type { NextRequest } from 'next/server'
-import { SITE_CONFIG } from '@/config'
-import type { WPThought } from '@/libs/dataSources/types'
+import { withCacheAndContext } from '@/libs/api/cloudflareCache'
+import { withRateLimit } from '@/libs/api/rateLimit'
+import {
+  type CloudflareContext,
+  fetchWordPressPost,
+  generateOGImage,
+  getCloudflareContext,
+  validatePostId,
+} from '@/libs/api/thumbnailUtils'
 import { logger } from '@/libs/logger'
-
-// Wranglerのローカル開発セッションエラーメッセージ
-// Service Bindingがローカル開発セッションを見つけられない場合のエラーメッセージ
-const WRANGLER_LOCAL_DEV_SESSION_ERROR = "Couldn't find a local dev session"
-
-// getCloudflareContextを動的インポートで取得（OpenNextのビルドプロセスで正しく解決されるように）
-async function getCloudflareContext(
-  options: { async: true } | { async?: false } = { async: false },
-) {
-  try {
-    const { getCloudflareContext: getContext } = await import('@opennextjs/cloudflare')
-    if (options.async === true) {
-      return await getContext({ async: true })
-    }
-    return getContext({ async: false })
-  } catch (_error) {
-    const cloudflareContextSymbol = Symbol.for('__cloudflare-context__')
-    const context = (
-      globalThis as typeof globalThis & {
-        [key: symbol]: unknown
-      }
-    )[cloudflareContextSymbol]
-    if (context) {
-      return options.async === true ? Promise.resolve(context) : context
-    }
-    throw new Error('Cloudflare context is not available')
-  }
-}
-
-// WordPress APIからdev-noteを取得
-async function fetchDevNoteFromWordPress(postId: number): Promise<{ title: string }> {
-  const wpResponse = await fetch(
-    `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes/${postId}?_fields=id,title`,
-  )
-
-  if (!wpResponse.ok) {
-    if (wpResponse.status === 404) {
-      throw new Response('Post not found', { status: 404 })
-    }
-    logger.error('WordPress API error', {
-      status: wpResponse.status,
-      statusText: wpResponse.statusText,
-      postId,
-    })
-    throw new Response('Failed to fetch post', { status: wpResponse.status })
-  }
-
-  const note: WPThought = await wpResponse.json()
-
-  if (!note.title?.rendered) {
-    throw new Response('Post title not found', { status: 500 })
-  }
-
-  return { title: note.title.rendered }
-}
-
-// Service Bindingのフォールバック付きでOG画像を生成
-async function generateOGImageWithFallback(
-  _title: string,
-  ogImageGenerator: { fetch: typeof fetch } | undefined,
-  ogImageUrl: URL,
-  headers: Headers,
-): Promise<Response> {
-  const fallbackFetch = () => fetch(ogImageUrl, { headers })
-  let response: Response
-
-  if (ogImageGenerator) {
-    response = await ogImageGenerator.fetch(ogImageUrl, { headers })
-
-    // Service Bindingが503エラーを返し、ローカル開発セッションが見つからない場合は通常のfetchにフォールバック
-    if (response.status === 503) {
-      const responseBodyText = await response
-        .clone()
-        .text()
-        .catch(() => '')
-      if (responseBodyText.includes(WRANGLER_LOCAL_DEV_SESSION_ERROR)) {
-        response = await fallbackFetch()
-      }
-    }
-  } else {
-    // Service Bindingが利用できない場合は通常のfetchを使用
-    response = await fallbackFetch()
-  }
-
-  return response
-}
 
 /**
  * WordPressのdev-notes投稿タイプ用のサムネイル画像生成API
+ *
+ * Features:
+ * - Rate limiting: 60 requests per minute per IP
+ * - Cloudflare Cache API: 1 year TTL for generated images
+ * - WordPress post validation: Only generates images for existing posts
  */
-export async function GET(_request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const postId = Number.parseInt(id, 10)
 
   try {
-    if (Number.isNaN(postId) || postId <= 0) {
-      return new Response('Invalid post ID', { status: 404 })
-    }
+    // Validate post ID
+    const postId = validatePostId(id)
 
-    const { title } = await fetchDevNoteFromWordPress(postId)
-    logger.log('Generating thumbnail for dev-note', { postId, title })
+    // Apply rate limiting (60 requests/minute)
+    return await withRateLimit(
+      request,
+      async () => {
+        // Get Cloudflare context
+        const context = (await getCloudflareContext({ async: true })) as CloudflareContext
+        const { env } = context
 
-    const context = (await getCloudflareContext({ async: true })) as {
-      env: {
-        OG_IMAGE_GENERATOR?: { fetch: typeof fetch }
-        OG_IMAGE_GEN_AUTH_TOKEN?: string
-      }
-    }
-    const typedEnv = context.env
-    const ogImageGenerator = typedEnv.OG_IMAGE_GENERATOR
+        // Use Cloudflare Cache API with 1 year TTL
+        return await withCacheAndContext(
+          request,
+          context as { waitUntil: (promise: Promise<unknown>) => void },
+          async () => {
+            // Fetch WordPress post to validate and get title
+            const { title } = await fetchWordPressPost(postId, 'dev-notes')
+            logger.log('Generating thumbnail for dev-note', { postId, title })
 
-    const ogImageUrl = new URL('https://cf-ogp-image-gen-worker.wp-kyoto.workers.dev/generate')
-    ogImageUrl.searchParams.set('title', title)
-    ogImageUrl.searchParams.set('siteUrl', SITE_CONFIG.url)
+            // Generate OG image
+            const authToken = env.OG_IMAGE_GEN_AUTH_TOKEN || process.env.OG_IMAGE_GEN_AUTH_TOKEN
+            const response = await generateOGImage(title, env.OG_IMAGE_GENERATOR, authToken)
 
-    const headers = new Headers()
-    const authToken = typedEnv.OG_IMAGE_GEN_AUTH_TOKEN || process.env.OG_IMAGE_GEN_AUTH_TOKEN
-    if (authToken) {
-      headers.set('Authorization', `Bearer ${authToken}`)
-    }
+            if (!response.ok) {
+              logger.error('OG image generation failed', {
+                status: response.status,
+                statusText: response.statusText,
+                postId,
+                title,
+              })
+              return new Response('Failed to generate image', { status: response.status })
+            }
 
-    const response = await generateOGImageWithFallback(title, ogImageGenerator, ogImageUrl, headers)
-
-    if (!response.ok) {
-      logger.error('OG image generation failed', {
-        status: response.status,
-        statusText: response.statusText,
-        postId,
-        title,
-      })
-      return new Response('Failed to generate image', { status: response.status })
-    }
-
-    const responseHeaders = new Headers(response.headers)
-    responseHeaders.set('Cache-Control', 'public, max-age=86400, s-maxage=86400')
-    responseHeaders.set('CDN-Cache-Control', 'public, max-age=86400')
-
-    return new Response(response.body, {
-      status: response.status,
-      statusText: response.statusText,
-      headers: responseHeaders,
-    })
+            return response
+          },
+          { ttl: 31536000, immutable: true }, // 1 year cache
+        )
+      },
+      { maxRequests: 60, windowSeconds: 60 },
+    )
   } catch (error) {
     if (error instanceof Response) {
       return error
