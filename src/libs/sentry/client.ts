@@ -5,6 +5,10 @@
 
 import * as Sentry from '@sentry/browser'
 
+// Note: We use process.env directly instead of env for Sentry config
+// because tests need to mock these values dynamically, and the env module
+// is evaluated at import time and caches values.
+
 /**
  * Common non-actionable errors that should be ignored
  * These are typically browser extensions, network issues, or third-party scripts

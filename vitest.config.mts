@@ -7,6 +7,12 @@ export default defineConfig({
     environment: 'node',
     include: ['**/*.test.ts'],
     exclude: ['**/*.component.test.{ts,tsx}', '**/node_modules/**'],
+    // Set up environment variables for tests
+    env: {
+      NODE_ENV: 'test',
+      MICROCMS_API_KEY: 'test_api_key',
+      OG_IMAGE_GEN_AUTH_TOKEN: 'test_token',
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html', 'lcov'],

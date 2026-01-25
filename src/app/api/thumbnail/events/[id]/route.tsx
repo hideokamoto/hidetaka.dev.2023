@@ -1,5 +1,6 @@
 import type { NextRequest } from 'next/server'
 import { SITE_CONFIG } from '@/config'
+import { env } from '@/env'
 import type { WPEvent } from '@/libs/dataSources/types'
 import { logger } from '@/libs/logger'
 
@@ -131,7 +132,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 
     // 認証トークンをヘッダーに追加
     const headers = new Headers()
-    const authToken = typedEnv.OG_IMAGE_GEN_AUTH_TOKEN || process.env.OG_IMAGE_GEN_AUTH_TOKEN
+    const authToken = typedEnv.OG_IMAGE_GEN_AUTH_TOKEN || env.OG_IMAGE_GEN_AUTH_TOKEN
     if (authToken) {
       headers.set('Authorization', `Bearer ${authToken}`)
     }

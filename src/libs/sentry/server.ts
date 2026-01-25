@@ -17,6 +17,11 @@ import {
   captureException as sentryCaptureException,
   captureMessage as sentryCaptureMessage,
 } from '@sentry/cloudflare'
+import { env } from '@/env'
+
+// Note: We use process.env.NODE_ENV directly instead of env.NODE_ENV
+// because tests need to mock NODE_ENV dynamically, and the env module
+// is evaluated at import time.
 
 type SeverityLevel = 'fatal' | 'error' | 'warning' | 'log' | 'info' | 'debug'
 
@@ -125,5 +130,5 @@ export function isSentryInitialized(): boolean {
  * This indicates whether Sentry error capture will work in production.
  */
 export function isSentryConfigured(): boolean {
-  return Boolean(process.env.SENTRY_DSN)
+  return Boolean(env.SENTRY_DSN)
 }

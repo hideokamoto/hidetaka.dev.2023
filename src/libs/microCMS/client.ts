@@ -1,30 +1,16 @@
 import { createClient } from 'microcms-js-sdk'
-import { logger } from '@/libs/logger'
+import { env } from '@/env'
 import type { MicroCMSClient } from './types'
 
+/**
+ * Create microCMS API client with type-safe environment variables
+ *
+ * The API key is validated at startup via src/env.ts, so we can safely
+ * use it here without additional null checks or fallback logic.
+ */
 export const createMicroCMSClient = (): MicroCMSClient => {
-  const apiKey = process.env.MICROCMS_API_KEY
-
-  if (apiKey) {
-    return createClient({
-      serviceDomain: 'hidetaka',
-      apiKey: apiKey,
-    })
-  }
-
-  logger.warn('Failed to load the microcms API keys')
-
-  return {
-    async get(props) {
-      if (props.contentId) {
-        return {}
-      }
-      return {
-        contents: [],
-      }
-    },
-    async getAllContents(_props) {
-      return []
-    },
-  } as MicroCMSClient
+  return createClient({
+    serviceDomain: 'hidetaka',
+    apiKey: env.MICROCMS_API_KEY, // Type-safe, guaranteed to exist
+  })
 }
