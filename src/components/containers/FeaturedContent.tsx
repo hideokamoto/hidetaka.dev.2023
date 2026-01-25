@@ -6,7 +6,7 @@ import DateDisplay from '@/components/ui/DateDisplay'
 import Tag from '@/components/ui/Tag'
 import { loadBlogPosts } from '@/libs/dataSources/blogs'
 import type { FeedItem } from '@/libs/dataSources/types'
-import { logger } from '@/libs/logger'
+import { parseDateSafely } from '@/libs/dateDisplay.utils'
 import { MicroCMSAPI } from '@/libs/microCMS/apis'
 import { createMicroCMSClient } from '@/libs/microCMS/client'
 import type { MicroCMSProjectsRecord } from '@/libs/microCMS/types'
@@ -29,22 +29,16 @@ function ArticleCard({
   const description = article.description
   const datetime = article.datetime
 
-  // Parse date properly - handle RFC 822 format from RSS feeds
-  let date: Date
-  try {
-    date = new Date(datetime)
-    // Validate date
-    if (Number.isNaN(date.getTime())) {
-      logger.warn('Invalid date string', { datetime, articleTitle: title })
-      date = new Date() // Fallback to current date
-    }
-  } catch (e) {
-    logger.warn('Date parsing error', {
-      error: e instanceof Error ? e.message : String(e),
-      datetime,
-      articleTitle: title,
-    })
-    date = new Date() // Fallback to current date
+  // Parse date safely - returns null for invalid dates instead of falling back to current date
+  const date = parseDateSafely(datetime, {
+    articleTitle: title,
+    source: article.dataSource?.name,
+  })
+
+  // Skip rendering article if date is invalid
+  // This prevents showing articles with corrupted or missing date data
+  if (!date) {
+    return null
   }
 
   const CardWrapper = ({ children }: { children: React.ReactNode }) => {
