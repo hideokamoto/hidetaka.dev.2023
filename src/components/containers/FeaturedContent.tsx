@@ -245,9 +245,18 @@ export default async function FeaturedContent({ lang }: { lang: string }) {
   const allProjects = await microCMS.listAllProjects()
 
   // Prepare unified content
-  const articles: FeedItem[] = externalPosts.sort((a, b) => {
-    return new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
-  })
+  // Filter articles with valid dates to prevent ArticleCard from returning null
+  const articles: FeedItem[] = externalPosts
+    .map((article) => ({
+      article,
+      date: parseDateSafely(article.datetime, {
+        articleTitle: article.title,
+        source: article.dataSource?.name,
+      }),
+    }))
+    .filter((item): item is { article: FeedItem; date: Date } => item.date !== null)
+    .sort((a, b) => b.date.getTime() - a.date.getTime())
+    .map(({ article }) => article)
 
   const projects = allProjects
     .filter((p) => p.published_at)
