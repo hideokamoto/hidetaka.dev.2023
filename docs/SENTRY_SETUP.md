@@ -4,9 +4,16 @@ This document explains how to set up and use Sentry error tracking in the Hideta
 
 ## Overview
 
-The project is configured with dual Sentry SDKs:
-- **`@sentry/browser`**: Client-side (browser) error tracking
-- **`@sentry/cloudflare`**: Server-side (Cloudflare Workers) error tracking
+The project uses **`@sentry/nextjs`** SDK for unified error tracking across all runtimes:
+- **Client-side (Browser)**: Browser error tracking via `@sentry/nextjs` browser integration
+- **Server-side (Edge Runtime)**: Cloudflare Workers error tracking via `@sentry/nextjs` edge integration
+- **Server-side (Node.js Runtime)**: Local development error tracking via `@sentry/nextjs` server integration
+
+**Key Features:**
+- ✅ Automatic initialization via Next.js instrumentation (`src/instrumentation.ts`)
+- ✅ Automatic error flushing on Cloudflare Workers (v10.28.0+)
+- ✅ `onRequestError` hook for Server Components, middleware, and proxies (Next.js 15+)
+- ✅ Integration with existing `logger` utility
 
 Error tracking is integrated into the existing `logger` utility, so all `logger.error()` and `logger.warn()` calls automatically send errors to Sentry in production.
 
@@ -96,11 +103,41 @@ Then trigger errors and check your Sentry dashboard.
 
 ## Architecture
 
+### Initialization System
+
+**Next.js Instrumentation** (`src/instrumentation.ts`)
+
+The primary entry point for Sentry initialization. Next.js automatically calls this file when the server starts (Next.js 15+).
+
+- **Runtime Detection**: Conditionally imports the appropriate Sentry config based on `process.env.NEXT_RUNTIME`
+  - `edge` → loads `src/sentry.edge.config.ts` (Cloudflare Workers)
+  - `nodejs` → loads `src/sentry.server.config.ts` (local development)
+- **Error Hook**: Exports `onRequestError()` to automatically capture errors from Server Components, middleware, and proxies
+
+**Edge Runtime Configuration** (`src/sentry.edge.config.ts`)
+
+Sentry configuration for Cloudflare Workers deployment via OpenNext.
+
+- Uses `@sentry/nextjs` edge integration
+- Configured via `SENTRY_DSN` or `NEXT_PUBLIC_SENTRY_DSN`
+- **Automatic error flushing** via `waitUntil` detection (v10.28.0+)
+  - No manual `flush()` calls needed
+  - Automatically detects OpenNext's `__cloudflare-context__` symbol
+  - See: [PR #18336](https://github.com/getsentry/sentry-javascript/pull/18336)
+
+**Server Runtime Configuration** (`src/sentry.server.config.ts`)
+
+Sentry configuration for Node.js runtime (local development only).
+
+- Uses `@sentry/nextjs` server integration
+- Configured via `SENTRY_DSN`
+- Only active during local development (`npm run dev`)
+
 ### Browser-side Tracking
 
 **File:** `src/libs/sentry/client.ts`
 
-- Initializes `@sentry/browser` in the browser
+- Initializes `@sentry/nextjs` in the browser
 - Configured via `NEXT_PUBLIC_SENTRY_DSN`
 - Automatically captures:
   - Unhandled exceptions
@@ -117,9 +154,9 @@ Then trigger errors and check your Sentry dashboard.
 
 **File:** `src/libs/sentry/server.ts`
 
-- Uses `@sentry/cloudflare` for Cloudflare Workers
+- Re-exports functions from `@sentry/nextjs` for server-side use
 - Configured via `SENTRY_DSN` and optional `SENTRY_RELEASE` environment variables
-- **No automatic initialization** - `initSentry()` is a no-op function
+- **Automatic initialization** via `src/instrumentation.ts`
 - Captures errors when explicitly called:
   - Server-side errors via `logger.error()` → `captureException()`
   - Server-side warnings via `logger.warn()` → `captureMessage()`
@@ -252,25 +289,32 @@ The server-side Sentry integration for Next.js on Cloudflare Workers (via OpenNe
 
 ### Sentry Integration Pattern
 
-Unlike traditional Cloudflare Workers where you wrap the handler with `Sentry.withSentry()`, Next.js apps deployed via OpenNext rely on the Wrangler runtime configuration for Sentry support.
+**How It Works with OpenNext + Cloudflare Workers:**
 
-**Implementation Details:**
+1. **Automatic Initialization via Next.js Instrumentation**
+   - Next.js automatically calls `src/instrumentation.ts` at server startup
+   - `instrumentation.ts` detects the runtime (`edge` for Cloudflare Workers)
+   - Loads `src/sentry.edge.config.ts` which calls `Sentry.init()`
+   - No manual initialization needed in application code
 
-1. **No Explicit Initialization**
-   - `initSentry()` in `src/libs/sentry/server.ts` is a **no-op function** (does nothing)
-   - No `Sentry.init()` is called anywhere in the application code
-   - Sentry SDK is **not automatically initialized** at app startup
+2. **Automatic Error Flushing (v10.28.0+)**
+   - **Key Feature**: Sentry automatically detects OpenNext's `waitUntil` context
+   - **How it works**: [PR #18336](https://github.com/getsentry/sentry-javascript/pull/18336) adds detection of OpenNext's `__cloudflare-context__` symbol
+   - **Result**: Errors are automatically flushed before the worker shuts down
+   - **No manual `flush()` calls needed**
 
-2. **Direct Error Capture**
-   - `captureException()` and `captureMessage()` from `@sentry/cloudflare` are exposed
-   - These functions work directly when called, without requiring initialization
+3. **Error Capture Methods**
+   - **Automatic**: `onRequestError()` hook catches Server Component/middleware errors
+   - **Manual**: Call `captureException()` or `captureMessage()` anywhere
+   - **Via Logger**: Use `logger.error()` or `logger.warn()` (automatically calls Sentry)
    - Events are only sent to Sentry in production when `SENTRY_DSN` is present
    - All errors/messages are also logged to console (Cloudflare Workers logs)
 
-3. **Runtime Requirements**
+4. **Runtime Requirements**
    - Wrangler configuration provides the necessary Node.js APIs
    - `compatibility_date: "2025-08-16"` enables `https.request` for Sentry transmission
    - `compatibility_flags: ["nodejs_compat"]` enables Node.js compatibility layer
+   - `@sentry/nextjs` version 10.28.0 or later for automatic flushing
 
 ### Version Metadata Binding
 
@@ -302,6 +346,11 @@ According to Sentry's official documentation:
 2. **Requires recent Cloudflare Workers runtime**
    - Must use compatibility date `2025-08-16` or later
    - Older compatibility dates lack required APIs
+
+3. **Requires @sentry/nextjs v10.28.0 or later**
+   - Automatic error flushing on Cloudflare Workers requires v10.28.0+
+   - Earlier versions may not properly capture all server-side errors
+   - See [Issue #14931](https://github.com/getsentry/sentry-javascript/issues/14931) and [PR #18336](https://github.com/getsentry/sentry-javascript/pull/18336)
 
 ### Environment Variables
 
