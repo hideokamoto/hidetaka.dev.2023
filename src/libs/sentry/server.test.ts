@@ -9,6 +9,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 vi.mock('@sentry/cloudflare', () => ({
   captureException: vi.fn(),
   captureMessage: vi.fn(),
+  isInitialized: vi.fn(() => false), // Always returns false (no manual init)
 }))
 
 describe('Sentry Server Functions', () => {
@@ -40,19 +41,19 @@ describe('Sentry Server Functions', () => {
   })
 
   describe('initSentry', () => {
-    it('should warn if DSN is not configured', async () => {
+    it('should not log anything if DSN is not configured', async () => {
       delete process.env.SENTRY_DSN
       process.env.NODE_ENV = 'production'
 
       const { initSentry } = await import('./server')
       initSentry()
 
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        '[Sentry] Server DSN not configured, skipping initialization (errors will be logged to console)',
-      )
+      // No initialization needed, so no logs should be called
+      expect(consoleWarnSpy).not.toHaveBeenCalled()
+      expect(consoleLogSpy).not.toHaveBeenCalled()
     })
 
-    it('should skip initialization in development mode', async () => {
+    it('should log Wrangler configuration info in development mode with DSN', async () => {
       process.env.SENTRY_DSN = 'https://test@sentry.io/123'
       process.env.NODE_ENV = 'development'
 
@@ -60,24 +61,27 @@ describe('Sentry Server Functions', () => {
       initSentry()
 
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        '[Sentry] Development mode detected, skipping Sentry initialization',
+        '[Sentry] Server-side Sentry is configured (via Wrangler compatibility settings)',
       )
-      expect(consoleLogSpy).toHaveBeenCalledWith('[Sentry] Errors will be logged to console only')
+      expect(consoleLogSpy).toHaveBeenCalledWith('[Sentry] Ensure wrangler.jsonc has:')
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        '[Sentry]   - compatibility_date: "2025-08-16" or later',
+      )
+      expect(consoleLogSpy).toHaveBeenCalledWith(
+        '[Sentry]   - compatibility_flags: ["nodejs_compat"]',
+      )
     })
 
-    it('should warn about OpenNext integration requirement in production', async () => {
+    it('should not log anything in production mode (Sentry works automatically)', async () => {
       process.env.SENTRY_DSN = 'https://test@sentry.io/123'
       process.env.NODE_ENV = 'production'
 
       const { initSentry } = await import('./server')
       initSentry()
 
-      expect(consoleWarnSpy).toHaveBeenCalledWith(
-        '[Sentry] Server-side Sentry for Cloudflare Workers requires OpenNext integration',
-      )
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        '[Sentry] Server errors will be logged to console and Cloudflare Workers logs',
-      )
+      // No initialization needed in production, Wrangler config handles it
+      expect(consoleWarnSpy).not.toHaveBeenCalled()
+      expect(consoleLogSpy).not.toHaveBeenCalled()
     })
   })
 
@@ -231,20 +235,49 @@ describe('Sentry Server Functions', () => {
   })
 
   describe('isSentryInitialized', () => {
-    it('should always return false', async () => {
+    it('should return false when Sentry.init() is not called', async () => {
+      delete process.env.SENTRY_DSN
+
       const { isSentryInitialized } = await import('./server')
+      // Uses Sentry.isInitialized() which returns false without manual init
       expect(isSentryInitialized()).toBe(false)
     })
 
-    it('should return false even after init is called', async () => {
+    it('should return false even when DSN is configured (no auto-init)', async () => {
+      process.env.SENTRY_DSN = 'https://test@sentry.io/123'
+      process.env.NODE_ENV = 'production'
+
+      const { isSentryInitialized } = await import('./server')
+
+      // Returns false because Sentry.init() is never called
+      expect(isSentryInitialized()).toBe(false)
+    })
+
+    it('should return false after initSentry() is called (no-op)', async () => {
       process.env.SENTRY_DSN = 'https://test@sentry.io/123'
       process.env.NODE_ENV = 'production'
 
       const { initSentry, isSentryInitialized } = await import('./server')
 
       expect(isSentryInitialized()).toBe(false)
-      initSentry()
+      initSentry() // This is a no-op
       expect(isSentryInitialized()).toBe(false)
+    })
+  })
+
+  describe('isSentryConfigured', () => {
+    it('should return false when DSN is not set', async () => {
+      delete process.env.SENTRY_DSN
+
+      const { isSentryConfigured } = await import('./server')
+      expect(isSentryConfigured()).toBe(false)
+    })
+
+    it('should return true when DSN is set', async () => {
+      process.env.SENTRY_DSN = 'https://test@sentry.io/123'
+
+      const { isSentryConfigured } = await import('./server')
+      expect(isSentryConfigured()).toBe(true)
     })
   })
 })

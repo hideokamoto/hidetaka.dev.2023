@@ -30,6 +30,9 @@ NEXT_PUBLIC_SENTRY_DSN=https://your-public-key@sentry.io/your-project-id
 # Server-side DSN (required for server-side tracking)
 SENTRY_DSN=https://your-public-key@sentry.io/your-project-id
 
+# Optional: Release version for tracking (recommended for production)
+SENTRY_RELEASE=your-release-version
+
 # Optional: For source map uploads (recommended for production)
 SENTRY_AUTH_TOKEN=your-sentry-auth-token
 SENTRY_ORG=your-sentry-organization-slug
@@ -38,15 +41,16 @@ SENTRY_PROJECT=your-sentry-project-slug
 
 **Note:** You can use the same DSN for both `NEXT_PUBLIC_SENTRY_DSN` and `SENTRY_DSN`, or create separate projects for browser and server tracking.
 
-### 3. Set Up Cloudflare Pages Environment Variables
+### 3. Set Up Cloudflare Workers Environment Variables
 
-For production deployments on Cloudflare Pages:
+For production deployments on Cloudflare Workers:
 
-1. Go to your Cloudflare Pages project settings
-2. Navigate to **Settings** > **Environment Variables**
+1. Go to your Cloudflare Workers project settings
+2. Navigate to **Settings** > **Variables and Secrets**
 3. Add the following variables:
    - `NEXT_PUBLIC_SENTRY_DSN` (same value as local)
    - `SENTRY_DSN` (same value as local)
+   - `SENTRY_RELEASE` (optional - your release version, e.g., commit SHA)
 
 ### 4. Configure Source Map Uploads (Optional but Recommended)
 
@@ -113,11 +117,42 @@ Then trigger errors and check your Sentry dashboard.
 
 **File:** `src/libs/sentry/server.ts`
 
-- Initializes `@sentry/cloudflare` for Cloudflare Workers
-- Configured via `SENTRY_DSN` environment variable
-- Automatically captures:
-  - Server-side errors via `logger.error()`
-  - Server-side warnings via `logger.warn()`
+- Uses `@sentry/cloudflare` for Cloudflare Workers
+- Configured via `SENTRY_DSN` and optional `SENTRY_RELEASE` environment variables
+- **No automatic initialization** - `initSentry()` is a no-op function
+- Captures errors when explicitly called:
+  - Server-side errors via `logger.error()` → `captureException()`
+  - Server-side warnings via `logger.warn()` → `captureMessage()`
+  - Events only sent in production when `SENTRY_DSN` is present
+  - All errors/messages also logged to console
+
+**Cloudflare Workers Configuration:** `wrangler.jsonc`
+
+For Sentry to work properly with Cloudflare Workers, the following configuration is required:
+
+```jsonc
+{
+  "compatibility_date": "2025-08-16",
+  "compatibility_flags": ["nodejs_compat"],
+  "version_metadata": {
+    "binding": "CF_VERSION_METADATA"
+  }
+}
+```
+
+**Configuration Requirements:**
+
+1. **`compatibility_date: "2025-08-16"` or later**
+   - Required for `https.request` API used by Sentry to transmit data
+   - This is a Cloudflare Workers runtime feature introduced in this compatibility date
+
+2. **`compatibility_flags: ["nodejs_compat"]`**
+   - Enables Node.js APIs required by the Sentry SDK
+   - Provides compatibility layer for Node.js-specific functionality
+
+3. **`version_metadata` binding**
+   - Optional but recommended for tracking deployment versions
+   - Helps correlate errors with specific deployments
 
 ### Unified Abstraction
 
@@ -185,6 +220,101 @@ useEffect(() => {
   })
 }, [error])
 ```
+
+## Server-Side Integration Details
+
+### Cloudflare Workers Runtime Requirements
+
+The server-side Sentry integration for Next.js on Cloudflare Workers (via OpenNext) requires specific Cloudflare Workers runtime configuration:
+
+**Critical Requirements:**
+
+1. **Compatibility Date: `2025-08-16` or later**
+   - **Why:** This compatibility date introduces the `https.request` API to the Cloudflare Workers runtime
+   - **Purpose:** Sentry SDK uses `https.request` to send error data to Sentry servers
+   - **Without it:** Sentry cannot transmit errors to the Sentry backend
+
+2. **Compatibility Flag: `nodejs_compat`**
+   - **Why:** Enables Node.js APIs that the Sentry SDK depends on
+   - **Purpose:** Provides a compatibility layer for Node.js-specific functionality
+   - **Without it:** Sentry SDK initialization will fail due to missing Node.js APIs
+
+**Configuration Example (`wrangler.jsonc`):**
+```jsonc
+{
+  "compatibility_date": "2025-08-16",
+  "compatibility_flags": ["nodejs_compat"],
+  "version_metadata": {
+    "binding": "CF_VERSION_METADATA"
+  }
+}
+```
+
+### Sentry Integration Pattern
+
+Unlike traditional Cloudflare Workers where you wrap the handler with `Sentry.withSentry()`, Next.js apps deployed via OpenNext rely on the Wrangler runtime configuration for Sentry support.
+
+**Implementation Details:**
+
+1. **No Explicit Initialization**
+   - `initSentry()` in `src/libs/sentry/server.ts` is a **no-op function** (does nothing)
+   - No `Sentry.init()` is called anywhere in the application code
+   - Sentry SDK is **not automatically initialized** at app startup
+
+2. **Direct Error Capture**
+   - `captureException()` and `captureMessage()` from `@sentry/cloudflare` are exposed
+   - These functions work directly when called, without requiring initialization
+   - Events are only sent to Sentry in production when `SENTRY_DSN` is present
+   - All errors/messages are also logged to console (Cloudflare Workers logs)
+
+3. **Runtime Requirements**
+   - Wrangler configuration provides the necessary Node.js APIs
+   - `compatibility_date: "2025-08-16"` enables `https.request` for Sentry transmission
+   - `compatibility_flags: ["nodejs_compat"]` enables Node.js compatibility layer
+
+### Version Metadata Binding
+
+The `CF_VERSION_METADATA` binding enables Cloudflare's version metadata feature:
+
+**Purpose:**
+- Tracks deployment versions automatically
+- Useful for correlating errors with specific deployments
+- Works alongside `SENTRY_RELEASE` for version tracking
+
+**Configuration:**
+```jsonc
+{
+  "version_metadata": {
+    "binding": "CF_VERSION_METADATA"
+  }
+}
+```
+
+### Known Limitations
+
+According to Sentry's official documentation:
+
+1. **Server-side spans display `0ms` duration**
+   - This is a security measure Cloudflare Workers implements to prevent timing attacks
+   - This is expected behavior, not a bug
+   - Errors are still tracked correctly
+
+2. **Requires recent Cloudflare Workers runtime**
+   - Must use compatibility date `2025-08-16` or later
+   - Older compatibility dates lack required APIs
+
+### Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `SENTRY_DSN` | Yes | Sentry Data Source Name for server-side tracking |
+| `SENTRY_RELEASE` | No | Release version (e.g., git commit SHA) for tracking |
+| `NEXT_PUBLIC_SENTRY_DSN` | Yes | Browser-side Sentry DSN (can be same as server DSN) |
+
+**Best Practices:**
+- Use the same DSN for both browser and server (simpler setup)
+- Set `SENTRY_RELEASE` to your git commit SHA or version number
+- Keep `SENTRY_AUTH_TOKEN` secure (only for build/deploy, not runtime)
 
 ## Configuration Options
 
