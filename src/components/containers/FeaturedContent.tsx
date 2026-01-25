@@ -247,16 +247,16 @@ export default async function FeaturedContent({ lang }: { lang: string }) {
   // Prepare unified content
   // Filter articles with valid dates to prevent ArticleCard from returning null
   const articles: FeedItem[] = externalPosts
-    .filter((article) => {
-      const date = parseDateSafely(article.datetime, {
+    .map((article) => ({
+      article,
+      date: parseDateSafely(article.datetime, {
         articleTitle: article.title,
         source: article.dataSource?.name,
-      })
-      return date !== null
-    })
-    .sort((a, b) => {
-      return new Date(b.datetime).getTime() - new Date(a.datetime).getTime()
-    })
+      }),
+    }))
+    .filter((item): item is { article: FeedItem; date: Date } => item.date !== null)
+    .sort((a, b) => b.date.getTime() - a.date.getTime())
+    .map(({ article }) => article)
 
   const projects = allProjects
     .filter((p) => p.published_at)
