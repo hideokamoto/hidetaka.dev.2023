@@ -1,0 +1,131 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@5
+
+executors:
+  default:
+    docker:
+      - image: cimg/node:22.1
+    resource_class: small
+
+jobs:
+  lint:
+    executor: default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Run Biome lint check
+          command: npm run lint:check
+          no_output_timeout: 5m
+
+  test:
+    executor: default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Run tests with coverage
+          command: npm run test:coverage
+          no_output_timeout: 10m
+      - store_artifacts:
+          path: coverage
+          destination: coverage
+
+  cf-build:
+    executor: default
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Build for Cloudflare Workers
+          command: npm run cf:build
+          no_output_timeout: 10m
+          environment:
+            MICROCMS_API_MODE: mock
+      - persist_to_workspace:
+          root: .
+          paths:
+            - .open-next
+      - store_artifacts:
+          path: .open-next
+          destination: build-output
+
+  deploy-production:
+    executor: default
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Deploy to production
+          command: npx wrangler versions deploy --yes --message "Deployed by CircleCI from commit ${CIRCLE_SHA1}"
+
+  deploy-branch:
+    executor: default
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - node/install-packages:
+          pkg-manager: npm
+      - run:
+          name: Upload version for testing (Durable Objects compatible)
+          command: |
+            # バージョンをアップロード（デプロイせず）
+            npx wrangler versions upload --message "Branch ${CIRCLE_BRANCH} - Commit ${CIRCLE_SHA1}"
+
+            # バージョンIDを取得
+            VERSION_ID=$(npx wrangler versions list --json | jq -r '.[0].id')
+
+            echo "=========================================="
+            echo "✅ Version uploaded: ${VERSION_ID}"
+            echo ""
+            echo "⚠️  Durable Objects使用のため、独立したプレビューURLは生成されません。"
+            echo ""
+            echo "📋 Version Overrideヘッダーでテストしてください："
+            echo ""
+            echo "【curlでのテスト】"
+            echo "curl https://hidetaka-dev-workers.workers.dev \\"
+            echo "  -H 'Cloudflare-Workers-Version-Overrides: hidetaka-dev-workers=\"${VERSION_ID}\"'"
+            echo ""
+            echo "【ブラウザでのテスト】"
+            echo "1. ブラウザ拡張（ModHeader等）をインストール"
+            echo "2. ヘッダーを追加："
+            echo "   Name: Cloudflare-Workers-Version-Overrides"
+            echo "   Value: hidetaka-dev-workers=\"${VERSION_ID}\""
+            echo "3. https://hidetaka-dev-workers.workers.dev にアクセス"
+            echo ""
+            echo "詳細: docs/guides/circleci-setup.md#durable-objects使用時の制約"
+            echo "=========================================="
+
+workflows:
+  build-test-deploy:
+    jobs:
+      - lint
+      - test:
+          requires:
+            - lint
+      - cf-build:
+          requires:
+            - lint
+      - deploy-production:
+          requires:
+            - cf-build
+            - test
+          filters:
+            branches:
+              only: main
+      - deploy-branch:
+          requires:
+            - cf-build
+            - test
+          filters:
+            branches:
+              ignore: main
