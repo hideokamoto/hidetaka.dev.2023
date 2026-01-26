@@ -3,6 +3,9 @@
   "main": ".open-next/worker.js",
   "compatibility_date": "2025-08-16",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "vars": {
+    "CLOUDFLARE_AI_MODEL_NAME": "@cf/openai/gpt-oss-20b"
+  },
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS"
