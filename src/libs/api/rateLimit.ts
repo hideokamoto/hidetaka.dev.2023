@@ -38,6 +38,14 @@ const DEFAULT_RATE_LIMIT: RateLimitConfig = {
 
 /**
  * Get client identifier from request (IP address)
+ *
+ * Priority order:
+ * 1. CF-Connecting-IP (Cloudflare Workers - most reliable)
+ * 2. X-Forwarded-For (proxy/load balancer)
+ * 3. URL pathname (fallback - NOTE: all requests to same path share limit)
+ *
+ * The URL fallback is only used when IP headers are unavailable (rare in Cloudflare Workers).
+ * In production, CF-Connecting-IP should always be present for Cloudflare-proxied requests.
  */
 function getClientId(request: Request): string {
   // Try to get real IP from Cloudflare headers
@@ -52,7 +60,9 @@ function getClientId(request: Request): string {
     return xForwardedFor.split(',')[0].trim()
   }
 
-  // Last resort: use URL as identifier (not ideal)
+  // Last resort: use URL pathname as identifier
+  // WARNING: This means all requests to the same path share the same rate limit
+  // This should only happen in non-production environments or if headers are stripped
   return new URL(request.url).pathname
 }
 

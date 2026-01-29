@@ -14,6 +14,7 @@ const WRANGLER_LOCAL_DEV_SESSION_ERROR = "Couldn't find a local dev session"
 
 /**
  * WordPress post types supported for thumbnail generation
+ * Note: 'thoughs' is the actual WordPress custom post type slug (not a typo)
  */
 export type WordPressPostType = 'dev-notes' | 'events' | 'thoughs'
 

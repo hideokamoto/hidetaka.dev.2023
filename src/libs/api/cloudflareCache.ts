@@ -33,10 +33,9 @@ const ONE_DAY = 86400 // 24 hours
 /**
  * Get cached response or execute callback and cache the result
  *
- * @param request - The incoming request
- * @param cacheKey - Optional custom cache key (defaults to request.url)
+ * @param request - The incoming request (used to generate cache key from request.url)
  * @param callback - Function to generate response if cache miss
- * @param options - Cache options
+ * @param options - Cache options (TTL, immutable flag)
  * @returns Cached or freshly generated response
  */
 export async function withCache(
