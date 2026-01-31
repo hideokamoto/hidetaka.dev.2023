@@ -3,17 +3,17 @@ import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
 import ArticleActions from '@/components/ui/ArticleActions'
 import BlogDetailSidebar from '@/components/ui/BlogDetailSidebar'
+import CategoryTagList from '@/components/ui/CategoryTagList'
 import DateDisplay from '@/components/ui/DateDisplay'
 import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
 import BlogReactions from '@/components/ui/reactions/BlogReactions'
 import SidebarLayout from '@/components/ui/SidebarLayout'
 import SocialShareButtons from '@/components/ui/SocialShareButtons'
-import Tag from '@/components/ui/Tag'
 import { SITE_CONFIG } from '@/config'
 import type { BlogItem, WPThought } from '@/libs/dataSources/types'
 
-type BlogDetailPageProps = {
+interface BlogDetailPageProps {
   thought: WPThought
   lang: string
   basePath: string
@@ -87,7 +87,7 @@ export default function BlogDetailPage({
           <BlogDetailSidebar
             lang={lang}
             basePath={basePath}
-            thought={thought}
+            categories={categories}
             previousThought={previousThought}
             nextThought={nextThought}
           />
@@ -113,25 +113,11 @@ export default function BlogDetailPage({
 
           {/* カテゴリ（モバイルのみ表示） */}
           {categories.length > 0 && (
-            <div className="mb-8 flex flex-wrap gap-2 lg:hidden">
-              {categories.map((category) => {
-                const normalizedSlug = category.slug.includes('%')
-                  ? decodeURIComponent(category.slug)
-                  : category.slug
-                const categoryUrl = `${basePath}/category/${encodeURIComponent(normalizedSlug)}`
-                return (
-                  <Link key={category.id} href={categoryUrl}>
-                    <Tag
-                      variant="indigo"
-                      size="sm"
-                      className="cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors"
-                    >
-                      {category.name}
-                    </Tag>
-                  </Link>
-                )
-              })}
-            </div>
+            <CategoryTagList
+              categories={categories}
+              basePath={basePath}
+              className="mb-8 lg:hidden"
+            />
           )}
 
           {/* サムネイル画像 (OG画像) */}
