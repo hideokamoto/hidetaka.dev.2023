@@ -137,7 +137,12 @@ jobs:
   #           echo "=========================================="
 
 workflows:
-  build-test-deploy:
+  # Lint workflow - runs when lint files are changed or all files
+  lint-workflow:
+    when:
+      or:
+        - << pipeline.parameters.run-all >>
+        - << pipeline.parameters.run-lint >>
     jobs:
       - lint:
           filters:
@@ -145,11 +150,20 @@ workflows:
               only:
                 - main
                 - /claude\/.*/
-          when:
-            or:
-              - << pipeline.parameters.run-all >>
-              - << pipeline.parameters.run-lint >>
 
+  # Test workflow - runs when test files are changed or all files
+  test-workflow:
+    when:
+      or:
+        - << pipeline.parameters.run-all >>
+        - << pipeline.parameters.run-test >>
+    jobs:
+      - lint:
+          filters:
+            branches:
+              only:
+                - main
+                - /claude\/.*/
       - test:
           requires:
             - lint
@@ -158,11 +172,20 @@ workflows:
               only:
                 - main
                 - /claude\/.*/
-          when:
-            or:
-              - << pipeline.parameters.run-all >>
-              - << pipeline.parameters.run-test >>
 
+  # Build workflow - runs when build files are changed or all files
+  build-workflow:
+    when:
+      or:
+        - << pipeline.parameters.run-all >>
+        - << pipeline.parameters.run-build >>
+    jobs:
+      - lint:
+          filters:
+            branches:
+              only:
+                - main
+                - /claude\/.*/
       - build:
           requires:
             - lint
@@ -171,11 +194,20 @@ workflows:
               only:
                 - main
                 - /claude\/.*/
-          when:
-            or:
-              - << pipeline.parameters.run-all >>
-              - << pipeline.parameters.run-build >>
 
+  # Cloudflare build workflow - runs when cf-build files are changed or all files
+  cf-build-workflow:
+    when:
+      or:
+        - << pipeline.parameters.run-all >>
+        - << pipeline.parameters.run-cf-build >>
+    jobs:
+      - lint:
+          filters:
+            branches:
+              only:
+                - main
+                - /claude\/.*/
       - cf-build:
           requires:
             - lint
@@ -184,23 +216,34 @@ workflows:
               only:
                 - main
                 - /claude\/.*/
-          when:
-            or:
-              - << pipeline.parameters.run-all >>
-              - << pipeline.parameters.run-cf-build >>
 
-      # - deploy-production:
-      #     requires:
-      #       - cf-build
-      #       - test
-      #     filters:
-      #       branches:
-      #         only: main
-
-      # - deploy-branch:
-      #     requires:
-      #       - cf-build
-      #       - test
-      #     filters:
-      #       branches:
-      #         ignore: main
+  # Deploy workflows (commented out for now)
+  # deploy-workflow:
+  #   when: << pipeline.parameters.run-all >>
+  #   jobs:
+  #     - lint:
+  #         filters:
+  #           branches:
+  #             only:
+  #               - main
+  #               - /claude\/.*/
+  #     - test:
+  #         requires:
+  #           - lint
+  #     - cf-build:
+  #         requires:
+  #           - lint
+  #     - deploy-production:
+  #         requires:
+  #           - cf-build
+  #           - test
+  #         filters:
+  #           branches:
+  #             only: main
+  #     - deploy-branch:
+  #         requires:
+  #           - cf-build
+  #           - test
+  #         filters:
+  #           branches:
+  #             ignore: main
