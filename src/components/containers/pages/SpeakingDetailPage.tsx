@@ -30,8 +30,8 @@ export default function SpeakingDetailPage({
 }: SpeakingDetailPageProps) {
   const date = new Date(event.date)
   const speakingLabel = lang === 'ja' ? '登壇・講演' : 'Speaking'
-  const previousLabel = lang === 'ja' ? '前の記事' : 'Previous'
-  const nextLabel = lang === 'ja' ? '次の記事' : 'Next'
+  const previousLabel = lang === 'ja' ? '前のレポート' : 'Previous Report'
+  const nextLabel = lang === 'ja' ? '次のレポート' : 'Next Report'
   const relatedEventsTitle = lang === 'ja' ? '最近参加した他のイベント' : 'Other Recent Events'
 
   // OG画像のURLを生成
