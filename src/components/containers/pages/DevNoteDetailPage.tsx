@@ -34,7 +34,7 @@ export default function DevNoteDetailPage({
   enableHatenaStar,
 }: DevNoteDetailPageProps) {
   const date = new Date(note.date)
-  const writingLabel = lang === 'ja' ? 'Writing' : 'Writing'
+  const writingLabel = lang === 'ja' ? '技術記事' : 'Writing'
   const previousLabel = lang === 'ja' ? '前の記事' : 'Previous'
   const nextLabel = lang === 'ja' ? '次の記事' : 'Next'
 
