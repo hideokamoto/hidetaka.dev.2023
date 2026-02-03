@@ -7,6 +7,8 @@ import {
   isValidDate,
   parseDate,
   parseDateAndFormat,
+  parseDateSafely,
+  parseDateWithFallback,
 } from './dateDisplay.utils'
 
 describe('DateDisplay Utils', () => {
@@ -499,6 +501,118 @@ describe('DateDisplay Utils', () => {
           ),
         )
       })
+    })
+  })
+
+  describe('parseDateSafely', () => {
+    it('should return Date object for valid date strings', () => {
+      const result = parseDateSafely('2024-06-15')
+      expect(result).toBeInstanceOf(Date)
+      expect(result?.getFullYear()).toBe(2024)
+      expect(result?.getMonth()).toBe(5) // June is month 5 (0-indexed)
+      expect(result?.getDate()).toBe(15)
+    })
+
+    it('should return null for invalid date strings', () => {
+      expect(parseDateSafely('invalid-date')).toBe(null)
+      expect(parseDateSafely('not a date')).toBe(null)
+      expect(parseDateSafely('2024-13-45')).toBe(null)
+    })
+
+    it('should return null for undefined input', () => {
+      expect(parseDateSafely(undefined)).toBe(null)
+    })
+
+    it('should return null for empty string', () => {
+      expect(parseDateSafely('')).toBe(null)
+    })
+
+    it('should handle ISO 8601 date strings', () => {
+      const result = parseDateSafely('2024-06-15T10:30:00Z')
+      expect(result).toBeInstanceOf(Date)
+      expect(result?.getFullYear()).toBe(2024)
+    })
+
+    it('should handle RFC 2822 date strings (from RSS feeds)', () => {
+      const result = parseDateSafely('Wed, 15 Jun 2024 10:30:00 GMT')
+      expect(result).toBeInstanceOf(Date)
+      expect(result?.getFullYear()).toBe(2024)
+    })
+
+    it('should accept context for logging', () => {
+      // Should not throw error even with context
+      const result = parseDateSafely('invalid-date', {
+        articleTitle: 'Test Article',
+        source: 'RSS',
+      })
+      expect(result).toBe(null)
+    })
+
+    it('should handle future dates (with warning)', () => {
+      const futureDate = new Date()
+      futureDate.setFullYear(futureDate.getFullYear() + 1)
+      const futureISOString = futureDate.toISOString()
+
+      const result = parseDateSafely(futureISOString)
+      // Future dates should still be returned (not null)
+      expect(result).toBeInstanceOf(Date)
+    })
+
+    it('should handle edge case dates', () => {
+      expect(parseDateSafely('2024-01-01')).toBeInstanceOf(Date)
+      expect(parseDateSafely('2024-12-31')).toBeInstanceOf(Date)
+      expect(parseDateSafely('2024-02-29')).toBeInstanceOf(Date) // Leap year
+    })
+  })
+
+  describe('parseDateWithFallback', () => {
+    const fallbackDate = new Date('2020-01-01')
+
+    it('should return parsed date for valid input', () => {
+      const result = parseDateWithFallback('2024-06-15', fallbackDate)
+      expect(result).toBeInstanceOf(Date)
+      expect(result.getFullYear()).toBe(2024)
+      expect(result.getMonth()).toBe(5)
+      expect(result.getDate()).toBe(15)
+    })
+
+    it('should return fallback date for invalid input', () => {
+      const result = parseDateWithFallback('invalid-date', fallbackDate)
+      expect(result).toBe(fallbackDate)
+      expect(result.getFullYear()).toBe(2020)
+    })
+
+    it('should return fallback date for undefined input', () => {
+      const result = parseDateWithFallback(undefined, fallbackDate)
+      expect(result).toBe(fallbackDate)
+    })
+
+    it('should return fallback date for empty string', () => {
+      const result = parseDateWithFallback('', fallbackDate)
+      expect(result).toBe(fallbackDate)
+    })
+
+    it('should accept context for logging', () => {
+      const result = parseDateWithFallback('invalid-date', fallbackDate, {
+        articleTitle: 'Test Article',
+      })
+      expect(result).toBe(fallbackDate)
+    })
+
+    it('should handle ISO 8601 date strings', () => {
+      const result = parseDateWithFallback('2024-06-15T10:30:00Z', fallbackDate)
+      expect(result).toBeInstanceOf(Date)
+      expect(result.getFullYear()).toBe(2024)
+    })
+
+    it('should never return null (always returns fallback)', () => {
+      const result1 = parseDateWithFallback(undefined, fallbackDate)
+      const result2 = parseDateWithFallback('invalid', fallbackDate)
+      const result3 = parseDateWithFallback('', fallbackDate)
+
+      expect(result1).not.toBe(null)
+      expect(result2).not.toBe(null)
+      expect(result3).not.toBe(null)
     })
   })
 })

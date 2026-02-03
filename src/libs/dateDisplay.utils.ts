@@ -96,3 +96,85 @@ export function parseDateAndFormat(
 
   return formatDateDisplay(dateObj, lang, format)
 }
+
+/**
+ * Safely parse a date with detailed error logging
+ * Returns null instead of falling back to current date for invalid inputs
+ *
+ * @param datetime - Date string to parse
+ * @param context - Additional context for logging (e.g., articleTitle, source)
+ * @returns Date object if valid, null if invalid
+ *
+ * @example
+ * const date = parseDateSafely('2024-01-15', { articleTitle: 'My Post' })
+ * if (date) {
+ *   // Use valid date
+ * } else {
+ *   // Handle invalid date case
+ * }
+ */
+export function parseDateSafely(
+  datetime: string | undefined,
+  context?: Record<string, unknown>,
+): Date | null {
+  // Check for missing datetime
+  if (!datetime) {
+    logger.warn('Missing datetime value', context)
+    return null
+  }
+
+  try {
+    const date = new Date(datetime)
+
+    // Validate parsed date
+    if (!isValidDate(date)) {
+      logger.error('Invalid date format', {
+        datetime,
+        ...context,
+      })
+      return null
+    }
+
+    // Optional: Check for future dates and log warning
+    const now = new Date()
+    if (date > now) {
+      logger.warn('Future date detected', {
+        datetime,
+        parsedDate: date.toISOString(),
+        ...context,
+      })
+      // Still return the date - just warn about it
+    }
+
+    return date
+  } catch (e) {
+    logger.error('Date parsing exception', {
+      datetime,
+      error: e instanceof Error ? e.message : 'Unknown error',
+      ...context,
+    })
+    return null
+  }
+}
+
+/**
+ * Parse date with fallback to a default date
+ * Useful when you need a date value and can't accept null
+ *
+ * @param datetime - Date string to parse
+ * @param fallback - Fallback date to use if parsing fails
+ * @param context - Additional context for logging
+ * @returns Parsed date or fallback date
+ *
+ * @example
+ * const date = parseDateWithFallback('invalid', new Date(), { source: 'RSS' })
+ * // Returns fallback date if parsing fails
+ */
+export function parseDateWithFallback(
+  datetime: string | undefined,
+  fallback: Date,
+  context?: Record<string, unknown>,
+): Date {
+  const result = parseDateSafely(datetime, context)
+  return result ?? fallback
+}

@@ -1,3 +1,4 @@
+import { APIError } from '@/libs/errors'
 import { logger } from '@/libs/logger'
 import type { BlogItem, Category, WPThought } from './types'
 
@@ -57,7 +58,11 @@ export const loadThoughts = async (
     )
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch thoughts: ${response.status}`)
+      throw await APIError.fromResponse(response, '/wp-json/wp/v2/thoughs', {
+        page,
+        perPage,
+        lang,
+      })
     }
 
     const thoughts: WPThought[] = await response.json()
@@ -139,7 +144,10 @@ export const loadThoughtsByCategory = async (
     )
 
     if (!categoryResponse.ok) {
-      throw new Error(`Failed to fetch category: ${categoryResponse.status}`)
+      throw await APIError.fromResponse(categoryResponse, '/wp-json/wp/v2/categories', {
+        categorySlug: normalizedCategorySlug,
+        lang,
+      })
     }
 
     const categories = await categoryResponse.json()
@@ -165,7 +173,12 @@ export const loadThoughtsByCategory = async (
     )
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch thoughts: ${response.status}`)
+      throw await APIError.fromResponse(response, '/wp-json/wp/v2/thoughs', {
+        categoryId,
+        page,
+        perPage,
+        lang,
+      })
     }
 
     const thoughts: WPThought[] = await response.json()
@@ -233,7 +246,9 @@ export const loadAllCategories = async (lang: 'en' | 'ja' = 'en'): Promise<Categ
     )
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch thoughts: ${response.status}`)
+      throw await APIError.fromResponse(response, '/wp-json/wp/v2/thoughs', {
+        lang,
+      })
     }
 
     const thoughts: WPThought[] = await response.json()
@@ -289,7 +304,10 @@ export const getThoughtBySlug = async (
     )
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch thought by slug: ${response.status}`)
+      throw await APIError.fromResponse(response, '/wp-json/wp/v2/thoughs', {
+        slug,
+        lang,
+      })
     }
 
     const thoughts: WPThought[] = await response.json()
@@ -448,7 +466,12 @@ export const getRelatedThoughts = async (
     )
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch related thoughts: ${response.status}`)
+      throw await APIError.fromResponse(response, '/wp-json/wp/v2/thoughs', {
+        categoryId,
+        currentThoughtId: currentThought.id,
+        limit,
+        lang,
+      })
     }
 
     const thoughts: WPThought[] = await response.json()
