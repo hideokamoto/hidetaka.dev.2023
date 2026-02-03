@@ -27,7 +27,6 @@ export default function BlogDetailSidebar({
 
   return (
     <div className={`hidden lg:block space-y-8 ${className}`}>
-
       {/* タグセクション */}
       {categories.length > 0 && (
         <div>
@@ -35,9 +34,9 @@ export default function BlogDetailSidebar({
           <CategoryTagList categories={categories} basePath={basePath} />
         </div>
       )}
-      
+
       {/* プロフィールカード */}
-      <ProfileCard lang={lang} imageSrc="/images/profile.jpg"  imageSize='responsive' />
+      <ProfileCard lang={lang} imageSrc="/images/profile.jpg" imageSize="responsive" />
 
       {/* 前後の記事ナビゲーション */}
       {(previousThought || nextThought) && (

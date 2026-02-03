@@ -20,8 +20,8 @@ type ProfileCardProps = {
   className?: string
   /** プロフィール画像のURL (デフォルト: /me.jpg) */
   imageSrc?: string
-  /** プロフィール画像のサイズ (sm: 小, md: 中, lg: 大) */ 
-  imageSize?: 'sm' | 'md' | 'lg' | "responsive"
+  /** プロフィール画像のサイズ (sm: 小, md: 中, lg: 大) */
+  imageSize?: 'sm' | 'md' | 'lg' | 'responsive'
 }
 
 /**
@@ -111,12 +111,8 @@ export default function ProfileCard({
       <div className={`flex flex-col gap-6`}>
         {/* プロフィール画像 */}
         {showImage && (
-          <div >
-            <ProfileImage
-              src={imageSrc}
-              alt={`${authorName} profile photo`}
-              size={imageSize}
-            />
+          <div>
+            <ProfileImage src={imageSrc} alt={`${authorName} profile photo`} size={imageSize} />
           </div>
         )}
 
@@ -125,15 +121,15 @@ export default function ProfileCard({
           {/* 名前 */}
           <div>
             <h3 className="text-xl font-bold text-slate-900 dark:text-white">{authorName}</h3>
-              <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-                {lang.startsWith('ja') ? 'ビジネスデベロップメント' : 'Business Development'}
-              </p>
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+              {lang.startsWith('ja') ? 'ビジネスデベロップメント' : 'Business Development'}
+            </p>
           </div>
 
           {/* 説明文 */}
-            <div className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
-              <Profile lang={lang} />
-            </div>
+          <div className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
+            <Profile lang={lang} />
+          </div>
 
           {/* ソーシャルリンク */}
           {showSocial && (

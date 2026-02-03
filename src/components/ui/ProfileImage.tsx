@@ -3,7 +3,7 @@ import Image from 'next/image'
 type ProfileImageProps = {
   src: string
   alt: string
-  size?: 'sm' | 'md' | 'lg' | "responsive"
+  size?: 'sm' | 'md' | 'lg' | 'responsive'
   className?: string
 }
 
