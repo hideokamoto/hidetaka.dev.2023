@@ -12,8 +12,6 @@ import ProfileImage from './ProfileImage'
 type ProfileCardProps = {
   /** 言語設定 (英語: 'en', 日本語: 'ja') */
   lang: string
-  /** 表示バリアント (compact: コンパクト, full: フル表示) */
-  variant?: 'compact' | 'full'
   /** プロフィール画像を表示するかどうか */
   showImage?: boolean
   /** ソーシャルリンクを表示するかどうか */
@@ -22,6 +20,8 @@ type ProfileCardProps = {
   className?: string
   /** プロフィール画像のURL (デフォルト: /me.jpg) */
   imageSrc?: string
+  /** プロフィール画像のサイズ (sm: 小, md: 中, lg: 大) */ 
+  imageSize?: 'sm' | 'md' | 'lg' | "responsive"
 }
 
 /**
@@ -96,28 +96,26 @@ function SocialLink({
  */
 export default function ProfileCard({
   lang,
-  variant = 'full',
   showImage = true,
   showSocial = true,
   className = '',
   imageSrc = '/me.jpg',
+  imageSize = 'md',
 }: ProfileCardProps) {
-  const isCompact = variant === 'compact'
   const authorName = SITE_CONFIG.author.name
 
   return (
     <div
       className={`rounded-2xl border border-zinc-200 bg-white/50 p-6 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/50 ${className}`}
     >
-      <div className={`flex ${isCompact ? 'flex-row items-center gap-4' : 'flex-col gap-6'}`}>
+      <div className={`flex flex-col gap-6`}>
         {/* プロフィール画像 */}
         {showImage && (
-          <div className={isCompact ? 'flex-shrink-0' : ''}>
+          <div >
             <ProfileImage
               src={imageSrc}
               alt={`${authorName} profile photo`}
-              size={isCompact ? 'sm' : 'md'}
-              className={isCompact ? 'lg:w-24 max-w-[6rem]' : ''}
+              size={imageSize}
             />
           </div>
         )}
@@ -127,19 +125,15 @@ export default function ProfileCard({
           {/* 名前 */}
           <div>
             <h3 className="text-xl font-bold text-slate-900 dark:text-white">{authorName}</h3>
-            {!isCompact && (
               <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
                 {lang.startsWith('ja') ? 'ビジネスデベロップメント' : 'Business Development'}
               </p>
-            )}
           </div>
 
           {/* 説明文 */}
-          {!isCompact && (
             <div className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed">
               <Profile lang={lang} />
             </div>
-          )}
 
           {/* ソーシャルリンク */}
           {showSocial && (

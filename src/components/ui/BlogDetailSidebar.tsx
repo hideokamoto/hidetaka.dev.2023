@@ -28,7 +28,7 @@ export default function BlogDetailSidebar({
   return (
     <div className={`hidden lg:block space-y-8 ${className}`}>
       {/* プロフィールカード */}
-      <ProfileCard lang={lang} imageSrc="/images/profile.jpg" />
+      <ProfileCard lang={lang} imageSrc="/images/profile.jpg"  imageSize='responsive' />
 
       {/* タグセクション */}
       {categories.length > 0 && (

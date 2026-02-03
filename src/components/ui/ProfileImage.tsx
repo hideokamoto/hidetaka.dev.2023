@@ -3,7 +3,7 @@ import Image from 'next/image'
 type ProfileImageProps = {
   src: string
   alt: string
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'sm' | 'md' | 'lg' | "responsive"
   className?: string
 }
 
@@ -12,6 +12,7 @@ export default function ProfileImage({ src, alt, size = 'lg', className = '' }: 
     sm: 'lg:w-64 max-w-xs',
     md: 'lg:w-80 max-w-sm',
     lg: 'lg:w-96 max-w-sm',
+    responsive: 'max-w-xs',
   }
 
   return (
