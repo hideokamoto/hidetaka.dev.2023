@@ -65,7 +65,7 @@ export default function SpeakingDetailSidebar({
 
       {/* 登壇レポート一覧に戻る */}
       <Link
-        href={basePath.replace(/\/event-reports$/, '/speaking')}
+        href={lang === 'ja' ? '/ja/speaking' : '/speaking'}
         aria-label={backLabel}
         className="block lg:text-sm lg:font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
       >
