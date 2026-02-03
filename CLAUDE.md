@@ -74,7 +74,7 @@ This is a **bilingual portfolio and developer blog** featuring:
 │   │   │   ├── blogs.ts       # Blog aggregation
 │   │   │   ├── thoughts.ts    # WordPress blog
 │   │   │   ├── wordpress.ts   # WordPress REST API
-│   │   │   ├── events.ts      # Event data sources
+│   │   │   ├── events.ts      # WordPress event data sources
 │   │   │   ├── devto.ts       # Dev.to API
 │   │   │   ├── qiita.ts       # Qiita feed
 │   │   │   ├── zenn.ts        # Zenn feed
@@ -262,13 +262,11 @@ className="group"
 
 ```typescript
 // Content Types
-MicroCMSEventsRecord      // Speaking events
 MicroCMSProjectsRecord    // Work/projects
-MicroCMSPostsRecord       // Blog posts
 ```
 
 **Secondary Sources:** Multi-source feed aggregation
-- WordPress REST API (`thoughts.ts`)
+- WordPress REST API (`wordpress.ts`, `thoughts.ts`, `events.ts`)
 - Dev.to API (`devto.ts`)
 - Qiita RSS (`qiita.ts`)
 - Zenn RSS (`zenn.ts`)
@@ -441,6 +439,76 @@ npm run build
    - Ensures all imports and dependencies resolve correctly
    - Validates Next.js static generation works
    - **If build fails:** Fix all errors before committing
+
+### 🛡️ Quality Enforcement - **ABSOLUTE REQUIREMENTS**
+
+**Claude Code Hooks - Automated Quality Gates**
+
+This project uses **Claude Code Hooks** to automatically enforce quality standards. These hooks run at key points during development:
+
+**1. Session Start Hook** (`.claude/hooks/session-start.sh`)
+- Automatically runs when Claude Code session starts
+- Installs dependencies: `npm install`
+- Builds the project: `npm run build`
+- Ensures the environment is ready for development
+
+**2. Pre-Push Hook** (`.claude/hooks/pre-push-matcher.sh` + `.claude/hooks/pre-push.sh`)
+- **INTERCEPTS ALL `git push` COMMANDS**
+- Runs quality checks BEFORE allowing push to remote
+- **Required checks:**
+  - ✅ `npm run test` - All unit tests must pass
+  - ✅ `npm run lint:check` - Code must pass linting
+  - ✅ `npm run format:check` - Code must be properly formatted
+  - ✅ `npm run build` - TypeScript compilation must succeed
+- **Push is BLOCKED if any check fails**
+
+**How It Works:**
+
+```bash
+# When you run git push, the hook automatically:
+# 1. Runs all quality checks
+# 2. Reports results with color-coded output
+# 3. Either allows or blocks the push
+
+git push -u origin claude/my-feature
+# 🛡️  Running pre-push quality checks...
+# 📝 Running tests...
+# ✅ Tests passed
+# 🔍 Running lint check...
+# ✅ Lint check passed
+# 💅 Running format check...
+# ✅ Format check passed
+# 🏗️  Running build...
+# ✅ Build passed
+# 🎉 All quality checks passed! Safe to push.
+```
+
+**Emergency Bypass (USE WITH EXTREME CAUTION):**
+
+In exceptional circumstances, you can bypass pre-push checks:
+
+```bash
+# ⚠️ WARNING: Only use when absolutely necessary!
+SKIP_PREPUSH_CHECKS=1 git push -u origin branch-name
+```
+
+**When bypass is acceptable:**
+- ❌ NEVER use to avoid fixing legitimate errors
+- ✅ Emergency hotfixes when CI/CD will catch issues
+- ✅ Pushing work-in-progress to personal feature branch for backup
+- ✅ Documented technical issues with the checks themselves
+
+**After using bypass, you MUST:**
+1. Create a follow-up commit that fixes all quality issues
+2. Push the fix WITHOUT bypass to verify checks pass
+3. Document the bypass reason in commit message or PR description
+
+**AI Assistant Rules:**
+- **NEVER bypass quality checks without explicit user permission**
+- **ALWAYS fix issues revealed by quality checks**
+- If checks fail, analyze errors, fix code, and re-run
+- Only suggest bypass if user explicitly requests it
+- Warn about risks if bypass is requested
 
 ### Git Pre-push Hook
 

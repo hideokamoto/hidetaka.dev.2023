@@ -1,53 +1,11 @@
-import dayjs from 'dayjs'
-import { MICROCMS_MOCK_BOOKs, MICROCMS_MOCK_EVENTs } from './mocks'
-import type { MicroCMSClient, MicroCMSEventsRecord, MicroCMSProjectsRecord } from './types'
+import { MICROCMS_MOCK_BOOKs } from './mocks'
+import type { MicroCMSClient, MicroCMSProjectsRecord } from './types'
 import { handleMicroCMSRequest } from './utils'
 
 export class MicroCMSAPI {
   private readonly client: MicroCMSClient
   constructor(client: MicroCMSClient) {
     this.client = client
-  }
-  public async listEndedEvents() {
-    const thisMonth = dayjs().format('YYYY-MM')
-    return handleMicroCMSRequest(
-      this.client,
-      MICROCMS_MOCK_EVENTs,
-      async () => {
-        const { contents: events } = await this.client!.get<{
-          contents: MicroCMSEventsRecord[]
-        }>({
-          endpoint: 'events',
-          queries: {
-            orders: '-date',
-            limit: 20,
-            filters: `date[less_than]${thisMonth}`,
-          },
-        })
-        return events
-      },
-      [],
-    )
-  }
-  public async listUpcomingEvents() {
-    const thisMonth = dayjs().format('YYYY-MM')
-    return handleMicroCMSRequest(
-      this.client,
-      MICROCMS_MOCK_EVENTs,
-      async () => {
-        const { contents: events } = await this.client!.get<{
-          contents: MicroCMSEventsRecord[]
-        }>({
-          endpoint: 'events',
-          queries: {
-            orders: '-date',
-            filters: `date[greater_than]${thisMonth}`,
-          },
-        })
-        return events
-      },
-      [],
-    )
   }
   public async listGuestPosts(): Promise<MicroCMSProjectsRecord[]> {
     return handleMicroCMSRequest(
@@ -135,24 +93,6 @@ export class MicroCMSAPI {
             contentId: 'iutgcn7l3ad',
           }),
         ]
-      },
-      [],
-    )
-  }
-  /**
-   * すべてのイベントを取得（sitemap用）
-   */
-  public async listAllEvents(): Promise<MicroCMSEventsRecord[]> {
-    return handleMicroCMSRequest(
-      this.client,
-      MICROCMS_MOCK_EVENTs,
-      async () => {
-        return await this.client!.getAllContents<MicroCMSEventsRecord>({
-          endpoint: 'events',
-          queries: {
-            orders: '-date',
-          },
-        })
       },
       [],
     )

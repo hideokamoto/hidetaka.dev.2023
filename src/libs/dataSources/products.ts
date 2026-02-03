@@ -1,3 +1,4 @@
+import { APIError } from '@/libs/errors'
 import { logger } from '@/libs/logger'
 import type { BlogItem } from './types'
 
@@ -49,7 +50,11 @@ export const loadProducts = async (
     )
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch products: ${response.status}`)
+      throw await APIError.fromResponse(response, '/wp-json/wp/v2/products', {
+        page,
+        perPage,
+        lang,
+      })
     }
 
     const products: WPProduct[] = await response.json()
@@ -113,7 +118,9 @@ export const getProductBySlug = async (
     )
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch product: ${response.status}`)
+      throw await APIError.fromResponse(response, '/wp-json/wp/v2/products', {
+        slug,
+      })
     }
 
     const products: WPProduct[] = await response.json()
@@ -216,7 +223,11 @@ export const getRelatedProducts = async (
     )
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch related products: ${response.status}`)
+      throw await APIError.fromResponse(response, '/wp-json/wp/v2/products', {
+        currentProductId: currentProduct.id,
+        limit,
+        lang,
+      })
     }
 
     const products: WPProduct[] = await response.json()
@@ -274,7 +285,9 @@ export const loadAllProducts = async (): Promise<WPProduct[]> => {
     )
 
     if (!firstResponse.ok) {
-      throw new Error(`Failed to fetch all products: ${firstResponse.status}`)
+      throw await APIError.fromResponse(firstResponse, '/wp-json/wp/v2/products', {
+        page: currentPage,
+      })
     }
 
     const firstPageProducts: WPProduct[] = await firstResponse.json()
@@ -294,7 +307,9 @@ export const loadAllProducts = async (): Promise<WPProduct[]> => {
       )
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch all products: ${response.status}`)
+        throw await APIError.fromResponse(response, '/wp-json/wp/v2/products', {
+          page: currentPage,
+        })
       }
 
       const products: WPProduct[] = await response.json()

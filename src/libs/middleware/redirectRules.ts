@@ -56,8 +56,9 @@ export class DevNotesExclusionRedirectRule implements RedirectRule {
     }
 
     // dev-notesパスはリダイレクトしない
-    const devNotesPath = `${this.sourcePath}dev-notes/`
-    if (pathname.startsWith(devNotesPath)) {
+    // 例: /writing/dev-notes または /writing/dev-notes/ で始まるパス
+    const devNotesPath = `${this.sourcePath}dev-notes`
+    if (pathname === devNotesPath || pathname.startsWith(`${devNotesPath}/`)) {
       return false
     }
 

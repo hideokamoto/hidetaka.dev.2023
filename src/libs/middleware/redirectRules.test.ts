@@ -125,6 +125,11 @@ describe('DevNotesExclusionRedirectRule', () => {
       expect(rule.shouldRedirect('/writing/')).toBe(false)
     })
 
+    it('/writing/dev-notes で始まるパスはリダイレクトしない（末尾スラッシュなし）', () => {
+      const rule = new DevNotesExclusionRedirectRule('/writing/', '/news/')
+      expect(rule.shouldRedirect('/writing/dev-notes')).toBe(false)
+    })
+
     it('/writing/dev-notes/ で始まるパスはリダイレクトしない', () => {
       const rule = new DevNotesExclusionRedirectRule('/writing/', '/news/')
       expect(rule.shouldRedirect('/writing/dev-notes/')).toBe(false)
@@ -140,6 +145,11 @@ describe('DevNotesExclusionRedirectRule', () => {
     it('/ja/writing/ 自体はリダイレクトしない', () => {
       const rule = new DevNotesExclusionRedirectRule('/ja/writing/', '/ja/news/')
       expect(rule.shouldRedirect('/ja/writing/')).toBe(false)
+    })
+
+    it('/ja/writing/dev-notes で始まるパスはリダイレクトしない（末尾スラッシュなし）', () => {
+      const rule = new DevNotesExclusionRedirectRule('/ja/writing/', '/ja/news/')
+      expect(rule.shouldRedirect('/ja/writing/dev-notes')).toBe(false)
     })
 
     it('/ja/writing/dev-notes/ で始まるパスはリダイレクトしない', () => {
@@ -177,9 +187,12 @@ describe('統合テスト: 実際のmiddlewareのルール', () => {
       false,
     )
     expect(engine.shouldRedirect('/ja/writing/dev-notes/', 'https://hidetaka.dev')).toBe(false)
+    expect(engine.shouldRedirect('/ja/writing/dev-notes', 'https://hidetaka.dev')).toBe(false)
     expect(engine.shouldRedirect('/writing/dev-notes/some-slug', 'https://hidetaka.dev')).toBe(
       false,
     )
+    expect(engine.shouldRedirect('/writing/dev-notes/', 'https://hidetaka.dev')).toBe(false)
+    expect(engine.shouldRedirect('/writing/dev-notes', 'https://hidetaka.dev')).toBe(false)
 
     // 他のwritingパスはリダイレクトされる
     expect(engine.shouldRedirect('/ja/writing/old-post', 'https://hidetaka.dev')).toBe(true)
@@ -212,7 +225,11 @@ describe('createRedirectRules', () => {
     expect(engine.shouldRedirect('/ja/articles', 'https://hidetaka.dev')).toBe(true)
 
     // dev-notesは除外される
+    expect(engine.shouldRedirect('/writing/dev-notes', 'https://hidetaka.dev')).toBe(false)
+    expect(engine.shouldRedirect('/writing/dev-notes/', 'https://hidetaka.dev')).toBe(false)
     expect(engine.shouldRedirect('/writing/dev-notes/test', 'https://hidetaka.dev')).toBe(false)
+    expect(engine.shouldRedirect('/ja/writing/dev-notes', 'https://hidetaka.dev')).toBe(false)
+    expect(engine.shouldRedirect('/ja/writing/dev-notes/', 'https://hidetaka.dev')).toBe(false)
     expect(engine.shouldRedirect('/ja/writing/dev-notes/test', 'https://hidetaka.dev')).toBe(false)
 
     // 他のwritingパスはリダイレクトされる
