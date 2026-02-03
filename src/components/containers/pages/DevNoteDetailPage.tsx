@@ -56,6 +56,7 @@ export default function DevNoteDetailPage({
             <div className="flex items-center text-sm">
               <Link
                 href={lang === 'ja' ? '/ja/writing' : '/writing'}
+                aria-label={lang === 'ja' ? `${writingLabel}に戻る` : `Go to ${writingLabel}`}
                 className="font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors"
               >
                 {writingLabel}
@@ -100,7 +101,7 @@ export default function DevNoteDetailPage({
             date={date}
             lang={lang}
             format="long"
-            className="mb-4 text-sm font-medium text-slate-600 dark:text-slate-400"
+            className="mb-4 text-sm lg:text-base font-medium text-slate-600 dark:text-slate-400"
           />
 
           {/* タイトル */}
@@ -178,7 +179,7 @@ export default function DevNoteDetailPage({
           {/* 前後の記事へのナビゲーション（モバイルのみ表示） */}
           {(previousNote || nextNote) && (
             <nav
-              aria-label="記事ナビゲーション"
+              aria-label={lang === 'ja' ? 'Dev Notesナビゲーション' : 'Dev Notes navigation'}
               className="mt-16 pt-8 border-t border-zinc-200 dark:border-zinc-700 lg:hidden"
             >
               <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
@@ -186,6 +187,7 @@ export default function DevNoteDetailPage({
                 {nextNote && (
                   <Link
                     href={`${basePath}/${nextNote.slug}`}
+                    aria-label={`${nextLabel}: ${nextNote.title.rendered}`}
                     className="group flex flex-col flex-1 p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
                   >
                     <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">
@@ -201,6 +203,7 @@ export default function DevNoteDetailPage({
                 {previousNote && (
                   <Link
                     href={`${basePath}/${previousNote.slug}`}
+                    aria-label={`${previousLabel}: ${previousNote.title.rendered}`}
                     className="group flex flex-col flex-1 p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors text-right"
                   >
                     <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">

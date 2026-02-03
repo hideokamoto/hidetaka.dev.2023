@@ -26,11 +26,13 @@ export default function DevNoteDetailSidebar({
   const backLabel = lang === 'ja' ? 'Writing に戻る' : 'Back to Writing'
 
   return (
-    <div className={`hidden lg:block space-y-8 ${className}`}>
+    <div className={`hidden lg:block lg:space-y-8 ${className}`}>
       {/* タグセクション */}
       {categories.length > 0 && (
         <div>
-          <h3 className="mb-3 text-sm font-semibold text-slate-900 dark:text-white">{tagsLabel}</h3>
+          <h3 className="lg:mb-3 lg:text-sm lg:font-semibold text-slate-900 dark:text-white">
+            {tagsLabel}
+          </h3>
           <CategoryTagList categories={categories} basePath={basePath} />
         </div>
       )}
@@ -40,16 +42,17 @@ export default function DevNoteDetailSidebar({
 
       {/* 前後の記事ナビゲーション */}
       {(previousNote || nextNote) && (
-        <nav className="space-y-4">
+        <nav className="lg:space-y-4">
           {/* 次の記事 */}
           {nextNote && (
             <div>
-              <h3 className="mb-2 text-sm font-semibold text-slate-900 dark:text-white">
+              <h3 className="lg:mb-2 lg:text-sm lg:font-semibold text-slate-900 dark:text-white">
                 {nextLabel}
               </h3>
               <Link
                 href={`${basePath}/${nextNote.slug}`}
-                className="block p-3 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg transition-colors line-clamp-2"
+                aria-label={`${nextLabel}: ${nextNote.title.rendered}`}
+                className="block lg:p-3 lg:text-sm lg:font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/20 lg:rounded-lg transition-colors line-clamp-2"
               >
                 {nextNote.title.rendered}
               </Link>
@@ -59,12 +62,13 @@ export default function DevNoteDetailSidebar({
           {/* 前の記事 */}
           {previousNote && (
             <div>
-              <h3 className="mb-2 text-sm font-semibold text-slate-900 dark:text-white">
+              <h3 className="lg:mb-2 lg:text-sm lg:font-semibold text-slate-900 dark:text-white">
                 {previousLabel}
               </h3>
               <Link
                 href={`${basePath}/${previousNote.slug}`}
-                className="block p-3 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg transition-colors line-clamp-2"
+                aria-label={`${previousLabel}: ${previousNote.title.rendered}`}
+                className="block lg:p-3 lg:text-sm lg:font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/20 lg:rounded-lg transition-colors line-clamp-2"
               >
                 {previousNote.title.rendered}
               </Link>
@@ -76,7 +80,8 @@ export default function DevNoteDetailSidebar({
       {/* Writingに戻る */}
       <Link
         href={lang === 'ja' ? '/ja/writing' : '/writing'}
-        className="block text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+        aria-label={backLabel}
+        className="block lg:text-sm lg:font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
       >
         ← {backLabel}
       </Link>
