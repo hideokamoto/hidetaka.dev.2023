@@ -2,17 +2,19 @@ export default function Profile({ lang }: { lang: string }) {
   if (lang.startsWith('ja')) {
     return (
       <>
-        DigitalCubeのBizDev。EC ASPの開発やStripeのDeveloper
-        Advocateとしての経験を元に、SaaSやECサイトの収益を増やすための方法・生成AIを使った効率化や新しい事業モデルの模索などに挑戦する。
+        CircleCI
+        シニアフィールドエンジニア。AWSやCloudflare上へのサーバーレスなアプリ開発を得意とする開発者。元Stripe
+        Developer Advocate / AWS Samurai
+        2017など、サービスの使い方や活用Tipsを紹介するコンテンツ作成や登壇などを得意とする。
       </>
     )
   }
   return (
     <>
-      I&apos;m a Business Development professional at DigitalCube. Based on my experience in EC ASP
-      development and as a Developer Advocate at Stripe, I&apos;m working on methods to increase
-      revenue for SaaS and EC sites, exploring efficiency improvements using generative AI, and
-      developing new business models. You can follow me on Twitter at{' '}
+      CircleCI Senior Field Engineer. A developer specialized in serverless application development
+      on AWS and Cloudflare. Former Stripe Developer Advocate / AWS Samurai 2017. Skilled in
+      creating content and presentations that introduce service usage and best practices. You can
+      follow me on Twitter at{' '}
       <a
         className="text-underline text-indigo-600 dark:text-sky-300"
         href="https://twitter.com/hidetaka_dev"
