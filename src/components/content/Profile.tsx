@@ -2,8 +2,7 @@ export default function Profile({ lang }: { lang: string }) {
   if (lang.startsWith('ja')) {
     return (
       <>
-        CircleCI
-        シニアフィールドエンジニア。AWSやCloudflare上へのサーバーレスなアプリ開発を得意とする開発者。元Stripe
+        CircleCIシニアフィールドエンジニア。AWSやCloudflare上へのサーバーレスなアプリ開発を得意とする開発者。元Stripe
         Developer Advocate / AWS Samurai
         2017など、サービスの使い方や活用Tipsを紹介するコンテンツ作成や登壇などを得意とする。
       </>
