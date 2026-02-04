@@ -11,7 +11,7 @@ import ProfileImage from './ProfileImage'
  */
 type ProfileCardProps = {
   /** 言語設定 (英語: 'en', 日本語: 'ja') */
-  lang: string
+  lang: 'ja' | 'en'
   /** プロフィール画像を表示するかどうか */
   showImage?: boolean
   /** ソーシャルリンクを表示するかどうか */
@@ -122,7 +122,7 @@ export default function ProfileCard({
           <div>
             <h3 className="text-xl font-bold text-slate-900 dark:text-white">{authorName}</h3>
             <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-              {lang.startsWith('ja') ? 'ビジネスデベロップメント' : 'Business Development'}
+              {lang === 'ja' ? 'ビジネスデベロップメント' : 'Business Development'}
             </p>
           </div>
 

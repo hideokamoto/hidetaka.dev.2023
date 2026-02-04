@@ -17,7 +17,7 @@ import { DETAIL_PAGE_SECTION_CLASS } from '@/libs/utils/detailPageStyles'
 type DevNoteDetailPageProps = {
   note: WPThought
   basePath: string
-  lang: string
+  lang: 'ja' | 'en'
   previousNote?: WPThought | null
   nextNote?: WPThought | null
   relatedArticles?: BlogItem[]

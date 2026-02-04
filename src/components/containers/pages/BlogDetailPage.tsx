@@ -15,7 +15,7 @@ import type { BlogItem, WPThought } from '@/libs/dataSources/types'
 
 interface BlogDetailPageProps {
   thought: WPThought
-  lang: string
+  lang: 'ja' | 'en'
   basePath: string
   previousThought?: WPThought | null
   nextThought?: WPThought | null

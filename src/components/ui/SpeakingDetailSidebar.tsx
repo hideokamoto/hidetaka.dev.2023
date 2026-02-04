@@ -3,7 +3,7 @@ import ProfileCard from '@/components/ui/ProfileCard'
 import type { WPEvent } from '@/libs/dataSources/types'
 
 interface SpeakingDetailSidebarProps {
-  lang: string
+  lang: 'ja' | 'en'
   basePath: string
   previousReport?: WPEvent | null
   nextReport?: WPEvent | null

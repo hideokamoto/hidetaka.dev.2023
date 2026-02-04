@@ -4,7 +4,7 @@ import ProfileCard from '@/components/ui/ProfileCard'
 import type { WPThought } from '@/libs/dataSources/types'
 
 interface DevNoteDetailSidebarProps {
-  lang: string
+  lang: 'ja' | 'en'
   basePath: string
   categories: Category[]
   previousNote?: WPThought | null
