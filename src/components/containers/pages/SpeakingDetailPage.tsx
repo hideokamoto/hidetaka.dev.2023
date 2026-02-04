@@ -13,7 +13,7 @@ import type { BlogItem, WPEvent } from '@/libs/dataSources/types'
 
 type SpeakingDetailPageProps = {
   event: WPEvent
-  lang: string
+  lang: 'ja' | 'en'
   basePath: string
   previousEvent?: WPEvent | null
   nextEvent?: WPEvent | null

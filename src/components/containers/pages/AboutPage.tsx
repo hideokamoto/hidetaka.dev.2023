@@ -12,8 +12,8 @@ import ProfileImage from '@/components/ui/ProfileImage'
 import SectionHeader from '@/components/ui/SectionHeader'
 import { SITE_CONFIG } from '@/config'
 
-function SpeakerProfile({ lang }: { lang: string }) {
-  if (lang.startsWith('ja')) {
+function SpeakerProfile({ lang }: { lang: 'ja' | 'en' }) {
+  if (lang === 'ja') {
     return (
       <>
         DigitalCubeのBizDevとして、SaaSやECサイトの収益を増やすための方法・生成AIを使った効率化や新しい事業モデルの模索などに挑戦している。前職では
@@ -122,7 +122,7 @@ function CertificationBadge({ title, link, src }: { title: string; link?: string
   return content
 }
 
-export default function AboutPageContent({ lang }: { lang: string }) {
+export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
   const isJa = lang.startsWith('ja')
 
   const pageTitle = isJa ? 'Hidetaka Okamotoについて' : 'About Hidetaka Okamoto'

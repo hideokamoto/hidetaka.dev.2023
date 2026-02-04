@@ -13,7 +13,7 @@ import { DETAIL_PAGE_SECTION_CLASS } from '@/libs/utils/detailPageStyles'
 
 type NewsDetailPageProps = {
   product: WPProduct
-  lang: string
+  lang: 'ja' | 'en'
   basePath: string
   previousProduct?: WPProduct | null
   nextProduct?: WPProduct | null

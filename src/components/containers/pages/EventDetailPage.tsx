@@ -12,7 +12,7 @@ import { DETAIL_PAGE_SECTION_CLASS } from '@/libs/utils/detailPageStyles'
 
 type EventDetailPageProps = {
   event: WPEvent
-  lang: string
+  lang: 'ja' | 'en'
   basePath: string
   previousEvent?: WPEvent | null
   nextEvent?: WPEvent | null
