@@ -10,8 +10,10 @@ workflows:
   setup-workflow:
     jobs:
       - path-filtering/filter:
-          # Base branch for comparison
-          base-revision: main
+          # Dynamic base revision: uses pipeline.git.base_revision if available (PR builds),
+          # falls back to HEAD~1 for first builds and API triggers,
+          # and uses HEAD~1 for main branch to avoid main-vs-main empty diffs
+          base-revision: <<# pipeline.git.base_revision >><<pipeline.git.base_revision>><<^ pipeline.git.base_revision >><<# equal [ <<pipeline.git.branch>>, main ] >>HEAD~1<</ equal >><<^ equal [ <<pipeline.git.branch>>, main ] >>HEAD~1<</ equal >><</ pipeline.git.base_revision >>
           # Path to the continuation config
           config-path: .circleci/continue.yml
           # Path-to-parameter mapping (regex patterns)
@@ -37,9 +39,3 @@ workflows:
             wrangler\.jsonc run-cf-build true
             package(-lock)?\.json run-cf-build true
             \.circleci/.* run-all true
-          # Only run on main and claude/** branches
-          filters:
-            branches:
-              only:
-                - main
-                - /claude\/.*/
