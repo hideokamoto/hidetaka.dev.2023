@@ -235,4 +235,209 @@ describe('blogCardTransformer - Property-Based Tests', () => {
       )
     })
   })
+
+  describe('プロパティ 5: iframeタグの正しい生成', () => {
+    it('should correctly escape URL using encodeURIComponent', () => {
+      /**
+       * **Validates: Requirements 2.2**
+       *
+       * Property 5: iframeタグの正しい生成（URLエスケープ）
+       * 任意のURL文字列において、Blog_Card_Transformerが生成するiframeタグは
+       * URLが正しくエスケープされている（encodeURIComponent）
+       */
+      fc.assert(
+        fc.property(fc.webUrl(), (url) => {
+          const html = `<p>${url}</p>`
+          const urls = [url]
+
+          // URLを変換
+          const result = transformUrlsToBlogCards(html, urls)
+
+          // エスケープされたURLが含まれることを検証
+          const encodedUrl = encodeURIComponent(url)
+          expect(result).toContain(`url=${encodedUrl}`)
+        }),
+        { numRuns: 100 },
+      )
+    })
+
+    it('should include loading="lazy" attribute in iframe tag', () => {
+      /**
+       * **Validates: Requirements 2.3**
+       *
+       * Property 5: iframeタグの正しい生成（loading="lazy"属性）
+       * 任意のURL文字列において、Blog_Card_Transformerが生成するiframeタグは
+       * loading="lazy"属性が含まれている
+       */
+      fc.assert(
+        fc.property(fc.webUrl(), (url) => {
+          const html = `<p>${url}</p>`
+          const urls = [url]
+
+          // URLを変換
+          const result = transformUrlsToBlogCards(html, urls)
+
+          // loading="lazy"属性が含まれることを検証
+          expect(result).toContain('loading="lazy"')
+        }),
+        { numRuns: 100 },
+      )
+    })
+
+    it('should reference correct OGP Service endpoint', () => {
+      /**
+       * **Validates: Requirements 2.4**
+       *
+       * Property 5: iframeタグの正しい生成（OGPサービスエンドポイント）
+       * 任意のURL文字列において、Blog_Card_Transformerが生成するiframeタグは
+       * OGP Serviceの正しいエンドポイント（/card?url={encodedUrl}）を参照している
+       */
+      fc.assert(
+        fc.property(fc.webUrl(), (url) => {
+          const html = `<p>${url}</p>`
+          const urls = [url]
+
+          // URLを変換
+          const result = transformUrlsToBlogCards(html, urls)
+
+          // OGP Serviceのエンドポイントが含まれることを検証
+          expect(result).toContain(
+            'https://ogp-metadata-service-production.wp-kyoto.workers.dev/card?url=',
+          )
+
+          // エスケープされたURLがエンドポイントに含まれることを検証
+          const encodedUrl = encodeURIComponent(url)
+          expect(result).toContain(`/card?url=${encodedUrl}`)
+        }),
+        { numRuns: 100 },
+      )
+    })
+
+    it('should generate iframe with all required attributes', () => {
+      /**
+       * **Validates: Requirements 2.2, 2.3, 2.4**
+       *
+       * Property 5: iframeタグの正しい生成（すべての必須属性）
+       * 任意のURL文字列において、Blog_Card_Transformerが生成するiframeタグは
+       * すべての必須属性（src, width, height, frameborder, loading, style）を含む
+       */
+      fc.assert(
+        fc.property(fc.webUrl(), (url) => {
+          const html = `<p>${url}</p>`
+          const urls = [url]
+
+          // URLを変換
+          const result = transformUrlsToBlogCards(html, urls)
+
+          // すべての必須属性が含まれることを検証
+          expect(result).toContain('<iframe')
+          expect(result).toContain('src="')
+          expect(result).toContain('width="100%"')
+          expect(result).toContain('height="155"')
+          expect(result).toContain('frameborder="0"')
+          expect(result).toContain('loading="lazy"')
+          expect(result).toContain('style="')
+          expect(result).toContain('</iframe>')
+        }),
+        { numRuns: 100 },
+      )
+    })
+
+    it('should correctly escape URLs with special characters', () => {
+      /**
+       * **Validates: Requirements 2.2**
+       *
+       * Property 5: iframeタグの正しい生成（特殊文字のエスケープ）
+       * URLに特殊文字（&, =, ?, #など）が含まれる場合でも、
+       * 正しくエスケープされる
+       */
+      fc.assert(
+        fc.property(
+          fc.webUrl(),
+          fc.string({ minLength: 1, maxLength: 20 }),
+          fc.string({ minLength: 1, maxLength: 20 }),
+          (baseUrl, param, value) => {
+            // クエリパラメータを含むURLを生成
+            const url = `${baseUrl}?${param}=${value}`
+            const html = `<p>${url}</p>`
+            const urls = [url]
+
+            // URLを変換
+            const result = transformUrlsToBlogCards(html, urls)
+
+            // エスケープされたURLが含まれることを検証
+            const encodedUrl = encodeURIComponent(url)
+            expect(result).toContain(`url=${encodedUrl}`)
+
+            // 元のURL（エスケープされていない）がsrc属性に直接含まれないことを検証
+            // （エスケープされたバージョンのみが含まれるべき）
+            const iframeMatch = result.match(/<iframe[^>]*src="([^"]*)"/)
+            if (iframeMatch) {
+              const srcValue = iframeMatch[1]
+              // src属性内のURLパラメータ部分を取得
+              const urlParamMatch = srcValue.match(/url=([^&]*)/)
+              if (urlParamMatch) {
+                const urlParam = urlParamMatch[1]
+                // URLパラメータがエスケープされていることを検証
+                expect(urlParam).toBe(encodedUrl)
+              }
+            }
+          },
+        ),
+        { numRuns: 100 },
+      )
+    })
+
+    it('should maintain consistent iframe structure across different URLs', () => {
+      /**
+       * **Validates: Requirements 2.2, 2.3, 2.4**
+       *
+       * Property 5: iframeタグの正しい生成（一貫性）
+       * 異なるURLに対しても、iframeタグの構造は一貫している
+       * （src属性のURL部分のみが異なる）
+       */
+      fc.assert(
+        fc.property(fc.array(fc.webUrl(), { minLength: 2, maxLength: 5 }), (urls) => {
+          // 重複を除去（reduce + Mapパターン）
+          const uniqueUrls = Array.from(
+            urls
+              .reduce((map, url) => {
+                map.set(url, url)
+                return map
+              }, new Map<string, string>())
+              .values(),
+          )
+
+          // 少なくとも2つのユニークなURLが必要
+          if (uniqueUrls.length < 2) return
+
+          // 各URLを個別に変換
+          const results = uniqueUrls.map((url) => {
+            const html = `<p>${url}</p>`
+            return transformUrlsToBlogCards(html, [url])
+          })
+
+          // すべての結果でloading="lazy"が含まれることを検証
+          for (const result of results) {
+            expect(result).toContain('loading="lazy"')
+          }
+
+          // すべての結果でOGPサービスエンドポイントが含まれることを検証
+          for (const result of results) {
+            expect(result).toContain(
+              'https://ogp-metadata-service-production.wp-kyoto.workers.dev/card?url=',
+            )
+          }
+
+          // すべての結果で同じ属性セットが含まれることを検証
+          for (const result of results) {
+            expect(result).toContain('width="100%"')
+            expect(result).toContain('height="155"')
+            expect(result).toContain('frameborder="0"')
+          }
+        }),
+        { numRuns: 100 },
+      )
+    })
+  })
 })
