@@ -388,4 +388,189 @@ describe('urlDetector - Property-Based Tests', () => {
       )
     })
   })
+
+  describe('プロパティ 3: 複数URLの完全な検出', () => {
+    it('should detect all independent URLs without duplicates', () => {
+      /**
+       * **Validates: Requirements 1.5**
+       * 
+       * Property 3: 複数URLの完全な検出
+       * 任意のHTML文字列において、複数の独立したURLが含まれる場合、
+       * URL_Detectorはすべての独立したURLを検出し、重複なく返す
+       */
+      fc.assert(
+        fc.property(
+          fc.array(fc.webUrl(), { minLength: 1, maxLength: 20 }),
+          (urls) => {
+            // 重複を除去（reduce + Mapパターン）
+            const uniqueUrls = Array.from(
+              urls.reduce((map, url) => {
+                map.set(url, url) // 最後の結果で上書き
+                return map
+              }, new Map<string, string>()).values()
+            )
+            
+            // 除外条件を適用（画像URL、自サイトURL）
+            const imageExtensions = /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i
+            const ownSitePattern = /hidetaka\.dev/i
+            
+            const expectedUrls = uniqueUrls.filter(url => {
+              return !imageExtensions.test(url) && !ownSitePattern.test(url)
+            })
+            
+            // 各URLを<p>タグで囲む
+            const html = uniqueUrls.map(url => `<p>${url}</p>`).join('\n')
+            
+            // URLを検出
+            const detected = detectIndependentUrls(html)
+            
+            // すべての期待されるURLが検出されることを検証
+            expect(detected.length).toBe(expectedUrls.length)
+            
+            // 各期待されるURLが検出されることを検証
+            for (const url of expectedUrls) {
+              expect(detected).toContain(url)
+            }
+            
+            // 重複がないことを検証
+            const detectedSet = new Set(detected)
+            expect(detectedSet.size).toBe(detected.length)
+          }
+        ),
+        { numRuns: 100 }
+      )
+    })
+
+    it('should handle mixed content with multiple URLs', () => {
+      /**
+       * **Validates: Requirements 1.5**
+       * 
+       * Property 3: 複数URLの完全な検出（混在コンテンツ）
+       * 独立したURL、リンクタグ、画像URL、自サイトURLが混在する場合でも、
+       * 独立したURLのみをすべて検出する
+       */
+      fc.assert(
+        fc.property(
+          fc.array(fc.webUrl(), { minLength: 1, maxLength: 5 }),
+          fc.array(fc.webUrl(), { minLength: 0, maxLength: 3 }),
+          fc.array(fc.webUrl(), { minLength: 0, maxLength: 3 }),
+          (independentUrls, linkUrls, imageBaseUrls) => {
+            // 独立したURLの重複を除去
+            const uniqueIndependentUrls = Array.from(
+              independentUrls.reduce((map, url) => {
+                map.set(url, url)
+                return map
+              }, new Map<string, string>()).values()
+            )
+            
+            // 除外条件を適用（画像URL、自サイトURL）
+            const imageExtensions = /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i
+            const ownSitePattern = /hidetaka\.dev/i
+            
+            const expectedUrls = uniqueIndependentUrls.filter(url => {
+              return !imageExtensions.test(url) && !ownSitePattern.test(url)
+            })
+            
+            // HTMLを構築
+            const independentHtml = uniqueIndependentUrls.map(url => `<p>${url}</p>`).join('\n')
+            const linkHtml = linkUrls.map(url => `<a href="${url}">Link</a>`).join('\n')
+            const imageHtml = imageBaseUrls.map(url => `<p>${url}.jpg</p>`).join('\n')
+            const ownSiteHtml = '<p>https://hidetaka.dev/blog/post</p>'
+            
+            const html = `${independentHtml}\n${linkHtml}\n${imageHtml}\n${ownSiteHtml}`
+            
+            // URLを検出
+            const detected = detectIndependentUrls(html)
+            
+            // すべての期待されるURLが検出されることを検証
+            expect(detected.length).toBe(expectedUrls.length)
+            
+            for (const url of expectedUrls) {
+              expect(detected).toContain(url)
+            }
+            
+            // 除外されるべきURLが検出されないことを検証
+            for (const url of linkUrls) {
+              expect(detected).not.toContain(url)
+            }
+            
+            for (const url of imageBaseUrls) {
+              expect(detected).not.toContain(`${url}.jpg`)
+            }
+            
+            expect(detected).not.toContain('https://hidetaka.dev/blog/post')
+          }
+        ),
+        { numRuns: 100 }
+      )
+    })
+
+    it('should handle duplicate URLs in input', () => {
+      /**
+       * **Validates: Requirements 1.5**
+       * 
+       * Property 3: 複数URLの完全な検出（重複URL）
+       * 同じURLが複数回出現する場合、重複を除去して1回だけ返す
+       */
+      fc.assert(
+        fc.property(
+          fc.webUrl(),
+          fc.integer({ min: 2, max: 10 }),
+          (url, count) => {
+            // 同じURLを複数回含むHTML
+            const html = Array(count).fill(`<p>${url}</p>`).join('\n')
+            
+            // URLを検出
+            const detected = detectIndependentUrls(html)
+            
+            // URLが1回だけ検出されることを検証（重複除去）
+            expect(detected).toContain(url)
+            expect(detected.filter(u => u === url).length).toBe(1)
+          }
+        ),
+        { numRuns: 100 }
+      )
+    })
+
+    it('should preserve order of first occurrence when deduplicating', () => {
+      /**
+       * **Validates: Requirements 1.5**
+       * 
+       * Property 3: 複数URLの完全な検出（順序保持）
+       * 重複を除去する際、最初に出現したURLの順序を保持する
+       */
+      fc.assert(
+        fc.property(
+          fc.array(fc.webUrl(), { minLength: 2, maxLength: 10 }),
+          (urls) => {
+            // 重複を除去（reduce + Mapパターン）
+            const uniqueUrls = Array.from(
+              urls.reduce((map, url) => {
+                map.set(url, url)
+                return map
+              }, new Map<string, string>()).values()
+            )
+            
+            // 除外条件を適用
+            const imageExtensions = /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i
+            const ownSitePattern = /hidetaka\.dev/i
+            
+            const expectedUrls = uniqueUrls.filter(url => {
+              return !imageExtensions.test(url) && !ownSitePattern.test(url)
+            })
+            
+            // 各URLを<p>タグで囲む
+            const html = uniqueUrls.map(url => `<p>${url}</p>`).join('\n')
+            
+            // URLを検出
+            const detected = detectIndependentUrls(html)
+            
+            // 検出されたURLの順序が期待される順序と一致することを検証
+            expect(detected).toEqual(expectedUrls)
+          }
+        ),
+        { numRuns: 100 }
+      )
+    })
+  })
 })
