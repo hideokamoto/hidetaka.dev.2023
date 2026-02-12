@@ -236,6 +236,254 @@ describe('blogCardTransformer - Property-Based Tests', () => {
     })
   })
 
+  describe('プロパティ 6: 複数URLの個別変換', () => {
+    it('should transform each URL to individual iframe tags', () => {
+      /**
+       * **Validates: Requirements 2.5**
+       *
+       * Property 6: 複数URLの個別変換
+       * 任意のHTML文字列において、複数のURLが検出される場合、
+       * Blog_Card_TransformerはそれぞれのURLを個別のiframeタグに変換し、
+       * すべての変換が完了する
+       */
+      fc.assert(
+        fc.property(fc.array(fc.webUrl(), { minLength: 1, maxLength: 10 }), (urls) => {
+          // 重複を除去（reduce + Mapパターン）
+          const uniqueUrls = Array.from(
+            urls
+              .reduce((map, url) => {
+                map.set(url, url) // 最後の結果で上書き
+                return map
+              }, new Map<string, string>())
+              .values(),
+          )
+
+          // 各URLを<p>タグで囲んでHTMLを生成
+          const html = uniqueUrls.map((url) => `<p>${url}</p>`).join('\n')
+
+          // URLを変換
+          const result = transformUrlsToBlogCards(html, uniqueUrls)
+
+          // すべてのURLが個別のiframeタグに変換されることを検証
+          const iframeCount = (result.match(/<iframe/g) || []).length
+          expect(iframeCount).toBe(uniqueUrls.length)
+
+          // 各URLに対応するiframeが存在することを検証
+          for (const url of uniqueUrls) {
+            const encodedUrl = encodeURIComponent(url)
+            expect(result).toContain(`url=${encodedUrl}`)
+          }
+
+          // 元のURL文字列が含まれないことを検証（すべて置換されている）
+          for (const url of uniqueUrls) {
+            expect(result).not.toContain(`<p>${url}</p>`)
+          }
+        }),
+        { numRuns: 100 },
+      )
+    })
+
+    it('should complete all transformations for multiple URLs', () => {
+      /**
+       * **Validates: Requirements 2.5**
+       *
+       * Property 6: 複数URLの個別変換（完全性）
+       * 複数のURLが含まれる場合、すべての変換が完了し、
+       * 変換されていないURLが残らない
+       */
+      fc.assert(
+        fc.property(
+          fc.array(fc.webUrl(), { minLength: 2, maxLength: 5 }),
+          fc.string().filter((s) => !s.includes('<') && !s.includes('>')),
+          (urls, additionalContent) => {
+            // 重複を除去（reduce + Mapパターン）
+            const uniqueUrls = Array.from(
+              urls
+                .reduce((map, url) => {
+                  map.set(url, url)
+                  return map
+                }, new Map<string, string>())
+                .values(),
+            )
+
+            // 少なくとも2つのユニークなURLが必要
+            if (uniqueUrls.length < 2) return
+
+            // URLと追加コンテンツを混在させたHTMLを生成
+            const htmlParts = uniqueUrls.map((url) => `<p>${url}</p>`)
+            htmlParts.push(`<p>${additionalContent}</p>`)
+            const html = htmlParts.join('\n')
+
+            // URLを変換
+            const result = transformUrlsToBlogCards(html, uniqueUrls)
+
+            // すべてのURLが変換されていることを検証
+            for (const url of uniqueUrls) {
+              // 元のURL文字列が含まれないことを検証
+              expect(result).not.toContain(`<p>${url}</p>`)
+
+              // 対応するiframeが存在することを検証
+              const encodedUrl = encodeURIComponent(url)
+              expect(result).toContain(`url=${encodedUrl}`)
+            }
+
+            // 追加コンテンツは保持されることを検証
+            expect(result).toContain(`<p>${additionalContent}</p>`)
+          },
+        ),
+        { numRuns: 100 },
+      )
+    })
+
+    it('should handle duplicate URLs in HTML correctly', () => {
+      /**
+       * **Validates: Requirements 2.5**
+       *
+       * Property 6: 複数URLの個別変換（重複URL）
+       * HTML内に同じURLが複数回出現する場合でも、
+       * すべての出現箇所が個別のiframeタグに変換される
+       */
+      fc.assert(
+        fc.property(
+          fc.webUrl(),
+          fc.integer({ min: 2, max: 5 }),
+          (url, duplicateCount) => {
+            // 同じURLを複数回含むHTMLを生成
+            const html = Array(duplicateCount)
+              .fill(null)
+              .map(() => `<p>${url}</p>`)
+              .join('\n')
+
+            // URLリストには1つだけ含める（重複除去済み）
+            const urls = [url]
+
+            // URLを変換
+            const result = transformUrlsToBlogCards(html, urls)
+
+            // すべての出現箇所が変換されることを検証
+            const iframeCount = (result.match(/<iframe/g) || []).length
+            expect(iframeCount).toBe(duplicateCount)
+
+            // 元のURL文字列が含まれないことを検証
+            expect(result).not.toContain(`<p>${url}</p>`)
+          },
+        ),
+        { numRuns: 100 },
+      )
+    })
+
+    it('should preserve order of URLs in transformation', () => {
+      /**
+       * **Validates: Requirements 2.5**
+       *
+       * Property 6: 複数URLの個別変換（順序保持）
+       * 複数のURLを変換する際、元のHTML内での順序が保持される
+       */
+      fc.assert(
+        fc.property(fc.array(fc.webUrl(), { minLength: 2, maxLength: 5 }), (urls) => {
+          // 重複を除去（reduce + Mapパターン）
+          const uniqueUrls = Array.from(
+            urls
+              .reduce((map, url) => {
+                map.set(url, url)
+                return map
+              }, new Map<string, string>())
+              .values(),
+          )
+
+          // 少なくとも2つのユニークなURLが必要
+          if (uniqueUrls.length < 2) return
+
+          // 各URLを<p>タグで囲んでHTMLを生成
+          const html = uniqueUrls.map((url) => `<p>${url}</p>`).join('\n')
+
+          // URLを変換
+          const result = transformUrlsToBlogCards(html, uniqueUrls)
+
+          // 各URLのiframeの位置を取得
+          const iframePositions = uniqueUrls.map((url) => {
+            const encodedUrl = encodeURIComponent(url)
+            const pattern = new RegExp(`url=${encodedUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`)
+            const match = result.match(pattern)
+            return match ? result.indexOf(match[0]) : -1
+          })
+
+          // すべてのiframeが見つかることを検証
+          for (const position of iframePositions) {
+            expect(position).toBeGreaterThanOrEqual(0)
+          }
+
+          // 順序が保持されることを検証（位置が昇順）
+          for (let i = 1; i < iframePositions.length; i++) {
+            expect(iframePositions[i]).toBeGreaterThan(iframePositions[i - 1])
+          }
+        }),
+        { numRuns: 100 },
+      )
+    })
+
+    it('should handle mixed content with multiple URLs', () => {
+      /**
+       * **Validates: Requirements 2.5**
+       *
+       * Property 6: 複数URLの個別変換（混在コンテンツ）
+       * URLと他のHTMLコンテンツが混在している場合でも、
+       * すべてのURLが正しく変換され、他のコンテンツは保持される
+       */
+      fc.assert(
+        fc.property(
+          fc.array(fc.webUrl(), { minLength: 1, maxLength: 5 }),
+          fc.array(fc.string().filter((s) => !s.includes('<') && !s.includes('>')), {
+            minLength: 1,
+            maxLength: 5,
+          }),
+          (urls, textContents) => {
+            // 重複を除去（reduce + Mapパターン）
+            const uniqueUrls = Array.from(
+              urls
+                .reduce((map, url) => {
+                  map.set(url, url)
+                  return map
+                }, new Map<string, string>())
+                .values(),
+            )
+
+            // URLとテキストコンテンツを交互に配置
+            const htmlParts: string[] = []
+            const maxLength = Math.max(uniqueUrls.length, textContents.length)
+
+            for (let i = 0; i < maxLength; i++) {
+              if (i < textContents.length) {
+                htmlParts.push(`<p>${textContents[i]}</p>`)
+              }
+              if (i < uniqueUrls.length) {
+                htmlParts.push(`<p>${uniqueUrls[i]}</p>`)
+              }
+            }
+
+            const html = htmlParts.join('\n')
+
+            // URLを変換
+            const result = transformUrlsToBlogCards(html, uniqueUrls)
+
+            // すべてのURLが変換されることを検証
+            for (const url of uniqueUrls) {
+              expect(result).not.toContain(`<p>${url}</p>`)
+              const encodedUrl = encodeURIComponent(url)
+              expect(result).toContain(`url=${encodedUrl}`)
+            }
+
+            // テキストコンテンツが保持されることを検証
+            for (const text of textContents) {
+              expect(result).toContain(`<p>${text}</p>`)
+            }
+          },
+        ),
+        { numRuns: 100 },
+      )
+    })
+  })
+
   describe('プロパティ 5: iframeタグの正しい生成', () => {
     it('should correctly escape URL using encodeURIComponent', () => {
       /**

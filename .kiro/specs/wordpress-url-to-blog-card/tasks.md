@@ -54,7 +54,7 @@ WordPress記事本文内の独立したURLを自動的にOGPブログカード�
     - **プロパティ 5: iframeタグの正しい生成**
     - **検証: 要件 2.2, 2.3, 2.4**
   
-  - [~] 4.4 blogCardTransformerのプロパティテスト（複数URL）
+  - [x] 4.4 blogCardTransformerのプロパティテスト（複数URL）
     - **プロパティ 6: 複数URLの個別変換**
     - **検証: 要件 2.5**
   
