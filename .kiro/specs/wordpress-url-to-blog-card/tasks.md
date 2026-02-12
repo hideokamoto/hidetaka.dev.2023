@@ -6,130 +6,130 @@ WordPress記事本文内の独立したURLを自動的にOGPブログカード�
 
 ## タスク
 
-- [ ] 1. プロジェクト構造とコアモジュールのセットアップ
+- [x] 1. プロジェクト構造とコアモジュールのセットアップ
   - src/libs/blogCard/ディレクトリを作成
   - TypeScript型定義ファイルを作成
   - テストフレームワーク（Vitest + fast-check）の設定を確認
   - _要件: 7.1, 7.2_
 
 - [ ] 2. URL検出モジュール（urlDetector）の実装
-  - [ ] 2.1 urlDetector.tsの基本実装
+  - [~] 2.1 urlDetector.tsの基本実装
     - detectIndependentUrls関数を実装
     - 正規表現パターンでURL検出ロジックを実装
     - 除外条件（リンクタグ、画像URL、自サイトURL）を実装
     - _要件: 1.1, 1.2, 1.3, 1.4, 1.5_
   
-  - [ ] 2.2 urlDetectorのプロパティテスト
+  - [~] 2.2 urlDetectorのプロパティテスト
     - **プロパティ 1: 独立したURLの検出**
     - **検証: 要件 1.1**
   
-  - [ ] 2.3 urlDetectorのプロパティテスト（除外条件）
+  - [~] 2.3 urlDetectorのプロパティテスト（除外条件）
     - **プロパティ 2: 除外条件の適用**
     - **検証: 要件 1.2, 1.3, 1.4**
   
-  - [ ] 2.4 urlDetectorのプロパティテスト（複数URL）
+  - [~] 2.4 urlDetectorのプロパティテスト（複数URL）
     - **プロパティ 3: 複数URLの完全な検出**
     - **検証: 要件 1.5**
   
-  - [ ] 2.5 urlDetectorのユニットテスト
+  - [~] 2.5 urlDetectorのユニットテスト
     - 特定の例とエッジケースをテスト
     - 空のHTML、URLなしのHTMLをテスト
     - _要件: 1.1, 1.2, 1.3, 1.4, 1.5_
 
-- [ ] 3. チェックポイント - URL検出モジュールの動作確認
+- [~] 3. チェックポイント - URL検出モジュールの動作確認
   - すべてのテストが通ることを確認し、ユーザーに質問があれば尋ねる
 
 - [ ] 4. URL変換モジュール（blogCardTransformer）の実装
-  - [ ] 4.1 blogCardTransformer.tsの基本実装
+  - [~] 4.1 blogCardTransformer.tsの基本実装
     - transformUrlsToBlogCards関数を実装
     - URLエスケープ処理（encodeURIComponent）を実装
     - iframeタグ生成ロジックを実装
     - _要件: 2.1, 2.2, 2.3, 2.4, 2.5_
   
-  - [ ] 4.2 blogCardTransformerのプロパティテスト（変換）
+  - [~] 4.2 blogCardTransformerのプロパティテスト（変換）
     - **プロパティ 4: URLからiframeへの変換**
     - **検証: 要件 2.1**
   
-  - [ ] 4.3 blogCardTransformerのプロパティテスト（iframeタグ生成）
+  - [~] 4.3 blogCardTransformerのプロパティテスト（iframeタグ生成）
     - **プロパティ 5: iframeタグの正しい生成**
     - **検証: 要件 2.2, 2.3, 2.4**
   
-  - [ ] 4.4 blogCardTransformerのプロパティテスト（複数URL）
+  - [~] 4.4 blogCardTransformerのプロパティテスト（複数URL）
     - **プロパティ 6: 複数URLの個別変換**
     - **検証: 要件 2.5**
   
-  - [ ] 4.5 blogCardTransformerのプロパティテスト（不正なURL）
+  - [~] 4.5 blogCardTransformerのプロパティテスト（不正なURL）
     - **プロパティ 7: 不正なURLのスキップ**
     - **検証: 要件 5.4**
   
-  - [ ] 4.6 blogCardTransformerのユニットテスト
+  - [~] 4.6 blogCardTransformerのユニットテスト
     - 特定の例とエッジケースをテスト
     - エラー条件をテスト
     - _要件: 2.1, 2.2, 2.3, 2.4, 2.5, 5.4_
 
-- [ ] 5. チェックポイント - URL変換モジュールの動作確認
+- [~] 5. チェックポイント - URL変換モジュールの動作確認
   - すべてのテストが通ることを確認し、ユーザーに質問があれば尋ねる
 
 - [ ] 6. TransformedBlogContentコンポーネントの実装
-  - [ ] 6.1 TransformedBlogContent.tsxの実装
+  - [~] 6.1 TransformedBlogContent.tsxの実装
     - サーバーコンポーネントとして実装
     - urlDetectorとblogCardTransformerを統合
     - エラーハンドリングを実装（try-catch）
     - ログ記録を実装
     - _要件: 3.1, 3.2, 3.3, 3.4, 3.5, 6.1, 6.2, 6.3, 6.5_
   
-  - [ ] 6.2 TransformedBlogContentのプロパティテスト（エラーハンドリング）
+  - [~] 6.2 TransformedBlogContentのプロパティテスト（エラーハンドリング）
     - **プロパティ 8: 不正なHTMLのエラーハンドリング**
     - **検証: 要件 6.3**
   
-  - [ ] 6.3 TransformedBlogContentのプロパティテスト（ラウンドトリップ）
+  - [~] 6.3 TransformedBlogContentのプロパティテスト（ラウンドトリップ）
     - **プロパティ 9: ラウンドトリップ一貫性**
     - **検証: 要件 2.1, 2.5**
   
-  - [ ] 6.4 TransformedBlogContentのユニットテスト
+  - [~] 6.4 TransformedBlogContentのユニットテスト
     - エラーハンドリングのテスト
     - ログ記録のテスト
     - _要件: 6.1, 6.2, 6.3, 6.5_
 
 - [ ] 7. BlogDetailPageコンポーネントの統合
-  - [ ] 7.1 BlogDetailPage.tsxの修正
+  - [~] 7.1 BlogDetailPage.tsxの修正
     - TransformedBlogContentコンポーネントをインポート
     - dangerouslySetInnerHTMLをTransformedBlogContentに置き換え
     - 既存のスタイリング（className）を維持
     - _要件: 8.1, 8.2, 8.3_
   
-  - [ ] 7.2 統合テスト
+  - [~] 7.2 統合テスト
     - BlogDetailPageとTransformedBlogContentの統合をテスト
     - スタイリングが維持されることを確認
     - _要件: 8.2, 8.3_
 
-- [ ] 8. チェックポイント - 統合の動作確認
+- [~] 8. チェックポイント - 統合の動作確認
   - すべてのテストが通ることを確認し、ユーザーに質問があれば尋ねる
 
 - [ ] 9. ローカル環境での動作確認
-  - [ ] 9.1 開発サーバーでの動作確認
+  - [~] 9.1 開発サーバーでの動作確認
     - npm run devで開発サーバーを起動（ユーザーが手動で実行）
     - ブログ記事ページでURL変換が動作することを確認
     - iframeが正しく表示されることを確認
     - _要件: 3.1, 3.2, 3.3, 3.4, 3.5_
   
-  - [ ] 9.2 パフォーマンスの確認
+  - [~] 9.2 パフォーマンスの確認
     - 大きな記事本文での処理時間を確認
     - ブラウザの開発者ツールでiframeの遅延読み込みを確認
     - _要件: 4.1, 4.3, 4.5_
 
 - [ ] 10. ドキュメントとクリーンアップ
-  - [ ] 10.1 READMEの更新
+  - [~] 10.1 READMEの更新
     - 機能の説明を追加
     - 使用方法を記載
     - _要件: 8.1_
   
-  - [ ] 10.2 型定義のエクスポート
+  - [~] 10.2 型定義のエクスポート
     - index.tsでモジュールをエクスポート
     - 型定義を整理
     - _要件: 7.1, 7.2_
 
-- [ ] 11. 最終チェックポイント
+- [~] 11. 最終チェックポイント
   - すべてのテストが通ることを確認
   - ビルドが成功することを確認（npm run build）
   - リントエラーがないことを確認（npm run lint）
