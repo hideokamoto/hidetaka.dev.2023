@@ -12,7 +12,7 @@ WordPress記事本文内の独立したURLを自動的にOGPブログカード�
   - テストフレームワーク（Vitest + fast-check）の設定を確認
   - _要件: 7.1, 7.2_
 
-- [ ] 2. URL検出モジュール（urlDetector）の実装
+- [x] 2. URL検出モジュール（urlDetector）の実装
   - [x] 2.1 urlDetector.tsの基本実装
     - detectIndependentUrls関数を実装
     - 正規表現パターンでURL検出ロジックを実装
@@ -40,7 +40,7 @@ WordPress記事本文内の独立したURLを自動的にOGPブログカード�
   - すべてのテストが通ることを確認し、ユーザーに質問があれば尋ねる
 
 - [ ] 4. URL変換モジュール（blogCardTransformer）の実装
-  - [~] 4.1 blogCardTransformer.tsの基本実装
+  - [x] 4.1 blogCardTransformer.tsの基本実装
     - transformUrlsToBlogCards関数を実装
     - URLエスケープ処理（encodeURIComponent）を実装
     - iframeタグ生成ロジックを実装
