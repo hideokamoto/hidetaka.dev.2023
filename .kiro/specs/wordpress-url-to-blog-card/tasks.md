@@ -46,7 +46,7 @@ WordPress記事本文内の独立したURLを自動的にOGPブログカード�
     - iframeタグ生成ロジックを実装
     - _要件: 2.1, 2.2, 2.3, 2.4, 2.5_
   
-  - [~] 4.2 blogCardTransformerのプロパティテスト（変換）
+  - [x] 4.2 blogCardTransformerのプロパティテスト（変換）
     - **プロパティ 4: URLからiframeへの変換**
     - **検証: 要件 2.1**
   
