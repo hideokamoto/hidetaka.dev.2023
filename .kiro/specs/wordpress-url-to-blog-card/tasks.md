@@ -13,7 +13,7 @@ WordPress記事本文内の独立したURLを自動的にOGPブログカード�
   - _要件: 7.1, 7.2_
 
 - [ ] 2. URL検出モジュール（urlDetector）の実装
-  - [~] 2.1 urlDetector.tsの基本実装
+  - [x] 2.1 urlDetector.tsの基本実装
     - detectIndependentUrls関数を実装
     - 正規表現パターンでURL検出ロジックを実装
     - 除外条件（リンクタグ、画像URL、自サイトURL）を実装
