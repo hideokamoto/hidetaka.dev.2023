@@ -58,11 +58,11 @@ WordPress記事本文内の独立したURLを自動的にOGPブログカード�
     - **プロパティ 6: 複数URLの個別変換**
     - **検証: 要件 2.5**
   
-  - [~] 4.5 blogCardTransformerのプロパティテスト（不正なURL）
+  - [x] 4.5 blogCardTransformerのプロパティテスト（不正なURL）
     - **プロパティ 7: 不正なURLのスキップ**
     - **検証: 要件 5.4**
   
-  - [~] 4.6 blogCardTransformerのユニットテスト
+  - [x] 4.6 blogCardTransformerのユニットテスト
     - 特定の例とエッジケースをテスト
     - エラー条件をテスト
     - _要件: 2.1, 2.2, 2.3, 2.4, 2.5, 5.4_
