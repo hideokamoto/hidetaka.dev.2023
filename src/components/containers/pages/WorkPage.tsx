@@ -4,6 +4,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
 import Container from '@/components/tailwindui/Container'
+import { GitHubIcon, LinkedInIcon, TwitterIcon } from '@/components/tailwindui/SocialLink'
+import BackgroundDecoration from '@/components/ui/BackgroundDecoration'
 import DateDisplay from '@/components/ui/DateDisplay'
 import FilterItem from '@/components/ui/FilterItem'
 import MobileFilterButton from '@/components/ui/MobileFilterButton'
@@ -12,6 +14,7 @@ import PageHeader from '@/components/ui/PageHeader'
 import SearchBar from '@/components/ui/SearchBar'
 import SidebarLayout from '@/components/ui/SidebarLayout'
 import Tag from '@/components/ui/Tag'
+import { SITE_CONFIG } from '@/config'
 import type { NPMRegistrySearchResult } from '@/libs/dataSources/npmjs'
 import type { WordPressPluginDetail } from '@/libs/dataSources/wporg'
 import type { MicroCMSProjectsRecord } from '@/libs/microCMS/types'
@@ -230,6 +233,107 @@ function OSSContributionLink({ project }: { project: MicroCMSProjectsRecord }) {
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
       </svg>
     </a>
+  )
+}
+
+// 統計バーコンポーネント
+function StatsBar({
+  projectCount,
+  ossCount,
+  bookCount,
+  npmCount,
+  lang,
+}: {
+  projectCount: number
+  ossCount: number
+  bookCount: number
+  npmCount: number
+  lang: string
+}) {
+  const stats = [
+    {
+      value: projectCount,
+      label: lang === 'ja' ? 'プロジェクト' : 'Projects',
+    },
+    {
+      value: ossCount,
+      label: lang === 'ja' ? 'OSS' : 'Open Source',
+    },
+    {
+      value: bookCount,
+      label: lang === 'ja' ? '書籍' : 'Books',
+    },
+    {
+      value: npmCount,
+      label: lang === 'ja' ? 'npm' : 'npm Packages',
+    },
+  ]
+
+  return (
+    <div className="mb-12 grid grid-cols-2 sm:grid-cols-4 gap-4">
+      {stats.map((stat, index) => (
+        <div
+          key={index}
+          className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 text-center transition-all hover:border-indigo-300 hover:shadow-md dark:hover:border-indigo-700"
+        >
+          <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
+            {stat.value}
+          </div>
+          <div className="mt-2 text-sm text-slate-600 dark:text-slate-400">{stat.label}</div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// CTAコンポーネント
+function WorkCTA({ lang }: { lang: string }) {
+  const title =
+    lang === 'ja' ? '一緒にプロジェクトを始めませんか？' : 'Interested in working together?'
+  const subtitle = lang === 'ja' ? 'お気軽にご連絡ください。' : 'Feel free to reach out'
+
+  return (
+    <section className="py-12 sm:py-16 bg-slate-50 dark:bg-zinc-800/50 border-t border-zinc-200 dark:border-zinc-700">
+      <Container>
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+            {title}
+          </h2>
+          <p className="text-lg text-slate-600 dark:text-slate-400 mb-8">{subtitle}</p>
+
+          {/* ソーシャルリンク */}
+          <div className="flex justify-center gap-4">
+            <a
+              href={SITE_CONFIG.social.twitter.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={SITE_CONFIG.social.twitter.ariaLabel}
+              className="group flex items-center justify-center h-12 w-12 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 transition hover:border-indigo-300 hover:bg-indigo-50 dark:hover:border-indigo-700 dark:hover:bg-zinc-800"
+            >
+              <TwitterIcon className="h-5 w-5 fill-slate-500 transition group-hover:fill-indigo-600 dark:fill-slate-400 dark:group-hover:fill-indigo-400" />
+            </a>
+            <a
+              href={SITE_CONFIG.social.github.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={SITE_CONFIG.social.github.ariaLabel}
+              className="group flex items-center justify-center h-12 w-12 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 transition hover:border-indigo-300 hover:bg-indigo-50 dark:hover:border-indigo-700 dark:hover:bg-zinc-800"
+            >
+              <GitHubIcon className="h-5 w-5 fill-slate-500 transition group-hover:fill-indigo-600 dark:fill-slate-400 dark:group-hover:fill-indigo-400" />
+            </a>
+            <a
+              href={SITE_CONFIG.social.linkedin.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={SITE_CONFIG.social.linkedin.ariaLabel}
+              className="group flex items-center justify-center h-12 w-12 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 transition hover:border-indigo-300 hover:bg-indigo-50 dark:hover:border-indigo-700 dark:hover:bg-zinc-800"
+            >
+              <LinkedInIcon className="h-5 w-5 fill-slate-500 transition group-hover:fill-indigo-600 dark:fill-slate-400 dark:group-hover:fill-indigo-400" />
+            </a>
+          </div>
+        </div>
+      </Container>
+    </section>
   )
 }
 
@@ -458,8 +562,8 @@ export default function WorkPageContent({
   const title = lang === 'ja' ? '制作物' : 'Work'
   const description =
     lang === 'ja'
-      ? 'これまでに開発・制作したプロジェクト、オープンソースプロジェクト、書籍などを紹介しています。'
-      : "A collection of projects, open source contributions, books, and other work I've created."
+      ? '開発者・BizDevとして10年以上のキャリアから生まれたプロダクト、OSSプロジェクト、書籍を紹介しています。'
+      : 'Products, open source projects, and books born from over 10 years as a developer and BizDev professional.'
   const filterButtonText = lang === 'ja' ? 'フィルター' : 'Filter'
 
   // アクティブなフィルターの数を計算
@@ -534,9 +638,20 @@ export default function WorkPageContent({
       />
 
       {/* Heroセクション + メインコンテンツ */}
-      <section className="pt-12 sm:pt-16 pb-8 sm:pb-12 bg-white dark:bg-zinc-900">
-        <Container>
+      <section className="relative pt-12 sm:pt-16 pb-8 sm:pb-12 bg-white dark:bg-zinc-900">
+        <BackgroundDecoration variant="section" />
+
+        <Container className="relative">
           <PageHeader title={title} description={description} />
+
+          {/* 統計バー */}
+          <StatsBar
+            projectCount={mainProjects.length}
+            ossCount={allOSSItems.length}
+            bookCount={booksProjects.length}
+            npmCount={npmPackages.length}
+            lang={lang}
+          />
 
           {/* モバイル用検索バーとフィルターボタン */}
           <div className="lg:hidden mb-6 space-y-4">
@@ -662,6 +777,9 @@ export default function WorkPageContent({
           </SidebarLayout>
         </Container>
       </section>
+
+      {/* CTA セクション */}
+      <WorkCTA lang={lang} />
     </>
   )
 }
