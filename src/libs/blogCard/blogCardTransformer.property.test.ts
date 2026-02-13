@@ -143,8 +143,8 @@ describe('blogCardTransformer - Property-Based Tests', () => {
       fc.assert(
         fc.property(
           fc.webUrl(),
-          fc.string(),
-          fc.string(),
+          fc.string().filter((s) => !s.includes(' ') && !s.includes('\t') && !s.includes('\n')),
+          fc.string().filter((s) => !s.includes(' ') && !s.includes('\t') && !s.includes('\n')),
           (baseUrl, queryParam, fragment) => {
             // クエリパラメータとフラグメントを含むURLを生成
             const url = `${baseUrl}?${queryParam}#${fragment}`
@@ -484,6 +484,203 @@ describe('blogCardTransformer - Property-Based Tests', () => {
     })
   })
 
+  describe('プロパティ 7: 不正なURLのスキップ', () => {
+    it('should skip invalid URLs without protocol and preserve original HTML', () => {
+      /**
+       * **Validates: Requirements 5.4**
+       *
+       * Property 7: 不正なURLのスキップ
+       * 任意の不正なURL（プロトコルなし、不正な形式など）において、
+       * Blog_Card_TransformerはそのURLを変換せずにスキップし、
+       * 元のHTML文字列を保持する
+       */
+      fc.assert(
+        fc.property(
+          fc.string({ minLength: 5, maxLength: 50 }).filter((s) => !s.startsWith('http')),
+          (invalidUrl) => {
+            // プロトコルなしのURLを含むHTML
+            const html = `<p>${invalidUrl}</p>`
+            const urls = [invalidUrl]
+
+            // URLを変換（不正なURLはスキップされるべき）
+            const result = transformUrlsToBlogCards(html, urls)
+
+            // 元のHTMLが保持されることを検証（変換されない）
+            expect(result).toBe(html)
+
+            // iframeタグが生成されないことを検証
+            expect(result).not.toContain('<iframe')
+          },
+        ),
+        { numRuns: 100 },
+      )
+    })
+
+    it('should skip malformed URLs and preserve original HTML', () => {
+      /**
+       * **Validates: Requirements 5.4**
+       *
+       * Property 7: 不正なURLのスキップ（不正な形式）
+       * 不正な形式のURL（スペース、制御文字など）を含む場合、
+       * そのURLをスキップし、元のHTMLを保持する
+       */
+      fc.assert(
+        fc.property(
+          fc.string({ minLength: 1, maxLength: 30 }).filter((s) => s.includes(' ')),
+          (malformedUrl) => {
+            // スペースを含む不正なURLを含むHTML
+            const html = `<p>https://${malformedUrl}</p>`
+            const urls = [`https://${malformedUrl}`]
+
+            // URLを変換
+            const result = transformUrlsToBlogCards(html, urls)
+
+            // 元のHTMLが保持されることを検証
+            expect(result).toBe(html)
+
+            // iframeタグが生成されないことを検証
+            expect(result).not.toContain('<iframe')
+          },
+        ),
+        { numRuns: 100 },
+      )
+    })
+
+    it('should skip invalid URLs and continue transforming valid URLs', () => {
+      /**
+       * **Validates: Requirements 5.4**
+       *
+       * Property 7: 不正なURLのスキップ（混在）
+       * 有効なURLと不正なURLが混在する場合、
+       * 不正なURLはスキップし、有効なURLのみを変換する
+       */
+      fc.assert(
+        fc.property(
+          fc.webUrl(),
+          fc.string({ minLength: 5, maxLength: 30 }).filter((s) => !s.startsWith('http')),
+          (validUrl, invalidUrl) => {
+            // 有効なURLと不正なURLを含むHTML
+            const html = `<p>${validUrl}</p>\n<p>${invalidUrl}</p>`
+            const urls = [validUrl, invalidUrl]
+
+            // URLを変換
+            const result = transformUrlsToBlogCards(html, urls)
+
+            // 有効なURLは変換されることを検証
+            expect(result).not.toContain(`<p>${validUrl}</p>`)
+            expect(result).toContain('<iframe')
+
+            // 不正なURLは保持されることを検証
+            expect(result).toContain(`<p>${invalidUrl}</p>`)
+          },
+        ),
+        { numRuns: 100 },
+      )
+    })
+
+    it('should handle empty or null-like URLs gracefully', () => {
+      /**
+       * **Validates: Requirements 5.4**
+       *
+       * Property 7: 不正なURLのスキップ（空URL）
+       * 空文字列やnull的な値を含むURLリストを処理する際、
+       * エラーを発生させずに処理を継続する
+       */
+      fc.assert(
+        fc.property(fc.webUrl(), (validUrl) => {
+          // 有効なURLと空文字列を含むHTML
+          const html = `<p>${validUrl}</p>\n<p></p>`
+          const urls = [validUrl, '']
+
+          // URLを変換（エラーが発生しないことを検証）
+          const result = transformUrlsToBlogCards(html, urls)
+
+          // 有効なURLは変換されることを検証
+          expect(result).not.toContain(`<p>${validUrl}</p>`)
+          expect(result).toContain('<iframe')
+
+          // 空の<p>タグは保持されることを検証
+          expect(result).toContain('<p></p>')
+        }),
+        { numRuns: 100 },
+      )
+    })
+
+    it('should preserve original HTML when all URLs are invalid', () => {
+      /**
+       * **Validates: Requirements 5.4**
+       *
+       * Property 7: 不正なURLのスキップ（すべて不正）
+       * すべてのURLが不正な場合、元のHTMLをそのまま返す
+       */
+      fc.assert(
+        fc.property(
+          fc.array(
+            fc.string({ minLength: 5, maxLength: 30 }).filter((s) => !s.startsWith('http')),
+            { minLength: 1, maxLength: 5 },
+          ),
+          (invalidUrls) => {
+            // 重複を除去（reduce + Mapパターン）
+            const uniqueUrls = Array.from(
+              invalidUrls
+                .reduce((map, url) => {
+                  map.set(url, url)
+                  return map
+                }, new Map<string, string>())
+                .values(),
+            )
+
+            // すべて不正なURLを含むHTML
+            const html = uniqueUrls.map((url) => `<p>${url}</p>`).join('\n')
+
+            // URLを変換
+            const result = transformUrlsToBlogCards(html, uniqueUrls)
+
+            // 元のHTMLが保持されることを検証
+            expect(result).toBe(html)
+
+            // iframeタグが生成されないことを検証
+            expect(result).not.toContain('<iframe')
+          },
+        ),
+        { numRuns: 100 },
+      )
+    })
+
+    it('should handle URLs with invalid characters gracefully', () => {
+      /**
+       * **Validates: Requirements 5.4**
+       *
+       * Property 7: 不正なURLのスキップ（不正な文字）
+       * 不正な文字（制御文字、改行など）を含むURLを処理する際、
+       * エラーを発生させずにスキップする
+       */
+      fc.assert(
+        fc.property(
+          fc.webUrl(),
+          fc.constantFrom('\n', '\r', '\t', '\0'),
+          (validUrl, invalidChar) => {
+            // 不正な文字を含むURL
+            const invalidUrl = `${validUrl}${invalidChar}`
+            const html = `<p>${validUrl}</p>\n<p>${invalidUrl}</p>`
+            const urls = [validUrl, invalidUrl]
+
+            // URLを変換（エラーが発生しないことを検証）
+            const result = transformUrlsToBlogCards(html, urls)
+
+            // 有効なURLは変換されることを検証
+            expect(result).not.toContain(`<p>${validUrl}</p>`)
+            expect(result).toContain('<iframe')
+
+            // 不正なURLを含む部分は保持されることを検証
+            expect(result).toContain(invalidUrl)
+          },
+        ),
+        { numRuns: 100 },
+      )
+    })
+  })
+
   describe('プロパティ 5: iframeタグの正しい生成', () => {
     it('should correctly escape URL using encodeURIComponent', () => {
       /**
@@ -602,8 +799,8 @@ describe('blogCardTransformer - Property-Based Tests', () => {
       fc.assert(
         fc.property(
           fc.webUrl(),
-          fc.string({ minLength: 1, maxLength: 20 }),
-          fc.string({ minLength: 1, maxLength: 20 }),
+          fc.string({ minLength: 1, maxLength: 20 }).filter((s) => !s.includes(' ') && !s.includes('\t') && !s.includes('\n')),
+          fc.string({ minLength: 1, maxLength: 20 }).filter((s) => !s.includes(' ') && !s.includes('\t') && !s.includes('\n')),
           (baseUrl, param, value) => {
             // クエリパラメータを含むURLを生成
             const url = `${baseUrl}?${param}=${value}`

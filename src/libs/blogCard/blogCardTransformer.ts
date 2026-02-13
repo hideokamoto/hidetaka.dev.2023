@@ -39,6 +39,12 @@ export function transformUrlsToBlogCards(html: string, urls: string[]): string {
   // 各URLをiframeタグに変換
   for (const url of urls) {
     try {
+      // URLの妥当性を検証
+      if (!isValidUrl(url)) {
+        console.warn(`Skipping invalid URL: ${url}`)
+        continue
+      }
+
       // URLをエスケープ（encodeURIComponent）
       const encodedUrl = encodeURIComponent(url)
 
@@ -69,4 +75,45 @@ export function transformUrlsToBlogCards(html: string, urls: string[]): string {
  */
 function escapeRegExp(str: string): string {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+/**
+ * URLの妥当性を検証する
+ *
+ * @param url - 検証するURL文字列
+ * @returns URLが有効な場合はtrue、無効な場合はfalse
+ */
+function isValidUrl(url: string): boolean {
+  // 空文字列または空白のみの場合は無効
+  if (!url || url.trim() === '') {
+    return false
+  }
+
+  // http:// または https:// で始まることを確認
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    return false
+  }
+
+  // 空白文字（スペース、タブ、改行など）が含まれている場合は無効
+  if (/\s/.test(url)) {
+    return false
+  }
+
+  // 制御文字（改行、タブなど）が含まれている場合は無効
+  if (/[\n\r\t\0]/.test(url)) {
+    return false
+  }
+
+  // URL構文の基本的な検証
+  try {
+    const urlObj = new URL(url)
+    // ホスト名が存在することを確認
+    if (!urlObj.hostname || urlObj.hostname.trim() === '') {
+      return false
+    }
+    return true
+  } catch {
+    // URL構文が不正な場合は無効
+    return false
+  }
 }
