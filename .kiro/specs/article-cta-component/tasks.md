@@ -4,7 +4,35 @@
 
 記事CTAコンポーネントシステムを実装し、記事タイプに基づいて適切なコールトゥアクションを表示します。実装は既存のコンポーネント構造に従い、将来のCMS統合を見据えた拡張可能なアーキテクチャを採用します。
 
-**Small Batch Size戦略**: 各タスクは独立したPRとしてマージ可能な最小単位に分割されています。git worktreeを使用して並列開発を行い、mainブランチに対して小さなPRを継続的にマージすることを推奨します。
+**⚠️ CRITICAL: Small Batch Size戦略（必須）⚠️**
+
+このタスクリストは**必ず**Small Batch Size戦略に従って実行すること。以下のルールは絶対に守ること：
+
+1. **各タスクは独立したブランチで実装**
+2. **各タスク完了後、即座にPRを作成**
+3. **ベースブランチ**: `feat/add-cta-component`（mainではない）
+4. **git worktreeを使用して並列開発可能**
+5. **1つのブランチで複数タスクを実装することは禁止**
+
+**ベースブランチの変更点:**
+- 従来: mainブランチから各タスクブランチをcheckout
+- **現在**: `feat/add-cta-component`ブランチから各タスクブランチをcheckout
+- PRのベースブランチ: `feat/add-cta-component`
+
+**違反例（絶対にやってはいけないこと）:**
+- ❌ 1つのブランチで複数タスクを実装
+- ❌ タスク完了後にPRを作成しない
+- ❌ mainブランチから直接checkout
+- ❌ Small Batch Size戦略を無視して全タスクを一度に実装
+
+**正しい実装フロー:**
+1. `feat/add-cta-component`ブランチから`feature/X-task-name`をcheckout
+2. タスクXを実装
+3. テスト・リントを実行
+4. コミット
+5. プッシュ
+6. **即座にPRを作成**（ベース: `feat/add-cta-component`）
+7. 次のタスクへ
 
 ## タスク依存関係図
 
@@ -200,12 +228,12 @@ gh auth login
 ### タスク1の完全なワークフロー例
 
 ```bash
-# 1. メインディレクトリで最新のmainを取得
+# 1. ベースブランチ（feat/add-cta-component）に移動
 cd hidetaka.dev
-git checkout main
-git pull origin main
+git checkout feat/add-cta-component
+git pull origin feat/add-cta-component
 
-# 2. worktreeを作成してブランチを切る
+# 2. worktreeを作成してブランチを切る（ベース: feat/add-cta-component）
 git worktree add ../hidetaka.dev-task1 -b feature/1-cta-types
 
 # 3. worktreeに移動して開発
@@ -256,7 +284,7 @@ gh pr create \
 ## 関連
 - 要件: 4.1, 4.4
 - 次のタスク: タスク2（CTAパターンデータ）、タスク3（バリデーション）" \
-  --base main \
+  --base feat/add-cta-component \
   --label "feature" \
   --label "small-batch"
 
@@ -273,12 +301,12 @@ git branch -d feature/1-cta-types  # ローカルブランチ削除
 ### Phase 1の並列開発フロー
 
 ```bash
-# メインディレクトリで作業
+# ベースブランチ（feat/add-cta-component）で作業
 cd hidetaka.dev
-git checkout main
-git pull origin main
+git checkout feat/add-cta-component
+git pull origin feat/add-cta-component
 
-# Phase 1の3タスクを並列でworktree作成
+# Phase 1の3タスクを並列でworktree作成（ベース: feat/add-cta-component）
 git worktree add ../hidetaka.dev-task1 -b feature/1-cta-types
 git worktree add ../hidetaka.dev-task2 -b feature/2-cta-patterns
 git worktree add ../hidetaka.dev-task3 -b feature/3-cta-validation
@@ -291,7 +319,7 @@ cd ../hidetaka.dev-task1
 npm test && npm run lint
 git add . && git commit -m "feat: add CTA type definitions"
 git push -u origin feature/1-cta-types
-gh pr create --title "feat: add CTA type definitions" --body "..." --base main
+gh pr create --title "feat: add CTA type definitions" --body "..." --base feat/add-cta-component
 
 # === ターミナル2: タスク2 ===
 cd ../hidetaka.dev-task2
@@ -299,7 +327,7 @@ cd ../hidetaka.dev-task2
 npm test && npm run lint
 git add . && git commit -m "feat: add CTA pattern data"
 git push -u origin feature/2-cta-patterns
-gh pr create --title "feat: add CTA pattern data" --body "..." --base main
+gh pr create --title "feat: add CTA pattern data" --body "..." --base feat/add-cta-component
 
 # === ターミナル3: タスク3 ===
 cd ../hidetaka.dev-task3
@@ -307,7 +335,7 @@ cd ../hidetaka.dev-task3
 npm test && npm run lint
 git add . && git commit -m "feat: add CTA validation functions"
 git push -u origin feature/3-cta-validation
-gh pr create --title "feat: add CTA validation functions" --body "..." --base main
+gh pr create --title "feat: add CTA validation functions" --body "..." --base feat/add-cta-component
 ```
 
 ### Phase 3の並列統合フロー
@@ -315,10 +343,10 @@ gh pr create --title "feat: add CTA validation functions" --body "..." --base ma
 ```bash
 # Phase 2完了後、Phase 3の統合タスクを並列開発
 cd hidetaka.dev
-git checkout main
-git pull origin main
+git checkout feat/add-cta-component
+git pull origin feat/add-cta-component
 
-# 4つの統合タスクを並列でworktree作成
+# 4つの統合タスクを並列でworktree作成（ベース: feat/add-cta-component）
 git worktree add ../hidetaka.dev-task6 -b feature/6-integrate-blog-detail
 git worktree add ../hidetaka.dev-task7 -b feature/7-integrate-devnote-detail
 git worktree add ../hidetaka.dev-task8 -b feature/8-integrate-news-detail
@@ -332,7 +360,7 @@ npm test && npm run lint
 git add . && git commit -m "feat: integrate ArticleCTA into BlogDetailPage"
 git push -u origin feature/6-integrate-blog-detail
 gh pr create --title "feat: integrate ArticleCTA into BlogDetailPage" \
-  --body "タスク6: BlogDetailPageへの統合..." --base main
+  --body "タスク6: BlogDetailPageへの統合..." --base feat/add-cta-component
 ```
 
 ### GitHub CLI便利コマンド
