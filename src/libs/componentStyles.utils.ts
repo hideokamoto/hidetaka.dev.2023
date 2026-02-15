@@ -84,7 +84,7 @@ export function getSectionHeaderAlignStyles(align: SectionHeaderAlign): string {
 }
 
 // CTA Button component types
-export type CTAButtonVariant = 'primary' | 'secondary'
+export type CTAButtonVariant = 'primary' | 'secondary' | 'outline'
 
 // CTA Button style constants (defined at module level for performance)
 const CTA_BUTTON_BASE_STYLES =
@@ -95,6 +95,8 @@ const CTA_BUTTON_VARIANT_STYLES = {
     'bg-indigo-600 text-white shadow-indigo-500/30 hover:bg-indigo-700 hover:shadow-indigo-500/40 dark:bg-indigo-500 dark:hover:bg-indigo-400',
   secondary:
     'border border-zinc-200 bg-white text-zinc-900 shadow-zinc-500/20 hover:bg-zinc-50 hover:shadow-zinc-500/30 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:hover:bg-zinc-800',
+  outline:
+    'border-2 border-indigo-600 bg-transparent text-indigo-600 shadow-indigo-500/20 hover:bg-indigo-50 hover:shadow-indigo-500/30 dark:border-indigo-400 dark:text-indigo-400 dark:hover:bg-indigo-950',
 } as const
 
 /**
