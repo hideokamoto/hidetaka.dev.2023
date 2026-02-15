@@ -57,9 +57,7 @@ describe('blogCardTransformer - Property-Based Tests', () => {
           const result = transformUrlsToBlogCards(html, urls)
 
           // OGP Serviceのエンドポイントが含まれることを検証
-          expect(result).toContain(
-            'https://ogp-metadata-service.wp-kyoto.workers.dev/card?url=',
-          )
+          expect(result).toContain('https://ogp-metadata-service.wp-kyoto.workers.dev/card?url=')
         }),
         { numRuns: 100 },
       )
@@ -1000,9 +998,7 @@ describe('blogCardTransformer - Property-Based Tests', () => {
           const result = transformUrlsToBlogCards(html, urls)
 
           // OGP Serviceのエンドポイントが含まれることを検証
-          expect(result).toContain(
-            'https://ogp-metadata-service.wp-kyoto.workers.dev/card?url=',
-          )
+          expect(result).toContain('https://ogp-metadata-service.wp-kyoto.workers.dev/card?url=')
 
           // エスケープされたURLがエンドポイントに含まれることを検証
           const encodedUrl = encodeURIComponent(url)
@@ -1127,9 +1123,7 @@ describe('blogCardTransformer - Property-Based Tests', () => {
 
           // すべての結果でOGPサービスエンドポイントが含まれることを検証
           for (const result of results) {
-            expect(result).toContain(
-              'https://ogp-metadata-service.wp-kyoto.workers.dev/card?url=',
-            )
+            expect(result).toContain('https://ogp-metadata-service.wp-kyoto.workers.dev/card?url=')
           }
 
           // すべての結果で同じ属性セットが含まれることを検証
