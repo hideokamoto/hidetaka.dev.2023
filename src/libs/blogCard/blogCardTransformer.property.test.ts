@@ -344,30 +344,26 @@ describe('blogCardTransformer - Property-Based Tests', () => {
        * すべての出現箇所が個別のiframeタグに変換される
        */
       fc.assert(
-        fc.property(
-          fc.webUrl(),
-          fc.integer({ min: 2, max: 5 }),
-          (url, duplicateCount) => {
-            // 同じURLを複数回含むHTMLを生成
-            const html = Array(duplicateCount)
-              .fill(null)
-              .map(() => `<p>${url}</p>`)
-              .join('\n')
+        fc.property(fc.webUrl(), fc.integer({ min: 2, max: 5 }), (url, duplicateCount) => {
+          // 同じURLを複数回含むHTMLを生成
+          const html = Array(duplicateCount)
+            .fill(null)
+            .map(() => `<p>${url}</p>`)
+            .join('\n')
 
-            // URLリストには1つだけ含める（重複除去済み）
-            const urls = [url]
+          // URLリストには1つだけ含める（重複除去済み）
+          const urls = [url]
 
-            // URLを変換
-            const result = transformUrlsToBlogCards(html, urls)
+          // URLを変換
+          const result = transformUrlsToBlogCards(html, urls)
 
-            // すべての出現箇所が変換されることを検証
-            const iframeCount = (result.match(/<iframe/g) || []).length
-            expect(iframeCount).toBe(duplicateCount)
+          // すべての出現箇所が変換されることを検証
+          const iframeCount = (result.match(/<iframe/g) || []).length
+          expect(iframeCount).toBe(duplicateCount)
 
-            // 元のURL文字列が含まれないことを検証
-            expect(result).not.toContain(`<p>${url}</p>`)
-          },
-        ),
+          // 元のURL文字列が含まれないことを検証
+          expect(result).not.toContain(`<p>${url}</p>`)
+        }),
         { numRuns: 100 },
       )
     })
@@ -433,10 +429,13 @@ describe('blogCardTransformer - Property-Based Tests', () => {
       fc.assert(
         fc.property(
           fc.array(fc.webUrl(), { minLength: 1, maxLength: 5 }),
-          fc.array(fc.string().filter((s) => !s.includes('<') && !s.includes('>')), {
-            minLength: 1,
-            maxLength: 5,
-          }),
+          fc.array(
+            fc.string().filter((s) => !s.includes('<') && !s.includes('>')),
+            {
+              minLength: 1,
+              maxLength: 5,
+            },
+          ),
           (urls, textContents) => {
             // 重複を除去（reduce + Mapパターン）
             const uniqueUrls = Array.from(
@@ -681,6 +680,261 @@ describe('blogCardTransformer - Property-Based Tests', () => {
     })
   })
 
+  describe('プロパティ 9: ラウンドトリップ一貫性', () => {
+    it('should preserve original content except transformed URLs', () => {
+      /**
+       * **Validates: Requirements 2.1, 2.5**
+       *
+       * Property 9: ラウンドトリップ一貫性
+       * 任意のHTML文字列において、変換処理を実行した後、
+       * 変換されたiframeタグを除く元のコンテンツは変更されない
+       */
+      fc.assert(
+        fc.property(
+          fc.array(fc.webUrl(), { minLength: 1, maxLength: 5 }),
+          fc.array(
+            fc.string().filter((s) => !s.includes('<') && !s.includes('>')),
+            { minLength: 1, maxLength: 5 },
+          ),
+          (urls, textContents) => {
+            // 重複を除去（reduce + Mapパターン）
+            const uniqueUrls = Array.from(
+              urls
+                .reduce((map, url) => {
+                  map.set(url, url)
+                  return map
+                }, new Map<string, string>())
+                .values(),
+            )
+
+            // URLとテキストコンテンツを混在させたHTMLを生成
+            // 各URLに対応する<p>タグを確実に生成
+            const htmlParts: string[] = []
+            const maxLength = Math.max(uniqueUrls.length, textContents.length)
+
+            for (let i = 0; i < maxLength; i++) {
+              if (i < textContents.length) {
+                htmlParts.push(`<p>${textContents[i]}</p>`)
+              }
+              if (i < uniqueUrls.length) {
+                htmlParts.push(`<p>${uniqueUrls[i]}</p>`)
+              }
+            }
+            const html = htmlParts.join('\n')
+
+            // URLを変換
+            const result = transformUrlsToBlogCards(html, uniqueUrls)
+
+            // 元のテキストコンテンツがすべて保持されることを検証
+            for (const text of textContents) {
+              expect(result).toContain(`<p>${text}</p>`)
+            }
+
+            // URLは変換されていることを検証（元のURL文字列は含まれない）
+            for (const url of uniqueUrls) {
+              expect(result).not.toContain(`<p>${url}</p>`)
+            }
+
+            // iframeタグが生成されていることを検証
+            const iframeCount = (result.match(/<iframe/g) || []).length
+            expect(iframeCount).toBe(uniqueUrls.length)
+          },
+        ),
+        { numRuns: 100 },
+      )
+    })
+
+    it('should preserve HTML structure and attributes of non-URL elements', () => {
+      /**
+       * **Validates: Requirements 2.1, 2.5**
+       *
+       * Property 9: ラウンドトリップ一貫性（HTML構造保持）
+       * URL以外のHTML要素の構造と属性は変更されない
+       */
+      fc.assert(
+        fc.property(
+          fc.webUrl(),
+          fc.stringMatching(/^[a-zA-Z0-9_-]+$/),
+          fc.string().filter((s) => !s.includes('<') && !s.includes('>')),
+          (url, className, headingText) => {
+            // 複雑なHTML構造を生成
+            const html = `<div class="${className}">
+  <h1>${headingText}</h1>
+  <p>${url}</p>
+  <p>Additional content</p>
+</div>`
+
+            // URLを変換
+            const result = transformUrlsToBlogCards(html, [url])
+
+            // div要素とその属性が保持されることを検証
+            expect(result).toContain(`<div class="${className}">`)
+            expect(result).toContain('</div>')
+
+            // h1要素とその内容が保持されることを検証
+            expect(result).toContain(`<h1>${headingText}</h1>`)
+
+            // 追加コンテンツが保持されることを検証
+            expect(result).toContain('<p>Additional content</p>')
+
+            // URLは変換されていることを検証
+            expect(result).not.toContain(`<p>${url}</p>`)
+            expect(result).toContain('<iframe')
+          },
+        ),
+        { numRuns: 100 },
+      )
+    })
+
+    it('should preserve whitespace and formatting of non-URL content', () => {
+      /**
+       * **Validates: Requirements 2.1, 2.5**
+       *
+       * Property 9: ラウンドトリップ一貫性（空白文字保持）
+       * URL以外のコンテンツの空白文字やフォーマットは変更されない
+       */
+      fc.assert(
+        fc.property(
+          fc.webUrl(),
+          fc.string().filter((s) => !s.includes('<') && !s.includes('>')),
+          (url, text) => {
+            // 空白文字を含むHTMLを生成
+            const html = `<p>  ${text}  </p>\n<p>${url}</p>\n<p>  Another paragraph  </p>`
+
+            // URLを変換
+            const result = transformUrlsToBlogCards(html, [url])
+
+            // 空白文字が保持されることを検証
+            expect(result).toContain(`<p>  ${text}  </p>`)
+            expect(result).toContain('<p>  Another paragraph  </p>')
+
+            // 改行文字が保持されることを検証（URLの前後）
+            expect(result).toMatch(/\n<iframe/)
+            expect(result).toMatch(/<\/iframe>\n/)
+
+            // URLは変換されていることを検証
+            expect(result).not.toContain(`<p>${url}</p>`)
+          },
+        ),
+        { numRuns: 100 },
+      )
+    })
+
+    it('should handle transformation idempotently for non-URL content', () => {
+      /**
+       * **Validates: Requirements 2.1, 2.5**
+       *
+       * Property 9: ラウンドトリップ一貫性（冪等性）
+       * 同じHTML（URL以外）に対して複数回変換を実行しても、
+       * URL以外のコンテンツは常に同じ状態を保つ
+       */
+      fc.assert(
+        fc.property(
+          fc.webUrl(),
+          fc.array(
+            fc.string().filter((s) => !s.includes('<') && !s.includes('>')),
+            { minLength: 2, maxLength: 5 },
+          ),
+          (url, textContents) => {
+            // テキストコンテンツとURLを含むHTMLを生成
+            const htmlParts = textContents.map((text) => `<p>${text}</p>`)
+            htmlParts.push(`<p>${url}</p>`)
+            const html = htmlParts.join('\n')
+
+            // 1回目の変換
+            const result1 = transformUrlsToBlogCards(html, [url])
+
+            // 2回目の変換（既に変換済みのHTMLに対して）
+            // 注: URLは既にiframeに変換されているため、urlsは空配列
+            const result2 = transformUrlsToBlogCards(result1, [])
+
+            // テキストコンテンツが両方の結果で保持されることを検証
+            for (const text of textContents) {
+              expect(result1).toContain(`<p>${text}</p>`)
+              expect(result2).toContain(`<p>${text}</p>`)
+            }
+
+            // 2回目の変換でHTMLが変更されないことを検証
+            expect(result2).toBe(result1)
+          },
+        ),
+        { numRuns: 100 },
+      )
+    })
+
+    it('should preserve nested HTML elements when transforming URLs', () => {
+      /**
+       * **Validates: Requirements 2.1, 2.5**
+       *
+       * Property 9: ラウンドトリップ一貫性（ネストされた要素）
+       * ネストされたHTML要素の構造は、URL変換後も保持される
+       */
+      fc.assert(
+        fc.property(
+          fc.webUrl(),
+          fc.string().filter((s) => !s.includes('<') && !s.includes('>')),
+          fc.string().filter((s) => !s.includes('<') && !s.includes('>')),
+          (url, listItem1, listItem2) => {
+            // ネストされたHTML構造を生成
+            const html = `<div>
+  <ul>
+    <li>${listItem1}</li>
+    <li>${listItem2}</li>
+  </ul>
+  <p>${url}</p>
+</div>`
+
+            // URLを変換
+            const result = transformUrlsToBlogCards(html, [url])
+
+            // ネストされた要素が保持されることを検証
+            expect(result).toContain('<div>')
+            expect(result).toContain('<ul>')
+            expect(result).toContain(`<li>${listItem1}</li>`)
+            expect(result).toContain(`<li>${listItem2}</li>`)
+            expect(result).toContain('</ul>')
+            expect(result).toContain('</div>')
+
+            // URLは変換されていることを検証
+            expect(result).not.toContain(`<p>${url}</p>`)
+            expect(result).toContain('<iframe')
+          },
+        ),
+        { numRuns: 100 },
+      )
+    })
+
+    it('should preserve special HTML entities in non-URL content', () => {
+      /**
+       * **Validates: Requirements 2.1, 2.5**
+       *
+       * Property 9: ラウンドトリップ一貫性（HTMLエンティティ）
+       * URL以外のコンテンツに含まれるHTMLエンティティは変更されない
+       */
+      fc.assert(
+        fc.property(
+          fc.webUrl(),
+          fc.constantFrom('&amp;', '&lt;', '&gt;', '&quot;', '&#39;'),
+          (url, entity) => {
+            // HTMLエンティティを含むコンテンツを生成
+            const html = `<p>Text with ${entity} entity</p>\n<p>${url}</p>`
+
+            // URLを変換
+            const result = transformUrlsToBlogCards(html, [url])
+
+            // HTMLエンティティが保持されることを検証
+            expect(result).toContain(`<p>Text with ${entity} entity</p>`)
+
+            // URLは変換されていることを検証
+            expect(result).not.toContain(`<p>${url}</p>`)
+            expect(result).toContain('<iframe')
+          },
+        ),
+        { numRuns: 100 },
+      )
+    })
+  })
+
   describe('プロパティ 5: iframeタグの正しい生成', () => {
     it('should correctly escape URL using encodeURIComponent', () => {
       /**
@@ -799,8 +1053,12 @@ describe('blogCardTransformer - Property-Based Tests', () => {
       fc.assert(
         fc.property(
           fc.webUrl(),
-          fc.string({ minLength: 1, maxLength: 20 }).filter((s) => !s.includes(' ') && !s.includes('\t') && !s.includes('\n')),
-          fc.string({ minLength: 1, maxLength: 20 }).filter((s) => !s.includes(' ') && !s.includes('\t') && !s.includes('\n')),
+          fc
+            .string({ minLength: 1, maxLength: 20 })
+            .filter((s) => !s.includes(' ') && !s.includes('\t') && !s.includes('\n')),
+          fc
+            .string({ minLength: 1, maxLength: 20 })
+            .filter((s) => !s.includes(' ') && !s.includes('\t') && !s.includes('\n')),
           (baseUrl, param, value) => {
             // クエリパラメータを含むURLを生成
             const url = `${baseUrl}?${param}=${value}`
