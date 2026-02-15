@@ -91,7 +91,7 @@ WordPress記事本文内の独立したURLを自動的にOGPブログカード�
     - ログ記録のテスト
     - _要件: 6.1, 6.2, 6.3, 6.5_
 
-- [ ] 7. BlogDetailPageコンポーネントの統合
+- [x] 7. BlogDetailPageコンポーネントの統合
   - [x] 7.1 BlogDetailPage.tsxの修正
     - TransformedBlogContentコンポーネントをインポート
     - dangerouslySetInnerHTMLをTransformedBlogContentに置き換え
@@ -103,7 +103,7 @@ WordPress記事本文内の独立したURLを自動的にOGPブログカード�
     - スタイリングが維持されることを確認
     - _要件: 8.2, 8.3_
 
-- [~] 8. チェックポイント - 統合の動作確認
+- [x] 8. チェックポイント - 統合の動作確認
   - すべてのテストが通ることを確認し、ユーザーに質問があれば尋ねる
 
 - [ ] 9. ローカル環境での動作確認
