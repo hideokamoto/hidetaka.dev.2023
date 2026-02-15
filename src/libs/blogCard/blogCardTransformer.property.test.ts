@@ -10,7 +10,7 @@
 
 import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
-import { transformUrlsToBlogCards } from './blogCardTransformer'
+import { transformUrlsToBlogCards } from '@/libs/blogCard/blogCardTransformer'
 
 describe('blogCardTransformer - Property-Based Tests', () => {
   describe('プロパティ 4: URLからiframeへの変換', () => {
@@ -408,9 +408,11 @@ describe('blogCardTransformer - Property-Based Tests', () => {
           }
 
           // 順序が保持されることを検証（位置が昇順）
-          for (let i = 1; i < iframePositions.length; i++) {
-            expect(iframePositions[i]).toBeGreaterThan(iframePositions[i - 1])
-          }
+          Array.from(iframePositions.entries()).forEach(([i, pos]) => {
+            if (i > 0) {
+              expect(pos).toBeGreaterThan(iframePositions[i - 1])
+            }
+          })
         }),
         { numRuns: 100 },
       )
@@ -449,14 +451,14 @@ describe('blogCardTransformer - Property-Based Tests', () => {
             const htmlParts: string[] = []
             const maxLength = Math.max(uniqueUrls.length, textContents.length)
 
-            for (let i = 0; i < maxLength; i++) {
+            Array.from({ length: maxLength }).forEach((_, i) => {
               if (i < textContents.length) {
                 htmlParts.push(`<p>${textContents[i]}</p>`)
               }
               if (i < uniqueUrls.length) {
                 htmlParts.push(`<p>${uniqueUrls[i]}</p>`)
               }
-            }
+            })
 
             const html = htmlParts.join('\n')
 
@@ -710,14 +712,14 @@ describe('blogCardTransformer - Property-Based Tests', () => {
             const htmlParts: string[] = []
             const maxLength = Math.max(uniqueUrls.length, textContents.length)
 
-            for (let i = 0; i < maxLength; i++) {
+            Array.from({ length: maxLength }).forEach((_, i) => {
               if (i < textContents.length) {
                 htmlParts.push(`<p>${textContents[i]}</p>`)
               }
               if (i < uniqueUrls.length) {
                 htmlParts.push(`<p>${uniqueUrls[i]}</p>`)
               }
-            }
+            })
             const html = htmlParts.join('\n')
 
             // URLを変換

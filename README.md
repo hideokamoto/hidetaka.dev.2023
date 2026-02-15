@@ -126,7 +126,7 @@ pnpm run cf:preview
    - `pnpm run cf:build`でビルド
    - `opennextjs-cloudflare deploy --env staging`でCloudflare Workersにデプロイ
 
-   **注意**: `wrangler.toml`に`[env.staging]`セクションが設定されている必要があります。
+   **注意**: `wrangler.jsonc`に`env.staging`セクションが設定されている必要があります。
 
 3. **デプロイ後の確認**
    - Cloudflareダッシュボードでデプロイ状況を確認

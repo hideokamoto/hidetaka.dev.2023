@@ -14,7 +14,7 @@
 
 ### Cloudflare Pages ビルドログ
 
-```
+```text
 2026-02-15T08:17:38.306Z	npm error code EUSAGE
 2026-02-15T08:17:38.307Z	npm error
 2026-02-15T08:17:38.307Z	npm error `npm ci` can only install packages when your package.json and package-lock.json or npm-shrinkwrap.json are in sync. Please update your lock file with `npm install` before continuing.
@@ -122,7 +122,7 @@ npm error Missing: webpack@5.105.2 from lock file
    - `@sentry/webpack-plugin` の peer dependency である webpack が lock file に存在しないため失敗
 
 3. **依存関係チェーン**
-   ```
+   ```text
    @sentry/nextjs@10.36.0
      └── @sentry/webpack-plugin@4.7.0
            └── peerDependency: webpack >=4.40.0 (満たされていない)
