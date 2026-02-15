@@ -4,7 +4,7 @@
  * カスタムCTAデータの検証と、無効な値のフォールバック処理を提供します。
  */
 
-import type { ArticleType, CTAData } from './ctaTypes'
+import type { ArticleType, CTAData } from '@/libs/ctaTypes'
 
 /**
  * 有効なCTAボタンのバリアント

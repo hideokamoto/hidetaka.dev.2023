@@ -4,8 +4,8 @@
 
 import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
-import type { ArticleType, CTAData } from './ctaTypes'
-import { isValidCTAData, normalizeArticleType, normalizeLang } from './ctaValidation'
+import type { ArticleType, CTAData } from '@/libs/ctaTypes'
+import { isValidCTAData, normalizeArticleType, normalizeLang } from '@/libs/ctaValidation'
 
 describe('ctaValidation', () => {
   describe('isValidCTAData', () => {

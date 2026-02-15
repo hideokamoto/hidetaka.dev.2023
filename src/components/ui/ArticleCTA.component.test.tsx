@@ -120,6 +120,13 @@ describe('ArticleCTA', () => {
         const { container } = render(<ArticleCTA articleType="tutorial" lang="ja" />)
 
         const section = container.querySelector('section')
+        expect(section).toHaveAttribute('aria-label', 'アクションを促すセクション')
+      })
+
+      it('should have localized aria-label on section for English', () => {
+        const { container } = render(<ArticleCTA articleType="tutorial" lang="en" />)
+
+        const section = container.querySelector('section')
         expect(section).toHaveAttribute('aria-label', 'Call to action')
       })
 
@@ -143,6 +150,13 @@ describe('ArticleCTA', () => {
 
         const nav = container.querySelector('nav')
         expect(nav).toBeInTheDocument()
+        expect(nav).toHaveAttribute('aria-label', 'CTAアクション')
+      })
+
+      it('should have localized aria-label on nav for English', () => {
+        const { container } = render(<ArticleCTA articleType="tutorial" lang="en" />)
+
+        const nav = container.querySelector('nav')
         expect(nav).toHaveAttribute('aria-label', 'CTA actions')
       })
     })

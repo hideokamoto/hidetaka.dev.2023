@@ -15,7 +15,7 @@
 
 ### コンポーネント階層
 
-```
+```text
 ArticleCTA (メインコンポーネント)
 ├── CTAPattern (パターン選択ロジック)
 │   ├── TutorialCTA
@@ -36,7 +36,7 @@ ArticleCTA (メインコンポーネント)
 
 ArticleCTAコンポーネントは以下の順序で配置されます：
 
-```
+```tsx
 <article>
   {/* 記事コンテンツ */}
 </article>
@@ -81,7 +81,7 @@ export default function ArticleCTA({
   lang,
   ctaData,
   className = '',
-}: ArticleCTAProps): JSX.Element
+}: ArticleCTAProps)
 ```
 
 ### CTAパターンデータ構造

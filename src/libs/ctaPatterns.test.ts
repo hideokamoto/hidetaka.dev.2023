@@ -1,7 +1,7 @@
 import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
-import { CTA_PATTERNS } from './ctaPatterns'
-import type { ArticleType } from './ctaTypes'
+import { CTA_PATTERNS } from '@/libs/ctaPatterns'
+import type { ArticleType } from '@/libs/ctaTypes'
 
 /**
  * CTAパターンデータのユニットテスト

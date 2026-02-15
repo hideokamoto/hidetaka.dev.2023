@@ -5,7 +5,7 @@
  * 将来的にCMS統合に移行する際の基盤となります。
  */
 
-import type { ArticleType, CTAPattern } from './ctaTypes'
+import type { ArticleType, CTAPattern } from '@/libs/ctaTypes'
 
 /**
  * 記事タイプごとのCTAパターン定義

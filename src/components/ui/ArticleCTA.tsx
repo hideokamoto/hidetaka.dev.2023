@@ -63,18 +63,18 @@ export default function ArticleCTA({
   return (
     <section
       className={`my-8 rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm transition-shadow hover:shadow-md sm:my-10 sm:p-8 md:my-12 lg:p-10 dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/30 ${className}`}
-      aria-label="Call to action"
+      aria-label={normalizedLang === 'ja' ? 'アクションを促すセクション' : 'Call to action'}
       role="complementary"
     >
       <h2 className="mb-3 text-xl font-bold leading-tight text-gray-900 sm:mb-4 sm:text-2xl md:text-3xl dark:text-gray-100">
         {selectedCTAData.heading}
       </h2>
-      <p className="mb-5 text-base leading-relaxed text-gray-700 sm:mb-6 sm:text-lg md:text-xl dark:text-gray-300">
+      <p className="mb-5 text-sm leading-relaxed text-gray-700 sm:mb-6 sm:text-base md:text-lg dark:text-gray-300">
         {selectedCTAData.description}
       </p>
       <nav
         className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4"
-        aria-label="CTA actions"
+        aria-label={normalizedLang === 'ja' ? 'CTAアクション' : 'CTA actions'}
       >
         {selectedCTAData.buttons.map((button) => (
           <CTAButton
