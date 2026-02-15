@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
 import ArticleActions from '@/components/ui/ArticleActions'
+import ArticleCTA from '@/components/ui/ArticleCTA'
 import BlogDetailSidebar from '@/components/ui/BlogDetailSidebar'
 import CategoryTagList from '@/components/ui/CategoryTagList'
 import DateDisplay from '@/components/ui/DateDisplay'
@@ -157,6 +158,9 @@ export default function BlogDetailPage({
             lang={lang}
             className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700"
           />
+
+          {/* CTA（行動喚起） */}
+          <ArticleCTA lang={lang} articleType="essay" className="mt-12" />
 
           {/* プロフィールカード（モバイルのみ表示） */}
           <div className="lg:hidden">
