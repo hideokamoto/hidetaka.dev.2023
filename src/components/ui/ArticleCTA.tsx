@@ -37,7 +37,7 @@ export default function ArticleCTA({
   lang,
   ctaData,
   className = '',
-}: ArticleCTAProps): JSX.Element {
+}: ArticleCTAProps) {
   // 記事タイプの正規化（無効な値は'general'にフォールバック）
   const normalizedArticleType = normalizeArticleType(articleType)
 
