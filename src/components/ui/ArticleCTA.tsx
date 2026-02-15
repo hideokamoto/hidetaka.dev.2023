@@ -56,7 +56,7 @@ export default function ArticleCTA({
     selectedCTAData = pattern[normalizedLang]
 
     // 無効なカスタムデータが提供された場合は警告をログ
-    if (ctaData && !isValidCTAData(ctaData)) {
+    if (ctaData) {
       console.warn('[ArticleCTA] Invalid ctaData provided, falling back to pattern:', {
         articleType: normalizedArticleType,
         lang: normalizedLang,
