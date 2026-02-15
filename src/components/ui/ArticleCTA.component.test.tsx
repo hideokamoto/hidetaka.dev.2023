@@ -7,9 +7,9 @@
 import { render, screen } from '@testing-library/react'
 import fc from 'fast-check'
 import { describe, expect, it } from 'vitest'
+import ArticleCTA from '@/components/ui/ArticleCTA'
 import { CTA_PATTERNS } from '@/libs/ctaPatterns'
 import type { ArticleType, CTAData } from '@/libs/ctaTypes'
-import ArticleCTA from '@/components/ui/ArticleCTA'
 
 describe('ArticleCTA', () => {
   describe('Unit Tests', () => {
