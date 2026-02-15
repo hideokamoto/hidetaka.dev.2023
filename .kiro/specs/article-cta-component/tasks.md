@@ -181,30 +181,183 @@
   - **PR条件**: ドキュメントとパフォーマンス検証のみ
   - _要件: 8.1、8.2、8.4_
 
-## Git Worktree開発フロー
+## Git Worktree + GitHub CLI開発フロー
 
-### 推奨ワークフロー
+### 前提条件
+
+```bash
+# GitHub CLIのインストール確認
+gh --version
+
+# 未インストールの場合
+# macOS: brew install gh
+# その他: https://cli.github.com/
+
+# GitHub CLIの認証
+gh auth login
+```
+
+### タスク1の完全なワークフロー例
+
+```bash
+# 1. メインディレクトリで最新のmainを取得
+cd hidetaka.dev
+git checkout main
+git pull origin main
+
+# 2. worktreeを作成してブランチを切る
+git worktree add ../hidetaka.dev-task1 -b feature/1-cta-types
+
+# 3. worktreeに移動して開発
+cd ../hidetaka.dev-task1
+
+# 4. 型定義ファイルを作成
+# src/libs/ctaTypes.ts を実装...
+
+# 5. テストを実行
+npm test
+
+# 6. リントを実行
+npm run lint
+
+# 7. 変更をコミット
+git add src/libs/ctaTypes.ts
+git commit -m "feat: add CTA type definitions
+
+- Add ArticleType union type
+- Add CTAButton interface
+- Add CTAData interface
+- Add CTAPattern interface
+
+Refs: #<issue-number>"
+
+# 8. ブランチをプッシュ
+git push -u origin feature/1-cta-types
+
+# 9. GitHub CLIでPRを作成（即座に）
+gh pr create \
+  --title "feat: add CTA type definitions" \
+  --body "## 概要
+タスク1: TypeScript型定義の作成
+
+## 変更内容
+- ArticleType型を定義
+- CTAButton、CTAData、CTAPatternインターフェースを定義
+
+## テスト
+- 型定義のみのため、テストは不要
+
+## チェックリスト
+- [x] 変更ファイル数: 1ファイル
+- [x] テストが通る
+- [x] リントエラーなし
+- [x] 依存タスクなし
+
+## 関連
+- 要件: 4.1, 4.4
+- 次のタスク: タスク2（CTAパターンデータ）、タスク3（バリデーション）" \
+  --base main \
+  --label "feature" \
+  --label "small-batch"
+
+# 10. PRのURLが表示される。レビュー依頼やマージはGitHub UIまたはCLIで
+# 自動マージの場合（CIが通れば）
+# gh pr merge --auto --squash
+
+# 11. マージ後、worktreeをクリーンアップ
+cd ../hidetaka.dev
+git worktree remove ../hidetaka.dev-task1
+git branch -d feature/1-cta-types  # ローカルブランチ削除
+```
+
+### Phase 1の並列開発フロー
 
 ```bash
 # メインディレクトリで作業
 cd hidetaka.dev
+git checkout main
+git pull origin main
 
-# Phase 1のタスクを並列開発
+# Phase 1の3タスクを並列でworktree作成
 git worktree add ../hidetaka.dev-task1 -b feature/1-cta-types
 git worktree add ../hidetaka.dev-task2 -b feature/2-cta-patterns
 git worktree add ../hidetaka.dev-task3 -b feature/3-cta-validation
 
-# 各worktreeで独立して開発
+# ターミナルを3つ開いて、それぞれで作業
+
+# === ターミナル1: タスク1 ===
 cd ../hidetaka.dev-task1
-# タスク1を実装、テスト、コミット、PR作成
+# 実装...
+npm test && npm run lint
+git add . && git commit -m "feat: add CTA type definitions"
+git push -u origin feature/1-cta-types
+gh pr create --title "feat: add CTA type definitions" --body "..." --base main
 
+# === ターミナル2: タスク2 ===
 cd ../hidetaka.dev-task2
-# タスク2を実装、テスト、コミット、PR作成
+# 実装...
+npm test && npm run lint
+git add . && git commit -m "feat: add CTA pattern data"
+git push -u origin feature/2-cta-patterns
+gh pr create --title "feat: add CTA pattern data" --body "..." --base main
 
-# Phase 3の統合タスクも並列開発可能
+# === ターミナル3: タスク3 ===
+cd ../hidetaka.dev-task3
+# 実装...
+npm test && npm run lint
+git add . && git commit -m "feat: add CTA validation functions"
+git push -u origin feature/3-cta-validation
+gh pr create --title "feat: add CTA validation functions" --body "..." --base main
+```
+
+### Phase 3の並列統合フロー
+
+```bash
+# Phase 2完了後、Phase 3の統合タスクを並列開発
+cd hidetaka.dev
+git checkout main
+git pull origin main
+
+# 4つの統合タスクを並列でworktree作成
 git worktree add ../hidetaka.dev-task6 -b feature/6-integrate-blog-detail
 git worktree add ../hidetaka.dev-task7 -b feature/7-integrate-devnote-detail
 git worktree add ../hidetaka.dev-task8 -b feature/8-integrate-news-detail
+git worktree add ../hidetaka.dev-task9 -b feature/9-integrate-other-details
+
+# 各ターミナルで統合作業 → テスト → コミット → プッシュ → PR作成
+# 例: タスク6
+cd ../hidetaka.dev-task6
+# BlogDetailPage.tsxを編集...
+npm test && npm run lint
+git add . && git commit -m "feat: integrate ArticleCTA into BlogDetailPage"
+git push -u origin feature/6-integrate-blog-detail
+gh pr create --title "feat: integrate ArticleCTA into BlogDetailPage" \
+  --body "タスク6: BlogDetailPageへの統合..." --base main
+```
+
+### GitHub CLI便利コマンド
+
+```bash
+# PRのステータス確認
+gh pr status
+
+# PRのリスト表示
+gh pr list --label "small-batch"
+
+# PRのレビュー依頼
+gh pr review <PR番号> --approve
+
+# PRのマージ（squash）
+gh pr merge <PR番号> --squash --delete-branch
+
+# PRのマージ（自動、CIが通れば）
+gh pr merge <PR番号> --auto --squash --delete-branch
+
+# PRの詳細表示
+gh pr view <PR番号>
+
+# PRをブラウザで開く
+gh pr view <PR番号> --web
 ```
 
 ### PR作成時のチェックリスト
@@ -217,6 +370,40 @@ git worktree add ../hidetaka.dev-task8 -b feature/8-integrate-news-detail
 - [ ] リントエラーなし（`npm run lint`）
 - [ ] ビルド成功（`npm run build`）
 - [ ] 依存タスクがマージ済み
+- [ ] **GitHub CLIでPRを即座に作成済み**
+
+### PRテンプレート
+
+各タスクのPR作成時に使用するテンプレート：
+
+```markdown
+## 概要
+タスク<番号>: <タスク名>
+
+## 変更内容
+- <変更点1>
+- <変更点2>
+
+## テスト
+- <テスト内容>
+- カバレッジ: XX%
+
+## チェックリスト
+- [x] 変更ファイル数: Xファイル
+- [x] 変更行数: XX行
+- [x] テストが通る
+- [x] リントエラーなし
+- [x] ビルド成功
+- [x] 依存タスク: <タスク番号>がマージ済み（または依存なし）
+
+## 関連
+- 要件: X.X, X.X
+- 次のタスク: タスクX（<タスク名>）
+- 依存タスク: タスクX（<タスク名>）
+
+## スクリーンショット（該当する場合）
+<画像>
+```
 
 ## 注意事項
 
