@@ -12,7 +12,40 @@ import BlogReactions from '@/components/ui/reactions/BlogReactions'
 import SidebarLayout from '@/components/ui/SidebarLayout'
 import SocialShareButtons from '@/components/ui/SocialShareButtons'
 import { SITE_CONFIG } from '@/config'
+import type { ArticleType } from '@/libs/ctaTypes'
 import type { BlogItem, WPThought } from '@/libs/dataSources/types'
+
+/**
+ * カテゴリから記事タイプを決定するヘルパー関数
+ *
+ * @param categories - 記事のカテゴリ配列
+ * @returns 適切なArticleType
+ */
+function getArticleTypeFromCategories(
+  categories: Array<{ name: string; slug: string }>,
+): ArticleType {
+  const categoryNames = new Set(categories.map((c) => c.name.toLowerCase()))
+  const categorySlugs = new Set(categories.map((c) => c.slug.toLowerCase()))
+
+  // チュートリアル記事の判定
+  if (categoryNames.has('tutorial') || categorySlugs.has('tutorial')) {
+    return 'tutorial'
+  }
+
+  // ツール発表記事の判定
+  if (
+    categoryNames.has('tool') ||
+    categoryNames.has('announcement') ||
+    categorySlugs.has('tool') ||
+    categorySlugs.has('announcement') ||
+    categorySlugs.has('tool-announcement')
+  ) {
+    return 'tool_announcement'
+  }
+
+  // デフォルトはエッセイ
+  return 'essay'
+}
 
 interface BlogDetailPageProps {
   thought: WPThought
@@ -48,6 +81,9 @@ export default function BlogDetailPage({
   // カテゴリ（タグ）を取得
   const categories =
     thought._embedded?.['wp:term']?.flat().filter((term) => term.taxonomy === 'category') || []
+
+  // カテゴリから記事タイプを決定
+  const articleType = getArticleTypeFromCategories(categories)
 
   return (
     <Container className="mt-16 sm:mt-32">
@@ -160,7 +196,7 @@ export default function BlogDetailPage({
           />
 
           {/* CTA（行動喚起） */}
-          <ArticleCTA lang={lang} articleType="essay" className="mt-12" />
+          <ArticleCTA lang={lang} articleType={articleType} className="mt-12" />
 
           {/* プロフィールカード（モバイルのみ表示） */}
           <div className="lg:hidden">
