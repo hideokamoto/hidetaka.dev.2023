@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import TransformedBlogContent from '@/components/BlogPosts/TransformedBlogContent'
 import Container from '@/components/tailwindui/Container'
 import ArticleActions from '@/components/ui/ArticleActions'
 import BlogDetailSidebar from '@/components/ui/BlogDetailSidebar'
@@ -144,10 +145,9 @@ export default function BlogDetailPage({
           />
 
           {/* コンテンツ */}
-          <div
+          <TransformedBlogContent
+            thought={thought}
             className="blog-content text-zinc-700 dark:text-zinc-300 leading-relaxed"
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: Content is from trusted WordPress CMS, controlled by site owner
-            dangerouslySetInnerHTML={{ __html: thought.content.rendered }}
           />
 
           {/* SNS共有ボタン */}

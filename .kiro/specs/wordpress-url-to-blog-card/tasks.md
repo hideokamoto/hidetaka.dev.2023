@@ -70,7 +70,7 @@ WordPress記事本文内の独立したURLを自動的にOGPブログカード�
 - [x] 5. チェックポイント - URL変換モジュールの動作確認
   - すべてのテストが通ることを確認し、ユーザーに質問があれば尋ねる
 
-- [ ] 6. TransformedBlogContentコンポーネントの実装
+- [x] 6. TransformedBlogContentコンポーネントの実装
   - [x] 6.1 TransformedBlogContent.tsxの実装
     - サーバーコンポーネントとして実装
     - urlDetectorとblogCardTransformerを統合
@@ -92,7 +92,7 @@ WordPress記事本文内の独立したURLを自動的にOGPブログカード�
     - _要件: 6.1, 6.2, 6.3, 6.5_
 
 - [ ] 7. BlogDetailPageコンポーネントの統合
-  - [~] 7.1 BlogDetailPage.tsxの修正
+  - [x] 7.1 BlogDetailPage.tsxの修正
     - TransformedBlogContentコンポーネントをインポート
     - dangerouslySetInnerHTMLをTransformedBlogContentに置き換え
     - 既存のスタイリング（className）を維持
