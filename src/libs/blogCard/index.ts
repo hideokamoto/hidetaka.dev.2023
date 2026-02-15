@@ -6,3 +6,4 @@
 
 export * from './types'
 export * from './urlDetector'
+export * from './blogCardTransformer'

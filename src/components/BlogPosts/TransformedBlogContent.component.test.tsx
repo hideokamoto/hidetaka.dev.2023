@@ -9,7 +9,7 @@
 
 import { render } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
-import type { WPThought } from '@/libs/blogCard/types'
+import type { WPThought } from '@/libs/blogCard'
 import TransformedBlogContent from './TransformedBlogContent'
 
 describe('TransformedBlogContent Integration Tests', () => {

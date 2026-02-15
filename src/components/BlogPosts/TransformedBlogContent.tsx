@@ -12,9 +12,8 @@
  * 要件: 3.1, 3.2, 3.3, 3.4, 3.5, 6.1, 6.2, 6.3, 6.5
  */
 
-import { transformUrlsToBlogCards } from '@/libs/blogCard/blogCardTransformer'
-import type { WPThought } from '@/libs/blogCard/types'
-import { detectIndependentUrls } from '@/libs/blogCard/urlDetector'
+import { transformUrlsToBlogCards, detectIndependentUrls } from '@/libs/blogCard'
+import type { WPThought } from '@/libs/blogCard'
 
 interface TransformedBlogContentProps {
   thought: WPThought
