@@ -44,20 +44,19 @@ export default function ArticleCTA({
   // 言語の正規化（無効な値は'en'にフォールバック）
   const normalizedLang = normalizeLang(lang)
 
-  // カスタムCTAデータの検証(一度だけ実行)
-  const isCustomDataValid = ctaData && isValidCTAData(ctaData)
-
   // CTAデータの選択: カスタムデータが有効な場合は優先、そうでなければパターンから選択
-  const selectedCTAData: CTAData = isCustomDataValid
-    ? ctaData
-    : CTA_PATTERNS[normalizedArticleType][normalizedLang]
-
-  // 無効なカスタムデータが提供された場合は警告をログ
-  if (ctaData && !isCustomDataValid) {
-    console.warn('[ArticleCTA] Invalid ctaData provided, falling back to pattern:', {
-      articleType: normalizedArticleType,
-      lang: normalizedLang,
-    })
+  let selectedCTAData: CTAData
+  if (ctaData && isValidCTAData(ctaData)) {
+    selectedCTAData = ctaData
+  } else {
+    selectedCTAData = CTA_PATTERNS[normalizedArticleType][normalizedLang]
+    // 無効なカスタムデータが提供された場合は警告をログ
+    if (ctaData) {
+      console.warn('[ArticleCTA] Invalid ctaData provided, falling back to pattern:', {
+        articleType: normalizedArticleType,
+        lang: normalizedLang,
+      })
+    }
   }
 
   return (
