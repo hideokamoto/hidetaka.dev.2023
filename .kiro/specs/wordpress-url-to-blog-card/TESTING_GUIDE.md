@@ -53,7 +53,7 @@ npm run dev
 
 <!-- 変換後 -->
 <iframe 
-  src="https://ogp-metadata-service-production.wp-kyoto.workers.dev/card?url=https%3A%2F%2Fexample.com"
+  src="https://ogp-metadata-service.wp-kyoto.workers.dev/card?url=https%3A%2F%2Fexample.com"
   width="100%"
   height="155"
   frameborder="0"
@@ -99,7 +99,7 @@ npm run dev
 2. Networkタブを選択
 3. ページをリロード
 4. 記事ページをスクロールしてブログカードが表示される位置まで移動
-5. Networkタブで`ogp-metadata-service-production.wp-kyoto.workers.dev`へのリクエストを確認
+5. Networkタブで`ogp-metadata-service.wp-kyoto.workers.dev`へのリクエストを確認
 
 **期待される動作:**
 - ページ読み込み時にはiframeのコンテンツは読み込まれない
@@ -234,7 +234,7 @@ npm run dev
 - iframeタグが存在するか確認
 
 **原因3: OGP Serviceが応答していない**
-- Networkタブで`ogp-metadata-service-production.wp-kyoto.workers.dev`へのリクエストを確認
+- Networkタブで`ogp-metadata-service.wp-kyoto.workers.dev`へのリクエストを確認
 - レスポンスステータスコードを確認（200 OKが期待される）
 
 ### スタイリングが崩れている

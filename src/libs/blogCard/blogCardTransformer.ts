@@ -13,7 +13,7 @@
 /**
  * OGP Serviceのベースエンドポイント
  */
-const OGP_SERVICE_ENDPOINT = 'https://ogp-metadata-service-production.wp-kyoto.workers.dev/card'
+const OGP_SERVICE_ENDPOINT = 'https://ogp-metadata-service.wp-kyoto.workers.dev/card'
 
 /**
  * HTML文字列内のURLをブログカードiframeに変換する

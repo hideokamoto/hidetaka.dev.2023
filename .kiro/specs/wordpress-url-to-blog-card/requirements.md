@@ -9,7 +9,7 @@
 - **System**: WordPress記事本文のURL変換システム
 - **URL_Detector**: 記事本文HTML内の独立したURLを検出するモジュール
 - **Blog_Card_Transformer**: 検出されたURLをiframeタグに変換するモジュール
-- **OGP_Service**: OGPメタデータを取得してブログカードHTMLを生成する外部サービス（https://ogp-metadata-service-production.wp-kyoto.workers.dev）
+- **OGP_Service**: OGPメタデータを取得してブログカードHTMLを生成する外部サービス（https://ogp-metadata-service.wp-kyoto.workers.dev）
 - **WordPress_API**: WordPress REST APIエンドポイント（wp-api.wp-kyoto.net）
 - **Transformed_Content**: URL変換後のHTML本文
 - **Independent_URL**: 独立したURL（`<p>https://example.com</p>`のような形式）

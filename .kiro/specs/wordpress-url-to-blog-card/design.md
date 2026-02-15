@@ -119,7 +119,7 @@ export function transformUrlsToBlogCards(html: string, urls: string[]): string
 
 ```html
 <iframe
-  src="https://ogp-metadata-service-production.wp-kyoto.workers.dev/card?url={encodedUrl}"
+  src="https://ogp-metadata-service.wp-kyoto.workers.dev/card?url={encodedUrl}"
   width="100%"
   height="155"
   frameborder="0"

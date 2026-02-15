@@ -107,7 +107,7 @@ const detectedUrls = detectIndependentUrls(html)
 
 // 2. 検出されたURLをブログカードに変換
 const transformedHtml = transformUrlsToBlogCards(html, detectedUrls)
-// => '<iframe src="https://ogp-metadata-service-production.wp-kyoto.workers.dev/card?url=https%3A%2F%2Fexample.com" ...></iframe>...'
+// => '<iframe src="https://ogp-metadata-service.wp-kyoto.workers.dev/card?url=https%3A%2F%2Fexample.com" ...></iframe>...'
 ```
 
 ### URL検出のみ
@@ -140,7 +140,7 @@ const html = '<p>https://example.com</p>'
 const urls = ['https://example.com']
 
 const transformedHtml = transformUrlsToBlogCards(html, urls)
-// => '<iframe src="https://ogp-metadata-service-production.wp-kyoto.workers.dev/card?url=https%3A%2F%2Fexample.com" width="100%" height="155" frameborder="0" loading="lazy" style="border: 1px solid #e5e7eb; border-radius: 0.5rem; margin: 1rem 0;"></iframe>'
+// => '<iframe src="https://ogp-metadata-service.wp-kyoto.workers.dev/card?url=https%3A%2F%2Fexample.com" width="100%" height="155" frameborder="0" loading="lazy" style="border: 1px solid #e5e7eb; border-radius: 0.5rem; margin: 1rem 0;"></iframe>'
 ```
 
 ## API リファレンス
@@ -204,7 +204,7 @@ WordPress記事本文を自動的に変換するサーバーコンポーネン�
 ブログカードの表示には、以下のOGP Serviceを使用します：
 
 ```
-https://ogp-metadata-service-production.wp-kyoto.workers.dev/card?url={encodedUrl}
+https://ogp-metadata-service.wp-kyoto.workers.dev/card?url={encodedUrl}
 ```
 
 - URLは`encodeURIComponent`でエスケープされます
@@ -217,7 +217,7 @@ https://ogp-metadata-service-production.wp-kyoto.workers.dev/card?url={encodedUr
 
 ```html
 <iframe
-  src="https://ogp-metadata-service-production.wp-kyoto.workers.dev/card?url={encodedUrl}"
+  src="https://ogp-metadata-service.wp-kyoto.workers.dev/card?url={encodedUrl}"
   width="100%"
   height="155"
   frameborder="0"

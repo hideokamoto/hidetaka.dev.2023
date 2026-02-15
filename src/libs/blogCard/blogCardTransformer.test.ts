@@ -16,7 +16,7 @@ describe('blogCardTransformer', () => {
 
       expect(result).toContain('<iframe')
       expect(result).toContain(
-        'src="https://ogp-metadata-service-production.wp-kyoto.workers.dev/card?url=https%3A%2F%2Fexample.com"',
+        'src="https://ogp-metadata-service.wp-kyoto.workers.dev/card?url=https%3A%2F%2Fexample.com"',
       )
       expect(result).toContain('loading="lazy"')
       expect(result).not.toContain('<p>https://example.com</p>')
