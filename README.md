@@ -12,9 +12,20 @@
 
 ## セットアップ
 
+### パッケージマネージャー
+
+このプロジェクトは**pnpm**を使用しています。npmのoptional dependencies問題（`@ast-grep/napi`のネイティブバインディングエラー）を回避するため、pnpmへ移行しました。
+
+pnpmのインストール:
+```bash
+npm install -g pnpm
+# または
+brew install pnpm
+```
+
 1. 依存関係のインストール:
 ```bash
-npm install
+pnpm install
 ```
 
 2. 環境変数の設定:
@@ -28,14 +39,26 @@ cp .env.example .env.local
 
 3. 開発サーバーの起動:
 ```bash
-npm run dev
+pnpm run dev
+```
+
+### npmからの移行
+
+既存のnpmプロジェクトからpnpmへ移行する場合:
+
+```bash
+# 既存のnode_modulesとpackage-lock.jsonを削除
+rm -rf node_modules package-lock.json
+
+# pnpmで依存関係をインストール
+pnpm install
 ```
 
 ## ビルドとデプロイ
 
 ### ローカルビルド
 ```bash
-npm run build
+pnpm run build
 ```
 
 ### Cloudflare Workersへのデプロイ
@@ -62,7 +85,7 @@ npm run build
 
 1. **Cloudflare用のビルド**
    ```bash
-   npm run cf:build
+   pnpm run cf:build
    ```
    このコマンドは以下を実行します:
    - Next.jsアプリケーションをビルド
@@ -74,11 +97,11 @@ npm run build
 ビルド後、ローカルでプレビューできます:
 
 ```bash
-npm run cf:preview
+pnpm run cf:preview
 ```
 
 このコマンドは以下を実行します:
-- `npm run cf:build`でビルド
+- `pnpm run cf:build`でビルド
 - `wrangler dev`でローカルプレビューサーバーを起動（`http://localhost:8787`）
 
 **注意**: R2バケットは不要です。R2はISR（Incremental Static Regeneration）のキャッシュが必要な場合のみオプションで使用します。
@@ -87,20 +110,20 @@ npm run cf:preview
 
 1. **本番環境へのデプロイ**
    ```bash
-   npm run cf:deploy
+   pnpm run cf:deploy
    # または明示的に
-   npm run cf:deploy:production
+   pnpm run cf:deploy:production
    ```
    このコマンドは以下を実行します:
-   - `npm run cf:build`でビルド
+   - `pnpm run cf:build`でビルド
    - `opennextjs-cloudflare deploy --env production`でCloudflare Workersにデプロイ
 
 2. **非本番環境（staging）へのデプロイ**
    ```bash
-   npm run cf:deploy:staging
+   pnpm run cf:deploy:staging
    ```
    このコマンドは以下を実行します:
-   - `npm run cf:build`でビルド
+   - `pnpm run cf:build`でビルド
    - `opennextjs-cloudflare deploy --env staging`でCloudflare Workersにデプロイ
 
    **注意**: `wrangler.toml`に`[env.staging]`セクションが設定されている必要があります。
@@ -147,12 +170,12 @@ npx wrangler secret put MICROCMS_API_KEY --env staging
 
 #### 利用可能なスクリプト
 
-- `npm run cf:build` - Cloudflare Workers用にビルド
-- `npm run cf:preview` - ビルド後、ローカルでプレビュー（`wrangler dev`）
-- `npm run cf:dev` - ビルド後、`opennextjs-cloudflare preview`でプレビュー
-- `npm run cf:deploy` - ビルド後、本番環境にデプロイ（デフォルト）
-- `npm run cf:deploy:production` - ビルド後、本番環境にデプロイ（明示的）
-- `npm run cf:deploy:staging` - ビルド後、非本番環境（staging）にデプロイ
+- `pnpm run cf:build` - Cloudflare Workers用にビルド
+- `pnpm run cf:preview` - ビルド後、ローカルでプレビュー（`wrangler dev`）
+- `pnpm run cf:dev` - ビルド後、`opennextjs-cloudflare preview`でプレビュー
+- `pnpm run cf:deploy` - ビルド後、本番環境にデプロイ（デフォルト）
+- `pnpm run cf:deploy:production` - ビルド後、本番環境にデプロイ（明示的）
+- `pnpm run cf:deploy:staging` - ビルド後、非本番環境（staging）にデプロイ
 
 ## プロジェクト構造
 
