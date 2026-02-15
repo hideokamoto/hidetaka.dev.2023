@@ -115,7 +115,7 @@
   - **PR条件**: コンポーネントロジックとテストのみ、スタイリングなし
   - _要件: 1.1、1.5、2.1、2.2、3.2、3.5_
 
-- [ ] 5. ArticleCTAコンポーネントのスタイリング
+- [x] 5. ArticleCTAコンポーネントのスタイリング
   - **ブランチ**: `feature/5-article-cta-styling`
   - **依存**: タスク4
   - **ファイル**: `src/components/ui/ArticleCTA.tsx`（更新）
@@ -150,7 +150,7 @@
   - **PR条件**: BlogDetailPageのみの変更、他のページへの影響なし
   - _要件: 3.1_
 
-- [ ] 7. DevNoteDetailPageへの統合
+- [x] 7. DevNoteDetailPageへの統合
   - **ブランチ**: `feature/7-integrate-devnote-detail`
   - **依存**: タスク5
   - **ファイル**: `src/components/containers/pages/DevNoteDetailPage.tsx`（更新）
