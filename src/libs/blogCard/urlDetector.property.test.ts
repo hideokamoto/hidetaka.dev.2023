@@ -20,10 +20,19 @@ describe('urlDetector - Property-Based Tests', () => {
        *
        * Property 1: 独立したURLの検出
        * 任意のHTML文字列において、<p>タグ内に含まれるHTTP/HTTPSで始まるURLは、
-       * URL_Detectorによって検出される
+       * 除外条件に該当しない限り、URL_Detectorによって検出される
        */
       fc.assert(
         fc.property(fc.webUrl(), (url) => {
+          // 除外条件を適用
+          const imageExtensions = /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i
+          const ownSitePattern = /hidetaka\.dev/i
+
+          // 除外条件に該当する場合はスキップ
+          if (imageExtensions.test(url) || ownSitePattern.test(url)) {
+            return true
+          }
+
           // <p>タグ内に独立したURLを配置
           const html = `<p>${url}</p>`
 
@@ -90,10 +99,19 @@ describe('urlDetector - Property-Based Tests', () => {
        *
        * Property 1: 独立したURLの検出（属性付き<p>タグ）
        * <p>タグに属性（class, id, styleなど）が含まれていても、
-       * タグ内のURLは正しく検出される
+       * タグ内のURLは正しく検出される（除外条件に該当しない場合）
        */
       fc.assert(
         fc.property(fc.webUrl(), fc.stringMatching(/^[a-zA-Z0-9_-]+$/), (url, className) => {
+          // 除外条件を適用
+          const imageExtensions = /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i
+          const ownSitePattern = /hidetaka\.dev/i
+
+          // 除外条件に該当する場合はスキップ
+          if (imageExtensions.test(url) || ownSitePattern.test(url)) {
+            return true
+          }
+
           // 属性付きの<p>タグ内にURLを配置
           // classNameは有効なHTML属性値（英数字、ハイフン、アンダースコアのみ）
           const html = `<p class="${className}">${url}</p>`
