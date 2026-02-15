@@ -136,7 +136,7 @@
 
 ### Phase 3: 段階的統合（Phase 2完了後、並列開発可能）
 
-- [ ] 6. BlogDetailPageへの統合
+- [x] 6. BlogDetailPageへの統合
   - **ブランチ**: `feature/6-integrate-blog-detail`
   - **依存**: タスク5
   - **ファイル**: `src/components/containers/pages/BlogDetailPage.tsx`（更新）
