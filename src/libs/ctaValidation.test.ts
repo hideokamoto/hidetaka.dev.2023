@@ -164,6 +164,51 @@ describe('ctaValidation', () => {
         }
         expect(isValidCTAData(invalidData)).toBe(false)
       })
+
+      it('should return false for button with javascript: protocol', () => {
+        const invalidData = {
+          heading: 'Test Heading',
+          description: 'Test Description',
+          buttons: [{ text: 'Button', href: 'javascript:alert("XSS")' }],
+        }
+        expect(isValidCTAData(invalidData)).toBe(false)
+      })
+
+      it('should return false for button with data: protocol', () => {
+        const invalidData = {
+          heading: 'Test Heading',
+          description: 'Test Description',
+          buttons: [{ text: 'Button', href: 'data:text/html,<script>alert("XSS")</script>' }],
+        }
+        expect(isValidCTAData(invalidData)).toBe(false)
+      })
+
+      it('should return true for button with https URL', () => {
+        const validData = {
+          heading: 'Test Heading',
+          description: 'Test Description',
+          buttons: [{ text: 'Button', href: 'https://example.com' }],
+        }
+        expect(isValidCTAData(validData)).toBe(true)
+      })
+
+      it('should return true for button with http URL', () => {
+        const validData = {
+          heading: 'Test Heading',
+          description: 'Test Description',
+          buttons: [{ text: 'Button', href: 'http://example.com' }],
+        }
+        expect(isValidCTAData(validData)).toBe(true)
+      })
+
+      it('should return true for button with relative path', () => {
+        const validData = {
+          heading: 'Test Heading',
+          description: 'Test Description',
+          buttons: [{ text: 'Button', href: '/blog' }],
+        }
+        expect(isValidCTAData(validData)).toBe(true)
+      })
     })
   })
 
@@ -242,10 +287,18 @@ describe('ctaValidation', () => {
         // Feature: article-cta-component, Property 4: カスタムCTAデータの優先
         // **Validates: Requirements 6.2**
 
+        // 安全なURLのarbitrary
+        const safeUrl = fc.oneof(
+          fc.webUrl(), // https://example.com
+          fc.constant('/blog'), // 相対パス
+          fc.constant('/projects'),
+          fc.constant('/about'),
+        )
+
         // 有効なCTAButtonのarbitrary
         const validButton = fc.record({
           text: fc.string({ minLength: 1 }).filter((s) => s.trim().length > 0),
-          href: fc.string({ minLength: 1 }).filter((s) => s.trim().length > 0),
+          href: safeUrl,
           variant: fc.option(fc.constantFrom('primary', 'secondary', 'outline')),
         })
 
@@ -331,6 +384,24 @@ describe('ctaValidation', () => {
             description: fc.string(),
             buttons: fc.array(
               fc.record({ text: fc.string(), href: fc.string(), variant: fc.constant('invalid') }),
+              { minLength: 1, maxLength: 3 },
+            ),
+          }),
+          // 危険なプロトコル（javascript:）
+          fc.record({
+            heading: fc.string(),
+            description: fc.string(),
+            buttons: fc.array(
+              fc.record({ text: fc.string(), href: fc.constant('javascript:alert("XSS")') }),
+              { minLength: 1, maxLength: 3 },
+            ),
+          }),
+          // 危険なプロトコル（data:）
+          fc.record({
+            heading: fc.string(),
+            description: fc.string(),
+            buttons: fc.array(
+              fc.record({ text: fc.string(), href: fc.constant('data:text/html,<script>alert("XSS")</script>') }),
               { minLength: 1, maxLength: 3 },
             ),
           }),

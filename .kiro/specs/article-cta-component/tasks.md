@@ -97,7 +97,7 @@
 
 ### Phase 2: コンポーネント実装（Phase 1完了後）
 
-- [ ] 4. ArticleCTAコンポーネントの基本実装
+- [x] 4. ArticleCTAコンポーネントの基本実装
   - **ブランチ**: `feature/4-article-cta-component`
   - **依存**: タスク1、2、3
   - **ファイル**: `src/components/ui/ArticleCTA.tsx`（新規作成）
