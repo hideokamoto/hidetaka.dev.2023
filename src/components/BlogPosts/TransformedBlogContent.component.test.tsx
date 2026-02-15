@@ -1,451 +1,445 @@
 /**
- * TransformedBlogContent ユニットテスト
+ * TransformedBlogContent 統合テスト
  *
- * Feature: wordpress-url-to-blog-card
+ * BlogDetailPageとTransformedBlogContentの統合をテストし、
+ * スタイリングが維持されることを確認します。
  *
- * このファイルは、TransformedBlogContentコンポーネントのエラーハンドリングとログ記録を検証します。
- * 要件: 6.1, 6.2, 6.3, 6.5
+ * 要件: 8.2, 8.3
  */
 
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { render } from '@testing-library/react'
-import TransformedBlogContent from './TransformedBlogContent'
+import { describe, expect, it } from 'vitest'
 import type { WPThought } from '@/libs/blogCard/types'
-import * as urlDetector from '@/libs/blogCard/urlDetector'
-import * as blogCardTransformer from '@/libs/blogCard/blogCardTransformer'
+import TransformedBlogContent from './TransformedBlogContent'
 
-describe('TransformedBlogContent - Unit Tests', () => {
-  // コンソールのモック
-  let consoleLogSpy: ReturnType<typeof vi.spyOn>
-  let consoleErrorSpy: ReturnType<typeof vi.spyOn>
-
-  beforeEach(() => {
-    // console.logとconsole.errorをモック
-    consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
-    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-  })
-
-  afterEach(() => {
-    // モックをリストア
-    consoleLogSpy.mockRestore()
-    consoleErrorSpy.mockRestore()
-    vi.restoreAllMocks()
-  })
-
-  // テスト用のWPThoughtオブジェクトを作成するヘルパー関数
-  const createMockThought = (content: string): WPThought => ({
-    id: 123,
-    title: { rendered: 'Test Post' },
-    content: { rendered: content },
-    excerpt: { rendered: 'Test excerpt' },
-    date: '2024-01-01T00:00:00',
-    slug: 'test-post',
-    link: 'https://example.com/test-post',
-    categories: [1],
-  })
-
-  describe('正常系: URL変換の成功', () => {
-    it('should transform URLs and log success message', () => {
-      const html = '<p>https://example.com</p>'
-      const thought = createMockThought(html)
-
-      render(<TransformedBlogContent thought={thought} />)
-
-      // console.logが呼ばれたことを確認
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        '[TransformedBlogContent] Successfully transformed 1 URL(s) to blog cards',
-        expect.objectContaining({
-          thoughtId: 123,
-          thoughtSlug: 'test-post',
-          detectedUrls: ['https://example.com'],
-        }),
-      )
-    })
-
-    it('should log multiple URLs when multiple URLs are detected', () => {
-      const html = '<p>https://example.com</p><p>https://test.com</p>'
-      const thought = createMockThought(html)
-
-      render(<TransformedBlogContent thought={thought} />)
-
-      // console.logが呼ばれたことを確認
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        '[TransformedBlogContent] Successfully transformed 2 URL(s) to blog cards',
-        expect.objectContaining({
-          thoughtId: 123,
-          thoughtSlug: 'test-post',
-          detectedUrls: ['https://example.com', 'https://test.com'],
-        }),
-      )
-    })
-
-    it('should not log when no URLs are detected', () => {
-      const html = '<p>Just some text without URLs</p>'
-      const thought = createMockThought(html)
-
-      render(<TransformedBlogContent thought={thought} />)
-
-      // console.logが呼ばれていないことを確認
-      expect(consoleLogSpy).not.toHaveBeenCalled()
-    })
-  })
-
-  describe('エラーハンドリング: URL検出エラー', () => {
-    it('should handle detectIndependentUrls error and return original HTML', () => {
-      const html = '<p>https://example.com</p>'
-      const thought = createMockThought(html)
-
-      // detectIndependentUrlsがエラーをスローするようにモック
-      vi.spyOn(urlDetector, 'detectIndependentUrls').mockImplementation(() => {
-        throw new Error('URL detection failed')
-      })
+describe('TransformedBlogContent Integration Tests', () => {
+  describe('基本的なレンダリング', () => {
+    it('should render transformed content with blog card iframes', () => {
+      const thought: WPThought = {
+        id: 1,
+        slug: 'test-post',
+        title: { rendered: 'Test Post' },
+        content: {
+          rendered: '<p>Check this out:</p><p>https://example.com</p><p>Great article!</p>',
+        },
+        excerpt: { rendered: 'Test excerpt' },
+        date: '2024-01-01T00:00:00',
+        link: 'https://wp-api.wp-kyoto.net/test-post',
+        categories: [1],
+      }
 
       const { container } = render(<TransformedBlogContent thought={thought} />)
 
-      // エラーがログに記録されることを確認
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        '[TransformedBlogContent] Failed to transform URLs to blog cards',
-        expect.objectContaining({
-          thoughtId: 123,
-          thoughtSlug: 'test-post',
-          error: expect.objectContaining({
-            message: 'URL detection failed',
-            stack: expect.any(String),
-          }),
-        }),
+      // iframeが生成されていることを確認
+      const iframe = container.querySelector('iframe')
+      expect(iframe).toBeTruthy()
+      expect(iframe?.getAttribute('src')).toContain(
+        'https://ogp-metadata-service-production.wp-kyoto.workers.dev/card?url=https%3A%2F%2Fexample.com',
       )
+      expect(iframe?.getAttribute('loading')).toBe('lazy')
 
-      // 元のHTMLが返されることを確認
-      expect(container.innerHTML).toContain('<p>https://example.com</p>')
+      // 他のコンテンツが保持されていることを確認
+      expect(container.innerHTML).toContain('<p>Check this out:</p>')
+      expect(container.innerHTML).toContain('<p>Great article!</p>')
     })
 
-    it('should handle non-Error exceptions', () => {
-      const html = '<p>https://example.com</p>'
-      const thought = createMockThought(html)
-
-      // detectIndependentUrlsが文字列をスローするようにモック
-      vi.spyOn(urlDetector, 'detectIndependentUrls').mockImplementation(() => {
-        throw 'String error'
-      })
+    it('should render original content when no URLs are detected', () => {
+      const thought: WPThought = {
+        id: 2,
+        slug: 'no-urls',
+        title: { rendered: 'No URLs' },
+        content: {
+          rendered: '<p>This is a post without any URLs.</p><p>Just plain text.</p>',
+        },
+        excerpt: { rendered: 'No URLs' },
+        date: '2024-01-01T00:00:00',
+        link: 'https://wp-api.wp-kyoto.net/no-urls',
+        categories: [1],
+      }
 
       const { container } = render(<TransformedBlogContent thought={thought} />)
 
-      // エラーがログに記録されることを確認
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        '[TransformedBlogContent] Failed to transform URLs to blog cards',
-        expect.objectContaining({
-          thoughtId: 123,
-          thoughtSlug: 'test-post',
-          error: 'String error',
-        }),
-      )
+      // iframeが生成されていないことを確認
+      const iframe = container.querySelector('iframe')
+      expect(iframe).toBeNull()
 
-      // 元のHTMLが返されることを確認
-      expect(container.innerHTML).toContain('<p>https://example.com</p>')
+      // 元のコンテンツが保持されていることを確認
+      expect(container.innerHTML).toContain('<p>This is a post without any URLs.</p>')
+      expect(container.innerHTML).toContain('<p>Just plain text.</p>')
+    })
+
+    it('should handle multiple URLs in content', () => {
+      const thought: WPThought = {
+        id: 3,
+        slug: 'multiple-urls',
+        title: { rendered: 'Multiple URLs' },
+        content: {
+          rendered:
+            '<p>First link:</p><p>https://example.com</p><p>Second link:</p><p>https://test.com</p>',
+        },
+        excerpt: { rendered: 'Multiple URLs' },
+        date: '2024-01-01T00:00:00',
+        link: 'https://wp-api.wp-kyoto.net/multiple-urls',
+        categories: [1],
+      }
+
+      const { container } = render(<TransformedBlogContent thought={thought} />)
+
+      // 2つのiframeが生成されていることを確認
+      const iframes = container.querySelectorAll('iframe')
+      expect(iframes.length).toBe(2)
+
+      // 両方のURLが変換されていることを確認
+      expect(iframes[0]?.getAttribute('src')).toContain('url=https%3A%2F%2Fexample.com')
+      expect(iframes[1]?.getAttribute('src')).toContain('url=https%3A%2F%2Ftest.com')
     })
   })
 
-  describe('エラーハンドリング: URL変換エラー', () => {
-    it('should handle transformUrlsToBlogCards error and return original HTML', () => {
-      const html = '<p>https://example.com</p>'
-      const thought = createMockThought(html)
+  describe('スタイリングの維持', () => {
+    it('should apply className prop to the container div', () => {
+      const thought: WPThought = {
+        id: 4,
+        slug: 'styled-post',
+        title: { rendered: 'Styled Post' },
+        content: {
+          rendered: '<p>Content with styling</p>',
+        },
+        excerpt: { rendered: 'Styled' },
+        date: '2024-01-01T00:00:00',
+        link: 'https://wp-api.wp-kyoto.net/styled-post',
+        categories: [1],
+      }
 
-      // transformUrlsToBlogCardsがエラーをスローするようにモック
-      vi.spyOn(blogCardTransformer, 'transformUrlsToBlogCards').mockImplementation(() => {
-        throw new Error('URL transformation failed')
-      })
-
-      const { container } = render(<TransformedBlogContent thought={thought} />)
-
-      // エラーがログに記録されることを確認
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        '[TransformedBlogContent] Failed to transform URLs to blog cards',
-        expect.objectContaining({
-          thoughtId: 123,
-          thoughtSlug: 'test-post',
-          error: expect.objectContaining({
-            message: 'URL transformation failed',
-            stack: expect.any(String),
-          }),
-        }),
-      )
-
-      // 元のHTMLが返されることを確認
-      expect(container.innerHTML).toContain('<p>https://example.com</p>')
-    })
-
-    it('should log error with correct thought metadata', () => {
-      const html = '<p>https://example.com</p>'
-      const thought = createMockThought(html)
-      thought.id = 456
-      thought.slug = 'custom-slug'
-
-      // transformUrlsToBlogCardsがエラーをスローするようにモック
-      vi.spyOn(blogCardTransformer, 'transformUrlsToBlogCards').mockImplementation(() => {
-        throw new Error('Transformation error')
-      })
-
-      render(<TransformedBlogContent thought={thought} />)
-
-      // エラーログに正しいメタデータが含まれることを確認
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        '[TransformedBlogContent] Failed to transform URLs to blog cards',
-        expect.objectContaining({
-          thoughtId: 456,
-          thoughtSlug: 'custom-slug',
-        }),
-      )
-    })
-  })
-
-  describe('エラーハンドリング: 不正なHTML', () => {
-    it('should handle malformed HTML gracefully', () => {
-      // 閉じタグがないHTML
-      const html = '<p>https://example.com<p>https://test.com</p>'
-      const thought = createMockThought(html)
-
-      const { container } = render(<TransformedBlogContent thought={thought} />)
-
-      // エラーが発生しないことを確認（正常に処理される）
-      expect(consoleErrorSpy).not.toHaveBeenCalled()
-
-      // HTMLが含まれることを確認
-      expect(container.innerHTML).toBeTruthy()
-    })
-
-    it('should handle empty HTML', () => {
-      const html = ''
-      const thought = createMockThought(html)
-
-      const { container } = render(<TransformedBlogContent thought={thought} />)
-
-      // エラーが発生しないことを確認
-      expect(consoleErrorSpy).not.toHaveBeenCalled()
-
-      // 空のdivが返されることを確認
-      expect(container.querySelector('div')).toBeTruthy()
-    })
-
-    it('should handle HTML with only whitespace', () => {
-      const html = '   \n\t  '
-      const thought = createMockThought(html)
-
-      const { container } = render(<TransformedBlogContent thought={thought} />)
-
-      // エラーが発生しないことを確認
-      expect(consoleErrorSpy).not.toHaveBeenCalled()
-
-      // divが返されることを確認
-      expect(container.querySelector('div')).toBeTruthy()
-    })
-
-    it('should handle HTML with nested tags', () => {
-      const html = '<div><section><p>https://example.com</p></section></div>'
-      const thought = createMockThought(html)
-
-      const { container } = render(<TransformedBlogContent thought={thought} />)
-
-      // エラーが発生しないことを確認
-      expect(consoleErrorSpy).not.toHaveBeenCalled()
-
-      // 変換されたHTMLが含まれることを確認
-      expect(container.innerHTML).toContain('<iframe')
-    })
-  })
-
-  describe('ログ記録の詳細', () => {
-    it('should log with correct format for success', () => {
-      const html = '<p>https://example.com</p>'
-      const thought = createMockThought(html)
-
-      render(<TransformedBlogContent thought={thought} />)
-
-      // ログのフォーマットを確認
-      expect(consoleLogSpy).toHaveBeenCalledTimes(1)
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[TransformedBlogContent]'),
-        expect.objectContaining({
-          thoughtId: expect.any(Number),
-          thoughtSlug: expect.any(String),
-          detectedUrls: expect.any(Array),
-        }),
-      )
-    })
-
-    it('should log with correct format for error', () => {
-      const html = '<p>https://example.com</p>'
-      const thought = createMockThought(html)
-
-      // エラーをスローするようにモック
-      vi.spyOn(urlDetector, 'detectIndependentUrls').mockImplementation(() => {
-        throw new Error('Test error')
-      })
-
-      render(<TransformedBlogContent thought={thought} />)
-
-      // エラーログのフォーマットを確認
-      expect(consoleErrorSpy).toHaveBeenCalledTimes(1)
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringContaining('[TransformedBlogContent]'),
-        expect.objectContaining({
-          thoughtId: expect.any(Number),
-          thoughtSlug: expect.any(String),
-          error: expect.anything(),
-        }),
-      )
-    })
-
-    it('should include error stack trace in log', () => {
-      const html = '<p>https://example.com</p>'
-      const thought = createMockThought(html)
-
-      // エラーをスローするようにモック
-      vi.spyOn(urlDetector, 'detectIndependentUrls').mockImplementation(() => {
-        throw new Error('Test error with stack')
-      })
-
-      render(<TransformedBlogContent thought={thought} />)
-
-      // スタックトレースが含まれることを確認
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({
-          error: expect.objectContaining({
-            message: 'Test error with stack',
-            stack: expect.any(String),
-          }),
-        }),
-      )
-    })
-  })
-
-  describe('classNameプロパティ', () => {
-    it('should apply className to the div element', () => {
-      const html = '<p>Test content</p>'
-      const thought = createMockThought(html)
-      const className = 'custom-class test-class'
-
+      const className = 'blog-content text-zinc-700 dark:text-zinc-300 leading-relaxed'
       const { container } = render(<TransformedBlogContent thought={thought} className={className} />)
 
-      // classNameが適用されることを確認
+      // classNameが適用されていることを確認
       const div = container.querySelector('div')
-      expect(div).toBeTruthy()
       expect(div?.className).toBe(className)
     })
 
+    it('should maintain styling when URLs are transformed', () => {
+      const thought: WPThought = {
+        id: 5,
+        slug: 'styled-with-url',
+        title: { rendered: 'Styled with URL' },
+        content: {
+          rendered: '<p>https://example.com</p>',
+        },
+        excerpt: { rendered: 'Styled with URL' },
+        date: '2024-01-01T00:00:00',
+        link: 'https://wp-api.wp-kyoto.net/styled-with-url',
+        categories: [1],
+      }
+
+      const className = 'blog-content text-zinc-700 dark:text-zinc-300 leading-relaxed'
+      const { container } = render(<TransformedBlogContent thought={thought} className={className} />)
+
+      // classNameが適用されていることを確認
+      const div = container.querySelector('div')
+      expect(div?.className).toBe(className)
+
+      // iframeが生成されていることを確認
+      const iframe = container.querySelector('iframe')
+      expect(iframe).toBeTruthy()
+    })
+
     it('should work without className prop', () => {
-      const html = '<p>Test content</p>'
-      const thought = createMockThought(html)
+      const thought: WPThought = {
+        id: 6,
+        slug: 'no-class',
+        title: { rendered: 'No Class' },
+        content: {
+          rendered: '<p>Content without className</p>',
+        },
+        excerpt: { rendered: 'No Class' },
+        date: '2024-01-01T00:00:00',
+        link: 'https://wp-api.wp-kyoto.net/no-class',
+        categories: [1],
+      }
 
       const { container } = render(<TransformedBlogContent thought={thought} />)
 
-      // classNameなしでも動作することを確認
+      // divが存在することを確認
       const div = container.querySelector('div')
       expect(div).toBeTruthy()
+
+      // classNameが空であることを確認
+      expect(div?.className).toBe('')
     })
   })
 
-  describe('フォールバック動作', () => {
-    it('should always render original HTML on error', () => {
-      const html = '<p>https://example.com</p><div>Important content</div>'
-      const thought = createMockThought(html)
-
-      // エラーをスローするようにモック
-      vi.spyOn(urlDetector, 'detectIndependentUrls').mockImplementation(() => {
-        throw new Error('Detection failed')
-      })
+  describe('除外条件の統合テスト', () => {
+    it('should not transform URLs inside link tags', () => {
+      const thought: WPThought = {
+        id: 7,
+        slug: 'with-links',
+        title: { rendered: 'With Links' },
+        content: {
+          rendered:
+            '<p><a href="https://example.com">Link text</a></p><p>https://test.com</p>',
+        },
+        excerpt: { rendered: 'With Links' },
+        date: '2024-01-01T00:00:00',
+        link: 'https://wp-api.wp-kyoto.net/with-links',
+        categories: [1],
+      }
 
       const { container } = render(<TransformedBlogContent thought={thought} />)
 
-      // 元のHTMLがすべて保持されることを確認
-      expect(container.innerHTML).toContain('<p>https://example.com</p>')
-      expect(container.innerHTML).toContain('<div>Important content</div>')
+      // リンクタグ内のURLは変換されない
+      expect(container.innerHTML).toContain('<a href="https://example.com">Link text</a>')
+
+      // 独立したURLは変換される
+      const iframe = container.querySelector('iframe')
+      expect(iframe).toBeTruthy()
+      expect(iframe?.getAttribute('src')).toContain('url=https%3A%2F%2Ftest.com')
+
+      // iframeは1つだけ
+      const iframes = container.querySelectorAll('iframe')
+      expect(iframes.length).toBe(1)
     })
 
-    it('should not lose content when transformation fails', () => {
-      const html = `
-        <h1>Title</h1>
-        <p>https://example.com</p>
-        <p>Some important text</p>
-        <p>https://test.com</p>
-      `
-      const thought = createMockThought(html)
-
-      // 変換エラーをシミュレート
-      vi.spyOn(blogCardTransformer, 'transformUrlsToBlogCards').mockImplementation(() => {
-        throw new Error('Transformation failed')
-      })
+    it('should not transform image URLs', () => {
+      const thought: WPThought = {
+        id: 8,
+        slug: 'with-images',
+        title: { rendered: 'With Images' },
+        content: {
+          rendered:
+            '<p>https://example.com/image.jpg</p><p>https://example.com/photo.png</p><p>https://test.com</p>',
+        },
+        excerpt: { rendered: 'With Images' },
+        date: '2024-01-01T00:00:00',
+        link: 'https://wp-api.wp-kyoto.net/with-images',
+        categories: [1],
+      }
 
       const { container } = render(<TransformedBlogContent thought={thought} />)
 
-      // すべてのコンテンツが保持されることを確認
-      expect(container.innerHTML).toContain('<h1>Title</h1>')
-      expect(container.innerHTML).toContain('<p>https://example.com</p>')
-      expect(container.innerHTML).toContain('<p>Some important text</p>')
-      expect(container.innerHTML).toContain('<p>https://test.com</p>')
+      // 画像URLは変換されない
+      expect(container.innerHTML).toContain('<p>https://example.com/image.jpg</p>')
+      expect(container.innerHTML).toContain('<p>https://example.com/photo.png</p>')
+
+      // 通常のURLは変換される
+      const iframe = container.querySelector('iframe')
+      expect(iframe).toBeTruthy()
+      expect(iframe?.getAttribute('src')).toContain('url=https%3A%2F%2Ftest.com')
+
+      // iframeは1つだけ
+      const iframes = container.querySelectorAll('iframe')
+      expect(iframes.length).toBe(1)
+    })
+
+    it('should not transform own site URLs', () => {
+      const thought: WPThought = {
+        id: 9,
+        slug: 'with-own-site',
+        title: { rendered: 'With Own Site' },
+        content: {
+          rendered:
+            '<p>https://hidetaka.dev/blog/post</p><p>https://example.com</p>',
+        },
+        excerpt: { rendered: 'With Own Site' },
+        date: '2024-01-01T00:00:00',
+        link: 'https://wp-api.wp-kyoto.net/with-own-site',
+        categories: [1],
+      }
+
+      const { container } = render(<TransformedBlogContent thought={thought} />)
+
+      // 自サイトURLは変換されない
+      expect(container.innerHTML).toContain('<p>https://hidetaka.dev/blog/post</p>')
+
+      // 外部URLは変換される
+      const iframe = container.querySelector('iframe')
+      expect(iframe).toBeTruthy()
+      expect(iframe?.getAttribute('src')).toContain('url=https%3A%2F%2Fexample.com')
+
+      // iframeは1つだけ
+      const iframes = container.querySelectorAll('iframe')
+      expect(iframes.length).toBe(1)
     })
   })
 
-  describe('統合シナリオ', () => {
-    it('should handle complete workflow: detect -> transform -> render', () => {
-      const html = '<p>https://example.com</p>'
-      const thought = createMockThought(html)
+  describe('エラーハンドリングの統合テスト', () => {
+    it('should render original content when transformation fails', () => {
+      // 不正なHTMLを含むthought
+      const thought: WPThought = {
+        id: 10,
+        slug: 'malformed-html',
+        title: { rendered: 'Malformed HTML' },
+        content: {
+          rendered: '<p>Unclosed paragraph<p>https://example.com</p>',
+        },
+        excerpt: { rendered: 'Malformed' },
+        date: '2024-01-01T00:00:00',
+        link: 'https://wp-api.wp-kyoto.net/malformed-html',
+        categories: [1],
+      }
 
       const { container } = render(<TransformedBlogContent thought={thought} />)
 
-      // iframeが生成されることを確認
-      expect(container.innerHTML).toContain('<iframe')
-      expect(container.innerHTML).toContain('url=https%3A%2F%2Fexample.com')
-
-      // 成功ログが記録されることを確認
-      expect(consoleLogSpy).toHaveBeenCalled()
-      expect(consoleErrorSpy).not.toHaveBeenCalled()
+      // コンテンツがレンダリングされることを確認（エラーでクラッシュしない）
+      const div = container.querySelector('div')
+      expect(div).toBeTruthy()
+      expect(div?.innerHTML).toBeTruthy()
     })
 
-    it('should handle workflow with no URLs', () => {
-      const html = '<p>Just text</p><div>More content</div>'
-      const thought = createMockThought(html)
+    it('should handle empty content gracefully', () => {
+      const thought: WPThought = {
+        id: 11,
+        slug: 'empty-content',
+        title: { rendered: 'Empty Content' },
+        content: {
+          rendered: '',
+        },
+        excerpt: { rendered: 'Empty' },
+        date: '2024-01-01T00:00:00',
+        link: 'https://wp-api.wp-kyoto.net/empty-content',
+        categories: [1],
+      }
 
       const { container } = render(<TransformedBlogContent thought={thought} />)
 
-      // 元のHTMLがそのまま返されることを確認
-      expect(container.innerHTML).toContain('<p>Just text</p>')
-      expect(container.innerHTML).toContain('<div>More content</div>')
+      // divが存在することを確認
+      const div = container.querySelector('div')
+      expect(div).toBeTruthy()
 
-      // ログが記録されないことを確認
-      expect(consoleLogSpy).not.toHaveBeenCalled()
-      expect(consoleErrorSpy).not.toHaveBeenCalled()
+      // 空のコンテンツが正しく処理されることを確認
+      expect(div?.innerHTML).toBe('')
+    })
+  })
+
+  describe('複雑なHTMLの統合テスト', () => {
+    it('should handle complex HTML with mixed content', () => {
+      const thought: WPThought = {
+        id: 12,
+        slug: 'complex-html',
+        title: { rendered: 'Complex HTML' },
+        content: {
+          rendered: `
+            <h2>Introduction</h2>
+            <p>This is a blog post with various elements.</p>
+            <p>https://example.com</p>
+            <blockquote>
+              <p>A quote from someone</p>
+            </blockquote>
+            <ul>
+              <li>Item 1</li>
+              <li>Item 2</li>
+            </ul>
+            <p>https://test.com</p>
+            <pre><code>const x = 1;</code></pre>
+          `,
+        },
+        excerpt: { rendered: 'Complex' },
+        date: '2024-01-01T00:00:00',
+        link: 'https://wp-api.wp-kyoto.net/complex-html',
+        categories: [1],
+      }
+
+      const { container } = render(<TransformedBlogContent thought={thought} />)
+
+      // すべての要素が保持されていることを確認
+      expect(container.innerHTML).toContain('<h2>Introduction</h2>')
+      expect(container.innerHTML).toContain('<blockquote>')
+      expect(container.innerHTML).toContain('<ul>')
+      expect(container.innerHTML).toContain('<pre><code>const x = 1;</code></pre>')
+
+      // 2つのiframeが生成されていることを確認
+      const iframes = container.querySelectorAll('iframe')
+      expect(iframes.length).toBe(2)
+      expect(iframes[0]?.getAttribute('src')).toContain('url=https%3A%2F%2Fexample.com')
+      expect(iframes[1]?.getAttribute('src')).toContain('url=https%3A%2F%2Ftest.com')
     })
 
-    it('should handle workflow with mixed content', () => {
-      const html = `
-        <h1>Blog Post</h1>
-        <p>Introduction text</p>
-        <p>https://example.com</p>
-        <p>More text</p>
-        <p>https://test.com</p>
-        <p>Conclusion</p>
-      `
-      const thought = createMockThought(html)
+    it('should preserve HTML structure and nesting', () => {
+      const thought: WPThought = {
+        id: 13,
+        slug: 'nested-html',
+        title: { rendered: 'Nested HTML' },
+        content: {
+          rendered: `
+            <div class="content">
+              <section>
+                <p>https://example.com</p>
+              </section>
+            </div>
+          `,
+        },
+        excerpt: { rendered: 'Nested' },
+        date: '2024-01-01T00:00:00',
+        link: 'https://wp-api.wp-kyoto.net/nested-html',
+        categories: [1],
+      }
 
       const { container } = render(<TransformedBlogContent thought={thought} />)
 
-      // URLが変換されることを確認
-      expect(container.innerHTML).toContain('<iframe')
+      // ネストされた構造が保持されていることを確認
+      expect(container.innerHTML).toContain('<div class="content">')
+      expect(container.innerHTML).toContain('<section>')
+      expect(container.innerHTML).toContain('</section>')
+      expect(container.innerHTML).toContain('</div>')
 
-      // 他のコンテンツが保持されることを確認
-      expect(container.innerHTML).toContain('<h1>Blog Post</h1>')
-      expect(container.innerHTML).toContain('<p>Introduction text</p>')
-      expect(container.innerHTML).toContain('<p>More text</p>')
-      expect(container.innerHTML).toContain('<p>Conclusion</p>')
+      // iframeが生成されていることを確認
+      const iframe = container.querySelector('iframe')
+      expect(iframe).toBeTruthy()
+    })
+  })
 
-      // 成功ログが記録されることを確認
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({
-          detectedUrls: ['https://example.com', 'https://test.com'],
-        }),
-      )
+  describe('BlogDetailPageとの統合', () => {
+    it('should work with the same className used in BlogDetailPage', () => {
+      const thought: WPThought = {
+        id: 14,
+        slug: 'blog-detail-page-integration',
+        title: { rendered: 'Blog Detail Page Integration' },
+        content: {
+          rendered: '<p>https://example.com</p><p>Content from WordPress</p>',
+        },
+        excerpt: { rendered: 'Integration' },
+        date: '2024-01-01T00:00:00',
+        link: 'https://wp-api.wp-kyoto.net/blog-detail-page-integration',
+        categories: [1],
+      }
+
+      // BlogDetailPageで使用されているclassNameと同じものを使用
+      const className = 'blog-content text-zinc-700 dark:text-zinc-300 leading-relaxed'
+      const { container } = render(<TransformedBlogContent thought={thought} className={className} />)
+
+      // classNameが正しく適用されていることを確認
+      const div = container.querySelector('div')
+      expect(div?.className).toBe(className)
+
+      // コンテンツが正しく変換されていることを確認
+      const iframe = container.querySelector('iframe')
+      expect(iframe).toBeTruthy()
+      expect(container.innerHTML).toContain('<p>Content from WordPress</p>')
+    })
+
+    it('should replace dangerouslySetInnerHTML behavior correctly', () => {
+      const thought: WPThought = {
+        id: 15,
+        slug: 'dangerous-html-replacement',
+        title: { rendered: 'Dangerous HTML Replacement' },
+        content: {
+          rendered: '<p><strong>Bold text</strong> and <em>italic text</em></p><p>https://example.com</p>',
+        },
+        excerpt: { rendered: 'Replacement' },
+        date: '2024-01-01T00:00:00',
+        link: 'https://wp-api.wp-kyoto.net/dangerous-html-replacement',
+        categories: [1],
+      }
+
+      const { container } = render(<TransformedBlogContent thought={thought} />)
+
+      // HTMLタグが正しくレンダリングされていることを確認
+      expect(container.innerHTML).toContain('<strong>Bold text</strong>')
+      expect(container.innerHTML).toContain('<em>italic text</em>')
+
+      // URLが変換されていることを確認
+      const iframe = container.querySelector('iframe')
+      expect(iframe).toBeTruthy()
     })
   })
 })

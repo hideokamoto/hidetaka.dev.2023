@@ -98,7 +98,7 @@ WordPress記事本文内の独立したURLを自動的にOGPブログカード�
     - 既存のスタイリング（className）を維持
     - _要件: 8.1, 8.2, 8.3_
   
-  - [~] 7.2 統合テスト
+  - [x] 7.2 統合テスト
     - BlogDetailPageとTransformedBlogContentの統合をテスト
     - スタイリングが維持されることを確認
     - _要件: 8.2, 8.3_
