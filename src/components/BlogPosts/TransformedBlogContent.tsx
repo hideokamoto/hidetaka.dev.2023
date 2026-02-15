@@ -12,8 +12,8 @@
  * 要件: 3.1, 3.2, 3.3, 3.4, 3.5, 6.1, 6.2, 6.3, 6.5
  */
 
-import { transformUrlsToBlogCards, detectIndependentUrls } from '@/libs/blogCard'
 import type { WPThought } from '@/libs/blogCard'
+import { detectIndependentUrls, transformUrlsToBlogCards } from '@/libs/blogCard'
 
 interface TransformedBlogContentProps {
   thought: WPThought
@@ -30,7 +30,7 @@ interface TransformedBlogContentProps {
 export default function TransformedBlogContent({
   thought,
   className,
-}: TransformedBlogContentProps): JSX.Element {
+}: TransformedBlogContentProps) {
   let transformedHtml = thought.content.rendered
 
   try {

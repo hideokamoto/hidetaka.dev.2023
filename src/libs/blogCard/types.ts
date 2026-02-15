@@ -29,7 +29,7 @@ export interface WPThought {
   date: string
   slug: string
   link: string
-  categories: number[]
+  categories?: number[]
   _embedded?: {
     'wp:term'?: Array<
       Array<{

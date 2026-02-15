@@ -111,7 +111,9 @@ describe('TransformedBlogContent Integration Tests', () => {
       }
 
       const className = 'blog-content text-zinc-700 dark:text-zinc-300 leading-relaxed'
-      const { container } = render(<TransformedBlogContent thought={thought} className={className} />)
+      const { container } = render(
+        <TransformedBlogContent thought={thought} className={className} />,
+      )
 
       // classNameが適用されていることを確認
       const div = container.querySelector('div')
@@ -133,7 +135,9 @@ describe('TransformedBlogContent Integration Tests', () => {
       }
 
       const className = 'blog-content text-zinc-700 dark:text-zinc-300 leading-relaxed'
-      const { container } = render(<TransformedBlogContent thought={thought} className={className} />)
+      const { container } = render(
+        <TransformedBlogContent thought={thought} className={className} />,
+      )
 
       // classNameが適用されていることを確認
       const div = container.querySelector('div')
@@ -176,8 +180,7 @@ describe('TransformedBlogContent Integration Tests', () => {
         slug: 'with-links',
         title: { rendered: 'With Links' },
         content: {
-          rendered:
-            '<p><a href="https://example.com">Link text</a></p><p>https://test.com</p>',
+          rendered: '<p><a href="https://example.com">Link text</a></p><p>https://test.com</p>',
         },
         excerpt: { rendered: 'With Links' },
         date: '2024-01-01T00:00:00',
@@ -237,8 +240,7 @@ describe('TransformedBlogContent Integration Tests', () => {
         slug: 'with-own-site',
         title: { rendered: 'With Own Site' },
         content: {
-          rendered:
-            '<p>https://hidetaka.dev/blog/post</p><p>https://example.com</p>',
+          rendered: '<p>https://hidetaka.dev/blog/post</p><p>https://example.com</p>',
         },
         excerpt: { rendered: 'With Own Site' },
         date: '2024-01-01T00:00:00',
@@ -405,7 +407,9 @@ describe('TransformedBlogContent Integration Tests', () => {
 
       // BlogDetailPageで使用されているclassNameと同じものを使用
       const className = 'blog-content text-zinc-700 dark:text-zinc-300 leading-relaxed'
-      const { container } = render(<TransformedBlogContent thought={thought} className={className} />)
+      const { container } = render(
+        <TransformedBlogContent thought={thought} className={className} />,
+      )
 
       // classNameが正しく適用されていることを確認
       const div = container.querySelector('div')
@@ -423,7 +427,8 @@ describe('TransformedBlogContent Integration Tests', () => {
         slug: 'dangerous-html-replacement',
         title: { rendered: 'Dangerous HTML Replacement' },
         content: {
-          rendered: '<p><strong>Bold text</strong> and <em>italic text</em></p><p>https://example.com</p>',
+          rendered:
+            '<p><strong>Bold text</strong> and <em>italic text</em></p><p>https://example.com</p>',
         },
         excerpt: { rendered: 'Replacement' },
         date: '2024-01-01T00:00:00',
