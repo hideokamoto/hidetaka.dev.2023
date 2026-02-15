@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
 import ArticleActions from '@/components/ui/ArticleActions'
+import ArticleCTA from '@/components/ui/ArticleCTA'
 import CategoryTagList from '@/components/ui/CategoryTagList'
 import DateDisplay from '@/components/ui/DateDisplay'
 import DevNoteDetailSidebar from '@/components/ui/DevNoteDetailSidebar'
@@ -157,6 +158,9 @@ export default function DevNoteDetailPage({
             lang={lang}
             className={DETAIL_PAGE_SECTION_CLASS}
           />
+
+          {/* CTA（コールトゥアクション） */}
+          <ArticleCTA lang={lang} articleType="tutorial" />
 
           {/* プロフィールカード（モバイルのみ表示） */}
           <div className="lg:hidden">

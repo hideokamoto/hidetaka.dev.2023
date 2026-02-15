@@ -150,7 +150,7 @@
   - **PR条件**: BlogDetailPageのみの変更、他のページへの影響なし
   - _要件: 3.1_
 
-- [ ] 7. DevNoteDetailPageへの統合
+- [x] 7. DevNoteDetailPageへの統合
   - **ブランチ**: `feature/7-integrate-devnote-detail`
   - **依存**: タスク5
   - **ファイル**: `src/components/containers/pages/DevNoteDetailPage.tsx`（更新）
