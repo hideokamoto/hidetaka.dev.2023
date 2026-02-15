@@ -115,7 +115,7 @@
   - **PR条件**: コンポーネントロジックとテストのみ、スタイリングなし
   - _要件: 1.1、1.5、2.1、2.2、3.2、3.5_
 
-- [ ] 5. ArticleCTAコンポーネントのスタイリング
+- [x] 5. ArticleCTAコンポーネントのスタイリング
   - **ブランチ**: `feature/5-article-cta-styling`
   - **依存**: タスク4
   - **ファイル**: `src/components/ui/ArticleCTA.tsx`（更新）

@@ -123,6 +123,13 @@ describe('ArticleCTA', () => {
         expect(section).toHaveAttribute('aria-label', 'Call to action')
       })
 
+      it('should have role attribute on section', () => {
+        const { container } = render(<ArticleCTA articleType="tutorial" lang="ja" />)
+
+        const section = container.querySelector('section')
+        expect(section).toHaveAttribute('role', 'complementary')
+      })
+
       it('should use h2 for heading', () => {
         render(<ArticleCTA articleType="tutorial" lang="ja" />)
 
@@ -155,6 +162,46 @@ describe('ArticleCTA', () => {
 
         const section = container.querySelector('section')
         expect(section?.className).toContain('dark:')
+      })
+
+      it('should have responsive breakpoint classes', () => {
+        const { container } = render(<ArticleCTA articleType="tutorial" lang="ja" />)
+
+        const section = container.querySelector('section')
+        const sectionClasses = section?.className || ''
+
+        // Check for sm: breakpoint classes
+        expect(sectionClasses).toContain('sm:')
+
+        // Check for md: breakpoint classes
+        expect(sectionClasses).toContain('md:')
+
+        // Check for lg: breakpoint classes
+        expect(sectionClasses).toContain('lg:')
+      })
+
+      it('should have proper spacing classes', () => {
+        const { container } = render(<ArticleCTA articleType="tutorial" lang="ja" />)
+
+        const section = container.querySelector('section')
+        const sectionClasses = section?.className || ''
+
+        // Check for margin and padding classes
+        expect(sectionClasses).toMatch(/my-\d+/)
+        expect(sectionClasses).toMatch(/p-\d+/)
+      })
+
+      it('should have shadow and transition classes', () => {
+        const { container } = render(<ArticleCTA articleType="tutorial" lang="ja" />)
+
+        const section = container.querySelector('section')
+        const sectionClasses = section?.className || ''
+
+        // Check for shadow classes
+        expect(sectionClasses).toContain('shadow')
+
+        // Check for transition classes
+        expect(sectionClasses).toContain('transition')
       })
     })
   })
