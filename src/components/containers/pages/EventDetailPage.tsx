@@ -114,7 +114,7 @@ export default function EventDetailPage({
         />
 
         {/* CTA */}
-        <ArticleCTA lang={lang} articleType="general" />
+        <ArticleCTA lang={lang} articleType="event_report" />
 
         {/* リアクション機能 */}
         <BlogReactions

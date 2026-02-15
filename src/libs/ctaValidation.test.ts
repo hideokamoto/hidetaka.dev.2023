@@ -230,6 +230,22 @@ describe('ctaValidation', () => {
         expect(normalizeArticleType('general')).toBe('general')
       })
 
+      it('should return "dev_note" for valid dev_note type', () => {
+        expect(normalizeArticleType('dev_note')).toBe('dev_note')
+      })
+
+      it('should return "news_article" for valid news_article type', () => {
+        expect(normalizeArticleType('news_article')).toBe('news_article')
+      })
+
+      it('should return "event_report" for valid event_report type', () => {
+        expect(normalizeArticleType('event_report')).toBe('event_report')
+      })
+
+      it('should return "speaking_report" for valid speaking_report type', () => {
+        expect(normalizeArticleType('speaking_report')).toBe('speaking_report')
+      })
+
       it('should return "general" for undefined', () => {
         expect(normalizeArticleType(undefined)).toBe('general')
       })
@@ -461,7 +477,16 @@ describe('ctaValidation', () => {
         // Feature: article-cta-component
         // **Validates: Requirements 1.5**
 
-        const validTypes: ArticleType[] = ['tutorial', 'essay', 'tool_announcement', 'general']
+        const validTypes: ArticleType[] = [
+          'tutorial',
+          'essay',
+          'tool_announcement',
+          'general',
+          'dev_note',
+          'news_article',
+          'event_report',
+          'speaking_report',
+        ]
 
         fc.assert(
           fc.property(

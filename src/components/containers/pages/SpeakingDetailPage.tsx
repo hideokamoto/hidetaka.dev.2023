@@ -142,7 +142,7 @@ export default function SpeakingDetailPage({
           />
 
           {/* CTA */}
-          <ArticleCTA lang={lang} articleType="general" />
+          <ArticleCTA lang={lang} articleType="speaking_report" />
 
           {/* プロフィールカード（モバイルのみ表示） */}
           <div className="lg:hidden">

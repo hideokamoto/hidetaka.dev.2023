@@ -10,7 +10,16 @@ import type { ArticleType } from '@/libs/ctaTypes'
 describe('CTA Patterns Unit Tests', () => {
   describe('Pattern Structure', () => {
     it('should have all required article types', () => {
-      const requiredTypes: ArticleType[] = ['tutorial', 'essay', 'tool_announcement', 'general']
+      const requiredTypes: ArticleType[] = [
+        'tutorial',
+        'essay',
+        'tool_announcement',
+        'general',
+        'dev_note',
+        'news_article',
+        'event_report',
+        'speaking_report',
+      ]
 
       requiredTypes.forEach((type) => {
         expect(CTA_PATTERNS).toHaveProperty(type)
@@ -18,7 +27,16 @@ describe('CTA Patterns Unit Tests', () => {
     })
 
     it('should have both ja and en for each pattern', () => {
-      const articleTypes: ArticleType[] = ['tutorial', 'essay', 'tool_announcement', 'general']
+      const articleTypes: ArticleType[] = [
+        'tutorial',
+        'essay',
+        'tool_announcement',
+        'general',
+        'dev_note',
+        'news_article',
+        'event_report',
+        'speaking_report',
+      ]
 
       articleTypes.forEach((type) => {
         expect(CTA_PATTERNS[type]).toHaveProperty('ja')
@@ -28,7 +46,16 @@ describe('CTA Patterns Unit Tests', () => {
   })
 
   describe('Required Fields', () => {
-    const articleTypes: ArticleType[] = ['tutorial', 'essay', 'tool_announcement', 'general']
+    const articleTypes: ArticleType[] = [
+      'tutorial',
+      'essay',
+      'tool_announcement',
+      'general',
+      'dev_note',
+      'news_article',
+      'event_report',
+      'speaking_report',
+    ]
     const languages = ['ja', 'en'] as const
 
     articleTypes.forEach((type) => {
@@ -49,7 +76,16 @@ describe('CTA Patterns Unit Tests', () => {
   })
 
   describe('Button Constraints', () => {
-    const articleTypes: ArticleType[] = ['tutorial', 'essay', 'tool_announcement', 'general']
+    const articleTypes: ArticleType[] = [
+      'tutorial',
+      'essay',
+      'tool_announcement',
+      'general',
+      'dev_note',
+      'news_article',
+      'event_report',
+      'speaking_report',
+    ]
     const languages = ['ja', 'en'] as const
 
     articleTypes.forEach((type) => {
@@ -83,7 +119,16 @@ describe('CTA Patterns Unit Tests', () => {
 
   describe('Content Validation', () => {
     it('should have non-empty headings', () => {
-      const articleTypes: ArticleType[] = ['tutorial', 'essay', 'tool_announcement', 'general']
+      const articleTypes: ArticleType[] = [
+        'tutorial',
+        'essay',
+        'tool_announcement',
+        'general',
+        'dev_note',
+        'news_article',
+        'event_report',
+        'speaking_report',
+      ]
       const languages = ['ja', 'en'] as const
 
       articleTypes.forEach((type) => {
@@ -95,13 +140,93 @@ describe('CTA Patterns Unit Tests', () => {
     })
 
     it('should have non-empty descriptions', () => {
-      const articleTypes: ArticleType[] = ['tutorial', 'essay', 'tool_announcement', 'general']
+      const articleTypes: ArticleType[] = [
+        'tutorial',
+        'essay',
+        'tool_announcement',
+        'general',
+        'dev_note',
+        'news_article',
+        'event_report',
+        'speaking_report',
+      ]
       const languages = ['ja', 'en'] as const
 
       articleTypes.forEach((type) => {
         languages.forEach((lang) => {
           const pattern = CTA_PATTERNS[type][lang]
           expect(pattern.description.trim().length).toBeGreaterThan(0)
+        })
+      })
+    })
+  })
+
+  describe('Deprecated Path Regression Tests', () => {
+    it('should not use /projects path (should use /work instead)', () => {
+      const articleTypes: ArticleType[] = [
+        'tutorial',
+        'essay',
+        'tool_announcement',
+        'general',
+        'dev_note',
+        'news_article',
+        'event_report',
+        'speaking_report',
+      ]
+      const languages = ['ja', 'en'] as const
+
+      articleTypes.forEach((type) => {
+        languages.forEach((lang) => {
+          const pattern = CTA_PATTERNS[type][lang]
+          pattern.buttons.forEach((button) => {
+            expect(button.href).not.toBe('/projects')
+          })
+        })
+      })
+    })
+
+    it('should not use /oss path (deprecated, consolidated to /work)', () => {
+      const articleTypes: ArticleType[] = [
+        'tutorial',
+        'essay',
+        'tool_announcement',
+        'general',
+        'dev_note',
+        'news_article',
+        'event_report',
+        'speaking_report',
+      ]
+      const languages = ['ja', 'en'] as const
+
+      articleTypes.forEach((type) => {
+        languages.forEach((lang) => {
+          const pattern = CTA_PATTERNS[type][lang]
+          pattern.buttons.forEach((button) => {
+            expect(button.href).not.toBe('/oss')
+          })
+        })
+      })
+    })
+
+    it('should not use /newsletter path (route does not exist)', () => {
+      const articleTypes: ArticleType[] = [
+        'tutorial',
+        'essay',
+        'tool_announcement',
+        'general',
+        'dev_note',
+        'news_article',
+        'event_report',
+        'speaking_report',
+      ]
+      const languages = ['ja', 'en'] as const
+
+      articleTypes.forEach((type) => {
+        languages.forEach((lang) => {
+          const pattern = CTA_PATTERNS[type][lang]
+          pattern.buttons.forEach((button) => {
+            expect(button.href).not.toBe('/newsletter')
+          })
         })
       })
     })
@@ -117,7 +242,7 @@ describe('CTA Patterns Property Tests', () => {
    * Property 3: CTAパターンの構造整合性
    * **Validates: Requirements 4.1, 4.2, 4.3**
    *
-   * すべてのCTAパターン（tutorial、essay、tool_announcement、general）は、
+   * すべてのCTAパターン（tutorial、essay、tool_announcement、general、dev_note、news_article、event_report、speaking_report）は、
    * 見出し（heading）、説明（description）、および1〜3個のボタン（buttons）を含むこと
    */
   it('Property 3: CTA pattern structural integrity', () => {
@@ -128,6 +253,10 @@ describe('CTA Patterns Property Tests', () => {
           fc.constant('essay' as ArticleType),
           fc.constant('tool_announcement' as ArticleType),
           fc.constant('general' as ArticleType),
+          fc.constant('dev_note' as ArticleType),
+          fc.constant('news_article' as ArticleType),
+          fc.constant('event_report' as ArticleType),
+          fc.constant('speaking_report' as ArticleType),
         ),
         fc.oneof(fc.constant('ja' as const), fc.constant('en' as const)),
         (articleType, lang) => {

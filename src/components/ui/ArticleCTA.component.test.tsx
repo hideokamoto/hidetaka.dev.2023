@@ -58,6 +58,40 @@ describe('ArticleCTA', () => {
         expect(screen.getByText('次に読む')).toBeInTheDocument()
         expect(screen.getByText('他の記事やプロジェクトもぜひご覧ください。')).toBeInTheDocument()
       })
+
+      it('should display dev_note pattern for dev_note article type', () => {
+        render(<ArticleCTA articleType="dev_note" lang="ja" />)
+
+        expect(screen.getByText('開発ノートをもっと読む')).toBeInTheDocument()
+        expect(
+          screen.getByText('技術的な学びや実践的な開発ノートをもっと探索してみませんか？'),
+        ).toBeInTheDocument()
+      })
+
+      it('should display news_article pattern for news_article article type', () => {
+        render(<ArticleCTA articleType="news_article" lang="ja" />)
+
+        expect(screen.getByText('最新のニュースとプロジェクト')).toBeInTheDocument()
+        expect(
+          screen.getByText('他のニュースやプロジェクトもぜひご覧ください。'),
+        ).toBeInTheDocument()
+      })
+
+      it('should display event_report pattern for event_report article type', () => {
+        render(<ArticleCTA articleType="event_report" lang="ja" />)
+
+        expect(screen.getByText('他のイベントもチェック')).toBeInTheDocument()
+        expect(screen.getByText('登壇・講演の記録や他の記事もご覧ください。')).toBeInTheDocument()
+      })
+
+      it('should display speaking_report pattern for speaking_report article type', () => {
+        render(<ArticleCTA articleType="speaking_report" lang="ja" />)
+
+        expect(screen.getByText('他の登壇・講演記録')).toBeInTheDocument()
+        expect(
+          screen.getByText('他のイベントレポートやブログ記事もぜひご覧ください。'),
+        ).toBeInTheDocument()
+      })
     })
 
     describe('Language Switching', () => {
@@ -232,6 +266,10 @@ describe('ArticleCTA', () => {
             fc.constant('essay' as ArticleType),
             fc.constant('tool_announcement' as ArticleType),
             fc.constant('general' as ArticleType),
+            fc.constant('dev_note' as ArticleType),
+            fc.constant('news_article' as ArticleType),
+            fc.constant('event_report' as ArticleType),
+            fc.constant('speaking_report' as ArticleType),
             fc.constant(undefined),
           ),
           fc.oneof(fc.constant('ja' as const), fc.constant('en' as const)),
@@ -281,6 +319,10 @@ describe('ArticleCTA', () => {
             fc.constant('essay' as ArticleType),
             fc.constant('tool_announcement' as ArticleType),
             fc.constant('general' as ArticleType),
+            fc.constant('dev_note' as ArticleType),
+            fc.constant('news_article' as ArticleType),
+            fc.constant('event_report' as ArticleType),
+            fc.constant('speaking_report' as ArticleType),
           ),
           fc.oneof(fc.constant('ja' as const), fc.constant('en' as const)),
           (articleType, lang) => {
