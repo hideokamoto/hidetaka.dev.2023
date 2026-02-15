@@ -360,11 +360,11 @@ describe('ArticleCTA Property Tests', () => {
 
 ```bash
 # すべてのテストを実行
-npm test
+pnpm test
 
 # プロパティテストのみを実行
-npm test -- --grep "Property"
+pnpm test -- --grep "Property"
 
 # カバレッジレポートを生成
-npm test -- --coverage
+pnpm test -- --coverage
 ```
