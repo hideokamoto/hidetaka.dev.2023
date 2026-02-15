@@ -59,8 +59,8 @@ export const CTA_PATTERNS: Record<ArticleType, CTAPattern> = {
       description: 'このツールを実際に使ってみて、あなたのワークフローを改善しましょう。',
       buttons: [
         { text: 'ツールを試す', href: '/projects', variant: 'primary' },
-        { text: 'ドキュメント', href: '/docs', variant: 'secondary' },
-        { text: 'GitHubで見る', href: 'https://github.com', variant: 'outline' },
+        { text: 'OSSプロジェクト', href: '/oss', variant: 'secondary' },
+        { text: 'GitHubで見る', href: 'https://github.com/hideokamoto', variant: 'outline' },
       ],
     },
     en: {
@@ -68,8 +68,8 @@ export const CTA_PATTERNS: Record<ArticleType, CTAPattern> = {
       description: 'Experience this tool firsthand and improve your workflow.',
       buttons: [
         { text: 'Try the Tool', href: '/projects', variant: 'primary' },
-        { text: 'Documentation', href: '/docs', variant: 'secondary' },
-        { text: 'View on GitHub', href: 'https://github.com', variant: 'outline' },
+        { text: 'OSS Projects', href: '/oss', variant: 'secondary' },
+        { text: 'View on GitHub', href: 'https://github.com/hideokamoto', variant: 'outline' },
       ],
     },
   },
