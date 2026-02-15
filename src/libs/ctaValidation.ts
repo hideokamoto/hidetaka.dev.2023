@@ -7,6 +7,16 @@
 import type { ArticleType, CTAData } from './ctaTypes'
 
 /**
+ * 有効なCTAボタンのバリアント
+ */
+const VALID_VARIANTS = ['primary', 'secondary', 'outline'] as const
+
+/**
+ * 有効な記事タイプ
+ */
+const VALID_ARTICLE_TYPES: ArticleType[] = ['tutorial', 'essay', 'tool_announcement', 'general']
+
+/**
  * CTADataの型ガード関数
  *
  * カスタムCTAデータが有効な構造を持つかを検証します。
@@ -37,11 +47,7 @@ export function isValidCTAData(data: unknown): data is CTAData {
         btn.text.trim().length > 0 &&
         typeof btn.href === 'string' &&
         btn.href.trim().length > 0 &&
-        (btn.variant === undefined ||
-          btn.variant === null ||
-          btn.variant === 'primary' ||
-          btn.variant === 'secondary' ||
-          btn.variant === 'outline'),
+        (btn.variant == null || VALID_VARIANTS.includes(btn.variant)),
     )
   )
 }
@@ -57,9 +63,7 @@ export function isValidCTAData(data: unknown): data is CTAData {
  * **Validates: Requirements 1.5**
  */
 export function normalizeArticleType(articleType: unknown): ArticleType {
-  const validTypes: ArticleType[] = ['tutorial', 'essay', 'tool_announcement', 'general']
-
-  if (typeof articleType === 'string' && validTypes.includes(articleType as ArticleType)) {
+  if (typeof articleType === 'string' && VALID_ARTICLE_TYPES.includes(articleType as ArticleType)) {
     return articleType as ArticleType
   }
 

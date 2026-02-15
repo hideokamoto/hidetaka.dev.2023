@@ -291,6 +291,85 @@ describe('ctaValidation', () => {
               maxLength: 10,
             }),
           }),
+          // headingが欠落
+          fc.record({
+            description: fc.string(),
+            buttons: fc.array(fc.record({ text: fc.string(), href: fc.string() }), {
+              minLength: 1,
+              maxLength: 3,
+            }),
+          }),
+          // descriptionが欠落
+          fc.record({
+            heading: fc.string(),
+            buttons: fc.array(fc.record({ text: fc.string(), href: fc.string() }), {
+              minLength: 1,
+              maxLength: 3,
+            }),
+          }),
+          // buttonsが配列ではない
+          fc.record({
+            heading: fc.string(),
+            description: fc.string(),
+            buttons: fc.string(),
+          }),
+          // ボタンのtextが欠落
+          fc.record({
+            heading: fc.string(),
+            description: fc.string(),
+            buttons: fc.array(fc.record({ href: fc.string() }), { minLength: 1, maxLength: 3 }),
+          }),
+          // ボタンのhrefが欠落
+          fc.record({
+            heading: fc.string(),
+            description: fc.string(),
+            buttons: fc.array(fc.record({ text: fc.string() }), { minLength: 1, maxLength: 3 }),
+          }),
+          // 無効なvariant
+          fc.record({
+            heading: fc.string(),
+            description: fc.string(),
+            buttons: fc.array(
+              fc.record({ text: fc.string(), href: fc.string(), variant: fc.constant('invalid') }),
+              { minLength: 1, maxLength: 3 },
+            ),
+          }),
+          // 空白のみのheading
+          fc.record({
+            heading: fc.constant('   '),
+            description: fc.string(),
+            buttons: fc.array(fc.record({ text: fc.string(), href: fc.string() }), {
+              minLength: 1,
+              maxLength: 3,
+            }),
+          }),
+          // 空白のみのdescription
+          fc.record({
+            heading: fc.string(),
+            description: fc.constant('   '),
+            buttons: fc.array(fc.record({ text: fc.string(), href: fc.string() }), {
+              minLength: 1,
+              maxLength: 3,
+            }),
+          }),
+          // 空白のみのbutton text
+          fc.record({
+            heading: fc.string(),
+            description: fc.string(),
+            buttons: fc.array(fc.record({ text: fc.constant('   '), href: fc.string() }), {
+              minLength: 1,
+              maxLength: 3,
+            }),
+          }),
+          // 空白のみのbutton href
+          fc.record({
+            heading: fc.string(),
+            description: fc.string(),
+            buttons: fc.array(fc.record({ text: fc.string(), href: fc.constant('   ') }), {
+              minLength: 1,
+              maxLength: 3,
+            }),
+          }),
         )
 
         fc.assert(
