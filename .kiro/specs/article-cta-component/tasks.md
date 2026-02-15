@@ -164,7 +164,7 @@
   - **PR条件**: DevNoteDetailPageのみの変更、他のページへの影響なし
   - _要件: 3.1_
 
-- [ ] 8. NewsDetailPageへの統合
+- [x] 8. NewsDetailPageへの統合
   - **ブランチ**: `feature/8-integrate-news-detail`
   - **依存**: タスク5
   - **ファイル**: `src/components/containers/pages/NewsDetailPage.tsx`（更新）
@@ -178,7 +178,7 @@
   - **PR条件**: NewsDetailPageのみの変更、他のページへの影響なし
   - _要件: 3.1_
 
-- [ ] 9. その他の詳細ページへの統合
+- [x] 9. その他の詳細ページへの統合
   - **ブランチ**: `feature/9-integrate-other-details`
   - **依存**: タスク5
   - **ファイル**: 
