@@ -1,6 +1,6 @@
 /**
  * CTA (Call-to-Action) パターンデータ
- * 
+ *
  * 記事タイプごとのハードコードされたCTAパターンを定義します。
  * 将来的にCMS統合に移行する際の基盤となります。
  */
@@ -9,7 +9,7 @@ import type { ArticleType, CTAPattern } from './ctaTypes'
 
 /**
  * 記事タイプごとのCTAパターン定義
- * 
+ *
  * 各パターンは日本語と英語の両方のコンテンツを含みます。
  * - tutorial: 実践指向のアクション
  * - essay: 探索指向のアクション
