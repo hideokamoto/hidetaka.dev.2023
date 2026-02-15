@@ -1,0 +1,11 @@
+# Cloudflare Pages build configuration
+build:
+  command: pnpm run cf:build
+  cwd: .
+  watch_paths:
+    - "**/*.ts"
+    - "**/*.tsx"
+    - "**/*.js"
+    - "**/*.jsx"
+    - "package.json"
+    - "pnpm-lock.yaml"
