@@ -107,14 +107,17 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
   const lang = getLanguageFromURL(pathname)
   const currentLang = lang
 
-  const navItems = [
+  const allNavItems = [
     { path: 'about', label: lang === 'ja' ? '概要' : 'About' },
     { path: 'work', label: lang === 'ja' ? '制作物' : 'Work' },
     { path: 'writing', label: lang === 'ja' ? '執筆' : 'Writing' },
-    { path: 'blog', label: lang === 'ja' ? 'ブログ' : 'Blog' },
+    { path: 'blog', label: lang === 'ja' ? 'ブログ' : 'Blog', jaOnly: true },
     { path: 'news', label: lang === 'ja' ? 'ニュース' : 'News' },
     { path: 'speaking', label: lang === 'ja' ? '登壇' : 'Speaking' },
   ]
+
+  // Filter out Japanese-only items when in English
+  const navItems = allNavItems.filter((item) => !item.jaOnly || lang === 'ja')
 
   useEffect(() => {
     if (isOpen) {
@@ -215,14 +218,17 @@ function DesktopNavigation() {
   const pathname = usePathname()
   const lang = getLanguageFromURL(pathname)
 
-  const navItems = [
+  const allNavItems = [
     { path: 'about', label: lang === 'ja' ? '概要' : 'About' },
     { path: 'work', label: lang === 'ja' ? '制作物' : 'Work' },
     { path: 'writing', label: lang === 'ja' ? '執筆' : 'Writing' },
-    { path: 'blog', label: lang === 'ja' ? 'ブログ' : 'Blog' },
+    { path: 'blog', label: lang === 'ja' ? 'ブログ' : 'Blog', jaOnly: true },
     { path: 'news', label: lang === 'ja' ? 'ニュース' : 'News' },
     { path: 'speaking', label: lang === 'ja' ? '登壇' : 'Speaking' },
   ]
+
+  // Filter out Japanese-only items when in English
+  const navItems = allNavItems.filter((item) => !item.jaOnly || lang === 'ja')
 
   return (
     <nav className="hidden lg:flex items-center gap-1">

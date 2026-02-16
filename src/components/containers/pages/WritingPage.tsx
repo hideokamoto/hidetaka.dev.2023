@@ -300,8 +300,8 @@ export default function WritingPageContent({
   const title = lang === 'ja' ? 'Writing' : 'Writing'
   const description =
     lang === 'ja'
-      ? '技術記事、ブログ投稿、ニュースなどの執筆活動を紹介しています。'
-      : "A collection of technical articles, blog posts, news, and other writing I've published."
+      ? '技術記事とチュートリアル。一部は外部サイト（Zenn、Qiita、Dev.to等）で公開しています。'
+      : 'Technical articles and tutorials. Some are published on external platforms like Zenn, Qiita, and Dev.to.'
   const filterButtonText = lang === 'ja' ? 'フィルター' : 'Filter'
 
   // アクティブなフィルターの数を計算

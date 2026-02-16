@@ -199,8 +199,8 @@ function getPageContent(lang: string, categoryName?: string) {
       ? `「${categoryName}」カテゴリのブログ記事一覧です。`
       : `Blog posts in the "${categoryName}" category.`
     : lang === 'ja'
-      ? '技術的ではないトピックを中心としたブログ記事を掲載しています。'
-      : 'A collection of blog posts focusing on non-technical topics.'
+      ? 'キャリア論、振り返り、個人的な考察などを掲載しています。'
+      : 'Career insights, reflections, and personal perspectives.'
 
   return { title, description }
 }
