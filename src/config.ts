@@ -17,11 +17,6 @@ export const SITE_CONFIG = {
       name: 'DigitalCube',
       url: 'https://en.digitalcube.jp/',
     },
-    social: {
-      twitter: 'https://twitter.com/hidetaka_dev',
-      github: 'https://github.com/hideokamoto',
-      linkedin: 'https://www.linkedin.com/in/hideokamoto/',
-    },
   },
 
   // ソーシャルリンク（全サイトで共通）
