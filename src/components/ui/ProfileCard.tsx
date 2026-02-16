@@ -122,7 +122,7 @@ export default function ProfileCard({
           <div>
             <h3 className="text-xl font-bold text-slate-900 dark:text-white">{authorName}</h3>
             <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-              {lang === 'ja' ? 'ビジネスデベロップメント' : 'Business Development'}
+              Developer Experience Engineer
             </p>
           </div>
 

@@ -10,13 +10,14 @@ export default function Profile({ lang }: ProfileProps) {
       <p>
         {isJapanese ? (
           <>
-            CircleCIシニアフィールドエンジニア。AWSやCloudflare上へのサーバーレスなアプリ開発を得意とする開発者。元Stripe
+            Developer Experience
+            Engineer。AWSやCloudflare上へのサーバーレスなアプリ開発を得意とする開発者。元Stripe
             Developer Advocate / AWS Samurai
             2017など、サービスの使い方や活用Tipsを紹介するコンテンツ作成や登壇などを得意とする。
           </>
         ) : (
           <>
-            CircleCI Senior Field Engineer. A developer specialized in serverless application
+            Developer Experience Engineer. A developer specialized in serverless application
             development on AWS and Cloudflare. Former Stripe Developer Advocate / AWS Samurai 2017.
             Skilled in creating content and presentations that introduce service usage and best
             practices. You can follow me on Twitter at{' '}
