@@ -4,8 +4,7 @@
 export const SITE_TITLE = 'Hidetaka Okamoto | Developer Experience Engineer'
 export const SITE_DESCRIPTION = 'Developer Experience Engineer passionate about creating tools and systems that empower developers. Portfolio, blog, and open-source contributions.'
 export const SITE_TITLE_JA = '岡本 秀高 | Developer Experience Engineer'
-export const SITE_DESCRIPTION_JA =
-  'デベロッパーエクスペリエンスを専門とするエンジニア。開発者向けツール・システム、ポートフォリオ、ブログ、オープンソースプロジェクト。'
+export const SITE_DESCRIPTION_JA = 'デベロッパーエクスペリエンスを専門とするエンジニア。開発者向けツール・システム、ポートフォリオ、ブログ、オープンソースプロジェクト。'
 
 /**
  * ISR revalidation periods (in seconds)
