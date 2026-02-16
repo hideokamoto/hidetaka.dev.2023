@@ -4,9 +4,11 @@ import './globals.css'
 import { ClarityAnalytics } from '@/components/ClarityAnalytics'
 import { DarkModeScript } from '@/components/DarkModeScript'
 import GoogleAnalytics from '@/components/GoogleAnalytics'
+import JsonLd from '@/components/JsonLd'
 import SentryProvider from '@/components/providers/SentryProvider'
 import Footer from '@/components/tailwindui/Footer'
 import Header from '@/components/tailwindui/Header'
+import { generatePersonJsonLd } from '@/libs/jsonLd'
 
 export const metadata: Metadata = {
   title: SITE_TITLE,
@@ -48,6 +50,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="h-full antialiased">
       <head>
         <link rel="alternate" type="application/rss+xml" title="RSS" href="/projects/rss.xml" />
+        <JsonLd data={generatePersonJsonLd()} />
       </head>
       <body className="flex h-full flex-col bg-zinc-50 dark:bg-black">
         <SentryProvider>
