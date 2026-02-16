@@ -93,14 +93,14 @@ function DesktopNavItem({
 }
 
 /**
- * Render the mobile slide-in navigation panel and backdrop when the mobile menu is open.
+ * モバイル向けのスライドインナビゲーションパネルと背景のバックドロップを表示する。
  *
- * Disables background scrolling while open and restores it when closed or on unmount. The menu
- * displays localized navigation links and a language switcher derived from the current URL.
+ * 開いている間はページの背景スクロールを無効化し、閉じるまたはアンマウント時に復元する。
+ * 現在のURLに基づいたローカライズ済みのナビゲーション項目と言語切替を含む。
  *
- * @param isOpen - Whether the mobile menu is visible
- * @param onClose - Callback invoked to request closing the menu (called by backdrop, close buttons, and nav item clicks)
- * @returns The mobile menu JSX when `isOpen` is true, `null` otherwise
+ * @param isOpen - メニューが表示されているかどうか
+ * @param onClose - メニューを閉じることを要求する際に呼び出されるコールバック
+ * @returns 開いている場合はモバイルメニューのJSX要素、閉じている場合は`null`
  */
 function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const pathname = usePathname()
@@ -214,6 +214,14 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
   )
 }
 
+/**
+ * デスクトップ表示用の水平ナビゲーションをレンダリングする。
+ *
+ * 現在のパス名とURLから判断した言語に基づき、jaOnly フラグ付きの項目を英語時に除外してナビゲーション項目を構成し、
+ * 各項目は現在のパスと完全一致またはプレフィックス一致する場合にアクティブとして表示される。
+ *
+ * @returns ナビゲーションを含む `<nav>` 要素を表す React 要素
+ */
 function DesktopNavigation() {
   const pathname = usePathname()
   const lang = getLanguageFromURL(pathname)
