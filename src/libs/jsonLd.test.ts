@@ -6,6 +6,7 @@ import {
   generateBlogPostingJsonLd,
   generateDevNoteBreadcrumbJsonLd,
   generateDevNoteJsonLd,
+  generatePersonJsonLd,
 } from './jsonLd'
 
 // テスト用のモックデータファクトリ
@@ -310,5 +311,106 @@ describe('generateBlogListJsonLd', () => {
 
     expect(result.mainEntity.numberOfItems).toBe(0)
     expect(result.mainEntity.itemListElement).toEqual([])
+  })
+})
+
+describe('generatePersonJsonLd', () => {
+  it('should generate valid Person JSON-LD structure', () => {
+    const result = generatePersonJsonLd()
+
+    expect(result['@context']).toBe('https://schema.org')
+    expect(result['@type']).toBe('Person')
+  })
+
+  it('should have correct @context value', () => {
+    const result = generatePersonJsonLd()
+
+    expect(result['@context']).toBe('https://schema.org')
+  })
+
+  it('should have correct @type value', () => {
+    const result = generatePersonJsonLd()
+
+    expect(result['@type']).toBe('Person')
+  })
+
+  it('should include name from SITE_CONFIG', () => {
+    const result = generatePersonJsonLd()
+
+    expect(result.name).toBe('Hidetaka Okamoto')
+  })
+
+  it('should include site URL', () => {
+    const result = generatePersonJsonLd()
+
+    expect(result.url).toBe('https://hidetaka.dev')
+  })
+
+  it('should include absolute image URL', () => {
+    const result = generatePersonJsonLd()
+
+    expect(result.image).toBe('https://hidetaka.dev/images/profile.jpg')
+  })
+
+  it('should include jobTitle from SITE_CONFIG', () => {
+    const result = generatePersonJsonLd()
+
+    expect(result.jobTitle).toBe('Developer Experience Engineer')
+  })
+
+  it('should include worksFor as an Organization object', () => {
+    const result = generatePersonJsonLd()
+
+    expect(result.worksFor).toBeDefined()
+    expect(result.worksFor['@type']).toBe('Organization')
+    expect(result.worksFor.name).toBe('DigitalCube')
+    expect(result.worksFor.url).toBe('https://en.digitalcube.jp/')
+  })
+
+  it('should include sameAs array with social profile URLs', () => {
+    const result = generatePersonJsonLd()
+
+    expect(result.sameAs).toBeDefined()
+    expect(Array.isArray(result.sameAs)).toBe(true)
+    expect(result.sameAs).toContain('https://twitter.com/hidetaka_dev')
+    expect(result.sameAs).toContain('https://github.com/hideokamoto')
+    expect(result.sameAs).toContain('https://www.linkedin.com/in/hideokamoto/')
+  })
+
+  it('should have exactly 3 social profiles in sameAs', () => {
+    const result = generatePersonJsonLd()
+
+    expect(result.sameAs).toHaveLength(3)
+  })
+
+  it('should include Twitter URL in sameAs', () => {
+    const result = generatePersonJsonLd()
+
+    expect(result.sameAs).toContain('https://twitter.com/hidetaka_dev')
+  })
+
+  it('should include GitHub URL in sameAs', () => {
+    const result = generatePersonJsonLd()
+
+    expect(result.sameAs).toContain('https://github.com/hideokamoto')
+  })
+
+  it('should include LinkedIn URL in sameAs', () => {
+    const result = generatePersonJsonLd()
+
+    expect(result.sameAs).toContain('https://www.linkedin.com/in/hideokamoto/')
+  })
+
+  it('should have all required Person schema properties', () => {
+    const result = generatePersonJsonLd()
+
+    expect(result).toHaveProperty('@context')
+    expect(result).toHaveProperty('@type')
+    expect(result).toHaveProperty('name')
+    expect(result).toHaveProperty('url')
+    expect(result).toHaveProperty('image')
+    expect(result).toHaveProperty('jobTitle')
+    expect(result).toHaveProperty('worksFor')
+    expect(result).toHaveProperty('sameAs')
   })
 })
