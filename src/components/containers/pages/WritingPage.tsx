@@ -204,6 +204,14 @@ function Sidebar({
   )
 }
 
+/**
+ * 検索、データソースによる絞り込み、および記事カードのグリッドを含む執筆一覧ページのコンテンツを描画するコンポーネント。
+ *
+ * @param lang - UI 表示に使用する言語コード（例: 'ja' または 'en'）
+ * @param externalArticles - 表示対象となる外部記事の配列（FeedItem のリスト）
+ * @param hasMoreBySource - 各データソースにさらに記事が存在するかを示すオプションのマッピング。キーはデータソース名、値が真の場合はそのソースのカウント表示が「20+」扱いになる
+ * @returns 執筆一覧ページ全体の JSX 要素
+ */
 export default function WritingPageContent({
   lang,
   externalArticles,
