@@ -45,7 +45,7 @@ export const CTA_PATTERNS: Record<ArticleType, CTAPattern> = {
       description: 'このトピックに興味を持ちましたか？関連する記事やプロフィールをご覧ください。',
       buttons: [
         { text: '他の記事を読む', href: '/blog', variant: 'primary' },
-        { text: 'プロフィールを見る', href: '/about', variant: 'outline' },
+        { text: 'プロフィールを見る', href: '/about', variant: 'secondary' },
       ],
     },
     en: {
