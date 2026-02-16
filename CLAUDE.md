@@ -13,6 +13,7 @@ This document provides comprehensive guidance for AI assistants working with the
 
 - **Framework:** Next.js 16 (App Router) with React 19
 - **Language:** TypeScript 5 (strict mode)
+- **Package Manager:** pnpm 9.x (fast, efficient Node.js package manager)
 - **Styling:** TailwindCSS 3.4.14 (utility-first, class-based dark mode)
 - **CMS:** microCMS (headless CMS for content management)
 - **Deployment:** Cloudflare Workers via @opennextjs/cloudflare
@@ -317,7 +318,7 @@ export default async function Page() {
 
 ```bash
 # 1. Install dependencies
-npm install
+pnpm install
 
 # 2. Set up environment variables
 cp .env.example .env.local
@@ -326,7 +327,7 @@ cp .env.example .env.local
 # - OG_IMAGE_GEN_AUTH_TOKEN=your_token_here
 
 # 3. Start development server
-npm run dev
+pnpm dev
 # Opens at http://localhost:3000
 ```
 
@@ -334,20 +335,20 @@ npm run dev
 
 | Command | Purpose |
 |---------|---------|
-| `npm run dev` | Start Next.js dev server (port 3000) |
-| `npm run build` | Standard Next.js build |
-| `npm run start` | Start production server |
-| `npm run lint` | Run Biome check with auto-fix |
-| `npm run lint:check` | Run Biome check only (no auto-fix) |
-| `npm run format` | Format code with Biome (auto-fix) |
-| `npm run format:check` | Check formatting only (no changes) |
-| `npm run test` | Run Vitest unit tests |
-| `npm run test:watch` | Run tests in watch mode |
-| `npm run test:ui` | Run tests with UI interface |
-| `npm run test:coverage` | Run tests with coverage report |
-| `npm run cf:build` | Build for Cloudflare Workers |
-| `npm run cf:preview` | Local preview with Wrangler |
-| `npm run cf:deploy` | Deploy to Cloudflare Workers |
+| `pnpm dev` | Start Next.js dev server (port 3000) |
+| `pnpm build` | Standard Next.js build |
+| `pnpm start` | Start production server |
+| `pnpm lint` | Run Biome check with auto-fix |
+| `pnpm lint:check` | Run Biome check only (no auto-fix) |
+| `pnpm format` | Format code with Biome (auto-fix) |
+| `pnpm format:check` | Check formatting only (no changes) |
+| `pnpm test` | Run Vitest unit tests |
+| `pnpm test:watch` | Run tests in watch mode |
+| `pnpm test:ui` | Run tests with UI interface |
+| `pnpm test:coverage` | Run tests with coverage report |
+| `pnpm cf:build` | Build for Cloudflare Workers |
+| `pnpm cf:preview` | Local preview with Wrangler |
+| `pnpm cf:deploy` | Deploy to Cloudflare Workers |
 
 ### Environment Variables
 
@@ -366,39 +367,39 @@ MICROCMS_API_MODE=mock          # Use mock data instead of API
 
 **Standard Next.js:**
 ```bash
-npm run build          # Compiles to .next/
-npm run start          # Runs production server
+pnpm build          # Compiles to .next/
+pnpm start          # Runs production server
 ```
 
 **Cloudflare Workers:**
 ```bash
-npm run cf:build       # Converts to .open-next/
-npm run cf:preview     # Test locally with Wrangler
-npm run cf:deploy      # Deploy to production
+pnpm cf:build       # Converts to .open-next/
+pnpm cf:preview     # Test locally with Wrangler
+pnpm cf:deploy      # Deploy to production
 ```
 
 ### Deployment to Cloudflare
 
 **Prerequisites:**
 1. Cloudflare account with Workers enabled
-2. Wrangler CLI authenticated: `npx wrangler login`
+2. Wrangler CLI authenticated: `pnpm dlx wrangler login`
 3. Environment variables configured in `wrangler.jsonc` or Cloudflare dashboard
 
 **Deployment Steps:**
 ```bash
 # 1. Build for Cloudflare
-npm run cf:build
+pnpm cf:build
 
 # 2. Deploy to production
-npm run cf:deploy
+pnpm cf:deploy
 
 # Or deploy to staging (if configured)
-npm run cf:deploy:staging
+pnpm cf:deploy:staging
 ```
 
 **Environment Variables on Cloudflare:**
 - Set in Cloudflare dashboard: Workers & Pages > hidetaka-dev > Settings > Variables
-- Or via CLI: `npx wrangler secret put MICROCMS_API_KEY --env production`
+- Or via CLI: `pnpm dlx wrangler secret put MICROCMS_API_KEY --env production`
 
 ---
 
@@ -410,30 +411,30 @@ Before committing or pushing any code changes, you **MUST** run these commands a
 
 ```bash
 # 1. Run Biome linter/formatter check
-npm run lint:check
+pnpm lint:check
 
 # 2. Run unit tests
-npm run test
+pnpm test
 
 # 3. Build the project to verify no TypeScript errors
-npm run build
+pnpm build
 ```
 
 ### Why This Is Critical
 
-1. **Lint Check (`npm run lint:check`):**
+1. **Lint Check (`pnpm lint:check`):**
    - Catches code quality issues, potential bugs, and style violations
    - Ensures accessibility (a11y) compliance
    - Validates TypeScript correctness
-   - **If lint fails:** Run `npm run lint` to auto-fix issues, then re-check
+   - **If lint fails:** Run `pnpm lint` to auto-fix issues, then re-check
 
-2. **Unit Test (`npm run test`):**
+2. **Unit Test (`pnpm test`):**
    - Verifies all unit tests pass
    - Prevents regression bugs
    - Ensures code changes don't break existing functionality
    - **If tests fail:** Fix failing tests before committing
 
-3. **Build Check (`npm run build`):**
+3. **Build Check (`pnpm build`):**
    - Verifies TypeScript compilation succeeds
    - Catches type errors across the entire codebase
    - Ensures all imports and dependencies resolve correctly
@@ -448,18 +449,18 @@ This project uses **Claude Code Hooks** to automatically enforce quality standar
 
 **1. Session Start Hook** (`.claude/hooks/session-start.sh`)
 - Automatically runs when Claude Code session starts
-- Installs dependencies: `npm install`
-- Builds the project: `npm run build`
+- Installs dependencies: `pnpm install`
+- Builds the project: `pnpm build`
 - Ensures the environment is ready for development
 
 **2. Pre-Push Hook** (`.claude/hooks/pre-push-matcher.sh` + `.claude/hooks/pre-push.sh`)
 - **INTERCEPTS ALL `git push` COMMANDS**
 - Runs quality checks BEFORE allowing push to remote
 - **Required checks:**
-  - ✅ `npm run test` - All unit tests must pass
-  - ✅ `npm run lint:check` - Code must pass linting
-  - ✅ `npm run format:check` - Code must be properly formatted
-  - ✅ `npm run build` - TypeScript compilation must succeed
+  - ✅ `pnpm test` - All unit tests must pass
+  - ✅ `pnpm lint:check` - Code must pass linting
+  - ✅ `pnpm format:check` - Code must be properly formatted
+  - ✅ `pnpm build` - TypeScript compilation must succeed
 - **Push is BLOCKED if any check fails**
 
 **How It Works:**
@@ -514,15 +515,15 @@ SKIP_PREPUSH_CHECKS=1 git push -u origin branch-name
 
 **A Git pre-push hook is configured** (`.git/hooks/pre-push`) that automatically runs all checks before allowing a push:
 
-1. Lint check (`npm run lint:check`)
-2. Unit tests (`npm run test`)
-3. Build check (`npm run build`)
+1. Lint check (`pnpm lint:check`)
+2. Unit tests (`pnpm test`)
+3. Build check (`pnpm build`)
 
 **If any check fails, the push will be blocked.** You must fix all issues before pushing.
 
 To manually run all checks:
 ```bash
-npm run pre-push
+pnpm pre-push
 ```
 
 ### Pre-commit Workflow
@@ -532,15 +533,15 @@ npm run pre-push
 # ... edit files ...
 
 # 2. Run lint check
-npm run lint:check
-# If fails, run: npm run lint (auto-fix)
+pnpm lint:check
+# If fails, run: pnpm lint (auto-fix)
 
 # 3. Run unit tests
-npm run test
+pnpm test
 # Fix any failing tests
 
 # 4. Build and verify
-npm run build
+pnpm build
 # Fix any TypeScript errors
 
 # 5. If all pass, commit your changes
@@ -554,9 +555,9 @@ git push -u origin <branch-name>
 ### For AI Assistants
 
 **NEVER commit or push code without:**
-1. ✅ Running `npm run lint:check` and confirming it passes
-2. ✅ Running `npm run test` and confirming all tests pass
-3. ✅ Running `npm run build` and confirming it succeeds
+1. ✅ Running `pnpm lint:check` and confirming it passes
+2. ✅ Running `pnpm test` and confirming all tests pass
+3. ✅ Running `pnpm build` and confirming it succeeds
 4. ✅ Fixing any errors or warnings that appear
 
 **If any command fails:**
@@ -739,34 +740,34 @@ if (pathname === '/ja/old-path' || pathname.startsWith('/ja/old-path/')) {
 
 **Local Development:**
 ```bash
-npm run dev               # Start dev server
+pnpm dev               # Start dev server
 # Visit http://localhost:3000
 ```
 
 **Linting & Formatting:**
 ```bash
-npm run lint              # Run Biome check with auto-fix
-npm run lint:check        # Check only (no changes)
-npm run format            # Format with auto-fix
-npm run format:check      # Check formatting only
+pnpm lint              # Run Biome check with auto-fix
+pnpm lint:check        # Check only (no changes)
+pnpm format            # Format with auto-fix
+pnpm format:check      # Check formatting only
 ```
 
 **Testing:**
 ```bash
-npm run test              # Run unit tests once
-npm run test:watch        # Run tests in watch mode
-npm run test:ui           # Run tests with UI (http://localhost:51204)
-npm run test:coverage     # Generate coverage report
+pnpm test              # Run unit tests once
+pnpm test:watch        # Run tests in watch mode
+pnpm test:ui           # Run tests with UI (http://localhost:51204)
+pnpm test:coverage     # Generate coverage report
 ```
 
 **Build Verification:**
 ```bash
-npm run build             # Verify TypeScript compilation
+pnpm build             # Verify TypeScript compilation
 ```
 
 **Cloudflare Preview:**
 ```bash
-npm run cf:preview        # Build & preview locally
+pnpm cf:preview        # Build & preview locally
 # Visit http://localhost:8787
 ```
 
@@ -829,7 +830,7 @@ MICROCMS_API_MODE=mock    # Use mock data (no API calls)
 ## Best Practices for AI Assistants
 
 ### DO:
-✅ **ALWAYS run `npm run lint` and `npm run build` before committing/pushing**
+✅ **ALWAYS run `pnpm lint` and `pnpm build` before committing/pushing**
 ✅ Write unit tests for utility functions (use Vitest)
 ✅ Use existing UI components from `src/components/ui/` before creating new ones
 ✅ Follow the three-tier component architecture (UI → Container → Layout)
@@ -849,7 +850,7 @@ MICROCMS_API_MODE=mock    # Use mock data (no API calls)
 ✅ Follow Biome formatting rules (single quotes, trailing commas, no semicolons)
 
 ### DON'T:
-❌ **NEVER commit or push without passing `npm run lint` and `npm run build`**
+❌ **NEVER commit or push without passing `pnpm lint` and `pnpm build`**
 ❌ Create custom CSS files or classes (use Tailwind utilities only)
 ❌ Use inline styles
 ❌ Add side effects or data fetching to UI components
@@ -869,9 +870,9 @@ MICROCMS_API_MODE=mock    # Use mock data (no API calls)
 ### Code Quality Checks:
 
 **Required Before Every Commit:**
-1. ✅ Biome lint passes: `npm run lint`
-2. ✅ TypeScript compiles without errors: `npm run build`
-3. ✅ Unit tests pass (if applicable): `npm run test`
+1. ✅ Biome lint passes: `pnpm lint`
+2. ✅ TypeScript compiles without errors: `pnpm build`
+3. ✅ Unit tests pass (if applicable): `pnpm test`
 
 **Manual Testing Checklist:**
 - ✅ All imports resolve correctly (no missing dependencies)
@@ -903,10 +904,10 @@ Before every commit and push, **you MUST run:**
 
 ```bash
 # 1. Lint check (REQUIRED)
-npm run lint
+pnpm lint
 
 # 2. Build verification (REQUIRED)
-npm run build
+pnpm build
 
 # 3. Only if both pass, proceed with commit
 git add .
@@ -916,8 +917,8 @@ git push -u origin <branch-name>
 
 **Workflow:**
 1. Make code changes
-2. **Run `npm run lint`** - Fix all issues
-3. **Run `npm run build`** - Fix all errors
+2. **Run `pnpm lint`** - Fix all issues
+3. **Run `pnpm build`** - Fix all errors
 4. Commit changes (only if steps 2-3 pass)
 5. Push to remote
 6. Create pull request
@@ -953,7 +954,7 @@ git push -u origin <branch-name>
 ### Common Issues
 
 **Issue:** Build fails with TypeScript errors
-**Solution:** Run `npm run build` to see errors. Ensure all types are properly defined.
+**Solution:** Run `pnpm build` to see errors. Ensure all types are properly defined.
 
 **Issue:** microCMS API calls fail
 **Solution:** Check `MICROCMS_API_KEY` in `.env.local`. Use `MICROCMS_API_MODE=mock` for development.
@@ -971,13 +972,13 @@ git push -u origin <branch-name>
 **Solution:** Ensure both `/[page]/page.tsx` and `/ja/[page]/page.tsx` exist.
 
 **Issue:** Biome lint errors
-**Solution:** Run `npm run lint` to auto-fix most issues. Check `biome.json` for rule configuration. Use `npm run format` for formatting issues.
+**Solution:** Run `pnpm lint` to auto-fix most issues. Check `biome.json` for rule configuration. Use `pnpm format` for formatting issues.
 
 **Issue:** TypeScript build fails
-**Solution:** Run `npm run build` to see specific errors. Ensure all types are properly imported and defined. Check for missing dependencies or incorrect import paths.
+**Solution:** Run `pnpm build` to see specific errors. Ensure all types are properly imported and defined. Check for missing dependencies or incorrect import paths.
 
 **Issue:** Tests failing
-**Solution:** Run `npm run test` to see failures. Use `npm run test:watch` for iterative development. Check test files (*.test.ts) for assertions.
+**Solution:** Run `pnpm test` to see failures. Use `pnpm test:watch` for iterative development. Check test files (*.test.ts) for assertions.
 
 ---
 
