@@ -11,6 +11,32 @@ import {
 import Container from './Container'
 import ModeToggle from './Headers/ModeToggle'
 
+type NavItem = {
+  path: string
+  label: string
+  jaOnly?: boolean
+}
+
+/**
+ * Get filtered navigation items based on language.
+ * Japanese-only items are excluded when language is English.
+ *
+ * @param lang - Current language ('ja' or 'en')
+ * @returns Array of navigation items filtered by language
+ */
+function getNavItems(lang: string): NavItem[] {
+  const allNavItems: NavItem[] = [
+    { path: 'about', label: lang === 'ja' ? '概要' : 'About' },
+    { path: 'work', label: lang === 'ja' ? '制作物' : 'Work' },
+    { path: 'writing', label: lang === 'ja' ? '執筆' : 'Writing' },
+    { path: 'blog', label: lang === 'ja' ? 'ブログ' : 'Blog', jaOnly: true },
+    { path: 'news', label: lang === 'ja' ? 'ニュース' : 'News' },
+    { path: 'speaking', label: lang === 'ja' ? '登壇' : 'Speaking' },
+  ]
+
+  return allNavItems.filter((item) => !item.jaOnly || lang === 'ja')
+}
+
 /**
  * Render a menu icon that switches between hamburger and close states.
  *
@@ -107,17 +133,7 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
   const lang = getLanguageFromURL(pathname)
   const currentLang = lang
 
-  const allNavItems = [
-    { path: 'about', label: lang === 'ja' ? '概要' : 'About' },
-    { path: 'work', label: lang === 'ja' ? '制作物' : 'Work' },
-    { path: 'writing', label: lang === 'ja' ? '執筆' : 'Writing' },
-    { path: 'blog', label: lang === 'ja' ? 'ブログ' : 'Blog', jaOnly: true },
-    { path: 'news', label: lang === 'ja' ? 'ニュース' : 'News' },
-    { path: 'speaking', label: lang === 'ja' ? '登壇' : 'Speaking' },
-  ]
-
-  // Filter out Japanese-only items when in English
-  const navItems = allNavItems.filter((item) => !item.jaOnly || lang === 'ja')
+  const navItems = getNavItems(lang)
 
   useEffect(() => {
     if (isOpen) {
@@ -226,17 +242,7 @@ function DesktopNavigation() {
   const pathname = usePathname()
   const lang = getLanguageFromURL(pathname)
 
-  const allNavItems = [
-    { path: 'about', label: lang === 'ja' ? '概要' : 'About' },
-    { path: 'work', label: lang === 'ja' ? '制作物' : 'Work' },
-    { path: 'writing', label: lang === 'ja' ? '執筆' : 'Writing' },
-    { path: 'blog', label: lang === 'ja' ? 'ブログ' : 'Blog', jaOnly: true },
-    { path: 'news', label: lang === 'ja' ? 'ニュース' : 'News' },
-    { path: 'speaking', label: lang === 'ja' ? '登壇' : 'Speaking' },
-  ]
-
-  // Filter out Japanese-only items when in English
-  const navItems = allNavItems.filter((item) => !item.jaOnly || lang === 'ja')
+  const navItems = getNavItems(lang)
 
   return (
     <nav className="hidden lg:flex items-center gap-1">
