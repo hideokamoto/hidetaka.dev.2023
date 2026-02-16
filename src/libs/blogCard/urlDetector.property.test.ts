@@ -358,6 +358,15 @@ describe('urlDetector - Property-Based Tests', () => {
           fc.webUrl(),
           fc.string(),
           (validUrl, linkUrl, imageUrl, linkText) => {
+            // 除外条件を適用
+            const imageExtensions = /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i
+            const ownSitePattern = /hidetaka\.dev/i
+
+            // validUrlが除外条件に該当する場合はスキップ
+            if (imageExtensions.test(validUrl) || ownSitePattern.test(validUrl)) {
+              return true
+            }
+
             // 画像拡張子を追加
             const imageUrlWithExt = `${imageUrl}.jpg`
 
@@ -514,6 +523,15 @@ describe('urlDetector - Property-Based Tests', () => {
        */
       fc.assert(
         fc.property(fc.webUrl(), fc.integer({ min: 2, max: 10 }), (url, count) => {
+          // 除外条件を適用
+          const imageExtensions = /\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i
+          const ownSitePattern = /hidetaka\.dev/i
+
+          // urlが除外条件に該当する場合はスキップ
+          if (imageExtensions.test(url) || ownSitePattern.test(url)) {
+            return true
+          }
+
           // 同じURLを複数回含むHTML
           const html = Array(count).fill(`<p>${url}</p>`).join('\n')
 
