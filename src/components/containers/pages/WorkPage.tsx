@@ -6,6 +6,7 @@ import { useCallback, useMemo, useState } from 'react'
 import Container from '@/components/tailwindui/Container'
 import { GitHubIcon, LinkedInIcon, TwitterIcon } from '@/components/tailwindui/SocialLink'
 import BackgroundDecoration from '@/components/ui/BackgroundDecoration'
+import Badge from '@/components/ui/Badge'
 import DateDisplay from '@/components/ui/DateDisplay'
 import FilterItem from '@/components/ui/FilterItem'
 import MobileFilterButton from '@/components/ui/MobileFilterButton'
@@ -18,6 +19,11 @@ import { SITE_CONFIG } from '@/config'
 import type { NPMRegistrySearchResult } from '@/libs/dataSources/npmjs'
 import type { WordPressPluginDetail } from '@/libs/dataSources/wporg'
 import type { MicroCMSProjectsRecord } from '@/libs/microCMS/types'
+import {
+  getStatusFromLastUpdate,
+  getStatusLabel,
+  statusToBadgeVariant,
+} from '@/libs/projectStatus.utils'
 
 type FilterCategory = 'all' | 'projects' | 'open-source' | 'books' | 'oss-contribution'
 
@@ -65,6 +71,8 @@ function getOSSItemDate(item: OSSItem): string {
 function UnifiedProjectCard({ project, lang }: { project: MicroCMSProjectsRecord; lang: string }) {
   const href = lang === 'ja' ? `/ja/work/${project.id}` : `/work/${project.id}`
   const date = project.published_at ? new Date(project.published_at) : null
+  const status = project.status || 'active'
+  const statusLabel = getStatusLabel(status, lang)
 
   return (
     <Link href={href} className="group block">
@@ -85,14 +93,23 @@ function UnifiedProjectCard({ project, lang }: { project: MicroCMSProjectsRecord
         {/* Content - Bottom */}
         <div className="p-5 lg:p-6">
           <div className="flex flex-col gap-3">
-            {date && (
-              <DateDisplay
-                date={date}
-                lang={lang}
-                format="short"
-                className="text-xs font-semibold text-slate-500 dark:text-slate-400"
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex-1">
+                {date && (
+                  <DateDisplay
+                    date={date}
+                    lang={lang}
+                    format="short"
+                    className="text-xs font-semibold text-slate-500 dark:text-slate-400"
+                  />
+                )}
+              </div>
+              <Badge
+                label={statusLabel}
+                variant={statusToBadgeVariant(status)}
+                className="shrink-0"
               />
-            )}
+            </div>
 
             <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
               {project.title}
@@ -133,6 +150,8 @@ function UnifiedOSSCard({
     const pkg = (item.data as NPMRegistrySearchResult).package
     const date = new Date(pkg.date)
     const href = pkg.links.npm
+    const status = getStatusFromLastUpdate(pkg.date)
+    const statusLabel = getStatusLabel(status, lang)
 
     return (
       <a href={href} target="_blank" rel="noopener noreferrer" className="group block">
@@ -140,12 +159,21 @@ function UnifiedOSSCard({
           {/* Content */}
           <div className="p-5 lg:p-6">
             <div className="flex flex-col gap-3">
-              <DateDisplay
-                date={date}
-                lang={lang}
-                format="short"
-                className="text-xs font-semibold text-slate-500 dark:text-slate-400"
-              />
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex-1">
+                  <DateDisplay
+                    date={date}
+                    lang={lang}
+                    format="short"
+                    className="text-xs font-semibold text-slate-500 dark:text-slate-400"
+                  />
+                </div>
+                <Badge
+                  label={statusLabel}
+                  variant={statusToBadgeVariant(status)}
+                  className="shrink-0"
+                />
+              </div>
 
               <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                 {pkg.name}
@@ -169,6 +197,8 @@ function UnifiedOSSCard({
     const plugin = item.data as WordPressPluginDetail
     const date = new Date(plugin.added)
     const href = `https://wordpress.org/plugins/${plugin.slug}`
+    const status = getStatusFromLastUpdate(plugin.last_updated)
+    const statusLabel = getStatusLabel(status, lang)
 
     return (
       <a href={href} target="_blank" rel="noopener noreferrer" className="group block">
@@ -176,12 +206,21 @@ function UnifiedOSSCard({
           {/* Content */}
           <div className="p-5 lg:p-6">
             <div className="flex flex-col gap-3">
-              <DateDisplay
-                date={date}
-                lang={lang}
-                format="short"
-                className="text-xs font-semibold text-slate-500 dark:text-slate-400"
-              />
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex-1">
+                  <DateDisplay
+                    date={date}
+                    lang={lang}
+                    format="short"
+                    className="text-xs font-semibold text-slate-500 dark:text-slate-400"
+                  />
+                </div>
+                <Badge
+                  label={statusLabel}
+                  variant={statusToBadgeVariant(status)}
+                  className="shrink-0"
+                />
+              </div>
 
               <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                 {plugin.name}
@@ -679,80 +718,94 @@ export default function WorkPageContent({
               />
             }
           >
-            {/* プロジェクトセクション */}
-            {(filterCategory === 'all' || filterCategory === 'projects') &&
-              filteredProjects.length > 0 && (
-                <div className="mb-12">
-                  <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
-                    {lang === 'ja' ? 'プロジェクト' : 'Projects'}
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                    {filteredProjects.map((project) => (
-                      <UnifiedProjectCard key={project.id} project={project} lang={lang} />
-                    ))}
-                  </div>
-                </div>
-              )}
+            {/* Active Products Section */}
+            {(filteredProjects.length > 0 ||
+              filteredBooks.length > 0 ||
+              filteredOSS.length > 0) && (
+              <div className="mb-16">
+                <h2 className="mb-8 text-3xl font-bold text-slate-900 dark:text-white">
+                  {lang === 'ja' ? 'アクティブな制作物' : 'Active Products'}
+                </h2>
 
-            {/* 書籍セクション */}
-            {(filterCategory === 'all' || filterCategory === 'books') &&
-              filteredBooks.length > 0 && (
-                <div className="mb-12">
-                  <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
-                    {lang === 'ja' ? '書籍' : 'Books'}
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                    {filteredBooks.map((project) => (
-                      <UnifiedProjectCard key={project.id} project={project} lang={lang} />
-                    ))}
-                  </div>
-                </div>
-              )}
+                {/* アクティブなプロジェクトセクション */}
+                {(filterCategory === 'all' || filterCategory === 'projects') &&
+                  filteredProjects.length > 0 && (
+                    <div className="mb-12">
+                      <h3 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
+                        {lang === 'ja' ? 'プロジェクト' : 'Projects'}
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+                        {filteredProjects.map((project) => (
+                          <UnifiedProjectCard key={project.id} project={project} lang={lang} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
-            {/* オープンソースセクション */}
-            {(filterCategory === 'all' || filterCategory === 'open-source') &&
-              filteredOSS.length > 0 && (
-                <div className="mb-12">
-                  <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
-                    {lang === 'ja' ? 'オープンソース' : 'Open Source'}
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                    {filteredOSS.map((item, _index) => {
-                      if (item.type === 'project') {
-                        return (
-                          <UnifiedProjectCard
-                            key={item.data.id}
-                            project={item.data as MicroCMSProjectsRecord}
-                            lang={lang}
-                          />
-                        )
-                      } else if (item.type === 'npm') {
-                        return (
-                          <UnifiedOSSCard
-                            key={`npm-${(item.data as NPMRegistrySearchResult).package.name}`}
-                            item={{ type: 'npm', data: item.data as NPMRegistrySearchResult }}
-                            lang={lang}
-                          />
-                        )
-                      } else {
-                        return (
-                          <UnifiedOSSCard
-                            key={`wp-${(item.data as WordPressPluginDetail).slug}`}
-                            item={{ type: 'wordpress', data: item.data as WordPressPluginDetail }}
-                            lang={lang}
-                          />
-                        )
-                      }
-                    })}
-                  </div>
-                </div>
-              )}
+                {/* アクティブな書籍セクション */}
+                {(filterCategory === 'all' || filterCategory === 'books') &&
+                  filteredBooks.length > 0 && (
+                    <div className="mb-12">
+                      <h3 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
+                        {lang === 'ja' ? '書籍' : 'Books'}
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+                        {filteredBooks.map((project) => (
+                          <UnifiedProjectCard key={project.id} project={project} lang={lang} />
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                {/* アクティブなオープンソースセクション */}
+                {(filterCategory === 'all' || filterCategory === 'open-source') &&
+                  filteredOSS.length > 0 && (
+                    <div className="mb-12">
+                      <h3 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
+                        {lang === 'ja' ? 'オープンソース' : 'Open Source'}
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+                        {filteredOSS.map((item, _index) => {
+                          if (item.type === 'project') {
+                            return (
+                              <UnifiedProjectCard
+                                key={item.data.id}
+                                project={item.data as MicroCMSProjectsRecord}
+                                lang={lang}
+                              />
+                            )
+                          } else if (item.type === 'npm') {
+                            return (
+                              <UnifiedOSSCard
+                                key={`npm-${(item.data as NPMRegistrySearchResult).package.name}`}
+                                item={{ type: 'npm', data: item.data as NPMRegistrySearchResult }}
+                                lang={lang}
+                              />
+                            )
+                          } else {
+                            return (
+                              <UnifiedOSSCard
+                                key={`wp-${(item.data as WordPressPluginDetail).slug}`}
+                                item={{
+                                  type: 'wordpress',
+                                  data: item.data as WordPressPluginDetail,
+                                }}
+                                lang={lang}
+                              />
+                            )
+                          }
+                        })}
+                      </div>
+                    </div>
+                  )}
+              </div>
+            )}
 
             {/* OSS Contributionセクション */}
             {(filterCategory === 'all' || filterCategory === 'oss-contribution') &&
               filteredOSSContributions.length > 0 && (
-                <div>
-                  <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
+                <div className="mb-16">
+                  <h2 className="mb-8 text-3xl font-bold text-slate-900 dark:text-white">
                     {lang === 'ja' ? 'OSS貢献' : 'OSS Contributions'}
                   </h2>
                   <div className="space-y-3">

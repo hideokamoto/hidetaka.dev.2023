@@ -19,6 +19,8 @@ export type MicroCMSProjectType =
   | 'oss_contribution'
   | 'community_activities'
 
+export type MicroCMSProjectStatus = 'active' | 'deprecated' | 'archived' | 'completed'
+
 export type MicroCMSProjectsRecord = MicroCMSRecord & {
   title: string
   url: string
@@ -35,6 +37,10 @@ export type MicroCMSProjectsRecord = MicroCMSRecord & {
   about?: string
   background?: string
   architecture?: string
+  /**
+   * プロジェクトのステータス (未指定の場合は 'active' として扱う)
+   **/
+  status?: MicroCMSProjectStatus
 }
 
 export type MicroCMSClient = Pick<ReturnType<typeof createClient>, 'get' | 'getAllContents'>
