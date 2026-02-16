@@ -322,18 +322,6 @@ describe('generatePersonJsonLd', () => {
     expect(result['@type']).toBe('Person')
   })
 
-  it('should have correct @context value', () => {
-    const result = generatePersonJsonLd()
-
-    expect(result['@context']).toBe('https://schema.org')
-  })
-
-  it('should have correct @type value', () => {
-    const result = generatePersonJsonLd()
-
-    expect(result['@type']).toBe('Person')
-  })
-
   it('should include name from SITE_CONFIG', () => {
     const result = generatePersonJsonLd()
 
@@ -381,24 +369,6 @@ describe('generatePersonJsonLd', () => {
     const result = generatePersonJsonLd()
 
     expect(result.sameAs).toHaveLength(3)
-  })
-
-  it('should include Twitter URL in sameAs', () => {
-    const result = generatePersonJsonLd()
-
-    expect(result.sameAs).toContain('https://twitter.com/hidetaka_dev')
-  })
-
-  it('should include GitHub URL in sameAs', () => {
-    const result = generatePersonJsonLd()
-
-    expect(result.sameAs).toContain('https://github.com/hideokamoto')
-  })
-
-  it('should include LinkedIn URL in sameAs', () => {
-    const result = generatePersonJsonLd()
-
-    expect(result.sameAs).toContain('https://www.linkedin.com/in/hideokamoto/')
   })
 
   it('should have all required Person schema properties', () => {

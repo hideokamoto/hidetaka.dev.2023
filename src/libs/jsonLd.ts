@@ -235,9 +235,9 @@ export function generatePersonJsonLd() {
       url: SITE_CONFIG.author.worksFor.url,
     },
     sameAs: [
-      SITE_CONFIG.author.social.twitter,
-      SITE_CONFIG.author.social.github,
-      SITE_CONFIG.author.social.linkedin,
+      SITE_CONFIG.social.twitter.url,
+      SITE_CONFIG.social.github.url,
+      SITE_CONFIG.social.linkedin.url,
     ],
   }
 
