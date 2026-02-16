@@ -13,11 +13,23 @@ export type UnifiedProjectStatus = 'active' | 'deprecated' | 'archived' | 'compl
 /**
  * Get status based on last update date
  * Projects updated within the threshold are considered 'active', otherwise 'deprecated'
- * @param lastUpdated - Last update date as string or Date
+ * @param lastUpdated - Last update date as string or Date (can be undefined)
  * @returns Status: 'active' or 'deprecated'
  */
-export function getStatusFromLastUpdate(lastUpdated: string | Date): 'active' | 'deprecated' {
+export function getStatusFromLastUpdate(
+  lastUpdated: string | Date | undefined,
+): 'active' | 'deprecated' {
+  if (!lastUpdated) {
+    return 'active'
+  }
+
   const lastUpdateDate = new Date(lastUpdated)
+
+  // Check if date is valid
+  if (isNaN(lastUpdateDate.getTime())) {
+    return 'active'
+  }
+
   const now = new Date()
 
   // Calculate months difference

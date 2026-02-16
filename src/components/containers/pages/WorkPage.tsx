@@ -148,9 +148,9 @@ function UnifiedOSSCard({
 }) {
   if (item.type === 'npm') {
     const pkg = (item.data as NPMRegistrySearchResult).package
-    const date = new Date(pkg.date)
+    const date = new Date(pkg.date || '')
     const href = pkg.links.npm
-    const status = getStatusFromLastUpdate(pkg.date)
+    const status = getStatusFromLastUpdate(pkg.date || 'now')
     const statusLabel = getStatusLabel(status, lang)
 
     return (
@@ -195,9 +195,9 @@ function UnifiedOSSCard({
     )
   } else {
     const plugin = item.data as WordPressPluginDetail
-    const date = new Date(plugin.added)
+    const date = new Date(plugin.added || '')
     const href = `https://wordpress.org/plugins/${plugin.slug}`
-    const status = getStatusFromLastUpdate(plugin.last_updated)
+    const status = getStatusFromLastUpdate(plugin.last_updated || 'now')
     const statusLabel = getStatusLabel(status, lang)
 
     return (
