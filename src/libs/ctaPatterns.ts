@@ -53,7 +53,7 @@ export const CTA_PATTERNS: Record<ArticleType, CTAPattern> = {
       description: 'Interested in this topic? Check out related articles and profile.',
       buttons: [
         { text: 'Read More', href: '/blog', variant: 'primary' },
-        { text: 'View Profile', href: '/about', variant: 'outline' },
+        { text: 'View Profile', href: '/about', variant: 'secondary' },
       ],
     },
   },
