@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200">
+  <!-- グラデーション定義 -->
+  <defs>
+    <linearGradient id="blueGreenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0277BD" />
+      <stop offset="100%" stop-color="#00BFA5" />
+    </linearGradient>
+    
+    <linearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0277BD" />
+      <stop offset="100%" stop-color="#039BE5" />
+    </linearGradient>
+    
+    <linearGradient id="greenGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#009688" />
+      <stop offset="100%" stop-color="#00BFA5" />
+    </linearGradient>
+  </defs>
+  
+  <!-- 左側のロゴマーク -->
+  <g transform="translate(100, 100)">
+    <!-- 外側の四角 -->
+    <rect x="-50" y="-50" width="100" height="100" rx="5" ry="5" fill="#F8F8F8" stroke="url(#blueGreenGradient)" stroke-width="2" />
+    
+    <!-- グリッドライン -->
+    <g stroke="#E0E0E0" stroke-width="0.5" opacity="0.3">
+      <line x1="-50" y1="-25" x2="50" y2="-25" />
+      <line x1="-50" y1="0" x2="50" y2="0" />
+      <line x1="-50" y1="25" x2="50" y2="25" />
+      <line x1="-25" y1="-50" x2="-25" y2="50" />
+      <line x1="0" y1="-50" x2="0" y2="50" />
+      <line x1="25" y1="-50" x2="25" y2="50" />
+    </g>
+    
+    <!-- ギア部分 - 左側 -->
+    <g transform="translate(-20, 0)">
+      <rect x="-15" y="-15" width="30" height="30" fill="#F8F8F8" stroke="url(#blueGradient)" stroke-width="2" />
+      
+      <!-- ギアの歯 -->
+      <rect x="-20" y="-7.5" width="5" height="15" fill="url(#blueGradient)" />
+      <rect x="15" y="-7.5" width="5" height="15" fill="url(#blueGradient)" />
+      <rect x="-7.5" y="-20" width="15" height="5" fill="url(#blueGradient)" />
+      <rect x="-7.5" y="15" width="15" height="5" fill="url(#blueGradient)" />
+      
+      <!-- 中心点 -->
+      <circle cx="0" cy="0" r="6" fill="url(#blueGradient)" opacity="0.7" />
+    </g>
+    
+    <!-- グラフ部分 - 右側 -->
+    <path d="M0,35 C10,25 20,15 30,0 C40,-15 50,0 60,-25" 
+          fill="none" stroke="url(#greenGradient)" stroke-width="3" stroke-linecap="round" />
+    
+    <!-- データポイント -->
+    <circle cx="30" cy="0" r="3" fill="#00BFA5" />
+    <circle cx="60" cy="-25" r="3" fill="#00BFA5" />
+    
+    <!-- ギアとグラフの接続 -->
+    <path d="M-5,0 C0,0 5,0 15,0" 
+          stroke="url(#blueGreenGradient)" stroke-width="2" stroke-linecap="round" stroke-dasharray="0, 5" />
+  </g>
+  
+  <!-- テキスト部分 -->
+  <g transform="translate(230, 100)">
+    <!-- メインロゴテキスト -->
+    <text x="0" y="15" font-family="Arial, sans-serif" font-size="48" font-weight="700" fill="url(#blueGreenGradient)">
+      Revtrona
+    </text>
+    
+    <!-- タグライン -->
+    <text x="0" y="45" font-family="Arial, sans-serif" font-size="18" font-weight="400" fill="#666666">
+      Powering Revenue through Technology
+    </text>
+  </g>
+</svg>

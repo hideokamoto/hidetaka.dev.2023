@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 280">
+  <!-- グラデーション定義 -->
+  <defs>
+    <linearGradient id="blueGreenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0277BD" />
+      <stop offset="100%" stop-color="#00BFA5" />
+    </linearGradient>
+    
+    <linearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0277BD" />
+      <stop offset="100%" stop-color="#039BE5" />
+    </linearGradient>
+    
+    <linearGradient id="greenGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#009688" />
+      <stop offset="100%" stop-color="#00BFA5" />
+    </linearGradient>
+    
+    <!-- 四角形のクリッピングパス -->
+    <clipPath id="squareClip">
+      <rect x="100" y="50" width="200" height="160" rx="5" ry="5" />
+    </clipPath>
+  </defs>
+  
+  <!-- 背景レイヤー -->
+  <rect x="100" y="50" width="200" height="160" rx="5" ry="5" fill="#F8F8F8" />
+  
+  <!-- グリッドライン -->
+  <g clip-path="url(#squareClip)" stroke="#E0E0E0" stroke-width="0.5" opacity="0.5">
+    <line x1="100" y1="90" x2="300" y2="90" />
+    <line x1="100" y1="130" x2="300" y2="130" />
+    <line x1="100" y1="170" x2="300" y2="170" />
+    <line x1="140" y1="50" x2="140" y2="210" />
+    <line x1="180" y1="50" x2="180" y2="210" />
+    <line x1="220" y1="50" x2="220" y2="210" />
+    <line x1="260" y1="50" x2="260" y2="210" />
+  </g>
+  
+  <!-- ギア部分 - 左側 -->
+  <g transform="translate(140, 130)">
+    <rect x="-20" y="-20" width="40" height="40" fill="#F8F8F8" stroke="url(#blueGradient)" stroke-width="2" />
+    
+    <!-- ギアの歯 -->
+    <rect x="-25" y="-10" width="5" height="20" fill="url(#blueGradient)" />
+    <rect x="20" y="-10" width="5" height="20" fill="url(#blueGradient)" />
+    <rect x="-10" y="-25" width="20" height="5" fill="url(#blueGradient)" />
+    <rect x="-10" y="20" width="20" height="5" fill="url(#blueGradient)" />
+    
+    <!-- 中心点 -->
+    <circle cx="0" cy="0" r="8" fill="url(#blueGradient)" opacity="0.7" />
+  </g>
+  
+  <!-- グラフ部分 - 右側 -->
+  <g clip-path="url(#squareClip)">
+    <!-- 上昇グラフライン -->
+    <path d="M160,180 C180,170 200,150 220,130 C240,110 260,120 280,70" 
+          fill="none" stroke="url(#greenGradient)" stroke-width="3" stroke-linecap="round" />
+    
+    <!-- データポイント -->
+    <circle cx="220" cy="130" r="4" fill="#00BFA5" />
+    <circle cx="280" cy="70" r="4" fill="#00BFA5" />
+  </g>
+  
+  <!-- ギアとグラフの接続 -->
+  <path d="M160,130 C170,130 180,130 200,130" 
+        stroke="url(#blueGreenGradient)" stroke-width="3" stroke-linecap="round" stroke-dasharray="0, 8" />
+  
+  <!-- 外枠 -->
+  <rect x="100" y="50" width="200" height="160" rx="5" ry="5" 
+        fill="none" stroke="url(#blueGreenGradient)" stroke-width="2" />
+  
+  <!-- ロゴテキスト -->
+  <text x="200" y="240" font-family="Arial, sans-serif" font-size="30" font-weight="700" text-anchor="middle" fill="url(#blueGreenGradient)">
+    Revtrona
+  </text>
+</svg>
