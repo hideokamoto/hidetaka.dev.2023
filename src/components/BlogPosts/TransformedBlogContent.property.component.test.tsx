@@ -148,7 +148,7 @@ describe('TransformedBlogContent - Property-Based Tests', () => {
             const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
 
             // 極端に大きなHTMLを生成してエラーを誘発
-            const extremeHtml = '<p>'.repeat(10000) + 'https://example.com' + '</p>'.repeat(10000)
+            const extremeHtml = `${'<p>'.repeat(10000)}https://example.com${'</p>'.repeat(10000)}`
 
             const thought: WPThought = {
               id,

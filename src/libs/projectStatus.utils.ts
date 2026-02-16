@@ -26,7 +26,7 @@ export function getStatusFromLastUpdate(
   const lastUpdateDate = new Date(lastUpdated)
 
   // Check if date is valid
-  if (isNaN(lastUpdateDate.getTime())) {
+  if (Number.isNaN(lastUpdateDate.getTime())) {
     return 'active'
   }
 
