@@ -66,3 +66,30 @@ export function getStatusFromLastUpdate(lastUpdated: string | Date): 'active' | 
 export function getMicroCMSProjectStatus(status?: MicroCMSProjectStatus): UnifiedProjectStatus {
   return status || 'active'
 }
+
+/**
+ * Get the badge variant for a given status
+ * @param status - Project status
+ * @returns Badge variant: 'green' for active, 'gray' for others
+ */
+export function getStatusBadgeVariant(status: UnifiedProjectStatus): 'green' | 'gray' {
+  return status === 'active' ? 'green' : 'gray'
+}
+
+/**
+ * Get localized status label
+ * @param status - Project status
+ * @param lang - Language code ('ja' or 'en')
+ * @returns Localized status label
+ */
+export function getStatusLabel(status: UnifiedProjectStatus, lang: string): string {
+  const labels: Record<UnifiedProjectStatus, Record<string, string>> = {
+    active: { ja: 'アクティブ', en: 'Active' },
+    deprecated: { ja: '非推奨', en: 'Deprecated' },
+    archived: { ja: 'アーカイブ', en: 'Archived' },
+    completed: { ja: '完了', en: 'Completed' },
+  }
+
+  const isJapanese = lang.startsWith('ja')
+  return labels[status][isJapanese ? 'ja' : 'en']
+}
