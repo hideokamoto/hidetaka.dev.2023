@@ -19,6 +19,8 @@ export type MicroCMSProjectType =
   | 'oss_contribution'
   | 'community_activities'
 
+export type MicroCMSProjectStatus = 'active' | 'deprecated' | 'archived' | 'completed'
+
 export type MicroCMSProjectsRecord = MicroCMSRecord & {
   title: string
   url: string
@@ -29,6 +31,7 @@ export type MicroCMSProjectsRecord = MicroCMSRecord & {
   image?: MicroCMSImageObject
   lang: ['Japanese' | 'English']
   is_solo: boolean
+  status?: MicroCMSProjectStatus
   /**
    * 詳細ページ向け
    **/
