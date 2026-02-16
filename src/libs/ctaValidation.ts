@@ -14,7 +14,16 @@ const VALID_VARIANTS = ['primary', 'secondary', 'outline'] as const
 /**
  * 有効な記事タイプ
  */
-const VALID_ARTICLE_TYPES: ArticleType[] = ['tutorial', 'essay', 'tool_announcement', 'general']
+const VALID_ARTICLE_TYPES: ArticleType[] = [
+  'tutorial',
+  'essay',
+  'tool_announcement',
+  'general',
+  'dev_note',
+  'news_article',
+  'event_report',
+  'speaking_report',
+]
 
 /**
  * 安全なURLプロトコルの正規表現

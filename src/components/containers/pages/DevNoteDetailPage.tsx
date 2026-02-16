@@ -160,7 +160,7 @@ export default function DevNoteDetailPage({
           />
 
           {/* CTA（コールトゥアクション） */}
-          <ArticleCTA lang={lang} articleType="tutorial" />
+          <ArticleCTA lang={lang} articleType="dev_note" />
 
           {/* プロフィールカード（モバイルのみ表示） */}
           <div className="lg:hidden">

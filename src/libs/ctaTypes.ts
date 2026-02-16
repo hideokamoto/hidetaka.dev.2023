@@ -10,8 +10,20 @@
  * - essay: エッセイや考察記事
  * - tool_announcement: ツールやプロジェクトの発表記事
  * - general: その他の一般記事（デフォルト）
+ * - dev_note: 開発ノート記事
+ * - news_article: ニュース記事
+ * - event_report: イベントレポート記事
+ * - speaking_report: 登壇・講演レポート記事
  */
-export type ArticleType = 'tutorial' | 'essay' | 'tool_announcement' | 'general'
+export type ArticleType =
+  | 'tutorial'
+  | 'essay'
+  | 'tool_announcement'
+  | 'general'
+  | 'dev_note'
+  | 'news_article'
+  | 'event_report'
+  | 'speaking_report'
 
 /**
  * CTAボタンの定義
