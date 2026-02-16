@@ -127,7 +127,7 @@ export default function NewsDetailPage({
         />
 
         {/* CTA（コールトゥアクション） */}
-        <ArticleCTA articleType="news_article" lang={lang} />
+        <ArticleCTA articleType="news_article" lang={lang} className="mt-12" />
 
         {/* 関連記事 */}
         <RelatedArticles articles={relatedArticles} lang={lang} />
