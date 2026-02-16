@@ -11,6 +11,32 @@ import {
 import Container from './Container'
 import ModeToggle from './Headers/ModeToggle'
 
+type NavItem = {
+  path: string
+  label: string
+  jaOnly?: boolean
+}
+
+/**
+ * Get filtered navigation items based on language.
+ * Japanese-only items are excluded when language is English.
+ *
+ * @param lang - Current language ('ja' or 'en')
+ * @returns Array of navigation items filtered by language
+ */
+function getNavItems(lang: string): NavItem[] {
+  const allNavItems: NavItem[] = [
+    { path: 'about', label: lang === 'ja' ? '概要' : 'About' },
+    { path: 'work', label: lang === 'ja' ? '制作物' : 'Work' },
+    { path: 'writing', label: lang === 'ja' ? '執筆' : 'Writing' },
+    { path: 'blog', label: lang === 'ja' ? 'ブログ' : 'Blog', jaOnly: true },
+    { path: 'news', label: lang === 'ja' ? 'ニュース' : 'News' },
+    { path: 'speaking', label: lang === 'ja' ? '登壇' : 'Speaking' },
+  ]
+
+  return allNavItems.filter((item) => !item.jaOnly || lang === 'ja')
+}
+
 /**
  * Render a menu icon that switches between hamburger and close states.
  *
@@ -93,28 +119,21 @@ function DesktopNavItem({
 }
 
 /**
- * Render the mobile slide-in navigation panel and backdrop when the mobile menu is open.
+ * モバイル向けのスライドインナビゲーションパネルと背景のバックドロップを表示する。
  *
- * Disables background scrolling while open and restores it when closed or on unmount. The menu
- * displays localized navigation links and a language switcher derived from the current URL.
+ * 開いている間はページの背景スクロールを無効化し、閉じるまたはアンマウント時に復元する。
+ * 現在のURLに基づいたローカライズ済みのナビゲーション項目と言語切替を含む。
  *
- * @param isOpen - Whether the mobile menu is visible
- * @param onClose - Callback invoked to request closing the menu (called by backdrop, close buttons, and nav item clicks)
- * @returns The mobile menu JSX when `isOpen` is true, `null` otherwise
+ * @param isOpen - メニューが表示されているかどうか
+ * @param onClose - メニューを閉じることを要求する際に呼び出されるコールバック
+ * @returns 開いている場合はモバイルメニューのJSX要素、閉じている場合は`null`
  */
 function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const pathname = usePathname()
   const lang = getLanguageFromURL(pathname)
   const currentLang = lang
 
-  const navItems = [
-    { path: 'about', label: lang === 'ja' ? '概要' : 'About' },
-    { path: 'work', label: lang === 'ja' ? '制作物' : 'Work' },
-    { path: 'writing', label: lang === 'ja' ? '執筆' : 'Writing' },
-    { path: 'blog', label: lang === 'ja' ? 'ブログ' : 'Blog' },
-    { path: 'news', label: lang === 'ja' ? 'ニュース' : 'News' },
-    { path: 'speaking', label: lang === 'ja' ? '登壇' : 'Speaking' },
-  ]
+  const navItems = getNavItems(lang)
 
   useEffect(() => {
     if (isOpen) {
@@ -211,18 +230,19 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
   )
 }
 
+/**
+ * デスクトップ表示用の水平ナビゲーションをレンダリングする。
+ *
+ * 現在のパス名とURLから判断した言語に基づき、jaOnly フラグ付きの項目を英語時に除外してナビゲーション項目を構成し、
+ * 各項目は現在のパスと完全一致またはプレフィックス一致する場合にアクティブとして表示される。
+ *
+ * @returns ナビゲーションを含む `<nav>` 要素を表す React 要素
+ */
 function DesktopNavigation() {
   const pathname = usePathname()
   const lang = getLanguageFromURL(pathname)
 
-  const navItems = [
-    { path: 'about', label: lang === 'ja' ? '概要' : 'About' },
-    { path: 'work', label: lang === 'ja' ? '制作物' : 'Work' },
-    { path: 'writing', label: lang === 'ja' ? '執筆' : 'Writing' },
-    { path: 'blog', label: lang === 'ja' ? 'ブログ' : 'Blog' },
-    { path: 'news', label: lang === 'ja' ? 'ニュース' : 'News' },
-    { path: 'speaking', label: lang === 'ja' ? '登壇' : 'Speaking' },
-  ]
+  const navItems = getNavItems(lang)
 
   return (
     <nav className="hidden lg:flex items-center gap-1">
