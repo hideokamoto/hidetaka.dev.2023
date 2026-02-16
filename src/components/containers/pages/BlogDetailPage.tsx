@@ -25,22 +25,15 @@ import type { BlogItem, WPThought } from '@/libs/dataSources/types'
 function getArticleTypeFromCategories(
   categories: Array<{ name: string; slug: string }>,
 ): ArticleType {
-  const categoryNames = new Set(categories.map((c) => c.name.toLowerCase()))
-  const categorySlugs = new Set(categories.map((c) => c.slug.toLowerCase()))
+  const terms = new Set(categories.flatMap((c) => [c.name.toLowerCase(), c.slug.toLowerCase()]))
 
   // チュートリアル記事の判定
-  if (categoryNames.has('tutorial') || categorySlugs.has('tutorial')) {
+  if (terms.has('tutorial')) {
     return 'tutorial'
   }
 
   // ツール発表記事の判定
-  if (
-    categoryNames.has('tool') ||
-    categoryNames.has('announcement') ||
-    categorySlugs.has('tool') ||
-    categorySlugs.has('announcement') ||
-    categorySlugs.has('tool-announcement')
-  ) {
+  if (terms.has('tool') || terms.has('announcement') || terms.has('tool-announcement')) {
     return 'tool_announcement'
   }
 
