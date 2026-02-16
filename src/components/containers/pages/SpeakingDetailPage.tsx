@@ -2,6 +2,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
 import ArticleActions from '@/components/ui/ArticleActions'
+import ArticleCTA from '@/components/ui/ArticleCTA'
 import DateDisplay from '@/components/ui/DateDisplay'
 import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
@@ -139,6 +140,9 @@ export default function SpeakingDetailPage({
             lang={lang}
             className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700"
           />
+
+          {/* CTA */}
+          <ArticleCTA lang={lang} articleType="speaking_report" />
 
           {/* プロフィールカード（モバイルのみ表示） */}
           <div className="lg:hidden">

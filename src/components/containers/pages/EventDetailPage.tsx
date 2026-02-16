@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
 import ArticleActions from '@/components/ui/ArticleActions'
+import ArticleCTA from '@/components/ui/ArticleCTA'
 import DateDisplay from '@/components/ui/DateDisplay'
 import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
@@ -111,6 +112,9 @@ export default function EventDetailPage({
           lang={lang}
           className={DETAIL_PAGE_SECTION_CLASS}
         />
+
+        {/* CTA */}
+        <ArticleCTA lang={lang} articleType="event_report" />
 
         {/* リアクション機能 */}
         <BlogReactions
