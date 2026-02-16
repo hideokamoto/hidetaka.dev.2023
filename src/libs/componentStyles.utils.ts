@@ -88,7 +88,7 @@ export type CTAButtonVariant = 'primary' | 'secondary' | 'outline'
 
 // CTA Button style constants (defined at module level for performance)
 const CTA_BUTTON_BASE_STYLES =
-  'group inline-flex items-center gap-2 rounded-lg px-8 py-3.5 text-base font-bold shadow-lg transition-all hover:scale-105 hover:shadow-xl'
+  'group inline-flex items-center gap-2 rounded-lg px-10 py-4 text-base font-bold shadow-lg transition-all hover:scale-105 hover:shadow-xl'
 
 const CTA_BUTTON_VARIANT_STYLES = {
   primary:
