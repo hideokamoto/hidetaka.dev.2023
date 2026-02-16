@@ -29,10 +29,7 @@ function CapabilityCard({ capability }: { capability: Capability }) {
 }
 
 export default function Capabilities({ lang }: { lang: string }) {
-  const sectionTitle =
-    lang === 'ja'
-      ? 'SaaSグロースのためのフルスタックエンジニアリング'
-      : 'Full-stack engineering for SaaS growth'
+  const sectionTitle = lang === 'ja' ? '私ができること' : 'What I Bring to the Table'
   const sectionDescription =
     lang === 'ja'
       ? 'Stripeの決済導線設計からAWS/Lambdaによるサーバーレス構築、WordPressによるメディア・マーケティング基盤まで。プロダクトの継続的な収益化と高速な実験を支援します。'
