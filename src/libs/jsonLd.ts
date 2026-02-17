@@ -242,32 +242,3 @@ export function generateBlogListJsonLd(
 
   return jsonLd
 }
-
-/**
- * サイトの著者のPerson JSON-LDを生成
- * 検索エンジンの著者識別用に使用
- */
-export function generatePersonJsonLd() {
-  const imageUrl = `${SITE_CONFIG.url}${SITE_CONFIG.author.image}`
-
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Person',
-    name: SITE_CONFIG.author.name,
-    url: SITE_CONFIG.url,
-    image: imageUrl,
-    jobTitle: SITE_CONFIG.author.jobTitle,
-    worksFor: {
-      '@type': 'Organization',
-      name: SITE_CONFIG.author.worksFor.name,
-      url: SITE_CONFIG.author.worksFor.url,
-    },
-    sameAs: [
-      SITE_CONFIG.social.twitter.url,
-      SITE_CONFIG.social.github.url,
-      SITE_CONFIG.social.linkedin.url,
-    ],
-  }
-
-  return jsonLd
-}
