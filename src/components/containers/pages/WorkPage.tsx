@@ -667,65 +667,69 @@ export default function WorkPageContent({
     )
   }, [filterCategory, ossContributionProjects, matchesSearch])
 
-  // Categorize filtered items into active and archived
+  // Categorize filtered items into active and archived, with sorting
   const categorizedProjects = useMemo(() => {
     const categorized = categorizeProjects(filteredProjects)
-    categorized.active = [...categorized.active].sort((a, b) => {
-      const dateA = a.published_at || ''
-      const dateB = b.published_at || ''
-      return new Date(dateB).getTime() - new Date(dateA).getTime()
-    })
-    categorized.archived = [...categorized.archived].sort((a, b) => {
-      const dateA = a.published_at || ''
-      const dateB = b.published_at || ''
-      return new Date(dateB).getTime() - new Date(dateA).getTime()
-    })
-    return categorized
+    return {
+      active: categorized.active.slice().sort((a, b) => {
+        const dateA = a.published_at || ''
+        const dateB = b.published_at || ''
+        return new Date(dateB).getTime() - new Date(dateA).getTime()
+      }),
+      archived: categorized.archived.slice().sort((a, b) => {
+        const dateA = a.published_at || ''
+        const dateB = b.published_at || ''
+        return new Date(dateB).getTime() - new Date(dateA).getTime()
+      }),
+    }
   }, [filteredProjects])
 
   const categorizedBooks = useMemo(() => {
     const categorized = categorizeProjects(filteredBooks)
-    categorized.active = [...categorized.active].sort((a, b) => {
-      const dateA = a.published_at || ''
-      const dateB = b.published_at || ''
-      return new Date(dateB).getTime() - new Date(dateA).getTime()
-    })
-    categorized.archived = [...categorized.archived].sort((a, b) => {
-      const dateA = a.published_at || ''
-      const dateB = b.published_at || ''
-      return new Date(dateB).getTime() - new Date(dateA).getTime()
-    })
-    return categorized
+    return {
+      active: categorized.active.slice().sort((a, b) => {
+        const dateA = a.published_at || ''
+        const dateB = b.published_at || ''
+        return new Date(dateB).getTime() - new Date(dateA).getTime()
+      }),
+      archived: categorized.archived.slice().sort((a, b) => {
+        const dateA = a.published_at || ''
+        const dateB = b.published_at || ''
+        return new Date(dateB).getTime() - new Date(dateA).getTime()
+      }),
+    }
   }, [filteredBooks])
 
   const categorizedOSSContributions = useMemo(() => {
     const categorized = categorizeProjects(filteredOSSContributions)
-    categorized.active = [...categorized.active].sort((a, b) => {
-      const dateA = a.published_at || ''
-      const dateB = b.published_at || ''
-      return new Date(dateB).getTime() - new Date(dateA).getTime()
-    })
-    categorized.archived = [...categorized.archived].sort((a, b) => {
-      const dateA = a.published_at || ''
-      const dateB = b.published_at || ''
-      return new Date(dateB).getTime() - new Date(dateA).getTime()
-    })
-    return categorized
+    return {
+      active: categorized.active.slice().sort((a, b) => {
+        const dateA = a.published_at || ''
+        const dateB = b.published_at || ''
+        return new Date(dateB).getTime() - new Date(dateA).getTime()
+      }),
+      archived: categorized.archived.slice().sort((a, b) => {
+        const dateA = a.published_at || ''
+        const dateB = b.published_at || ''
+        return new Date(dateB).getTime() - new Date(dateA).getTime()
+      }),
+    }
   }, [filteredOSSContributions])
 
   const categorizedOSS = useMemo(() => {
     const categorized = categorizeOSSItems(filteredOSS)
-    categorized.active = [...categorized.active].sort((a, b) => {
-      const dateA = getOSSItemDate(a)
-      const dateB = getOSSItemDate(b)
-      return new Date(dateB).getTime() - new Date(dateA).getTime()
-    })
-    categorized.archived = [...categorized.archived].sort((a, b) => {
-      const dateA = getOSSItemDate(a)
-      const dateB = getOSSItemDate(b)
-      return new Date(dateB).getTime() - new Date(dateA).getTime()
-    })
-    return categorized
+    return {
+      active: categorized.active.slice().sort((a, b) => {
+        const dateA = getOSSItemDate(a)
+        const dateB = getOSSItemDate(b)
+        return new Date(dateB).getTime() - new Date(dateA).getTime()
+      }),
+      archived: categorized.archived.slice().sort((a, b) => {
+        const dateA = getOSSItemDate(a)
+        const dateB = getOSSItemDate(b)
+        return new Date(dateB).getTime() - new Date(dateA).getTime()
+      }),
+    }
   }, [filteredOSS])
 
   // カウント計算
