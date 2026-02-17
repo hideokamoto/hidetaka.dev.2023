@@ -12,9 +12,9 @@ import type { MicroCMSProjectStatus } from './microCMS/types'
 export const STATUS_THRESHOLD_MONTHS = 6
 
 /**
- * Union type representing all possible status values across data sources
+ * Alias for MicroCMSProjectStatus - represents all possible status values across data sources
  */
-export type UnifiedProjectStatus = 'active' | 'deprecated' | 'archived' | 'completed'
+export type UnifiedProjectStatus = MicroCMSProjectStatus
 
 /**
  * Check if a status is considered active
@@ -33,8 +33,27 @@ export function isActiveStatus(status: UnifiedProjectStatus): boolean {
 export function getStatusFromLastUpdate(lastUpdated: string | Date): 'active' | 'deprecated' {
   const lastUpdateDate = typeof lastUpdated === 'string' ? new Date(lastUpdated) : lastUpdated
   const now = new Date()
-  const thresholdDate = new Date(now)
-  thresholdDate.setMonth(thresholdDate.getMonth() - STATUS_THRESHOLD_MONTHS)
+
+  // Calculate target month/year explicitly to avoid end-of-month rollover issues
+  const originalDay = now.getDate()
+  let targetMonth = now.getMonth() - STATUS_THRESHOLD_MONTHS
+  let targetYear = now.getFullYear()
+
+  // Handle year rollover
+  if (targetMonth < 0) {
+    targetMonth += 12
+    targetYear -= 1
+  }
+
+  // Calculate the last day of the target month
+  const lastDayOfTargetMonth = new Date(targetYear, targetMonth + 1, 0).getDate()
+
+  // Create threshold date with the appropriate day (minimum of original day and last day of month)
+  const thresholdDate = new Date(
+    targetYear,
+    targetMonth,
+    Math.min(originalDay, lastDayOfTargetMonth),
+  )
 
   return lastUpdateDate >= thresholdDate ? 'active' : 'deprecated'
 }
