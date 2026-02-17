@@ -353,6 +353,32 @@ function categorizeOSSItems(items: OSSItem[]) {
   return { active, archived }
 }
 
+// OSSアイテムをレンダリングするヘルパー関数
+function renderOSSItem(item: OSSItem, lang: string) {
+  if (item.type === 'project') {
+    return <UnifiedProjectCard key={item.data.id} project={item.data} lang={lang} />
+  }
+  if (item.type === 'npm') {
+    return (
+      <UnifiedOSSCard
+        key={`npm-${item.data.package.name}`}
+        item={{ type: 'npm', data: item.data }}
+        lang={lang}
+      />
+    )
+  }
+  return (
+    <UnifiedOSSCard
+      key={`wp-${item.data.slug}`}
+      item={{
+        type: 'wordpress',
+        data: item.data,
+      }}
+      lang={lang}
+    />
+  )
+}
+
 // 統計バーコンポーネント
 function StatsBar({
   projectCount,
@@ -634,62 +660,70 @@ export default function WorkPageContent({
     )
   }, [filterCategory, ossContributionProjects, matchesSearch])
 
-  // Categorize filtered items into active and archived
-  const categorizedProjects = useMemo(
-    () => categorizeProjects(filteredProjects),
-    [filteredProjects],
-  )
-  const categorizedBooks = useMemo(() => categorizeProjects(filteredBooks), [filteredBooks])
-  const categorizedOSS = useMemo(() => categorizeOSSItems(filteredOSS), [filteredOSS])
-  const categorizedOSSContributions = useMemo(
-    () => categorizeProjects(filteredOSSContributions),
-    [filteredOSSContributions],
-  )
+  // Categorize filtered items into active and archived, with sorting
+  const categorizedProjects = useMemo(() => {
+    const categorized = categorizeProjects(filteredProjects)
+    return {
+      active: categorized.active.slice().sort((a, b) => {
+        const dateA = a.published_at || ''
+        const dateB = b.published_at || ''
+        return new Date(dateB).getTime() - new Date(dateA).getTime()
+      }),
+      archived: categorized.archived.slice().sort((a, b) => {
+        const dateA = a.published_at || ''
+        const dateB = b.published_at || ''
+        return new Date(dateB).getTime() - new Date(dateA).getTime()
+      }),
+    }
+  }, [filteredProjects])
 
-  // 日付順にソート
-  categorizedProjects.active.sort((a, b) => {
-    const dateA = a.published_at || ''
-    const dateB = b.published_at || ''
-    return new Date(dateB).getTime() - new Date(dateA).getTime()
-  })
-  categorizedProjects.archived.sort((a, b) => {
-    const dateA = a.published_at || ''
-    const dateB = b.published_at || ''
-    return new Date(dateB).getTime() - new Date(dateA).getTime()
-  })
+  const categorizedBooks = useMemo(() => {
+    const categorized = categorizeProjects(filteredBooks)
+    return {
+      active: categorized.active.slice().sort((a, b) => {
+        const dateA = a.published_at || ''
+        const dateB = b.published_at || ''
+        return new Date(dateB).getTime() - new Date(dateA).getTime()
+      }),
+      archived: categorized.archived.slice().sort((a, b) => {
+        const dateA = a.published_at || ''
+        const dateB = b.published_at || ''
+        return new Date(dateB).getTime() - new Date(dateA).getTime()
+      }),
+    }
+  }, [filteredBooks])
 
-  categorizedBooks.active.sort((a, b) => {
-    const dateA = a.published_at || ''
-    const dateB = b.published_at || ''
-    return new Date(dateB).getTime() - new Date(dateA).getTime()
-  })
-  categorizedBooks.archived.sort((a, b) => {
-    const dateA = a.published_at || ''
-    const dateB = b.published_at || ''
-    return new Date(dateB).getTime() - new Date(dateA).getTime()
-  })
+  const categorizedOSSContributions = useMemo(() => {
+    const categorized = categorizeProjects(filteredOSSContributions)
+    return {
+      active: categorized.active.slice().sort((a, b) => {
+        const dateA = a.published_at || ''
+        const dateB = b.published_at || ''
+        return new Date(dateB).getTime() - new Date(dateA).getTime()
+      }),
+      archived: categorized.archived.slice().sort((a, b) => {
+        const dateA = a.published_at || ''
+        const dateB = b.published_at || ''
+        return new Date(dateB).getTime() - new Date(dateA).getTime()
+      }),
+    }
+  }, [filteredOSSContributions])
 
-  categorizedOSSContributions.active.sort((a, b) => {
-    const dateA = a.published_at || ''
-    const dateB = b.published_at || ''
-    return new Date(dateB).getTime() - new Date(dateA).getTime()
-  })
-  categorizedOSSContributions.archived.sort((a, b) => {
-    const dateA = a.published_at || ''
-    const dateB = b.published_at || ''
-    return new Date(dateB).getTime() - new Date(dateA).getTime()
-  })
-
-  categorizedOSS.active.sort((a, b) => {
-    const dateA = getOSSItemDate(a)
-    const dateB = getOSSItemDate(b)
-    return new Date(dateB).getTime() - new Date(dateA).getTime()
-  })
-  categorizedOSS.archived.sort((a, b) => {
-    const dateA = getOSSItemDate(a)
-    const dateB = getOSSItemDate(b)
-    return new Date(dateB).getTime() - new Date(dateA).getTime()
-  })
+  const categorizedOSS = useMemo(() => {
+    const categorized = categorizeOSSItems(filteredOSS)
+    return {
+      active: categorized.active.slice().sort((a, b) => {
+        const dateA = getOSSItemDate(a)
+        const dateB = getOSSItemDate(b)
+        return new Date(dateB).getTime() - new Date(dateA).getTime()
+      }),
+      archived: categorized.archived.slice().sort((a, b) => {
+        const dateA = getOSSItemDate(a)
+        const dateB = getOSSItemDate(b)
+        return new Date(dateB).getTime() - new Date(dateA).getTime()
+      }),
+    }
+  }, [filteredOSS])
 
   // カウント計算
   const counts = useMemo(
@@ -876,36 +910,7 @@ export default function WorkPageContent({
                         {lang === 'ja' ? 'オープンソース' : 'Open Source'}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                        {categorizedOSS.active.map((item, _index) => {
-                          if (item.type === 'project') {
-                            return (
-                              <UnifiedProjectCard
-                                key={item.data.id}
-                                project={item.data as MicroCMSProjectsRecord}
-                                lang={lang}
-                              />
-                            )
-                          } else if (item.type === 'npm') {
-                            return (
-                              <UnifiedOSSCard
-                                key={`npm-${(item.data as NPMRegistrySearchResult).package.name}`}
-                                item={{ type: 'npm', data: item.data as NPMRegistrySearchResult }}
-                                lang={lang}
-                              />
-                            )
-                          } else {
-                            return (
-                              <UnifiedOSSCard
-                                key={`wp-${(item.data as WordPressPluginDetail).slug}`}
-                                item={{
-                                  type: 'wordpress',
-                                  data: item.data as WordPressPluginDetail,
-                                }}
-                                lang={lang}
-                              />
-                            )
-                          }
-                        })}
+                        {categorizedOSS.active.map((item) => renderOSSItem(item, lang))}
                       </div>
                     </div>
                   )}
@@ -975,36 +980,7 @@ export default function WorkPageContent({
                         {lang === 'ja' ? 'オープンソース' : 'Open Source'}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                        {categorizedOSS.archived.map((item, _index) => {
-                          if (item.type === 'project') {
-                            return (
-                              <UnifiedProjectCard
-                                key={item.data.id}
-                                project={item.data as MicroCMSProjectsRecord}
-                                lang={lang}
-                              />
-                            )
-                          } else if (item.type === 'npm') {
-                            return (
-                              <UnifiedOSSCard
-                                key={`npm-${(item.data as NPMRegistrySearchResult).package.name}`}
-                                item={{ type: 'npm', data: item.data as NPMRegistrySearchResult }}
-                                lang={lang}
-                              />
-                            )
-                          } else {
-                            return (
-                              <UnifiedOSSCard
-                                key={`wp-${(item.data as WordPressPluginDetail).slug}`}
-                                item={{
-                                  type: 'wordpress',
-                                  data: item.data as WordPressPluginDetail,
-                                }}
-                                lang={lang}
-                              />
-                            )
-                          }
-                        })}
+                        {categorizedOSS.archived.map((item) => renderOSSItem(item, lang))}
                       </div>
                     </div>
                   )}
