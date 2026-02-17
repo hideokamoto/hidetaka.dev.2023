@@ -4,22 +4,28 @@
  */
 
 // Badge component types
-export type BadgeVariant = 'default' | 'indigo'
+export type BadgeVariant = 'default' | 'indigo' | 'green' | 'gray'
 
 // Badge style constants (defined at module level for performance)
 const BADGE_VARIANT_STYLES = {
   default: 'border-zinc-200 bg-zinc-50/80 dark:border-zinc-500/30 dark:bg-zinc-500/10',
   indigo: 'border-indigo-200 bg-indigo-50/80 dark:border-indigo-500/30 dark:bg-indigo-500/10',
+  green: 'border-green-200 bg-green-50/80 dark:border-green-500/30 dark:bg-green-500/10',
+  gray: 'border-gray-200 bg-gray-50/80 dark:border-gray-500/30 dark:bg-gray-500/10',
 } as const
 
 const BADGE_TEXT_STYLES = {
   default: 'text-sm font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-400',
   indigo: 'text-sm font-semibold uppercase tracking-wider text-indigo-700 dark:text-indigo-400',
+  green: 'text-sm font-semibold uppercase tracking-wider text-green-700 dark:text-green-400',
+  gray: 'text-sm font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-400',
 } as const
 
 const BADGE_DOT_STYLES = {
   default: 'h-2 w-2 rounded-full bg-zinc-500 animate-pulse',
   indigo: 'h-2 w-2 rounded-full bg-indigo-500 animate-pulse',
+  green: 'h-2 w-2 rounded-full bg-green-500 animate-pulse',
+  gray: 'h-2 w-2 rounded-full bg-gray-500 animate-pulse',
 } as const
 
 /**
