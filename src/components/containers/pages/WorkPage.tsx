@@ -40,6 +40,11 @@ function getStatusBadgeVariant(status: UnifiedProjectStatus): 'green' | 'gray' {
 
 // Get status label for display
 function getStatusLabel(status: UnifiedProjectStatus, lang: string): string {
+  // Ensure status is a string for safety
+  if (!status || typeof status !== 'string') {
+    return lang === 'ja' ? 'アクティブ' : 'Active'
+  }
+
   if (lang === 'ja') {
     switch (status) {
       case 'active':
@@ -50,6 +55,9 @@ function getStatusLabel(status: UnifiedProjectStatus, lang: string): string {
         return 'アーカイブ'
       case 'completed':
         return '完了'
+      default:
+        // Fallback to English label for unknown status
+        break
     }
   }
   return status.charAt(0).toUpperCase() + status.slice(1)
