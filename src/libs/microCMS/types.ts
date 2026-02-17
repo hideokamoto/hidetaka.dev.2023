@@ -14,10 +14,12 @@ export type MicroCMSImageObject = {
 }
 
 export type MicroCMSProjectType =
+  | 'applications'
   | 'books'
   | 'owned_oss'
   | 'oss_contribution'
   | 'community_activities'
+  | 'guest_posts'
 
 export type MicroCMSProjectsRecord = MicroCMSRecord & {
   title: string
