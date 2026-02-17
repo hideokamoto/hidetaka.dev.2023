@@ -3,6 +3,34 @@ import type { BlogItem, WPThought } from './dataSources/types'
 import { removeHtmlTags } from './sanitize'
 
 /**
+ * サイト著者用のPerson JSON-LDを生成
+ */
+export function generatePersonJsonLd() {
+  const sameAs = [
+    SITE_CONFIG.social.twitter.url,
+    SITE_CONFIG.social.github.url,
+    SITE_CONFIG.social.linkedin.url,
+  ]
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: SITE_CONFIG.author.name,
+    url: SITE_CONFIG.url,
+    image: `${SITE_CONFIG.url}${SITE_CONFIG.author.image}`,
+    jobTitle: SITE_CONFIG.author.jobTitle,
+    worksFor: {
+      '@type': 'Organization',
+      name: SITE_CONFIG.author.worksFor.name,
+      url: SITE_CONFIG.author.worksFor.url,
+    },
+    sameAs,
+  }
+
+  return jsonLd
+}
+
+/**
  * ブログ詳細ページ用のBlogPosting JSON-LDを生成
  */
 export function generateBlogPostingJsonLd(thought: WPThought, lang: string, basePath: string) {
@@ -210,35 +238,6 @@ export function generateBlogListJsonLd(
       numberOfItems: thoughts.length,
       itemListElement: itemListElements,
     },
-  }
-
-  return jsonLd
-}
-
-/**
- * サイトの著者のPerson JSON-LDを生成
- * 検索エンジンの著者識別用に使用
- */
-export function generatePersonJsonLd() {
-  const imageUrl = `${SITE_CONFIG.url}${SITE_CONFIG.author.image}`
-
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Person',
-    name: SITE_CONFIG.author.name,
-    url: SITE_CONFIG.url,
-    image: imageUrl,
-    jobTitle: SITE_CONFIG.author.jobTitle,
-    worksFor: {
-      '@type': 'Organization',
-      name: SITE_CONFIG.author.worksFor.name,
-      url: SITE_CONFIG.author.worksFor.url,
-    },
-    sameAs: [
-      SITE_CONFIG.social.twitter.url,
-      SITE_CONFIG.social.github.url,
-      SITE_CONFIG.social.linkedin.url,
-    ],
   }
 
   return jsonLd
