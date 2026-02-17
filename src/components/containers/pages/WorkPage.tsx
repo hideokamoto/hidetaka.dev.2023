@@ -291,6 +291,39 @@ function OSSContributionLink({ project }: { project: MicroCMSProjectsRecord }) {
   )
 }
 
+// Render OSS item based on type
+function renderOSSItem(item: OSSItem, lang: string): React.ReactNode {
+  if (item.type === 'project') {
+    return (
+      <UnifiedProjectCard
+        key={item.data.id}
+        project={item.data as MicroCMSProjectsRecord}
+        lang={lang}
+      />
+    )
+  }
+  if (item.type === 'npm') {
+    return (
+      <UnifiedOSSCard
+        key={`npm-${(item.data as NPMRegistrySearchResult).package.name}`}
+        item={{ type: 'npm', data: item.data as NPMRegistrySearchResult }}
+        lang={lang}
+      />
+    )
+  }
+  // wordpress
+  return (
+    <UnifiedOSSCard
+      key={`wp-${(item.data as WordPressPluginDetail).slug}`}
+      item={{
+        type: 'wordpress',
+        data: item.data as WordPressPluginDetail,
+      }}
+      lang={lang}
+    />
+  )
+}
+
 // Helper functions to categorize items by status
 
 /**
