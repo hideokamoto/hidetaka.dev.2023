@@ -291,6 +291,39 @@ function OSSContributionLink({ project }: { project: MicroCMSProjectsRecord }) {
   )
 }
 
+// Render OSS item based on type
+function renderOSSItem(item: OSSItem, lang: string): React.ReactNode {
+  if (item.type === 'project') {
+    return (
+      <UnifiedProjectCard
+        key={item.data.id}
+        project={item.data as MicroCMSProjectsRecord}
+        lang={lang}
+      />
+    )
+  }
+  if (item.type === 'npm') {
+    return (
+      <UnifiedOSSCard
+        key={`npm-${(item.data as NPMRegistrySearchResult).package.name}`}
+        item={{ type: 'npm', data: item.data as NPMRegistrySearchResult }}
+        lang={lang}
+      />
+    )
+  }
+  // wordpress
+  return (
+    <UnifiedOSSCard
+      key={`wp-${(item.data as WordPressPluginDetail).slug}`}
+      item={{
+        type: 'wordpress',
+        data: item.data as WordPressPluginDetail,
+      }}
+      lang={lang}
+    />
+  )
+}
+
 // Helper functions to categorize items by status
 
 /**
@@ -414,9 +447,9 @@ function StatsBar({
 
   return (
     <div className="mb-12 grid grid-cols-2 sm:grid-cols-4 gap-4">
-      {stats.map((stat, index) => (
+      {stats.map((stat) => (
         <div
-          key={index}
+          key={stat.label}
           className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 text-center transition-all hover:border-indigo-300 hover:shadow-md dark:hover:border-indigo-700"
         >
           <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
