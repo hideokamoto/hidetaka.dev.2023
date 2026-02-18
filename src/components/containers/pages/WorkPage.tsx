@@ -421,9 +421,9 @@ function StatsBar({
 
   return (
     <div className="mb-12 grid grid-cols-2 sm:grid-cols-4 gap-4">
-      {stats.map((stat, index) => (
+      {stats.map((stat) => (
         <div
-          key={index}
+          key={stat.label}
           className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 text-center transition-all hover:border-indigo-300 hover:shadow-md dark:hover:border-indigo-700"
         >
           <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
