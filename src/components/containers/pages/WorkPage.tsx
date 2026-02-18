@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useCallback, useMemo, useState } from 'react'
+import { Fragment, useCallback, useMemo, useState } from 'react'
 import Container from '@/components/tailwindui/Container'
 import { GitHubIcon, LinkedInIcon, TwitterIcon } from '@/components/tailwindui/SocialLink'
 import BackgroundDecoration from '@/components/ui/BackgroundDecoration'
@@ -32,6 +32,26 @@ type OSSItem =
   | { type: 'project'; data: MicroCMSProjectsRecord }
   | { type: 'npm'; data: NPMRegistrySearchResult }
   | { type: 'wordpress'; data: WordPressPluginDetail }
+
+// Helper to generate stable keys for OSS items
+function getOSSItemKey(item: OSSItem): string {
+  if (item.type === 'project') {
+    return item.data.id
+  }
+  if (item.type === 'npm') {
+    return `npm-${(item.data as NPMRegistrySearchResult).package.name}`
+  }
+  return `wp-${(item.data as WordPressPluginDetail).slug}`
+}
+
+// Helper to sort items by date in descending order
+function sortByDateDesc<T>(items: T[], getDate: (item: T) => string): T[] {
+  return items.slice().sort((a, b) => {
+    const dateA = getDate(a)
+    const dateB = getDate(b)
+    return new Date(dateB).getTime() - new Date(dateA).getTime()
+  })
+}
 
 // Map project status to badge variant
 function getStatusBadgeVariant(status: UnifiedProjectStatus): 'green' | 'gray' {
@@ -291,12 +311,11 @@ function OSSContributionLink({ project }: { project: MicroCMSProjectsRecord }) {
   )
 }
 
-// Render OSS item based on type
+// Render OSS item based on type (keys are applied at map call site)
 function renderOSSItem(item: OSSItem, lang: string): React.ReactNode {
   if (item.type === 'project') {
     return (
       <UnifiedProjectCard
-        key={item.data.id}
         project={item.data as MicroCMSProjectsRecord}
         lang={lang}
       />
@@ -305,7 +324,6 @@ function renderOSSItem(item: OSSItem, lang: string): React.ReactNode {
   if (item.type === 'npm') {
     return (
       <UnifiedOSSCard
-        key={`npm-${(item.data as NPMRegistrySearchResult).package.name}`}
         item={{ type: 'npm', data: item.data as NPMRegistrySearchResult }}
         lang={lang}
       />
@@ -314,7 +332,6 @@ function renderOSSItem(item: OSSItem, lang: string): React.ReactNode {
   // wordpress
   return (
     <UnifiedOSSCard
-      key={`wp-${(item.data as WordPressPluginDetail).slug}`}
       item={{
         type: 'wordpress',
         data: item.data as WordPressPluginDetail,
@@ -671,64 +688,32 @@ export default function WorkPageContent({
   const categorizedProjects = useMemo(() => {
     const categorized = categorizeProjects(filteredProjects)
     return {
-      active: categorized.active.slice().sort((a, b) => {
-        const dateA = a.published_at || ''
-        const dateB = b.published_at || ''
-        return new Date(dateB).getTime() - new Date(dateA).getTime()
-      }),
-      archived: categorized.archived.slice().sort((a, b) => {
-        const dateA = a.published_at || ''
-        const dateB = b.published_at || ''
-        return new Date(dateB).getTime() - new Date(dateA).getTime()
-      }),
+      active: sortByDateDesc(categorized.active, (p) => p.published_at || ''),
+      archived: sortByDateDesc(categorized.archived, (p) => p.published_at || ''),
     }
   }, [filteredProjects])
 
   const categorizedBooks = useMemo(() => {
     const categorized = categorizeProjects(filteredBooks)
     return {
-      active: categorized.active.slice().sort((a, b) => {
-        const dateA = a.published_at || ''
-        const dateB = b.published_at || ''
-        return new Date(dateB).getTime() - new Date(dateA).getTime()
-      }),
-      archived: categorized.archived.slice().sort((a, b) => {
-        const dateA = a.published_at || ''
-        const dateB = b.published_at || ''
-        return new Date(dateB).getTime() - new Date(dateA).getTime()
-      }),
+      active: sortByDateDesc(categorized.active, (p) => p.published_at || ''),
+      archived: sortByDateDesc(categorized.archived, (p) => p.published_at || ''),
     }
   }, [filteredBooks])
 
   const categorizedOSSContributions = useMemo(() => {
     const categorized = categorizeProjects(filteredOSSContributions)
     return {
-      active: categorized.active.slice().sort((a, b) => {
-        const dateA = a.published_at || ''
-        const dateB = b.published_at || ''
-        return new Date(dateB).getTime() - new Date(dateA).getTime()
-      }),
-      archived: categorized.archived.slice().sort((a, b) => {
-        const dateA = a.published_at || ''
-        const dateB = b.published_at || ''
-        return new Date(dateB).getTime() - new Date(dateA).getTime()
-      }),
+      active: sortByDateDesc(categorized.active, (p) => p.published_at || ''),
+      archived: sortByDateDesc(categorized.archived, (p) => p.published_at || ''),
     }
   }, [filteredOSSContributions])
 
   const categorizedOSS = useMemo(() => {
     const categorized = categorizeOSSItems(filteredOSS)
     return {
-      active: categorized.active.slice().sort((a, b) => {
-        const dateA = getOSSItemDate(a)
-        const dateB = getOSSItemDate(b)
-        return new Date(dateB).getTime() - new Date(dateA).getTime()
-      }),
-      archived: categorized.archived.slice().sort((a, b) => {
-        const dateA = getOSSItemDate(a)
-        const dateB = getOSSItemDate(b)
-        return new Date(dateB).getTime() - new Date(dateA).getTime()
-      }),
+      active: sortByDateDesc(categorized.active, getOSSItemDate),
+      archived: sortByDateDesc(categorized.archived, getOSSItemDate),
     }
   }, [filteredOSS])
 
@@ -917,7 +902,11 @@ export default function WorkPageContent({
                         {lang === 'ja' ? 'オープンソース' : 'Open Source'}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                        {categorizedOSS.active.map((item) => renderOSSItem(item, lang))}
+                        {categorizedOSS.active.map((item) => (
+                          <Fragment key={getOSSItemKey(item)}>
+                            {renderOSSItem(item, lang)}
+                          </Fragment>
+                        ))}
                       </div>
                     </div>
                   )}
@@ -987,7 +976,11 @@ export default function WorkPageContent({
                         {lang === 'ja' ? 'オープンソース' : 'Open Source'}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                        {categorizedOSS.archived.map((item) => renderOSSItem(item, lang))}
+                        {categorizedOSS.archived.map((item) => (
+                          <Fragment key={getOSSItemKey(item)}>
+                            {renderOSSItem(item, lang)}
+                          </Fragment>
+                        ))}
                       </div>
                     </div>
                   )}
