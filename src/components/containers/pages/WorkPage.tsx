@@ -314,12 +314,7 @@ function OSSContributionLink({ project }: { project: MicroCMSProjectsRecord }) {
 // Render OSS item based on type (keys are applied at map call site)
 function renderOSSItem(item: OSSItem, lang: string): React.ReactNode {
   if (item.type === 'project') {
-    return (
-      <UnifiedProjectCard
-        project={item.data as MicroCMSProjectsRecord}
-        lang={lang}
-      />
-    )
+    return <UnifiedProjectCard project={item.data as MicroCMSProjectsRecord} lang={lang} />
   }
   if (item.type === 'npm') {
     return (
@@ -903,9 +898,7 @@ export default function WorkPageContent({
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                         {categorizedOSS.active.map((item) => (
-                          <Fragment key={getOSSItemKey(item)}>
-                            {renderOSSItem(item, lang)}
-                          </Fragment>
+                          <Fragment key={getOSSItemKey(item)}>{renderOSSItem(item, lang)}</Fragment>
                         ))}
                       </div>
                     </div>
@@ -977,9 +970,7 @@ export default function WorkPageContent({
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
                         {categorizedOSS.archived.map((item) => (
-                          <Fragment key={getOSSItemKey(item)}>
-                            {renderOSSItem(item, lang)}
-                          </Fragment>
+                          <Fragment key={getOSSItemKey(item)}>{renderOSSItem(item, lang)}</Fragment>
                         ))}
                       </div>
                     </div>
