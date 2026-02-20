@@ -155,7 +155,7 @@ vars = {
 
 **方法2: Cloudflareダッシュボードで設定**
 1. Cloudflareダッシュボードにログイン
-2. Workers & Pages > hidetaka-dev を選択
+2. Workers & Pages > hidetaka-dev-workers を選択
 3. Settings > Variables で環境変数を設定
 4. 環境ごとに異なる値を設定できます
 
@@ -176,6 +176,82 @@ npx wrangler secret put MICROCMS_API_KEY --env staging
 - `pnpm run cf:deploy` - ビルド後、本番環境にデプロイ（デフォルト）
 - `pnpm run cf:deploy:production` - ビルド後、本番環境にデプロイ（明示的）
 - `pnpm run cf:deploy:staging` - ビルド後、非本番環境（staging）にデプロイ
+
+## CI/CD パイプライン
+
+このプロジェクトはCircleCIを使用して自動化されたCI/CDパイプラインを実装しています。
+
+### パイプライン概要
+
+```text
+lint → test → cf-build → deploy
+```
+
+1. **lint** - Biomeによるコード品質チェック
+2. **test** - Vitestによるユニットテスト実行
+3. **cf-build** - Cloudflare Workers用のビルド
+4. **deploy** - 本番環境またはプレビュー環境へのデプロイ
+
+### Free プランの最適化
+
+CircleCIの無料プラン（6,000ビルド分/月）を効率的に使用するため、以下の最適化を実施:
+
+- **Small リソースクラス** (1 vCPU, 2GB RAM)
+- **自動キャッシュ** - node orbによる`node_modules/`の自動キャッシュ
+- **1日のワークスペース保持** - ビルド成果物の効率的な共有
+- **並列実行** - `test`と`cf-build`を並列実行して時間短縮
+
+### 必須環境変数
+
+CircleCIプロジェクト設定で以下の環境変数を設定する必要があります:
+
+| 変数名 | 説明 |
+|--------|------|
+| `CLOUDFLARE_API_TOKEN` | Cloudflare Workers デプロイ用APIトークン |
+| `CLOUDFLARE_ACCOUNT_ID` | CloudflareアカウントID |
+| `MICROCMS_API_KEY` | microCMS APIキー |
+| `OG_IMAGE_GEN_AUTH_TOKEN` | OG画像生成認証トークン |
+
+### デプロイ戦略
+
+**単一Workerでバージョン管理:**
+- Worker名: `hidetaka-dev-workers`
+- バージョンベースのデプロイメント
+- Durable Objects対応
+
+**本番デプロイ** (`main`ブランチ):
+- コマンド: `wrangler versions deploy`
+- URL: `https://hidetaka-dev-workers.workers.dev`
+- 本番トラフィックに100%デプロイ
+
+**ブランチプレビュー** (その他のブランチ):
+- コマンド: `wrangler versions upload`
+- ⚠️ Durable Objects使用のため、独立したプレビューURLは生成されません
+- **Version Overridesヘッダーでテスト:**
+  ```bash
+  curl https://hidetaka-dev-workers.workers.dev \
+    -H 'Cloudflare-Workers-Version-Overrides: hidetaka-dev-workers="<VERSION_ID>"'
+  ```
+- 詳細: [CircleCI Setup Guide](docs/guides/circleci-setup.md#durable-objects-constraints)
+
+### バージョン管理
+
+**バージョン確認:**
+
+```bash
+npx wrangler versions list
+```
+
+**テスト方法:**
+1. CircleCIログからVersion IDを取得
+2. Version Overrideヘッダーを使用してテスト
+3. テストが成功したらmainにマージ
+4. 本番環境に自動デプロイ
+
+### 詳細ドキュメント
+
+CircleCIセットアップの詳細については、以下を参照してください:
+- [CircleCIセットアップガイド](docs/guides/circleci-setup.md) - パイプライン構成、ジョブ詳細、トラブルシューティング
 
 ## プロジェクト構造
 

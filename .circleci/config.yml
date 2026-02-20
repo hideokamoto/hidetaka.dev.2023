@@ -1,0 +1,41 @@
+version: 2.1
+
+# Enable dynamic config for path filtering
+setup: true
+
+orbs:
+  path-filtering: circleci/path-filtering@1.1.0
+
+workflows:
+  setup-workflow:
+    jobs:
+      - path-filtering/filter:
+          # Dynamic base revision: uses pipeline.git.base_revision if available (PR builds),
+          # falls back to HEAD~1 for first builds and API triggers,
+          # and uses HEAD~1 for main branch to avoid main-vs-main empty diffs
+          base-revision: <<# pipeline.git.base_revision >><<pipeline.git.base_revision>><<^ pipeline.git.base_revision >><<# equal [ <<pipeline.git.branch>>, main ] >>HEAD~1<</ equal >><<^ equal [ <<pipeline.git.branch>>, main ] >>HEAD~1<</ equal >><</ pipeline.git.base_revision >>
+          # Path to the continuation config
+          config-path: .circleci/continue.yml
+          # Path-to-parameter mapping (regex patterns)
+          # Format: <file-path-regex> <parameter-name> <value>
+          mapping: |
+            src/.*\.(ts|tsx|js|jsx|json|css) run-lint true
+            biome\.json run-lint true
+            package(-lock)?\.json run-lint true
+            src/.* run-test true
+            vitest\.config\.ts run-test true
+            package(-lock)?\.json run-test true
+            src/.* run-build true
+            public/.* run-build true
+            next\.config\.ts run-build true
+            tsconfig\.json run-build true
+            tailwind\.config\.cjs run-build true
+            package(-lock)?\.json run-build true
+            src/.* run-cf-build true
+            public/.* run-cf-build true
+            next\.config\.ts run-cf-build true
+            tsconfig\.json run-cf-build true
+            tailwind\.config\.cjs run-cf-build true
+            wrangler\.jsonc run-cf-build true
+            package(-lock)?\.json run-cf-build true
+            \.circleci/.* run-all true
