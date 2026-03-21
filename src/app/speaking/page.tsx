@@ -6,7 +6,7 @@ export const metadata = {
 }
 
 export default async function SpeakingPage() {
-  const wpEvents = await loadWPEvents()
+  const wpEvents = await loadWPEvents('en')
 
   return <SpeakingPageContent lang="en" events={wpEvents} basePath="/event-reports" />
 }

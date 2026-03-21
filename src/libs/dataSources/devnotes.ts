@@ -51,7 +51,7 @@ export const loadDevNotes = async (
 ): Promise<DevNotesResult> => {
   try {
     const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?page=${page}&per_page=${perPage}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?page=${page}&per_page=${perPage}&filter[lang]=${lang}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
       {
         next: { revalidate: 1800 }, // 30分ごとに再検証（WordPress記事）
       },
@@ -171,10 +171,13 @@ const fetchDevNote = async (url: string): Promise<WPThought | null> => {
 /**
  * 前後の記事を取得
  */
-export const getAdjacentDevNotes = async (currentNote: WPThought): Promise<AdjacentDevNotes> => {
+export const getAdjacentDevNotes = async (
+  currentNote: WPThought,
+  lang: string = 'ja',
+): Promise<AdjacentDevNotes> => {
   try {
-    const previousUrl = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?before=${encodeURIComponent(currentNote.date)}&per_page=1&orderby=date&order=desc&_fields=id,title,slug`
-    const nextUrl = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?after=${encodeURIComponent(currentNote.date)}&per_page=1&orderby=date&order=asc&_fields=id,title,slug`
+    const previousUrl = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?before=${encodeURIComponent(currentNote.date)}&per_page=1&orderby=date&order=desc&filter[lang]=${lang}&_fields=id,title,slug`
+    const nextUrl = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?after=${encodeURIComponent(currentNote.date)}&per_page=1&orderby=date&order=asc&filter[lang]=${lang}&_fields=id,title,slug`
 
     const [previous, next] = await Promise.all([fetchDevNote(previousUrl), fetchDevNote(nextUrl)])
 
@@ -218,9 +221,9 @@ export const getRelatedDevNotes = async (
       // カスタム投稿タイプでは、カテゴリのタクソノミー名をパラメータとして使用
       // 例: categories (デフォルト) または dev-note-category (カスタム)
       const taxonomyParam = category.taxonomy === 'category' ? 'categories' : category.taxonomy
-      url = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?${taxonomyParam}=${category.id}&exclude=${currentNote.id}&per_page=${fetchLimit}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`
+      url = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?${taxonomyParam}=${category.id}&exclude=${currentNote.id}&per_page=${fetchLimit}&filter[lang]=${lang}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`
     } else {
-      url = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?exclude=${currentNote.id}&per_page=${fetchLimit}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`
+      url = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?exclude=${currentNote.id}&per_page=${fetchLimit}&filter[lang]=${lang}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`
     }
 
     const response = await fetch(url, {

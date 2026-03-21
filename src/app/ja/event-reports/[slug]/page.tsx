@@ -15,6 +15,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: event.title.rendered,
     description: event.excerpt.rendered.replace(/<[^>]*>/g, '').substring(0, 160),
+    alternates: {
+      canonical: `https://hidetaka.dev/ja/event-reports/${slug}`,
+    },
   }
 }
 
@@ -32,7 +35,7 @@ export default async function SpeakingDetailPage({
 
   // 前後の記事と関連記事を取得
   const [{ previous, next }, relatedEvents] = await Promise.all([
-    getAdjacentEvents(event),
+    getAdjacentEvents(event, 'ja'),
     getRelatedEvents(event, 4, 'ja'),
   ])
 

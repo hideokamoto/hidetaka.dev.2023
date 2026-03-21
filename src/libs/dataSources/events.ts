@@ -2,7 +2,7 @@ import { APIError } from '@/libs/errors'
 import { logger } from '@/libs/logger'
 import type { BlogItem, WPEvent } from './types'
 
-export const loadWPEvents = async (): Promise<WPEvent[]> => {
+export const loadWPEvents = async (lang: 'en' | 'ja' = 'ja'): Promise<WPEvent[]> => {
   try {
     const allEvents: WPEvent[] = []
     let currentPage = 1
@@ -10,7 +10,7 @@ export const loadWPEvents = async (): Promise<WPEvent[]> => {
 
     // 最初のページを取得して総ページ数を確認
     const firstResponse = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?page=${currentPage}&per_page=100&orderby=date&order=desc`,
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?page=${currentPage}&per_page=100&orderby=date&order=desc&filter[lang]=${lang}`,
     )
 
     if (!firstResponse.ok) {
@@ -29,7 +29,7 @@ export const loadWPEvents = async (): Promise<WPEvent[]> => {
     while (currentPage < totalPages) {
       currentPage++
       const response = await fetch(
-        `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?page=${currentPage}&per_page=100&orderby=date&order=desc`,
+        `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?page=${currentPage}&per_page=100&orderby=date&order=desc&filter[lang]=${lang}`,
       )
 
       if (!response.ok) {
@@ -109,13 +109,16 @@ const fetchEvent = async (url: string): Promise<WPEvent | null> => {
   }
 }
 
-export const getAdjacentEvents = async (currentEvent: WPEvent): Promise<AdjacentEvents> => {
+export const getAdjacentEvents = async (
+  currentEvent: WPEvent,
+  lang: 'en' | 'ja' = 'ja',
+): Promise<AdjacentEvents> => {
   try {
     // 前の記事を取得（現在の記事より前の日付で最も新しいもの）
-    const previousUrl = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?before=${encodeURIComponent(currentEvent.date)}&per_page=1&orderby=date&order=desc&_fields=id,title,slug`
+    const previousUrl = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?before=${encodeURIComponent(currentEvent.date)}&per_page=1&orderby=date&order=desc&filter[lang]=${lang}&_fields=id,title,slug`
 
     // 次の記事を取得（現在の記事より後の日付で最も古いもの）
-    const nextUrl = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?after=${encodeURIComponent(currentEvent.date)}&per_page=1&orderby=date&order=asc&_fields=id,title,slug`
+    const nextUrl = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?after=${encodeURIComponent(currentEvent.date)}&per_page=1&orderby=date&order=asc&filter[lang]=${lang}&_fields=id,title,slug`
 
     // 並列で実行
     const [previous, next] = await Promise.all([fetchEvent(previousUrl), fetchEvent(nextUrl)])
@@ -149,7 +152,7 @@ export const getRelatedEvents = async (
   try {
     // 現在の記事を除外して最新のイベント記事を取得
     const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?exclude=${currentEvent.id}&per_page=${limit}&orderby=date&order=desc&_fields=id,title,date,date_gmt,excerpt,slug`,
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?exclude=${currentEvent.id}&per_page=${limit}&orderby=date&order=desc&filter[lang]=${lang}&_fields=id,title,date,date_gmt,excerpt,slug`,
     )
 
     if (!response.ok) {
