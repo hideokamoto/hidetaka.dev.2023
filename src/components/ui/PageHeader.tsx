@@ -1,6 +1,7 @@
 type PageHeaderProps = {
   title: string
   description?: string
+  eyebrow?: string
   className?: string
   titleClassName?: string
   descriptionClassName?: string
@@ -9,20 +10,69 @@ type PageHeaderProps = {
 export default function PageHeader({
   title,
   description,
+  eyebrow,
   className = '',
   titleClassName = '',
   descriptionClassName = '',
 }: PageHeaderProps) {
   return (
-    <header className={`max-w-3xl mb-8 ${className}`}>
+    <header
+      className={className}
+      style={{
+        paddingBlock: 'var(--space-12) var(--space-10)',
+        borderBottom: '1px solid var(--color-line-strong)',
+      }}
+    >
+      {eyebrow && (
+        <div
+          style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: 'var(--text-xs)',
+            letterSpacing: 'var(--tracking-widest)',
+            textTransform: 'uppercase' as const,
+            color: 'var(--color-muted)',
+            marginBottom: 'var(--space-5)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--space-4)',
+          }}
+        >
+          <span
+            style={{
+              width: '32px',
+              height: '1px',
+              background: 'var(--color-accent)',
+              flexShrink: 0,
+            }}
+          />
+          {eyebrow}
+        </div>
+      )}
       <h1
-        className={`text-4xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-5xl ${titleClassName}`}
+        className={titleClassName}
+        style={{
+          fontFamily: 'var(--font-sans)',
+          fontSize: 'var(--text-3xl)',
+          fontWeight: 900,
+          letterSpacing: 'var(--tracking-tight)',
+          lineHeight: 'var(--leading-tight)',
+          color: 'var(--color-ink)',
+          marginBottom: description ? 'var(--space-4)' : 0,
+        }}
       >
         {title}
       </h1>
       {description && (
         <p
-          className={`mt-3 text-lg leading-relaxed text-slate-600 dark:text-slate-400 ${descriptionClassName}`}
+          className={descriptionClassName}
+          style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: 'var(--text-xs)',
+            letterSpacing: 'var(--tracking-widest)',
+            textTransform: 'uppercase' as const,
+            color: 'var(--color-muted)',
+            marginTop: 'var(--space-3)',
+          }}
         >
           {description}
         </p>

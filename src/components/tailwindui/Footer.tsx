@@ -8,166 +8,195 @@ import {
   getLanguageFromURL,
   getPathnameWithLangType,
 } from '@/libs/urlUtils/lang.util'
-import GitHubIcon from './SocialIcons/GitHub'
-import LinkedInIcon from './SocialIcons/LinkedIn'
-import TwitterIcon from './SocialIcons/Twitter'
 
-/**
- * Renders a styled navigation link used in the footer navigation.
- *
- * @param href - Destination URL or path for the link
- * @param children - Visible label or content for the link
- * @returns A Next.js `Link` element styled for footer navigation
- */
-function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
-  return (
-    <Link
-      href={href}
-      className="text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
-    >
-      {children}
-    </Link>
-  )
+const monoLabel: React.CSSProperties = {
+  fontFamily: 'var(--font-mono)',
+  fontSize: 'var(--text-2xs)',
+  letterSpacing: 'var(--tracking-widest)',
+  textTransform: 'uppercase',
+  color: 'var(--color-muted)',
+  marginBottom: '16px',
 }
 
-function InnerContainer({
-  children,
-  className = '',
-}: {
-  children: React.ReactNode
-  className?: string
-}) {
-  return (
-    <div className={`relative px-4 sm:px-8 lg:px-12 ${className}`}>
-      <div className="mx-auto max-w-2xl lg:max-w-5xl">{children}</div>
-    </div>
-  )
-}
-
-function OuterContainer({
-  children,
-  className = '',
-}: {
-  children: React.ReactNode
-  className?: string
-}) {
-  return (
-    <div className={`sm:px-8 ${className}`}>
-      <div className="mx-auto max-w-7xl lg:px-8">{children}</div>
-    </div>
-  )
+const monoLink: React.CSSProperties = {
+  display: 'block',
+  fontFamily: 'var(--font-mono)',
+  fontSize: 'var(--text-xs)',
+  letterSpacing: 'var(--tracking-wide)',
+  color: 'var(--color-muted)',
+  marginBottom: '12px',
+  transition: 'color var(--duration-fast)',
+  textDecoration: 'none',
 }
 
 export default function Footer() {
   const pathname = usePathname()
   const lang = getLanguageFromURL(pathname)
 
+  const navLinks = [
+    { path: 'about', label: lang === 'ja' ? '概要' : 'About' },
+    { path: 'work', label: lang === 'ja' ? '制作物' : 'Work' },
+    { path: 'writing', label: lang === 'ja' ? '執筆' : 'Writing' },
+    { path: 'speaking', label: lang === 'ja' ? '登壇' : 'Speaking' },
+    { path: 'privacy', label: lang === 'ja' ? 'プライバシー' : 'Privacy' },
+  ]
+
   return (
-    <footer className="relative mt-32 overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-indigo-200/20 blur-3xl dark:bg-indigo-900/10" />
-        <div className="absolute bottom-0 right-1/4 h-48 w-48 rounded-full bg-purple-200/15 blur-3xl dark:bg-purple-900/10" />
-      </div>
-
-      <OuterContainer>
-        <div className="relative border-t border-zinc-200 dark:border-zinc-800 pt-16 pb-20">
-          <InnerContainer>
-            <div className="flex flex-col gap-12">
-              {/* Top section: Navigation and Social Links */}
-              <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
-                {/* Navigation */}
-                <div className="flex flex-col gap-6">
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
-                    Navigation
-                  </h3>
-                  <nav className="flex flex-col gap-4">
-                    <NavLink href={getPathnameWithLangType('about', lang)}>
-                      {lang === 'ja' ? '概要' : 'About'}
-                    </NavLink>
-                    <NavLink href={getPathnameWithLangType('work', lang)}>
-                      {lang === 'ja' ? '制作物' : 'Work'}
-                    </NavLink>
-                    <NavLink href={getPathnameWithLangType('writing', lang)}>
-                      {lang === 'ja' ? '執筆' : 'Writing'}
-                    </NavLink>
-                    <NavLink href={getPathnameWithLangType('blog', lang)}>
-                      {lang === 'ja' ? 'ブログ' : 'Blog'}
-                    </NavLink>
-                    <NavLink href={getPathnameWithLangType('speaking', lang)}>
-                      {lang === 'ja' ? '登壇' : 'Speaking'}
-                    </NavLink>
-                    <NavLink href={getPathnameWithLangType('privacy', lang)}>
-                      {lang === 'ja' ? 'プライバシーポリシー' : 'Privacy Policy'}
-                    </NavLink>
-                  </nav>
-                </div>
-
-                {/* Language Switcher */}
-                <div className="flex flex-col gap-6">
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
-                    Language
-                  </h3>
-                  <nav className="flex flex-col gap-4">
-                    <NavLink href={changeLanguageURL(pathname, 'ja')}>
-                      {lang === 'ja' ? '日本語' : 'Japanese'}
-                    </NavLink>
-                    <NavLink href={changeLanguageURL(pathname, 'en')}>
-                      {lang === 'ja' ? '英語' : 'English'}
-                    </NavLink>
-                  </nav>
-                </div>
-
-                {/* Social Links */}
-                <div className="flex flex-col gap-6">
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
-                    Connect
-                  </h3>
-                  <ul className="flex flex-col gap-4">
-                    <li>
-                      <a
-                        href={SITE_CONFIG.social.twitter.url}
-                        aria-label={SITE_CONFIG.social.twitter.ariaLabel}
-                        className="group flex items-center gap-3 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
-                      >
-                        <TwitterIcon className="h-5 w-5 flex-none fill-slate-500 transition-colors group-hover:fill-indigo-600 dark:fill-slate-400 dark:group-hover:fill-indigo-400" />
-                        <span>{SITE_CONFIG.social.twitter.label}</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href={SITE_CONFIG.social.github.url}
-                        aria-label={SITE_CONFIG.social.github.ariaLabel}
-                        className="group flex items-center gap-3 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
-                      >
-                        <GitHubIcon className="h-5 w-5 flex-none fill-slate-500 transition-colors group-hover:fill-indigo-600 dark:fill-slate-400 dark:group-hover:fill-indigo-400" />
-                        <span>{SITE_CONFIG.social.github.label}</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href={SITE_CONFIG.social.linkedin.url}
-                        aria-label={SITE_CONFIG.social.linkedin.ariaLabel}
-                        className="group flex items-center gap-3 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
-                      >
-                        <LinkedInIcon className="h-5 w-5 flex-none fill-slate-500 transition-colors group-hover:fill-indigo-600 dark:fill-slate-400 dark:group-hover:fill-indigo-400" />
-                        <span>{SITE_CONFIG.social.linkedin.label}</span>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              {/* Bottom section: Copyright */}
-              <div className="border-t border-zinc-200 dark:border-zinc-800 pt-8">
-                <p className="text-sm text-slate-600 dark:text-slate-400 text-center sm:text-left">
-                  &copy; {new Date().getFullYear()} {SITE_CONFIG.author.name}. All rights reserved.
-                </p>
-              </div>
-            </div>
-          </InnerContainer>
+    <footer
+      style={{
+        marginTop: 'var(--space-13)',
+        borderTop: '1px solid var(--color-line-strong)',
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 'var(--page-max)',
+          marginInline: 'auto',
+          paddingInline: 'clamp(20px, 4vw, var(--page-px))',
+          paddingBlock: 'var(--space-10)',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+          gap: 'var(--space-7)',
+          alignItems: 'start',
+        }}
+      >
+        {/* Brand */}
+        <div>
+          <div
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: 'var(--text-sm)',
+              fontWeight: 700,
+              letterSpacing: 'var(--tracking-wide)',
+              color: 'var(--color-ink)',
+              marginBottom: '12px',
+            }}
+          >
+            hidetaka.dev
+          </div>
+          <p
+            style={{
+              fontFamily: 'var(--font-mono)',
+              fontSize: 'var(--text-xs)',
+              color: 'var(--color-muted)',
+              letterSpacing: 'var(--tracking-wide)',
+              lineHeight: 'var(--leading-loose)',
+            }}
+          >
+            Developer Experience Engineer
+            <br />© {new Date().getFullYear()} {SITE_CONFIG.author.name}
+          </p>
         </div>
-      </OuterContainer>
+
+        {/* Pages */}
+        <nav>
+          <div style={monoLabel}>Pages</div>
+          {navLinks.map((item) => (
+            <Link
+              key={item.path}
+              href={getPathnameWithLangType(item.path, lang)}
+              style={monoLink}
+              onMouseEnter={(e) => {
+                ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-ink)'
+              }}
+              onMouseLeave={(e) => {
+                ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-muted)'
+              }}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Language */}
+        <div>
+          <div style={monoLabel}>Language</div>
+          <Link
+            href={changeLanguageURL(pathname, 'ja')}
+            style={monoLink}
+            onMouseEnter={(e) => {
+              ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-ink)'
+            }}
+            onMouseLeave={(e) => {
+              ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-muted)'
+            }}
+          >
+            {lang === 'ja' ? '日本語' : 'Japanese'}
+          </Link>
+          <Link
+            href={changeLanguageURL(pathname, 'en')}
+            style={monoLink}
+            onMouseEnter={(e) => {
+              ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-ink)'
+            }}
+            onMouseLeave={(e) => {
+              ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-muted)'
+            }}
+          >
+            {lang === 'ja' ? '英語' : 'English'}
+          </Link>
+        </div>
+
+        {/* Social / Status */}
+        <div style={{ textAlign: 'right' }}>
+          <div style={monoLabel}>Connect</div>
+          {[
+            { href: SITE_CONFIG.social.twitter.url, label: 'X / Twitter' },
+            { href: SITE_CONFIG.social.github.url, label: 'GitHub' },
+            { href: SITE_CONFIG.social.linkedin.url, label: 'LinkedIn' },
+          ].map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ ...monoLink, display: 'inline-block' }}
+              onMouseEnter={(e) => {
+                ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-ink)'
+              }}
+              onMouseLeave={(e) => {
+                ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-muted)'
+              }}
+            >
+              {link.label}
+            </a>
+          ))}
+
+          {/* Status dot */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-end',
+              gap: '8px',
+              marginTop: '16px',
+            }}
+          >
+            <span
+              style={{
+                display: 'inline-block',
+                width: '6px',
+                height: '6px',
+                borderRadius: '100px',
+                background: 'var(--color-accent)',
+                boxShadow: '0 0 0 3px color-mix(in oklab, var(--color-accent) 22%, transparent)',
+                animation: 'hdk-pulse 2.4s infinite',
+              }}
+            />
+            <span
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: 'var(--text-xs)',
+                letterSpacing: 'var(--tracking-wider)',
+                textTransform: 'uppercase',
+                color: 'var(--color-muted)',
+              }}
+            >
+              Available
+            </span>
+          </div>
+        </div>
+      </div>
     </footer>
   )
 }

@@ -50,19 +50,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className="h-full antialiased">
       <head>
         <link rel="alternate" type="application/rss+xml" title="RSS" href="/projects/rss.xml" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Shippori+Mincho:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&family=Inter+Tight:wght@400;500;600;700&display=swap"
+        />
         <JsonLd data={generatePersonJsonLd()} />
       </head>
-      <body className="flex h-full flex-col bg-zinc-50 dark:bg-black">
+      <body className="flex h-full flex-col">
         <JsonLd data={generatePersonJsonLd()} />
         <SentryProvider>
           <GoogleAnalytics gaId="G-RV8PYHHYHN" />
           <DarkModeScript />
           <ClarityAnalytics />
-          <div className="fixed inset-0 flex justify-center sm:px-8">
-            <div className="flex w-full max-w-7xl lg:px-4">
-              <div className="w-full bg-white ring-1 ring-zinc-100 dark:bg-zinc-900 dark:ring-zinc-300/20" />
-            </div>
-          </div>
           <div className="relative">
             <Header />
             <main>{children}</main>
