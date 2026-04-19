@@ -104,7 +104,7 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
       <button
         type="button"
         className="fixed inset-0 z-40 lg:hidden"
-        style={{ background: 'rgba(20,19,18,.5)' }}
+        style={{ background: 'color-mix(in oklab, var(--color-ink) 50%, transparent)' }}
         onClick={onClose}
         aria-label="Close menu"
       />
@@ -187,7 +187,7 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
                   marginBottom: '12px',
                 }}
               >
-                Language
+                {lang === 'ja' ? '言語' : 'Language'}
               </div>
               <div className="flex gap-3">
                 <Link

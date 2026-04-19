@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { loadFeedPosts, processAtomFeed, processRSSFeed } from './feed.utils'
-import type { ZennFeed } from './types'
+import type { QiitaAtomFeed, ZennFeed } from './types'
 
 describe('processRSSFeed', () => {
   it('should process RSS feed with array of items', () => {
@@ -28,7 +28,7 @@ describe('processRSSFeed', () => {
       },
     }
 
-    const result = processRSSFeed<ZennFeed>(parsedItem)
+    const result = processRSSFeed<QiitaAtomFeed>(parsedItem)
 
     expect(result.title).toBe('Test Feed')
     expect(result.link).toBe('https://example.com')
@@ -149,7 +149,7 @@ describe('processAtomFeed', () => {
       },
     }
 
-    const result = processAtomFeed<ZennFeed>(parsedItem)
+    const result = processAtomFeed<QiitaAtomFeed>(parsedItem)
 
     expect(result.title).toBe('Test Atom Feed')
     expect(result.link).toBe('https://example.com/atom')

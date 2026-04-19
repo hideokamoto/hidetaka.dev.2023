@@ -2,6 +2,14 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import type { WPThought } from './dataSources/types'
 import { generateBlogPostMetadata, generateDevNoteMetadata } from './metadata'
 
+type OGMeta = {
+  type?: string
+  publishedTime?: string
+  title?: string
+  images?: Array<{ url: string; width: number; height: number; alt: string }>
+}
+type TwitterMeta = { card?: string; title?: string; images?: string[] }
+
 // テスト用のモックデータファクトリ
 const createMockWPThought = (overrides: Partial<WPThought> = {}): WPThought => ({
   id: 123,
@@ -46,10 +54,10 @@ describe('generateDevNoteMetadata', () => {
     expect(result.title).toBe('Test Dev Note')
     expect(result.openGraph).toBeDefined()
     expect(result.openGraph?.title).toBe('Test Dev Note')
-    expect(result.openGraph?.type).toBe('article')
-    expect(result.openGraph?.publishedTime).toBe('2024-07-01T12:00:00')
+    expect((result.openGraph as OGMeta)?.type).toBe('article')
+    expect((result.openGraph as OGMeta)?.publishedTime).toBe('2024-07-01T12:00:00')
     expect(result.twitter).toBeDefined()
-    expect(result.twitter?.card).toBe('summary_large_image')
+    expect((result.twitter as TwitterMeta)?.card).toBe('summary_large_image')
     expect(result.twitter?.title).toBe('Test Dev Note')
   })
 
@@ -62,12 +70,12 @@ describe('generateDevNoteMetadata', () => {
 
     expect(result.openGraph?.images).toBeDefined()
     expect(result.openGraph?.images).toHaveLength(1)
-    expect(result.openGraph?.images?.[0]?.url).toBe(
+    expect((result.openGraph as OGMeta)?.images?.[0]?.url).toBe(
       'https://hidetaka.dev/api/thumbnail/dev-notes/789',
     )
-    expect(result.openGraph?.images?.[0]?.width).toBe(1200)
-    expect(result.openGraph?.images?.[0]?.height).toBe(630)
-    expect(result.openGraph?.images?.[0]?.alt).toBe('Test Blog Post Title')
+    expect((result.openGraph as OGMeta)?.images?.[0]?.width).toBe(1200)
+    expect((result.openGraph as OGMeta)?.images?.[0]?.height).toBe(630)
+    expect((result.openGraph as OGMeta)?.images?.[0]?.alt).toBe('Test Blog Post Title')
   })
 
   it('should use default URL when NEXT_PUBLIC_SITE_URL is not set', () => {
@@ -79,7 +87,7 @@ describe('generateDevNoteMetadata', () => {
 
     const result = generateDevNoteMetadata(note)
 
-    expect(result.openGraph?.images?.[0]?.url).toBe(
+    expect((result.openGraph as OGMeta)?.images?.[0]?.url).toBe(
       'https://hidetaka.dev/api/thumbnail/dev-notes/999',
     )
   })
@@ -93,7 +101,7 @@ describe('generateDevNoteMetadata', () => {
 
     const result = generateDevNoteMetadata(note)
 
-    expect(result.openGraph?.images?.[0]?.url).toBe(
+    expect((result.openGraph as OGMeta)?.images?.[0]?.url).toBe(
       'https://custom.example.com/api/thumbnail/dev-notes/111',
     )
   })
@@ -139,10 +147,10 @@ describe('generateBlogPostMetadata', () => {
     expect(result.title).toBe('Test Blog Post')
     expect(result.openGraph).toBeDefined()
     expect(result.openGraph?.title).toBe('Test Blog Post')
-    expect(result.openGraph?.type).toBe('article')
-    expect(result.openGraph?.publishedTime).toBe('2024-07-01T12:00:00')
+    expect((result.openGraph as OGMeta)?.type).toBe('article')
+    expect((result.openGraph as OGMeta)?.publishedTime).toBe('2024-07-01T12:00:00')
     expect(result.twitter).toBeDefined()
-    expect(result.twitter?.card).toBe('summary_large_image')
+    expect((result.twitter as TwitterMeta)?.card).toBe('summary_large_image')
     expect(result.twitter?.title).toBe('Test Blog Post')
   })
 
@@ -155,12 +163,12 @@ describe('generateBlogPostMetadata', () => {
 
     expect(result.openGraph?.images).toBeDefined()
     expect(result.openGraph?.images).toHaveLength(1)
-    expect(result.openGraph?.images?.[0]?.url).toBe(
+    expect((result.openGraph as OGMeta)?.images?.[0]?.url).toBe(
       'https://hidetaka.dev/api/thumbnail/thoughts/789',
     )
-    expect(result.openGraph?.images?.[0]?.width).toBe(1200)
-    expect(result.openGraph?.images?.[0]?.height).toBe(630)
-    expect(result.openGraph?.images?.[0]?.alt).toBe('Test Blog Post Title')
+    expect((result.openGraph as OGMeta)?.images?.[0]?.width).toBe(1200)
+    expect((result.openGraph as OGMeta)?.images?.[0]?.height).toBe(630)
+    expect((result.openGraph as OGMeta)?.images?.[0]?.alt).toBe('Test Blog Post Title')
   })
 
   it('should use default URL when NEXT_PUBLIC_SITE_URL is not set', () => {
@@ -172,7 +180,7 @@ describe('generateBlogPostMetadata', () => {
 
     const result = generateBlogPostMetadata(thought)
 
-    expect(result.openGraph?.images?.[0]?.url).toBe(
+    expect((result.openGraph as OGMeta)?.images?.[0]?.url).toBe(
       'https://hidetaka.dev/api/thumbnail/thoughts/999',
     )
   })
@@ -186,7 +194,7 @@ describe('generateBlogPostMetadata', () => {
 
     const result = generateBlogPostMetadata(thought)
 
-    expect(result.openGraph?.images?.[0]?.url).toBe(
+    expect((result.openGraph as OGMeta)?.images?.[0]?.url).toBe(
       'https://custom.example.com/api/thumbnail/thoughts/111',
     )
   })
