@@ -36,18 +36,18 @@ function ThemeToggle() {
 
   function toggleMode() {
     document.documentElement.classList.add('[&_*]:!transition-none')
-    window.setTimeout(() => {
+    requestAnimationFrame(() => {
       document.documentElement.classList.remove('[&_*]:!transition-none')
-    }, 0)
+    })
 
     const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
     const isSystemDarkMode = darkModeMediaQuery.matches
     const isDarkMode = document.documentElement.classList.toggle('dark')
 
     if (isDarkMode === isSystemDarkMode) {
-      delete window.localStorage.isDarkMode
+      window.localStorage.removeItem('isDarkMode')
     } else {
-      window.localStorage.isDarkMode = isDarkMode
+      window.localStorage.setItem('isDarkMode', String(isDarkMode))
     }
   }
 
@@ -72,12 +72,12 @@ function ThemeToggle() {
         lineHeight: 1,
       }}
       onMouseEnter={(e) => {
-        ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--color-ink)'
-        ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--color-ink)'
+        e.currentTarget.style.color = 'var(--color-ink)'
+        e.currentTarget.style.borderColor = 'var(--color-ink)'
       }}
       onMouseLeave={(e) => {
-        ;(e.currentTarget as HTMLButtonElement).style.color = 'var(--color-muted)'
-        ;(e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--color-line-strong)'
+        e.currentTarget.style.color = 'var(--color-muted)'
+        e.currentTarget.style.borderColor = 'var(--color-line-strong)'
       }}
     >
       Light / Dark

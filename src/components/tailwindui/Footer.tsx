@@ -90,17 +90,17 @@ export default function Footer() {
 
         {/* Pages */}
         <nav>
-          <div style={monoLabel}>Pages</div>
+          <div style={monoLabel}>{lang === 'ja' ? 'ページ' : 'Pages'}</div>
           {navLinks.map((item) => (
             <Link
               key={item.path}
               href={getPathnameWithLangType(item.path, lang)}
               style={monoLink}
               onMouseEnter={(e) => {
-                ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-ink)'
+                e.currentTarget.style.color = 'var(--color-ink)'
               }}
               onMouseLeave={(e) => {
-                ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-muted)'
+                e.currentTarget.style.color = 'var(--color-muted)'
               }}
             >
               {item.label}
@@ -110,15 +110,15 @@ export default function Footer() {
 
         {/* Language */}
         <div>
-          <div style={monoLabel}>Language</div>
+          <div style={monoLabel}>{lang === 'ja' ? '言語' : 'Language'}</div>
           <Link
             href={changeLanguageURL(pathname, 'ja')}
             style={monoLink}
             onMouseEnter={(e) => {
-              ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-ink)'
+              e.currentTarget.style.color = 'var(--color-ink)'
             }}
             onMouseLeave={(e) => {
-              ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-muted)'
+              e.currentTarget.style.color = 'var(--color-muted)'
             }}
           >
             {lang === 'ja' ? '日本語' : 'Japanese'}
@@ -127,10 +127,10 @@ export default function Footer() {
             href={changeLanguageURL(pathname, 'en')}
             style={monoLink}
             onMouseEnter={(e) => {
-              ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-ink)'
+              e.currentTarget.style.color = 'var(--color-ink)'
             }}
             onMouseLeave={(e) => {
-              ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-muted)'
+              e.currentTarget.style.color = 'var(--color-muted)'
             }}
           >
             {lang === 'ja' ? '英語' : 'English'}
@@ -139,7 +139,7 @@ export default function Footer() {
 
         {/* Social / Status */}
         <div style={{ textAlign: 'right' }}>
-          <div style={monoLabel}>Connect</div>
+          <div style={monoLabel}>{lang === 'ja' ? 'つながる' : 'Connect'}</div>
           {[
             { href: SITE_CONFIG.social.twitter.url, label: 'X / Twitter' },
             { href: SITE_CONFIG.social.github.url, label: 'GitHub' },
@@ -152,10 +152,10 @@ export default function Footer() {
               rel="noopener noreferrer"
               style={{ ...monoLink, display: 'inline-block' }}
               onMouseEnter={(e) => {
-                ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-ink)'
+                e.currentTarget.style.color = 'var(--color-ink)'
               }}
               onMouseLeave={(e) => {
-                ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-muted)'
+                e.currentTarget.style.color = 'var(--color-muted)'
               }}
             >
               {link.label}
