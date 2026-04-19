@@ -70,6 +70,8 @@ function ThemeToggle() {
         border: '1px solid var(--color-line-strong)',
         transition: 'color var(--duration-fast), border-color var(--duration-fast)',
         lineHeight: 1,
+        outline: '2px solid transparent',
+        outlineOffset: '2px',
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.color = 'var(--color-ink)'
@@ -78,6 +80,12 @@ function ThemeToggle() {
       onMouseLeave={(e) => {
         e.currentTarget.style.color = 'var(--color-muted)'
         e.currentTarget.style.borderColor = 'var(--color-line-strong)'
+      }}
+      onFocus={(e) => {
+        e.currentTarget.style.outlineColor = 'var(--color-accent)'
+      }}
+      onBlur={(e) => {
+        e.currentTarget.style.outlineColor = 'transparent'
       }}
     >
       Light / Dark
@@ -159,6 +167,7 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
                   key={item.path}
                   href={itemPath}
                   onClick={onClose}
+                  aria-current={isActive ? 'page' : undefined}
                   style={{
                     display: 'block',
                     fontFamily: 'var(--font-mono)',

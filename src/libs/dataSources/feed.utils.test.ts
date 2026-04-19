@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
+import type { QiitaAtomFeed, ZennFeed } from '@/libs/dataSources/types'
 import { loadFeedPosts, processAtomFeed, processRSSFeed } from './feed.utils'
-import type { QiitaAtomFeed, ZennFeed } from './types'
 
 describe('processRSSFeed', () => {
   it('should process RSS feed with array of items', () => {
