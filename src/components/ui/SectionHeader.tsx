@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 type SectionHeaderProps = {
   title: string
   description?: string
@@ -108,28 +110,28 @@ export default function SectionHeader({
         )}
       </div>
       {actionLabel && actionHref && (
-        <a
+        <Link
           href={actionHref}
           style={{
             gridColumn: 'span 3',
-            justifySelf: 'end' as const,
+            justifySelf: 'end',
             fontFamily: 'var(--font-mono)',
             fontSize: 'var(--text-xs)',
             letterSpacing: 'var(--tracking-wider)',
-            textTransform: 'uppercase' as const,
+            textTransform: 'uppercase',
             color: 'var(--color-muted)',
             transition: 'color var(--duration-fast)',
             textDecoration: 'none',
           }}
           onMouseEnter={(e) => {
-            ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-accent)'
+            e.currentTarget.style.color = 'var(--color-accent)'
           }}
           onMouseLeave={(e) => {
-            ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-muted)'
+            e.currentTarget.style.color = 'var(--color-muted)'
           }}
         >
           {actionLabel} →
-        </a>
+        </Link>
       )}
     </div>
   )

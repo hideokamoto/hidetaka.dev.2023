@@ -1,13 +1,4 @@
-type BadgeVariant =
-  | 'default'
-  | 'accent'
-  | 'ink'
-  | 'status'
-  | 'indigo'
-  | 'green'
-  | 'gray'
-  | 'purple'
-  | string
+type BadgeVariant = 'default' | 'accent' | 'ink' | 'status' | 'indigo' | 'green' | 'gray' | 'purple'
 
 type BadgeProps = {
   label: string

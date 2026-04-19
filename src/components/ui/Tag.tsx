@@ -1,4 +1,4 @@
-type TagVariant = 'default' | 'active' | 'indigo' | 'purple' | 'green' | string
+type TagVariant = 'default' | 'active' | 'indigo' | 'purple' | 'green'
 type TagSize = 'sm' | 'md' | 'lg'
 
 type TagProps = {
@@ -20,8 +20,8 @@ export default function Tag({
 
   const sizeMap: Record<TagSize, string> = {
     sm: 'var(--text-xs)',
-    md: 'var(--text-xs)',
-    lg: 'var(--text-sm)',
+    md: 'var(--text-sm)',
+    lg: 'var(--text-base)',
   }
 
   return (
@@ -35,10 +35,10 @@ export default function Tag({
         padding: 'var(--space-1) var(--space-3)',
         border: '1px solid var(--color-line-strong)',
         color: isActive ? 'var(--color-bg)' : 'var(--color-muted)',
-        background: isActive ? 'var(--color-ink)' : 'transparent',
         borderColor: isActive ? 'var(--color-ink)' : 'var(--color-line-strong)',
         transition: 'color var(--duration-fast), border-color var(--duration-fast)',
         whiteSpace: 'nowrap',
+        ...(isActive ? { background: 'var(--color-ink)' } : {}),
       }}
     >
       {children}

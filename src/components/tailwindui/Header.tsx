@@ -240,7 +240,7 @@ export default function Header() {
           position: 'sticky',
           top: 0,
           zIndex: 'var(--z-nav)',
-          background: 'color-mix(in oklab, var(--color-bg), transparent 8%)',
+          background: 'var(--color-bg)',
           backdropFilter: 'blur(12px)',
           WebkitBackdropFilter: 'blur(12px)',
           borderBottom: '1px solid var(--color-line)',
@@ -298,6 +298,12 @@ export default function Header() {
                     transition: 'color var(--duration-fast)',
                     position: 'relative',
                     paddingBottom: '2px',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) e.currentTarget.style.color = 'var(--color-ink)'
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) e.currentTarget.style.color = 'var(--color-muted)'
                   }}
                 >
                   {item.label}

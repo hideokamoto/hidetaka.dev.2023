@@ -192,7 +192,7 @@ export default function Footer() {
                 color: 'var(--color-muted)',
               }}
             >
-              Available
+              {lang === 'ja' ? '対応可能' : 'Available'}
             </span>
           </div>
         </div>

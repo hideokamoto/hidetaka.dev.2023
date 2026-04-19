@@ -34,22 +34,20 @@ const sizeStyles: Record<CTAButtonSize, React.CSSProperties> = {
   lg: { padding: 'var(--space-5) var(--space-9)', fontSize: 'var(--text-base)' },
 }
 
+const borderedStyle: React.CSSProperties = {
+  background: 'transparent',
+  color: 'var(--color-ink)',
+  borderColor: 'var(--color-ink)',
+}
+
 const variantStyles: Record<CTAButtonVariant, React.CSSProperties> = {
   primary: {
     background: 'var(--color-ink)',
     color: 'var(--color-bg)',
     borderColor: 'var(--color-ink)',
   },
-  secondary: {
-    background: 'transparent',
-    color: 'var(--color-ink)',
-    borderColor: 'var(--color-ink)',
-  },
-  outline: {
-    background: 'transparent',
-    color: 'var(--color-ink)',
-    borderColor: 'var(--color-ink)',
-  },
+  secondary: borderedStyle,
+  outline: borderedStyle,
   ghost: {
     background: 'transparent',
     color: 'var(--color-muted)',
@@ -62,6 +60,11 @@ const variantStyles: Record<CTAButtonVariant, React.CSSProperties> = {
   },
 }
 
+const arrowStyle: React.CSSProperties = {
+  transition: 'transform var(--duration-fast)',
+  display: 'inline-block',
+}
+
 export default function CTAButton({
   href,
   children,
@@ -71,14 +74,15 @@ export default function CTAButton({
   external = false,
 }: CTAButtonProps) {
   const style = { ...baseStyle, ...sizeStyles[size], ...variantStyles[variant] }
-
   const showArrow = variant === 'primary' || variant === 'accent'
+
+  const arrow = showArrow ? <span style={arrowStyle}>→</span> : null
 
   if (external) {
     return (
       <a href={href} target="_blank" rel="noopener noreferrer" className={className} style={style}>
         {children}
-        {showArrow && <span>→</span>}
+        {arrow}
       </a>
     )
   }
@@ -86,7 +90,7 @@ export default function CTAButton({
   return (
     <Link href={href} className={className} style={style}>
       {children}
-      {showArrow && <span>→</span>}
+      {arrow}
     </Link>
   )
 }

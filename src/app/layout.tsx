@@ -59,7 +59,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <JsonLd data={generatePersonJsonLd()} />
       </head>
       <body className="flex h-full flex-col">
-        <JsonLd data={generatePersonJsonLd()} />
         <SentryProvider>
           <GoogleAnalytics gaId="G-RV8PYHHYHN" />
           <DarkModeScript />

@@ -29,7 +29,7 @@ export default function PageHeader({
             fontFamily: 'var(--font-mono)',
             fontSize: 'var(--text-xs)',
             letterSpacing: 'var(--tracking-widest)',
-            textTransform: 'uppercase' as const,
+            textTransform: 'uppercase',
             color: 'var(--color-muted)',
             marginBottom: 'var(--space-5)',
             display: 'flex',
@@ -69,7 +69,7 @@ export default function PageHeader({
             fontFamily: 'var(--font-mono)',
             fontSize: 'var(--text-xs)',
             letterSpacing: 'var(--tracking-widest)',
-            textTransform: 'uppercase' as const,
+            textTransform: 'uppercase',
             color: 'var(--color-muted)',
             marginTop: 'var(--space-3)',
           }}

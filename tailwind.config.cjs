@@ -17,8 +17,8 @@ module.exports = {
 				],
 				serif: [
 					'Shippori Mincho',
-					'Inter Tight',
 					'Georgia',
+					'Times New Roman',
 					'serif',
 				],
 				mono: [
