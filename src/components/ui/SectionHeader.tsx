@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import MonochromeLink from '@/components/ui/MonochromeLink'
 
 type SectionHeaderProps = {
   title: string
@@ -110,7 +110,7 @@ export default function SectionHeader({
         )}
       </div>
       {actionLabel && actionHref && (
-        <Link
+        <MonochromeLink
           href={actionHref}
           style={{
             gridColumn: 'span 3',
@@ -123,15 +123,9 @@ export default function SectionHeader({
             transition: 'color var(--duration-fast)',
             textDecoration: 'none',
           }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.color = 'var(--color-accent)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.color = 'var(--color-muted)'
-          }}
         >
           {actionLabel} →
-        </Link>
+        </MonochromeLink>
       )}
     </div>
   )

@@ -23,9 +23,6 @@ function getVariantStyle(variant: BadgeVariant): React.CSSProperties {
         color: 'var(--color-bg)',
         borderColor: 'var(--color-ink)',
       }
-    case 'status':
-    case 'gray':
-    case 'default':
     default:
       return {}
   }
