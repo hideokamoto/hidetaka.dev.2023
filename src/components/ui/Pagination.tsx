@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import MonochromeLink from '@/components/ui/MonochromeLink'
 import {
   calculateNextPage,
   calculatePrevPage,
@@ -56,18 +56,9 @@ export default function Pagination({ currentPage, totalPages, basePath, lang }: 
       }}
     >
       {prevPage ? (
-        <Link
-          href={prevHref}
-          style={monoStyle}
-          onMouseEnter={(e) => {
-            ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-accent)'
-          }}
-          onMouseLeave={(e) => {
-            ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-muted)'
-          }}
-        >
+        <MonochromeLink href={prevHref} style={monoStyle}>
           ← {prevText}
-        </Link>
+        </MonochromeLink>
       ) : (
         <span style={{ ...monoStyle, opacity: 0.4 }}>← {prevText}</span>
       )}
@@ -77,18 +68,9 @@ export default function Pagination({ currentPage, totalPages, basePath, lang }: 
       </span>
 
       {nextPage ? (
-        <Link
-          href={nextHref}
-          style={monoStyle}
-          onMouseEnter={(e) => {
-            ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-accent)'
-          }}
-          onMouseLeave={(e) => {
-            ;(e.currentTarget as HTMLAnchorElement).style.color = 'var(--color-muted)'
-          }}
-        >
+        <MonochromeLink href={nextHref} style={monoStyle}>
           {nextText} →
-        </Link>
+        </MonochromeLink>
       ) : (
         <span style={{ ...monoStyle, opacity: 0.4 }}>{nextText} →</span>
       )}
