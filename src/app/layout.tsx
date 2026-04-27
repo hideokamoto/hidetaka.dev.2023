@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { Inter_Tight, JetBrains_Mono, Shippori_Mincho, Zen_Kaku_Gothic_New } from 'next/font/google'
 import { SITE_DESCRIPTION, SITE_TITLE } from '@/consts'
 import './globals.css'
 import { ClarityAnalytics } from '@/components/ClarityAnalytics'
@@ -7,6 +8,34 @@ import GoogleAnalytics from '@/components/GoogleAnalytics'
 import SentryProvider from '@/components/providers/SentryProvider'
 import Footer from '@/components/tailwindui/Footer'
 import Header from '@/components/tailwindui/Header'
+
+const zenKaku = Zen_Kaku_Gothic_New({
+  weight: ['400', '500', '700', '900'],
+  subsets: ['latin'],
+  variable: '--font-zen-kaku',
+  display: 'swap',
+})
+
+const shipporiMincho = Shippori_Mincho({
+  weight: ['500', '600', '700', '800'],
+  subsets: ['latin'],
+  variable: '--font-shippori',
+  display: 'swap',
+})
+
+const jetbrainsMono = JetBrains_Mono({
+  weight: ['400', '500'],
+  subsets: ['latin'],
+  variable: '--font-jetbrains',
+  display: 'swap',
+})
+
+const interTight = Inter_Tight({
+  weight: ['400', '500', '600', '700'],
+  subsets: ['latin'],
+  variable: '--font-inter-tight',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: SITE_TITLE,
@@ -45,20 +74,18 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html
+      lang="en"
+      className={`h-full ${zenKaku.variable} ${shipporiMincho.variable} ${jetbrainsMono.variable} ${interTight.variable}`}
+    >
       <head>
         <link rel="alternate" type="application/rss+xml" title="RSS" href="/projects/rss.xml" />
       </head>
-      <body className="flex h-full flex-col bg-zinc-50 dark:bg-black">
+      <body className="flex h-full flex-col bg-[#f4f2ee] dark:bg-[#0d0c0b]">
         <SentryProvider>
           <GoogleAnalytics gaId="G-RV8PYHHYHN" />
           <DarkModeScript />
           <ClarityAnalytics />
-          <div className="fixed inset-0 flex justify-center sm:px-8">
-            <div className="flex w-full max-w-7xl lg:px-4">
-              <div className="w-full bg-white ring-1 ring-zinc-100 dark:bg-zinc-900 dark:ring-zinc-300/20" />
-            </div>
-          </div>
           <div className="relative">
             <Header />
             <main>{children}</main>

@@ -1,19 +1,10 @@
 'use client'
 
-import Image from 'next/image'
 import Link from 'next/link'
 import { useCallback, useMemo, useState } from 'react'
-import Container from '@/components/tailwindui/Container'
-import { GitHubIcon, LinkedInIcon, TwitterIcon } from '@/components/tailwindui/SocialLink'
-import BackgroundDecoration from '@/components/ui/BackgroundDecoration'
 import DateDisplay from '@/components/ui/DateDisplay'
-import FilterItem from '@/components/ui/FilterItem'
-import MobileFilterButton from '@/components/ui/MobileFilterButton'
-import MobileFilterDrawer, { type FilterGroup } from '@/components/ui/MobileFilterDrawer'
 import PageHeader from '@/components/ui/PageHeader'
-import SearchBar from '@/components/ui/SearchBar'
-import SidebarLayout from '@/components/ui/SidebarLayout'
-import Tag from '@/components/ui/Tag'
+import SectionHeader from '@/components/ui/SectionHeader'
 import { SITE_CONFIG } from '@/config'
 import type { NPMRegistrySearchResult } from '@/libs/dataSources/npmjs'
 import type { WordPressPluginDetail } from '@/libs/dataSources/wporg'
@@ -26,7 +17,6 @@ type OSSItem =
   | { type: 'npm'; data: NPMRegistrySearchResult }
   | { type: 'wordpress'; data: WordPressPluginDetail }
 
-// OSSアイテムをフィルタリングするヘルパー関数
 export function filterOSSItem(item: OSSItem, matchesSearch: (text: string) => boolean): boolean {
   if (item.type === 'project') {
     const p = item.data
@@ -50,375 +40,30 @@ export function filterOSSItem(item: OSSItem, matchesSearch: (text: string) => bo
   )
 }
 
-// OSSアイテムの日付を取得するヘルパー関数
 function getOSSItemDate(item: OSSItem): string {
-  if (item.type === 'project') {
-    return item.data.published_at || ''
-  }
-  if (item.type === 'npm') {
-    return item.data.package.date
-  }
+  if (item.type === 'project') return item.data.published_at || ''
+  if (item.type === 'npm') return item.data.package.date
   return item.data.added
 }
 
-// 統一されたWorkカードコンポーネント（プロジェクト用）
-function UnifiedProjectCard({ project, lang }: { project: MicroCMSProjectsRecord; lang: string }) {
-  const href = lang === 'ja' ? `/ja/work/${project.id}` : `/work/${project.id}`
-  const date = project.published_at ? new Date(project.published_at) : null
-
-  return (
-    <Link href={href} className="group block">
-      <article className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all hover:border-indigo-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700">
-        {/* Image - Top */}
-        {project.image && (
-          <div className="relative aspect-[4/3] w-full overflow-hidden">
-            <Image
-              src={project.image.url}
-              alt={project.title}
-              fill
-              className="object-cover transition-transform duration-500 group-hover:scale-110"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            />
-          </div>
-        )}
-
-        {/* Content - Bottom */}
-        <div className="p-5 lg:p-6">
-          <div className="flex flex-col gap-3">
-            {date && (
-              <DateDisplay
-                date={date}
-                lang={lang}
-                format="short"
-                className="text-xs font-semibold text-slate-500 dark:text-slate-400"
-              />
-            )}
-
-            <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-              {project.title}
-            </h3>
-
-            {project.about && (
-              <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-2">
-                {project.about.replace(/<[^>]*>/g, '').substring(0, 120)}
-                {project.about.replace(/<[^>]*>/g, '').length > 120 ? '...' : ''}
-              </p>
-            )}
-
-            {project.tags && project.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {project.tags.slice(0, 3).map((tag) => (
-                  <Tag key={tag} variant="indigo" size="sm">
-                    {tag}
-                  </Tag>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </article>
-    </Link>
-  )
+function getOSSItemHref(item: OSSItem, lang: string): string {
+  if (item.type === 'project')
+    return lang === 'ja' ? `/ja/work/${item.data.id}` : `/work/${item.data.id}`
+  if (item.type === 'npm') return (item.data as NPMRegistrySearchResult).package.links.npm
+  return `https://wordpress.org/plugins/${(item.data as WordPressPluginDetail).slug}`
 }
 
-// 統一されたOSSカードコンポーネント
-function UnifiedOSSCard({
-  item,
-  lang,
-}: {
-  item: { type: 'npm' | 'wordpress'; data: NPMRegistrySearchResult | WordPressPluginDetail }
-  lang: string
-}) {
-  if (item.type === 'npm') {
-    const pkg = (item.data as NPMRegistrySearchResult).package
-    const date = new Date(pkg.date)
-    const href = pkg.links.npm
-
-    return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className="group block">
-        <article className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all hover:border-indigo-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700">
-          {/* Content */}
-          <div className="p-5 lg:p-6">
-            <div className="flex flex-col gap-3">
-              <DateDisplay
-                date={date}
-                lang={lang}
-                format="short"
-                className="text-xs font-semibold text-slate-500 dark:text-slate-400"
-              />
-
-              <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                {pkg.name}
-              </h3>
-
-              {pkg.description && (
-                <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-2">
-                  {pkg.description}
-                </p>
-              )}
-
-              <Tag variant="indigo" size="sm">
-                npm
-              </Tag>
-            </div>
-          </div>
-        </article>
-      </a>
-    )
-  } else {
-    const plugin = item.data as WordPressPluginDetail
-    const date = new Date(plugin.added)
-    const href = `https://wordpress.org/plugins/${plugin.slug}`
-
-    return (
-      <a href={href} target="_blank" rel="noopener noreferrer" className="group block">
-        <article className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all hover:border-indigo-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700">
-          {/* Content */}
-          <div className="p-5 lg:p-6">
-            <div className="flex flex-col gap-3">
-              <DateDisplay
-                date={date}
-                lang={lang}
-                format="short"
-                className="text-xs font-semibold text-slate-500 dark:text-slate-400"
-              />
-
-              <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                {plugin.name}
-              </h3>
-
-              {plugin.short_description && (
-                <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-2">
-                  {plugin.short_description}
-                </p>
-              )}
-
-              <Tag variant="indigo" size="sm">
-                WordPress
-              </Tag>
-            </div>
-          </div>
-        </article>
-      </a>
-    )
-  }
+function getOSSItemTitle(item: OSSItem): string {
+  if (item.type === 'project') return (item.data as MicroCMSProjectsRecord).title
+  if (item.type === 'npm') return (item.data as NPMRegistrySearchResult).package.name
+  return (item.data as WordPressPluginDetail).name
 }
 
-// OSS Contributionリンク（GitHubリンクのみ）
-function OSSContributionLink({ project }: { project: MicroCMSProjectsRecord }) {
-  return (
-    <a
-      href={project.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-4 py-3 transition-all hover:border-indigo-300 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700"
-    >
-      <div className="flex flex-col gap-1">
-        <span className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-          {project.title}
-        </span>
-        {project.about && (
-          <span className="text-xs text-slate-600 dark:text-slate-400 line-clamp-1">
-            {project.about.replace(/<[^>]*>/g, '').substring(0, 80)}
-            {project.about.replace(/<[^>]*>/g, '').length > 80 ? '...' : ''}
-          </span>
-        )}
-      </div>
-      <svg
-        className="h-5 w-5 shrink-0 text-slate-400 transition-transform group-hover:translate-x-1 group-hover:text-indigo-600 dark:text-slate-500 dark:group-hover:text-indigo-400"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-      </svg>
-    </a>
-  )
-}
-
-// 統計バーコンポーネント
-function StatsBar({
-  projectCount,
-  ossCount,
-  bookCount,
-  npmCount,
-  lang,
-}: {
-  projectCount: number
-  ossCount: number
-  bookCount: number
-  npmCount: number
-  lang: string
-}) {
-  const stats = [
-    {
-      value: projectCount,
-      label: lang === 'ja' ? 'プロジェクト' : 'Projects',
-    },
-    {
-      value: ossCount,
-      label: lang === 'ja' ? 'OSS' : 'Open Source',
-    },
-    {
-      value: bookCount,
-      label: lang === 'ja' ? '書籍' : 'Books',
-    },
-    {
-      value: npmCount,
-      label: lang === 'ja' ? 'npm' : 'npm Packages',
-    },
-  ]
-
-  return (
-    <div className="mb-12 grid grid-cols-2 sm:grid-cols-4 gap-4">
-      {stats.map((stat, index) => (
-        <div
-          key={index}
-          className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 text-center transition-all hover:border-indigo-300 hover:shadow-md dark:hover:border-indigo-700"
-        >
-          <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
-            {stat.value}
-          </div>
-          <div className="mt-2 text-sm text-slate-600 dark:text-slate-400">{stat.label}</div>
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// CTAコンポーネント
-function WorkCTA({ lang }: { lang: string }) {
-  const title =
-    lang === 'ja' ? '一緒にプロジェクトを始めませんか？' : 'Interested in working together?'
-  const subtitle = lang === 'ja' ? 'お気軽にご連絡ください。' : 'Feel free to reach out'
-
-  return (
-    <section className="py-12 sm:py-16 bg-slate-50 dark:bg-zinc-800/50 border-t border-zinc-200 dark:border-zinc-700">
-      <Container>
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">
-            {title}
-          </h2>
-          <p className="text-lg text-slate-600 dark:text-slate-400 mb-8">{subtitle}</p>
-
-          {/* ソーシャルリンク */}
-          <div className="flex justify-center gap-4">
-            <a
-              href={SITE_CONFIG.social.twitter.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={SITE_CONFIG.social.twitter.ariaLabel}
-              className="group flex items-center justify-center h-12 w-12 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 transition hover:border-indigo-300 hover:bg-indigo-50 dark:hover:border-indigo-700 dark:hover:bg-zinc-800"
-            >
-              <TwitterIcon className="h-5 w-5 fill-slate-500 transition group-hover:fill-indigo-600 dark:fill-slate-400 dark:group-hover:fill-indigo-400" />
-            </a>
-            <a
-              href={SITE_CONFIG.social.github.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={SITE_CONFIG.social.github.ariaLabel}
-              className="group flex items-center justify-center h-12 w-12 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 transition hover:border-indigo-300 hover:bg-indigo-50 dark:hover:border-indigo-700 dark:hover:bg-zinc-800"
-            >
-              <GitHubIcon className="h-5 w-5 fill-slate-500 transition group-hover:fill-indigo-600 dark:fill-slate-400 dark:group-hover:fill-indigo-400" />
-            </a>
-            <a
-              href={SITE_CONFIG.social.linkedin.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={SITE_CONFIG.social.linkedin.ariaLabel}
-              className="group flex items-center justify-center h-12 w-12 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 transition hover:border-indigo-300 hover:bg-indigo-50 dark:hover:border-indigo-700 dark:hover:bg-zinc-800"
-            >
-              <LinkedInIcon className="h-5 w-5 fill-slate-500 transition group-hover:fill-indigo-600 dark:fill-slate-400 dark:group-hover:fill-indigo-400" />
-            </a>
-          </div>
-        </div>
-      </Container>
-    </section>
-  )
-}
-
-// サイドバーコンポーネント
-function Sidebar({
-  searchQuery,
-  onSearchChange,
-  filterCategory,
-  onFilterChange,
-  counts,
-  lang,
-}: {
-  searchQuery: string
-  onSearchChange: (value: string) => void
-  filterCategory: FilterCategory
-  onFilterChange: (category: FilterCategory) => void
-  counts: {
-    all: number
-    projects: number
-    'open-source': number
-    books: number
-    'oss-contribution': number
-  }
-  lang: string
-}) {
-  const searchPlaceholder = lang === 'ja' ? '検索...' : 'Search...'
-  const filterTitle = lang === 'ja' ? 'カテゴリ' : 'Category'
-  const allText = lang === 'ja' ? 'すべて' : 'All'
-  const projectsText = lang === 'ja' ? 'プロジェクト' : 'Projects'
-  const openSourceText = lang === 'ja' ? 'オープンソース' : 'Open Source'
-  const booksText = lang === 'ja' ? '書籍' : 'Books'
-  const ossContributionText = lang === 'ja' ? 'OSS貢献' : 'OSS Contributions'
-
-  return (
-    <div className="hidden lg:block space-y-6">
-      {/* 検索バー */}
-      <div>
-        <SearchBar value={searchQuery} onChange={onSearchChange} placeholder={searchPlaceholder} />
-      </div>
-
-      {/* フィルター */}
-      <div>
-        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
-          {filterTitle}
-        </h3>
-        <nav className="space-y-1">
-          <FilterItem
-            active={filterCategory === 'all'}
-            onClick={() => onFilterChange('all')}
-            count={counts.all}
-          >
-            {allText}
-          </FilterItem>
-          <FilterItem
-            active={filterCategory === 'projects'}
-            onClick={() => onFilterChange('projects')}
-            count={counts.projects}
-          >
-            {projectsText}
-          </FilterItem>
-          <FilterItem
-            active={filterCategory === 'open-source'}
-            onClick={() => onFilterChange('open-source')}
-            count={counts['open-source']}
-          >
-            {openSourceText}
-          </FilterItem>
-          <FilterItem
-            active={filterCategory === 'books'}
-            onClick={() => onFilterChange('books')}
-            count={counts.books}
-          >
-            {booksText}
-          </FilterItem>
-          <FilterItem
-            active={filterCategory === 'oss-contribution'}
-            onClick={() => onFilterChange('oss-contribution')}
-            count={counts['oss-contribution']}
-          >
-            {ossContributionText}
-          </FilterItem>
-        </nav>
-      </div>
-    </div>
-  )
+function getOSSItemMeta(item: OSSItem): string {
+  if (item.type === 'npm') return 'npm'
+  if (item.type === 'wordpress') return 'WordPress'
+  const p = item.data as MicroCMSProjectsRecord
+  return p.tags?.slice(0, 2).join(' · ') ?? ''
 }
 
 export default function WorkPageContent({
@@ -434,17 +79,12 @@ export default function WorkPageContent({
 }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [filterCategory, setFilterCategory] = useState<FilterCategory>('all')
-  const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false)
 
-  // プロジェクトをタイプ別に分類
   const booksProjects = projects.filter((p) => p.project_type?.includes('books'))
   const ownedOSSProjects = projects.filter((p) => p.project_type?.includes('owned_oss'))
   const ossContributionProjects = projects.filter((p) =>
     p.project_type?.includes('oss_contribution'),
   )
-
-  // プロジェクト（books, owned_oss, oss_contribution以外のすべて）
-  // applications, guest_posts, community_activitiesなど
   const mainProjects = projects.filter((p) => {
     const types = p.project_type || []
     return (
@@ -454,7 +94,6 @@ export default function WorkPageContent({
     )
   })
 
-  // オープンソース（owned_oss + NPM + WordPress）
   const allOSSItems = useMemo(
     () => [
       ...ownedOSSProjects.map((p) => ({ type: 'project' as const, data: p })),
@@ -464,85 +103,75 @@ export default function WorkPageContent({
     [ownedOSSProjects, npmPackages, wpPlugins],
   )
 
-  // 検索フィルター関数
   const matchesSearch = useCallback(
     (text: string): boolean => {
       if (!searchQuery.trim()) return true
-      const query = searchQuery.toLowerCase()
-      return text.toLowerCase().includes(query)
+      return text.toLowerCase().includes(searchQuery.toLowerCase())
     },
     [searchQuery],
   )
 
-  // フィルターと検索を適用
   const filteredProjects = useMemo(() => {
-    let items: MicroCMSProjectsRecord[] = []
-
-    if (filterCategory === 'all' || filterCategory === 'projects') {
-      items = [...mainProjects]
-    } else if (filterCategory === 'oss-contribution') {
-      items = [...ossContributionProjects]
-    }
-
-    return items.filter(
-      (p) =>
-        matchesSearch(p.title) ||
-        (p.about && matchesSearch(p.about.replace(/<[^>]*>/g, ''))) ||
-        p.tags?.some((tag) => matchesSearch(tag)),
+    if (
+      filterCategory !== 'all' &&
+      filterCategory !== 'projects' &&
+      filterCategory !== 'oss-contribution'
     )
+      return []
+    const items =
+      filterCategory === 'oss-contribution'
+        ? ossContributionProjects
+        : filterCategory === 'all' || filterCategory === 'projects'
+          ? mainProjects
+          : []
+    return items
+      .filter(
+        (p) =>
+          matchesSearch(p.title) ||
+          (p.about && matchesSearch(p.about.replace(/<[^>]*>/g, ''))) ||
+          p.tags?.some((tag) => matchesSearch(tag)),
+      )
+      .sort(
+        (a, b) =>
+          new Date(b.published_at || '').getTime() - new Date(a.published_at || '').getTime(),
+      )
   }, [filterCategory, mainProjects, ossContributionProjects, matchesSearch])
 
   const filteredBooks = useMemo(() => {
     if (filterCategory !== 'all' && filterCategory !== 'books') return []
-
-    return booksProjects.filter(
-      (p) =>
-        matchesSearch(p.title) ||
-        (p.about && matchesSearch(p.about.replace(/<[^>]*>/g, ''))) ||
-        p.tags?.some((tag) => matchesSearch(tag)),
-    )
+    return booksProjects
+      .filter(
+        (p) =>
+          matchesSearch(p.title) ||
+          (p.about && matchesSearch(p.about.replace(/<[^>]*>/g, ''))) ||
+          p.tags?.some((tag) => matchesSearch(tag)),
+      )
+      .sort(
+        (a, b) =>
+          new Date(b.published_at || '').getTime() - new Date(a.published_at || '').getTime(),
+      )
   }, [filterCategory, booksProjects, matchesSearch])
 
   const filteredOSS = useMemo(() => {
     if (filterCategory !== 'all' && filterCategory !== 'open-source') return []
-
-    return allOSSItems.filter((item) => filterOSSItem(item, matchesSearch))
+    return allOSSItems
+      .filter((item) => filterOSSItem(item, matchesSearch))
+      .sort((a, b) => new Date(getOSSItemDate(b)).getTime() - new Date(getOSSItemDate(a)).getTime())
   }, [filterCategory, allOSSItems, matchesSearch])
 
   const filteredOSSContributions = useMemo(() => {
     if (filterCategory !== 'all' && filterCategory !== 'oss-contribution') return []
-
-    return ossContributionProjects.filter(
-      (p) => matchesSearch(p.title) || (p.about && matchesSearch(p.about.replace(/<[^>]*>/g, ''))),
-    )
+    return ossContributionProjects
+      .filter(
+        (p) =>
+          matchesSearch(p.title) || (p.about && matchesSearch(p.about.replace(/<[^>]*>/g, ''))),
+      )
+      .sort(
+        (a, b) =>
+          new Date(b.published_at || '').getTime() - new Date(a.published_at || '').getTime(),
+      )
   }, [filterCategory, ossContributionProjects, matchesSearch])
 
-  // 日付順にソート
-  filteredProjects.sort((a, b) => {
-    const dateA = a.published_at || ''
-    const dateB = b.published_at || ''
-    return new Date(dateB).getTime() - new Date(dateA).getTime()
-  })
-
-  filteredBooks.sort((a, b) => {
-    const dateA = a.published_at || ''
-    const dateB = b.published_at || ''
-    return new Date(dateB).getTime() - new Date(dateA).getTime()
-  })
-
-  filteredOSSContributions.sort((a, b) => {
-    const dateA = a.published_at || ''
-    const dateB = b.published_at || ''
-    return new Date(dateB).getTime() - new Date(dateA).getTime()
-  })
-
-  filteredOSS.sort((a, b) => {
-    const dateA = getOSSItemDate(a)
-    const dateB = getOSSItemDate(b)
-    return new Date(dateB).getTime() - new Date(dateA).getTime()
-  })
-
-  // カウント計算
   const counts = useMemo(
     () => ({
       all:
@@ -558,228 +187,270 @@ export default function WorkPageContent({
     [mainProjects.length, allOSSItems.length, ossContributionProjects.length, booksProjects.length],
   )
 
-  // テキスト
-  const title = lang === 'ja' ? '制作物' : 'Work'
-  const description =
-    lang === 'ja'
-      ? '開発者・BizDevとして10年以上のキャリアから生まれたプロダクト、OSSプロジェクト、書籍を紹介しています。'
-      : 'Products, open source projects, and books born from over 10 years as a developer and BizDev professional.'
-  const filterButtonText = lang === 'ja' ? 'フィルター' : 'Filter'
+  const isJa = lang === 'ja'
+  const title = isJa ? '制作物' : 'Work'
+  const description = isJa
+    ? '開発者・BizDevとして10年以上のキャリアから生まれたプロダクト、OSSプロジェクト、書籍を紹介しています。'
+    : 'Products, open source projects, and books born from over 10 years as a developer and BizDev professional.'
 
-  // アクティブなフィルターの数を計算
-  const activeFilterCount = useMemo(() => {
-    return filterCategory !== 'all' ? 1 : 0
-  }, [filterCategory])
+  const filterLabels: Record<FilterCategory, string> = {
+    all: isJa ? 'すべて' : 'All',
+    projects: isJa ? 'プロジェクト' : 'Projects',
+    'open-source': isJa ? 'オープンソース' : 'Open Source',
+    books: isJa ? '書籍' : 'Books',
+    'oss-contribution': isJa ? 'OSS貢献' : 'OSS Contributions',
+  }
 
-  // フィルターグループを構築
-  const filterGroups = useMemo<FilterGroup[]>(() => {
-    const filterTitle = lang === 'ja' ? 'カテゴリ' : 'Category'
-    const allText = lang === 'ja' ? 'すべて' : 'All'
-    const projectsText = lang === 'ja' ? 'プロジェクト' : 'Projects'
-    const openSourceText = lang === 'ja' ? 'オープンソース' : 'Open Source'
-    const booksText = lang === 'ja' ? '書籍' : 'Books'
-    const ossContributionText = lang === 'ja' ? 'OSS貢献' : 'OSS Contributions'
+  const categories: FilterCategory[] = [
+    'all',
+    'projects',
+    'open-source',
+    'books',
+    'oss-contribution',
+  ]
 
-    return [
-      {
-        title: filterTitle,
-        items: [
-          {
-            id: 'all',
-            label: allText,
-            active: filterCategory === 'all',
-            count: counts.all,
-            onClick: () => setFilterCategory('all'),
-          },
-          {
-            id: 'projects',
-            label: projectsText,
-            active: filterCategory === 'projects',
-            count: counts.projects,
-            onClick: () => setFilterCategory('projects'),
-          },
-          {
-            id: 'open-source',
-            label: openSourceText,
-            active: filterCategory === 'open-source',
-            count: counts['open-source'],
-            onClick: () => setFilterCategory('open-source'),
-          },
-          {
-            id: 'books',
-            label: booksText,
-            active: filterCategory === 'books',
-            count: counts.books,
-            onClick: () => setFilterCategory('books'),
-          },
-          {
-            id: 'oss-contribution',
-            label: ossContributionText,
-            active: filterCategory === 'oss-contribution',
-            count: counts['oss-contribution'],
-            onClick: () => setFilterCategory('oss-contribution'),
-          },
-        ],
-      },
-    ]
-  }, [lang, filterCategory, counts])
+  const isEmpty =
+    filteredProjects.length === 0 &&
+    filteredBooks.length === 0 &&
+    filteredOSS.length === 0 &&
+    filteredOSSContributions.length === 0
+
+  const stats = [
+    { value: mainProjects.length, label: isJa ? 'プロジェクト' : 'Projects' },
+    { value: allOSSItems.length, label: isJa ? 'OSS' : 'Open Source' },
+    { value: booksProjects.length, label: isJa ? '書籍' : 'Books' },
+    { value: npmPackages.length, label: isJa ? 'npm' : 'npm Packages' },
+  ]
 
   return (
     <>
-      {/* モバイル用フィルタードロワー */}
-      <MobileFilterDrawer
-        isOpen={isMobileFilterOpen}
-        onClose={() => setIsMobileFilterOpen(false)}
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
-        searchPlaceholder={lang === 'ja' ? '検索...' : 'Search...'}
-        filterGroups={filterGroups}
-        title={filterButtonText}
-      />
+      <section className="mx-auto max-w-[1440px] px-8 sm:px-16 pt-12 pb-20">
+        <PageHeader eyebrow="WORK" title={title} sub={description} />
 
-      {/* Heroセクション + メインコンテンツ */}
-      <section className="relative pt-12 sm:pt-16 pb-8 sm:pb-12 bg-white dark:bg-zinc-900">
-        <BackgroundDecoration variant="section" />
+        {/* Metrics */}
+        <div className="ds-metrics" style={{ marginBottom: '2rem' }}>
+          {stats.map((s) => (
+            <div key={s.label} className="ds-metric">
+              <dt className="ds-metric__label">{s.label}</dt>
+              <dd className="ds-metric__value">{s.value}</dd>
+            </div>
+          ))}
+        </div>
 
-        <Container className="relative">
-          <PageHeader title={title} description={description} />
-
-          {/* 統計バー */}
-          <StatsBar
-            projectCount={mainProjects.length}
-            ossCount={allOSSItems.length}
-            bookCount={booksProjects.length}
-            npmCount={npmPackages.length}
-            lang={lang}
+        {/* Search + filter bar */}
+        <div className="ds-filter-bar">
+          <span className="ds-filter-bar__label">{isJa ? 'カテゴリ' : 'Category'}</span>
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              type="button"
+              className="ds-tag"
+              aria-pressed={filterCategory === cat ? 'true' : 'false'}
+              onClick={() => setFilterCategory(cat)}
+            >
+              {filterLabels[cat]} <small style={{ opacity: 0.6 }}>{counts[cat]}</small>
+            </button>
+          ))}
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder={isJa ? '検索...' : 'Search...'}
+            style={{
+              marginLeft: 'auto',
+              fontFamily: 'var(--font-mono)',
+              fontSize: 'var(--text-xs)',
+              background: 'transparent',
+              border: '1px solid var(--color-line-strong)',
+              color: 'var(--color-ink)',
+              padding: '4px 10px',
+              outline: 'none',
+            }}
           />
+        </div>
 
-          {/* モバイル用検索バーとフィルターボタン */}
-          <div className="lg:hidden mb-6 space-y-4">
-            <SearchBar
-              value={searchQuery}
-              onChange={setSearchQuery}
-              placeholder={lang === 'ja' ? '検索...' : 'Search...'}
-            />
-            <MobileFilterButton
-              onClick={() => setIsMobileFilterOpen(true)}
-              activeFilterCount={activeFilterCount}
-              label={filterButtonText}
-            />
+        {/* Projects */}
+        {(filterCategory === 'all' || filterCategory === 'projects') &&
+          filteredProjects.length > 0 && (
+            <div style={{ marginBottom: '3rem' }}>
+              <SectionHeader no="01" title={isJa ? 'プロジェクト' : 'Projects'} />
+              {filteredProjects.map((p, i) => {
+                const href = isJa ? `/ja/work/${p.id}` : `/work/${p.id}`
+                const date = p.published_at ? new Date(p.published_at) : null
+                return (
+                  <Link key={p.id} href={href} className="ds-entry">
+                    <span className="ds-entry__no">{String(i + 1).padStart(3, '0')}</span>
+                    <div>
+                      <p className="ds-entry__title">{p.title}</p>
+                      {p.about && (
+                        <p className="ds-entry__meta">
+                          {p.about.replace(/<[^>]*>/g, '').substring(0, 100)}
+                          {p.about.replace(/<[^>]*>/g, '').length > 100 ? '…' : ''}
+                        </p>
+                      )}
+                      {p.tags && p.tags.length > 0 && (
+                        <p className="ds-entry__meta">{p.tags.slice(0, 3).join(' · ')}</p>
+                      )}
+                    </div>
+                    {date && (
+                      <DateDisplay
+                        date={date}
+                        lang={lang}
+                        format="short"
+                        className="ds-entry__date"
+                      />
+                    )}
+                  </Link>
+                )
+              })}
+            </div>
+          )}
+
+        {/* Books */}
+        {(filterCategory === 'all' || filterCategory === 'books') && filteredBooks.length > 0 && (
+          <div style={{ marginBottom: '3rem' }}>
+            <SectionHeader no="02" title={isJa ? '書籍' : 'Books'} />
+            {filteredBooks.map((p, i) => {
+              const href = isJa ? `/ja/work/${p.id}` : `/work/${p.id}`
+              const date = p.published_at ? new Date(p.published_at) : null
+              return (
+                <Link key={p.id} href={href} className="ds-entry">
+                  <span className="ds-entry__no">{String(i + 1).padStart(3, '0')}</span>
+                  <div>
+                    <p className="ds-entry__title">{p.title}</p>
+                    {p.about && (
+                      <p className="ds-entry__meta">
+                        {p.about.replace(/<[^>]*>/g, '').substring(0, 100)}
+                        {p.about.replace(/<[^>]*>/g, '').length > 100 ? '…' : ''}
+                      </p>
+                    )}
+                  </div>
+                  {date && (
+                    <DateDisplay
+                      date={date}
+                      lang={lang}
+                      format="short"
+                      className="ds-entry__date"
+                    />
+                  )}
+                </Link>
+              )
+            })}
           </div>
+        )}
 
-          <SidebarLayout
-            sidebar={
-              <Sidebar
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-                filterCategory={filterCategory}
-                onFilterChange={setFilterCategory}
-                counts={counts}
-                lang={lang}
-              />
-            }
+        {/* Open Source */}
+        {(filterCategory === 'all' || filterCategory === 'open-source') &&
+          filteredOSS.length > 0 && (
+            <div style={{ marginBottom: '3rem' }}>
+              <SectionHeader no="03" title={isJa ? 'オープンソース' : 'Open Source'} />
+              {filteredOSS.map((item, i) => {
+                const href = getOSSItemHref(item, lang)
+                const title = getOSSItemTitle(item)
+                const meta = getOSSItemMeta(item)
+                const date = new Date(getOSSItemDate(item))
+                const isExternal =
+                  item.type !== 'project' || !!(item.data as MicroCMSProjectsRecord).url
+                const Comp = isExternal ? 'a' : Link
+                const extraProps =
+                  item.type !== 'project' ? { target: '_blank', rel: 'noopener noreferrer' } : {}
+                return (
+                  // biome-ignore lint/a11y/useValidAnchor: dynamic element
+                  <Comp key={`${item.type}-${i}`} href={href} {...extraProps} className="ds-entry">
+                    <span className="ds-entry__no">{String(i + 1).padStart(3, '0')}</span>
+                    <div>
+                      <p className="ds-entry__title">{title}</p>
+                      {meta && <p className="ds-entry__meta">{meta}</p>}
+                    </div>
+                    <DateDisplay
+                      date={date}
+                      lang={lang}
+                      format="short"
+                      className="ds-entry__date"
+                    />
+                  </Comp>
+                )
+              })}
+            </div>
+          )}
+
+        {/* OSS Contributions */}
+        {(filterCategory === 'all' || filterCategory === 'oss-contribution') &&
+          filteredOSSContributions.length > 0 && (
+            <div style={{ marginBottom: '3rem' }}>
+              <SectionHeader no="04" title={isJa ? 'OSS貢献' : 'OSS Contributions'} />
+              {filteredOSSContributions.map((p, i) => (
+                <a
+                  key={p.id}
+                  href={p.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ds-entry"
+                >
+                  <span className="ds-entry__no">{String(i + 1).padStart(3, '0')}</span>
+                  <div>
+                    <p className="ds-entry__title">{p.title}</p>
+                    {p.about && (
+                      <p className="ds-entry__meta">
+                        {p.about.replace(/<[^>]*>/g, '').substring(0, 80)}
+                        {p.about.replace(/<[^>]*>/g, '').length > 80 ? '…' : ''}
+                      </p>
+                    )}
+                  </div>
+                  <span className="ds-entry__date">GitHub →</span>
+                </a>
+              ))}
+            </div>
+          )}
+
+        {isEmpty && (
+          <p
+            style={{
+              color: 'var(--color-muted)',
+              padding: '3rem 0',
+              fontFamily: 'var(--font-mono)',
+              fontSize: 'var(--text-sm)',
+            }}
           >
-            {/* プロジェクトセクション */}
-            {(filterCategory === 'all' || filterCategory === 'projects') &&
-              filteredProjects.length > 0 && (
-                <div className="mb-12">
-                  <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
-                    {lang === 'ja' ? 'プロジェクト' : 'Projects'}
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                    {filteredProjects.map((project) => (
-                      <UnifiedProjectCard key={project.id} project={project} lang={lang} />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-            {/* 書籍セクション */}
-            {(filterCategory === 'all' || filterCategory === 'books') &&
-              filteredBooks.length > 0 && (
-                <div className="mb-12">
-                  <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
-                    {lang === 'ja' ? '書籍' : 'Books'}
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                    {filteredBooks.map((project) => (
-                      <UnifiedProjectCard key={project.id} project={project} lang={lang} />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-            {/* オープンソースセクション */}
-            {(filterCategory === 'all' || filterCategory === 'open-source') &&
-              filteredOSS.length > 0 && (
-                <div className="mb-12">
-                  <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
-                    {lang === 'ja' ? 'オープンソース' : 'Open Source'}
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-                    {filteredOSS.map((item, _index) => {
-                      if (item.type === 'project') {
-                        return (
-                          <UnifiedProjectCard
-                            key={item.data.id}
-                            project={item.data as MicroCMSProjectsRecord}
-                            lang={lang}
-                          />
-                        )
-                      } else if (item.type === 'npm') {
-                        return (
-                          <UnifiedOSSCard
-                            key={`npm-${(item.data as NPMRegistrySearchResult).package.name}`}
-                            item={{ type: 'npm', data: item.data as NPMRegistrySearchResult }}
-                            lang={lang}
-                          />
-                        )
-                      } else {
-                        return (
-                          <UnifiedOSSCard
-                            key={`wp-${(item.data as WordPressPluginDetail).slug}`}
-                            item={{ type: 'wordpress', data: item.data as WordPressPluginDetail }}
-                            lang={lang}
-                          />
-                        )
-                      }
-                    })}
-                  </div>
-                </div>
-              )}
-
-            {/* OSS Contributionセクション */}
-            {(filterCategory === 'all' || filterCategory === 'oss-contribution') &&
-              filteredOSSContributions.length > 0 && (
-                <div>
-                  <h2 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
-                    {lang === 'ja' ? 'OSS貢献' : 'OSS Contributions'}
-                  </h2>
-                  <div className="space-y-3">
-                    {filteredOSSContributions.map((project) => (
-                      <OSSContributionLink key={project.id} project={project} />
-                    ))}
-                  </div>
-                </div>
-              )}
-
-            {/* 結果なし */}
-            {filteredProjects.length === 0 &&
-              filteredBooks.length === 0 &&
-              filteredOSS.length === 0 &&
-              filteredOSSContributions.length === 0 && (
-                <div className="py-12 text-center">
-                  <p className="text-slate-600 dark:text-slate-400">
-                    {lang === 'ja' ? '該当する項目が見つかりませんでした。' : 'No items found.'}
-                  </p>
-                </div>
-              )}
-          </SidebarLayout>
-        </Container>
+            {isJa ? '該当する項目が見つかりませんでした。' : 'No items found.'}
+          </p>
+        )}
       </section>
 
-      {/* CTA セクション */}
-      <WorkCTA lang={lang} />
+      {/* CTA */}
+      <div className="mx-auto max-w-[1440px] px-8 sm:px-16">
+        <div className="ds-cta-block">
+          <span className="ds-cta-block__pre">{isJa ? 'お問い合わせ' : 'Collaboration'}</span>
+          <h2 className="ds-cta-block__title">
+            {isJa ? (
+              <>
+                一緒にプロジェクトを
+                <br />
+                <em>始めませんか？</em>
+              </>
+            ) : (
+              <>
+                Interested in working
+                <br />
+                <em>together?</em>
+              </>
+            )}
+          </h2>
+          <div className="ds-cta-block__actions">
+            <a href="mailto:hello@hidetaka.dev" className="ds-btn ds-btn--primary ds-btn--lg">
+              {isJa ? 'お問い合わせ' : 'Get in touch'}
+            </a>
+            <Link
+              href={SITE_CONFIG.social.twitter.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ds-btn ds-btn--secondary ds-btn--lg"
+            >
+              Twitter / X
+            </Link>
+          </div>
+        </div>
+      </div>
     </>
   )
 }

@@ -9,6 +9,9 @@ module.exports = {
 	theme: {
 		extend: {
 			fontFamily: {
+				sans: ['var(--font-zen-kaku)', 'var(--font-inter-tight)', 'system-ui', 'sans-serif'],
+				serif: ['var(--font-shippori)', 'var(--font-inter-tight)', 'Georgia', 'serif'],
+				mono: ['var(--font-jetbrains)', 'ui-monospace', 'monospace'],
 				japanese: [
 					'"Noto Sans JP"',
 					'"Hiragino Kaku Gothic ProN"',
@@ -17,6 +20,9 @@ module.exports = {
 					'Arial',
 					'sans-serif',
 				],
+			},
+			colors: {
+				vermilion: '#ff5b29',
 			},
 		},
 	},

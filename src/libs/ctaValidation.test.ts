@@ -401,7 +401,10 @@ describe('ctaValidation', () => {
             heading: fc.string(),
             description: fc.string(),
             buttons: fc.array(
-              fc.record({ text: fc.string(), href: fc.constant('data:text/html,<script>alert("XSS")</script>') }),
+              fc.record({
+                text: fc.string(),
+                href: fc.constant('data:text/html,<script>alert("XSS")</script>'),
+              }),
               { minLength: 1, maxLength: 3 },
             ),
           }),

@@ -1,23 +1,26 @@
 'use client'
-
 import { useEffect } from 'react'
 
 export function DarkModeScript() {
   useEffect(() => {
     const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
+    function applyTheme(isDark: boolean) {
+      if (isDark) {
+        document.documentElement.classList.add('dark')
+        document.documentElement.dataset.theme = 'dark'
+      } else {
+        document.documentElement.classList.remove('dark')
+        document.documentElement.dataset.theme = 'light'
+      }
+    }
+
     function updateMode() {
       const isSystemDarkMode = darkModeMediaQuery.matches
       const isDarkMode =
         window.localStorage.isDarkMode === 'true' ||
         (!('isDarkMode' in window.localStorage) && isSystemDarkMode)
-
-      if (isDarkMode) {
-        document.documentElement.classList.add('dark')
-      } else {
-        document.documentElement.classList.remove('dark')
-      }
-
+      applyTheme(isDarkMode)
       if (isDarkMode === isSystemDarkMode) {
         delete window.localStorage.isDarkMode
       }
@@ -38,12 +41,10 @@ export function DarkModeScript() {
     updateMode()
     darkModeMediaQuery.addEventListener('change', updateModeWithoutTransitions)
     window.addEventListener('storage', updateModeWithoutTransitions)
-
     return () => {
       darkModeMediaQuery.removeEventListener('change', updateModeWithoutTransitions)
       window.removeEventListener('storage', updateModeWithoutTransitions)
     }
   }, [])
-
   return null
 }

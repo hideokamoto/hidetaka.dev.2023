@@ -40,39 +40,49 @@ export default function NewsDetailPage({
     <Container className="mt-16 sm:mt-32">
       <article className="max-w-3xl mx-auto">
         {/* パンくずリスト */}
-        <nav aria-label="Breadcrumb" className="mb-8">
-          <ol className="flex items-center space-x-2">
+        <nav
+          aria-label="Breadcrumb"
+          className="mb-8"
+          style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: 'var(--text-xs)',
+            letterSpacing: '0.1em',
+            color: 'var(--color-muted)',
+          }}
+        >
+          <ol style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <li>
-              <div className="flex items-center text-sm">
-                <Link
-                  href={basePath}
-                  className="font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors"
-                >
-                  {newsLabel}
-                </Link>
-                <svg
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  aria-hidden="true"
-                  className="ml-2 size-5 shrink-0 text-slate-300 dark:text-slate-600"
-                >
-                  <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
-                </svg>
-              </div>
+              <Link href={basePath} style={{ color: 'var(--color-muted)' }}>
+                {newsLabel}
+              </Link>
             </li>
-            <li>
-              <div className="flex items-center text-sm">
-                <span className="font-medium text-slate-900 dark:text-slate-100 line-clamp-1">
-                  {product.title.rendered}
-                </span>
-              </div>
+            <li style={{ opacity: 0.4 }}>/</li>
+            <li
+              style={{
+                color: 'var(--color-ink)',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                maxWidth: '40ch',
+              }}
+            >
+              {product.title.rendered}
             </li>
           </ol>
         </nav>
 
         {/* タイトル */}
         <header className="mb-6">
-          <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-5xl">
+          <h1
+            style={{
+              fontFamily: 'var(--font-sans)',
+              fontWeight: 900,
+              fontSize: 'clamp(28px,4vw,48px)',
+              lineHeight: 1.1,
+              letterSpacing: '-0.025em',
+              color: 'var(--color-ink)',
+            }}
+          >
             {product.title.rendered}
           </h1>
         </header>
@@ -136,36 +146,26 @@ export default function NewsDetailPage({
         {(previousProduct || nextProduct) && (
           <nav
             aria-label="記事ナビゲーション"
-            className="mt-16 pt-8 border-t border-zinc-200 dark:border-zinc-700"
+            className="ds-pagination"
+            style={{ marginTop: '4rem' }}
           >
-            <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
-              {/* 次の記事 */}
+            <div>
               {nextProduct && (
                 <Link
                   href={`${basePath}/${nextProduct.slug}`}
-                  className="group flex flex-col flex-1 p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                  className="ds-btn ds-btn--ghost ds-btn--sm"
                 >
-                  <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                    ← {nextLabel}
-                  </span>
-                  <span className="text-base font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2">
-                    {nextProduct.title.rendered}
-                  </span>
+                  ← {nextLabel}
                 </Link>
               )}
-
-              {/* 前の記事 */}
+            </div>
+            <div>
               {previousProduct && (
                 <Link
                   href={`${basePath}/${previousProduct.slug}`}
-                  className="group flex flex-col flex-1 p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors text-right"
+                  className="ds-btn ds-btn--ghost ds-btn--sm"
                 >
-                  <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">
-                    {previousLabel} →
-                  </span>
-                  <span className="text-base font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2">
-                    {previousProduct.title.rendered}
-                  </span>
+                  {previousLabel} →
                 </Link>
               )}
             </div>

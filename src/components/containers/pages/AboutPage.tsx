@@ -1,14 +1,6 @@
 import Image from 'next/image'
+import Link from 'next/link'
 import Profile from '@/components/content/Profile'
-import Container from '@/components/tailwindui/Container'
-import SocialLink, {
-  GitHubIcon,
-  LinkedInIcon,
-  TwitterIcon,
-} from '@/components/tailwindui/SocialLink'
-import BackgroundDecoration from '@/components/ui/BackgroundDecoration'
-import PageHeader from '@/components/ui/PageHeader'
-import ProfileImage from '@/components/ui/ProfileImage'
 import SectionHeader from '@/components/ui/SectionHeader'
 import { SITE_CONFIG } from '@/config'
 
@@ -18,7 +10,7 @@ function SpeakerProfile({ lang }: { lang: 'ja' | 'en' }) {
       <>
         DigitalCubeのBizDevとして、SaaSやECサイトの収益を増やすための方法・生成AIを使った効率化や新しい事業モデルの模索などに挑戦している。前職では
         <a
-          className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 underline"
+          style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}
           href="https://stripe.com/docs"
         >
           Stripe
@@ -34,7 +26,7 @@ function SpeakerProfile({ lang }: { lang: 'ja' | 'en' }) {
     <>
       Hide (ひで pronounced &quot;Hee-Day&quot;) is a Business Development professional at{' '}
       <a
-        className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 underline"
+        style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}
         href="https://en.digitalcube.jp/"
       >
         DigitalCube
@@ -43,7 +35,7 @@ function SpeakerProfile({ lang }: { lang: 'ja' | 'en' }) {
       improvements using generative AI, and developing new business models. Previously, he was a
       Developer Advocate at{' '}
       <a
-        className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 underline"
+        style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}
         href="https://stripe.com/docs"
       >
         Stripe
@@ -51,7 +43,7 @@ function SpeakerProfile({ lang }: { lang: 'ja' | 'en' }) {
       , where he worked on writing, coding, and teaching how to integrate online payments. He has
       organized several community conferences including WordCamp Kansai 2024 and{' '}
       <a
-        className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 underline"
+        style={{ color: 'var(--color-accent)', textDecoration: 'underline' }}
         href="https://connect2019.jpstripes.com/"
       >
         JP_Stripes Connect 2019
@@ -63,33 +55,44 @@ function SpeakerProfile({ lang }: { lang: 'ja' | 'en' }) {
   )
 }
 
-type ExperienceCardProps = {
+type ExperienceItem = {
+  no: string
   title: string
   period: string
   description: string
   highlights?: string[]
 }
 
-function ExperienceCard({ title, period, description, highlights }: ExperienceCardProps) {
+function ExperiencePanel({ item }: { item: ExperienceItem }) {
   return (
-    <article className="group relative flex h-full flex-col rounded-2xl border border-zinc-200 bg-white p-8 transition-all hover:shadow-md hover:border-indigo-200 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-800">
-      <div className="flex items-start justify-between gap-4 mb-4">
-        <h3 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
-          {title}
-        </h3>
-        <span className="text-sm font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
-          {period}
+    <article className="ds-panel">
+      <span className="ds-panel__no">{item.no}</span>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          gap: '1rem',
+        }}
+      >
+        <h3 className="ds-panel__title">{item.title}</h3>
+        <span
+          style={{
+            fontFamily: 'var(--font-mono)',
+            fontSize: 'var(--text-xs)',
+            color: 'var(--color-muted)',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {item.period}
         </span>
       </div>
-      <p className="text-base leading-relaxed text-slate-700 dark:text-slate-400 mb-6">
-        {description}
-      </p>
-      {highlights && highlights.length > 0 && (
-        <ul className="mt-auto space-y-3 text-sm leading-6 text-slate-600 dark:text-slate-400">
-          {highlights.map((highlight) => (
-            <li key={highlight} className="flex items-start gap-3">
-              <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-indigo-600 dark:bg-indigo-400" />
-              <span>{highlight}</span>
+      <p className="ds-panel__body">{item.description}</p>
+      {item.highlights && item.highlights.length > 0 && (
+        <ul className="ds-panel__bullets">
+          {item.highlights.map((h) => (
+            <li key={h} className="ds-panel__bullet">
+              {h}
             </li>
           ))}
         </ul>
@@ -98,42 +101,18 @@ function ExperienceCard({ title, period, description, highlights }: ExperienceCa
   )
 }
 
-function CertificationBadge({ title, link, src }: { title: string; link?: string; src: string }) {
-  const content = (
-    <div className="group relative transition-transform hover:scale-105">
-      <Image
-        src={src}
-        width={120}
-        height={120}
-        alt={title}
-        className="rounded-lg shadow-sm group-hover:shadow-md transition-shadow"
-      />
-    </div>
-  )
-
-  if (link) {
-    return (
-      <a href={link} target="_blank" rel="noopener noreferrer" className="block" aria-label={title}>
-        {content}
-      </a>
-    )
-  }
-
-  return content
-}
-
 export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
   const isJa = lang.startsWith('ja')
 
-  const pageTitle = isJa ? 'Hidetaka Okamotoについて' : 'About Hidetaka Okamoto'
   const pageDescription = isJa
     ? 'SaaSやECサイトの収益最大化を支援するエンジニア。Stripe、AWS Serverless、WordPressを専門としています。'
     : 'Engineering partner specializing in Stripe, AWS Serverless, and WordPress. Helping SaaS and e-commerce sites maximize revenue.'
 
-  const experiences: ExperienceCardProps[] = isJa
+  const experiences: ExperienceItem[] = isJa
     ? [
         {
-          title: 'DigitalCube - Business Development',
+          no: '01',
+          title: 'DigitalCube — Business Development',
           period: '2024 - 現在',
           description:
             'SaaSやECサイトの収益を増やすための方法・生成AIを使った効率化や新しい事業モデルの模索などに挑戦しています。',
@@ -144,7 +123,8 @@ export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
           ],
         },
         {
-          title: 'Stripe - Developer Advocate',
+          no: '02',
+          title: 'Stripe — Developer Advocate',
           period: '2019 - 2024',
           description:
             '開発者・ユーザーコミュニティとの対話やコンテンツ・サンプルの提供に取り組みました。',
@@ -155,7 +135,8 @@ export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
           ],
         },
         {
-          title: 'DigitalCube - Lead Software Engineer',
+          no: '03',
+          title: 'DigitalCube — Lead Software Engineer',
           period: '2015 - 2019',
           description:
             'プラグイン開発、オープンソースプロジェクト、SaaSアプリケーションダッシュボードの開発に従事しました。',
@@ -168,7 +149,8 @@ export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
       ]
     : [
         {
-          title: 'DigitalCube - Business Development',
+          no: '01',
+          title: 'DigitalCube — Business Development',
           period: '2024 - Present',
           description:
             'Working on methods to increase revenue for SaaS and EC sites, exploring efficiency improvements using generative AI, and developing new business models.',
@@ -179,7 +161,8 @@ export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
           ],
         },
         {
-          title: 'Stripe - Developer Advocate',
+          no: '02',
+          title: 'Stripe — Developer Advocate',
           period: '2019 - 2024',
           description:
             'Worked on writing, coding, and teaching how to integrate online payments. Engaged with developer and user communities.',
@@ -190,7 +173,8 @@ export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
           ],
         },
         {
-          title: 'DigitalCube - Lead Software Engineer',
+          no: '03',
+          title: 'DigitalCube — Lead Software Engineer',
           period: '2015 - 2019',
           description:
             'Focused on building plugins, open source projects, and developing SaaS application dashboards.',
@@ -225,114 +209,268 @@ export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
     },
   ]
 
-  const certificationsTitle = isJa ? '認定証' : 'Certifications'
   const experienceTitle = isJa ? '経歴' : 'Experience'
+  const certificationsTitle = isJa ? '認定証' : 'Certifications'
   const connectTitle = isJa ? '連絡先' : 'Connect'
+  const moreAboutTitle = isJa ? '詳細プロフィール' : 'More About Me'
+  const profileTitle = isJa ? 'プロフィール' : 'Profile'
 
   return (
     <>
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-white via-indigo-50/40 to-purple-50/30 dark:from-zinc-900 dark:via-indigo-950/30 dark:to-purple-950/20 -mt-[var(--header-height)] pt-[var(--header-height)]">
-        <BackgroundDecoration variant="hero" />
+      {/* Hero */}
+      <section style={{ borderBottom: '1px solid var(--color-line-strong)' }}>
+        <div className="mx-auto max-w-[1440px] px-8 sm:px-16">
+          {/* Top bar */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr auto',
+              padding: '0.75rem 0',
+              borderBottom: '1px solid var(--color-line)',
+            }}
+          >
+            <span
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: 'var(--text-2xs)',
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: 'var(--color-muted)',
+              }}
+            >
+              Hidetaka.dev / ABOUT
+            </span>
+            <span
+              style={{
+                fontFamily: 'var(--font-mono)',
+                fontSize: 'var(--text-2xs)',
+                letterSpacing: '0.14em',
+                textTransform: 'uppercase',
+                color: 'var(--color-muted)',
+              }}
+            >
+              {isJa ? 'プロフィール' : 'ABOUT · PROFILE'}
+            </span>
+          </div>
 
-        <Container className="relative py-24 sm:py-32 lg:py-40">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-16 lg:gap-20">
-            {/* Left: Content */}
-            <div className="flex-1 space-y-8 lg:max-w-2xl">
-              <PageHeader title={pageTitle} description={pageDescription} />
-              <div className="space-y-6 text-base leading-relaxed text-slate-600 dark:text-slate-400">
+          {/* Main grid */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr',
+              gap: '3rem',
+              paddingTop: '3rem',
+              paddingBottom: '4rem',
+            }}
+            className="lg:grid-cols-[1fr_320px]"
+          >
+            {/* Left */}
+            <div>
+              <div
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: 'var(--text-2xs)',
+                  letterSpacing: '0.2em',
+                  textTransform: 'uppercase',
+                  color: 'var(--color-muted)',
+                  marginBottom: '1rem',
+                }}
+              >
+                &#9675; {profileTitle}
+              </div>
+              <h1
+                style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontWeight: 900,
+                  fontSize: 'clamp(40px,6vw,80px)',
+                  lineHeight: 1,
+                  letterSpacing: '-0.03em',
+                  color: 'var(--color-ink)',
+                  marginBottom: '1.5rem',
+                }}
+              >
+                {isJa ? 'Hidetaka\nOkamoto' : 'Hidetaka\nOkamoto'}
+              </h1>
+              <p
+                style={{
+                  fontFamily: 'var(--font-serif)',
+                  fontSize: 'var(--text-md)',
+                  lineHeight: 'var(--leading-loose)',
+                  color: 'var(--color-ink-2)',
+                  maxWidth: '38em',
+                }}
+              >
+                {pageDescription}
+              </p>
+              <div
+                style={{
+                  marginTop: '2rem',
+                  fontFamily: 'var(--font-serif)',
+                  fontSize: 'var(--text-base)',
+                  lineHeight: 'var(--leading-loose)',
+                  color: 'var(--color-ink-2)',
+                  maxWidth: '38em',
+                }}
+              >
                 <Profile lang={lang} />
               </div>
             </div>
 
-            {/* Right: Image */}
-            <ProfileImage src="/images/profile.jpg" alt="Hidetaka Okamoto" size="lg" />
-          </div>
-        </Container>
-      </section>
-
-      {/* Experience Section */}
-      <section className="relative py-24 sm:py-32">
-        <Container>
-          <SectionHeader
-            title={experienceTitle}
-            description={isJa ? 'これまでの経験と専門性' : 'Professional experience and expertise'}
-            align="center"
-          />
-
-          <div className="mt-20 grid gap-8 lg:grid-cols-3 lg:gap-10">
-            {experiences.map((experience) => (
-              <ExperienceCard key={experience.title} {...experience} />
-            ))}
-          </div>
-
-          {/* Additional Profile */}
-          <div className="mt-16 max-w-3xl mx-auto">
-            <div className="rounded-2xl border border-zinc-200 bg-white p-10 dark:border-zinc-800 dark:bg-zinc-900">
-              <h3 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white mb-6">
-                {isJa ? '詳細プロフィール' : 'More About Me'}
-              </h3>
-              <div className="space-y-6 text-base leading-relaxed text-slate-700 dark:text-slate-400">
-                <SpeakerProfile lang={lang} />
-              </div>
+            {/* Right: portrait */}
+            <div
+              style={{
+                position: 'relative',
+                aspectRatio: '3/4',
+                border: '1px solid var(--color-line-strong)',
+                overflow: 'hidden',
+              }}
+            >
+              <Image
+                src="/images/profile.jpg"
+                alt="Hidetaka Okamoto"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 320px"
+                priority
+              />
             </div>
           </div>
-        </Container>
+        </div>
       </section>
 
-      {/* Certifications Section */}
-      <section className="relative py-24 sm:py-32 bg-white dark:bg-zinc-900">
-        <Container>
+      {/* Experience */}
+      <section style={{ borderBottom: '1px solid var(--color-line-strong)' }}>
+        <div className="mx-auto max-w-[1440px] px-8 sm:px-16 py-16">
           <SectionHeader
-            title={certificationsTitle}
-            description={isJa ? 'Stripe認定資格' : 'Stripe certifications'}
-            align="center"
+            no="01"
+            title={experienceTitle}
+            titleSub={isJa ? 'これまでの経験と専門性' : 'Professional experience and expertise'}
           />
 
-          <div className="mt-16 flex flex-wrap justify-center gap-8 lg:gap-10">
-            {certifications.map((cert) => (
-              <CertificationBadge key={cert.title} {...cert} />
+          <div className="ds-panel-grid ds-panel-grid--3" style={{ marginTop: '2rem' }}>
+            {experiences.map((exp) => (
+              <ExperiencePanel key={exp.no} item={exp} />
             ))}
           </div>
-        </Container>
+
+          {/* Additional profile */}
+          <div style={{ marginTop: '2rem' }}>
+            <article className="ds-panel" style={{ maxWidth: '800px' }}>
+              <h3 className="ds-panel__title">{moreAboutTitle}</h3>
+              <p className="ds-panel__body">
+                <SpeakerProfile lang={lang} />
+              </p>
+            </article>
+          </div>
+        </div>
       </section>
 
-      {/* Connect Section */}
-      <section className="relative py-24 sm:py-32">
-        <Container>
+      {/* Certifications */}
+      <section style={{ borderBottom: '1px solid var(--color-line-strong)' }}>
+        <div className="mx-auto max-w-[1440px] px-8 sm:px-16 py-16">
           <SectionHeader
-            title={connectTitle}
-            description={isJa ? 'SNSやGitHubでフォローしてください' : 'Follow me on social media'}
-            align="center"
+            no="02"
+            title={certificationsTitle}
+            titleSub={isJa ? 'Stripe認定資格' : 'Stripe certifications'}
           />
 
-          <div className="mt-16 flex justify-center">
-            <ul className="space-y-6">
-              <SocialLink
-                href={SITE_CONFIG.social.twitter.url}
-                icon={TwitterIcon}
-                aria-label={SITE_CONFIG.social.twitter.ariaLabel}
-              >
-                {isJa ? 'Twitterでフォロー' : 'Follow on Twitter'}
-              </SocialLink>
-              <SocialLink
-                href={SITE_CONFIG.social.github.url}
-                icon={GitHubIcon}
-                aria-label={SITE_CONFIG.social.github.ariaLabel}
-              >
-                {isJa ? 'GitHubでフォロー' : 'Follow on GitHub'}
-              </SocialLink>
-              <SocialLink
-                href={SITE_CONFIG.social.linkedin.url}
-                icon={LinkedInIcon}
-                aria-label={SITE_CONFIG.social.linkedin.ariaLabel}
-              >
-                {isJa ? 'LinkedInでフォロー' : 'Follow on LinkedIn'}
-              </SocialLink>
-            </ul>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem', marginTop: '2rem' }}>
+            {certifications.map((cert) =>
+              cert.link ? (
+                <a
+                  key={cert.title}
+                  href={cert.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={cert.title}
+                >
+                  <Image src={cert.src} width={120} height={120} alt={cert.title} />
+                </a>
+              ) : (
+                <Image key={cert.title} src={cert.src} width={120} height={120} alt={cert.title} />
+              ),
+            )}
           </div>
-        </Container>
+        </div>
       </section>
+
+      {/* Connect */}
+      <section>
+        <div className="mx-auto max-w-[1440px] px-8 sm:px-16 py-16">
+          <SectionHeader
+            no="03"
+            title={connectTitle}
+            titleSub={isJa ? 'SNSやGitHubでフォローしてください' : 'Follow me on social media'}
+          />
+
+          <div
+            style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '2rem' }}
+          >
+            <Link
+              href={SITE_CONFIG.social.twitter.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ds-btn ds-btn--secondary"
+              style={{ width: 'fit-content' }}
+              aria-label={SITE_CONFIG.social.twitter.ariaLabel}
+            >
+              Twitter / X →
+            </Link>
+            <Link
+              href={SITE_CONFIG.social.github.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ds-btn ds-btn--secondary"
+              style={{ width: 'fit-content' }}
+              aria-label={SITE_CONFIG.social.github.ariaLabel}
+            >
+              GitHub →
+            </Link>
+            <Link
+              href={SITE_CONFIG.social.linkedin.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="ds-btn ds-btn--secondary"
+              style={{ width: 'fit-content' }}
+              aria-label={SITE_CONFIG.social.linkedin.ariaLabel}
+            >
+              LinkedIn →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <div className="mx-auto max-w-[1440px] px-8 sm:px-16">
+        <div className="ds-cta-block">
+          <span className="ds-cta-block__pre">{isJa ? 'お問い合わせ' : 'Get In Touch'}</span>
+          <h2 className="ds-cta-block__title">
+            {isJa ? (
+              <>
+                一緒に<em>プロジェクト</em>を<br />
+                始めませんか？
+              </>
+            ) : (
+              <>
+                Let&apos;s build something
+                <br />
+                <em>together.</em>
+              </>
+            )}
+          </h2>
+          <div className="ds-cta-block__actions">
+            <a href="mailto:hello@hidetaka.dev" className="ds-btn ds-btn--primary ds-btn--lg">
+              {isJa ? 'メールで相談する' : 'Get in touch'}
+            </a>
+            <Link
+              href={isJa ? '/ja/work' : '/work'}
+              className="ds-btn ds-btn--secondary ds-btn--lg"
+            >
+              {isJa ? '制作物を見る' : 'View my work'}
+            </Link>
+          </div>
+        </div>
+      </div>
     </>
   )
 }

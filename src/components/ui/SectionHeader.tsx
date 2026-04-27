@@ -1,30 +1,28 @@
-import { getSectionHeaderAlignStyles, type SectionHeaderAlign } from '@/libs/componentStyles.utils'
-
 type SectionHeaderProps = {
+  no?: string
   title: string
+  titleSub?: string
+  action?: React.ReactNode
   description?: string
-  align?: SectionHeaderAlign
+  align?: 'left' | 'center' | 'right'
   className?: string
 }
 
 export default function SectionHeader({
+  no,
   title,
-  description,
-  align = 'center',
+  titleSub,
+  action,
   className = '',
 }: SectionHeaderProps) {
-  const alignStyles = getSectionHeaderAlignStyles(align)
-
   return (
-    <div className={`mx-auto max-w-3xl ${alignStyles} ${className}`}>
-      <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+    <header className={`ds-sec-header ${className}`}>
+      {no && <div className="ds-sec-header__no">{no}</div>}
+      <h2 className="ds-sec-header__title">
         {title}
+        {titleSub && <small>{titleSub}</small>}
       </h2>
-      {description && (
-        <p className="mt-6 text-lg leading-relaxed text-slate-700 dark:text-slate-400">
-          {description}
-        </p>
-      )}
-    </div>
+      {action && <div className="ds-sec-header__action">{action}</div>}
+    </header>
   )
 }

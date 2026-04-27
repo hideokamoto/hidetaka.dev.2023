@@ -2,3 +2,8 @@
 @import "tailwindcss/components";
 /*@import './prism.css';*/
 @import "tailwindcss/utilities";
+
+body {
+  font-feature-settings: "palt";
+  -webkit-font-smoothing: antialiased;
+}
