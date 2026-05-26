@@ -1,5 +1,7 @@
 import WritingPageContent from '@/components/containers/pages/WritingPage'
+import StatsSection from '@/components/ui/stats/StatsSection'
 import { loadBlogPosts } from '@/libs/dataSources/blogs'
+import { loadStatsPosts } from '@/libs/stats/loadStatsPosts'
 
 export const metadata = {
   title: 'Writing',
@@ -9,13 +11,17 @@ export const metadata = {
 export const revalidate = 3600
 
 export default async function WritingPage() {
-  const { items: externalArticles, hasMoreBySource } = await loadBlogPosts('ja')
+  const [{ items: externalArticles, hasMoreBySource }, statsItems] = await Promise.all([
+    loadBlogPosts('ja'),
+    loadStatsPosts('ja'),
+  ])
 
   return (
     <WritingPageContent
       lang="ja"
       externalArticles={externalArticles}
       hasMoreBySource={hasMoreBySource}
+      statsSlot={<StatsSection items={statsItems} lang="ja" />}
     />
   )
 }

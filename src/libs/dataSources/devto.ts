@@ -1,24 +1,29 @@
 import type { FeedDataSource, FeedItem } from './types'
 
-export const loadDevToPosts = async (): Promise<{ items: FeedItem[]; hasMore: boolean }> => {
+export const loadDevToPosts = async (
+  limit = 20,
+): Promise<{ items: FeedItem[]; hasMore: boolean }> => {
   const dataSource: FeedDataSource = {
     href: 'https://dev.to',
     name: 'Dev.to',
     color: 'bg-green-100 text-gren-800',
   }
-  const personal = await fetch('https://dev.to/api/articles?username=hideokamoto').then((data) => {
+  const perPage = Math.max(limit, 30)
+  const personal = await fetch(
+    `https://dev.to/api/articles?username=hideokamoto&per_page=${perPage}`,
+  ).then((data) => {
     if (data.ok) return data.json()
     return []
   })
-  const stripe = await fetch('https://dev.to/api/articles?username=hideokamoto_stripe').then(
-    (data) => {
-      if (data.ok) return data.json()
-      return []
-    },
-  )
+  const stripe = await fetch(
+    `https://dev.to/api/articles?username=hideokamoto_stripe&per_page=${perPage}`,
+  ).then((data) => {
+    if (data.ok) return data.json()
+    return []
+  })
   const allItems = [...personal, ...stripe]
-  const hasMore = allItems.length > 20
-  const items = allItems.slice(0, 20).map((data): FeedItem => {
+  const hasMore = allItems.length > limit
+  const items = allItems.slice(0, limit).map((data): FeedItem => {
     return {
       id: data.id,
       title: data.title,

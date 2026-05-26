@@ -56,7 +56,9 @@ const fetchAllQiitaItems = async (userId: string): Promise<QiitaItem[]> => {
   return allItems
 }
 
-export const loadQiitaPosts = async (): Promise<{ items: FeedItem[]; hasMore: boolean }> => {
+export const loadQiitaPosts = async (
+  limit = 20,
+): Promise<{ items: FeedItem[]; hasMore: boolean }> => {
   const dataSource: FeedDataSource = {
     href: 'https://qiita.com/hideokamoto',
     name: 'Qiita',
@@ -75,8 +77,8 @@ export const loadQiitaPosts = async (): Promise<{ items: FeedItem[]; hasMore: bo
       (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
     )
 
-    const hasMore = sortedItems.length > 20
-    const items = sortedItems.slice(0, 20).map((item): FeedItem => {
+    const hasMore = sortedItems.length > limit
+    const items = sortedItems.slice(0, limit).map((item): FeedItem => {
       // HTMLタグを除去してdescriptionを作成
       const description = item.body
         .replace(/<[^>]*>/g, '')

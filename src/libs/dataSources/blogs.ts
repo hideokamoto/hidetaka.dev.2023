@@ -7,7 +7,7 @@ import type { FeedDataSource, FeedItem } from './types'
 import { loadWPPosts } from './wordpress'
 import { loadZennPosts } from './zenn'
 
-const sourceDevNotes: FeedDataSource = {
+export const sourceDevNotes: FeedDataSource = {
   href: '/ja/writing/dev-notes',
   name: 'Dev Notes',
   color: 'green',
@@ -18,7 +18,7 @@ const sourceStripeDotDev: FeedDataSource = {
   name: 'Stripe.dev',
   color: 'red',
 }
-const stripeDotDevPosts: Array<FeedItem> = [
+export const stripeDotDevPosts: Array<FeedItem> = [
   {
     title: 'Easily debug your 3DS authentication with Stripe Workbench',
     href: 'https://stripe.dev/blog/easily-debug-your-3ds-authentication-with-stripe-workbench',
