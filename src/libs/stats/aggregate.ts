@@ -60,40 +60,48 @@ export function cumulativeTotal(items: readonly StatsInput[]): number {
   return items.reduce((acc, item) => (parse(item.datetime) ? acc + 1 : acc), 0)
 }
 
-// ISO 週（月曜始まり）の連番インデックス。連続する週はちょうど 1 違いになる。
-const isoWeekIndex = (d: Date): number => {
-  const date = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()))
-  const dayNum = (date.getUTCDay() + 6) % 7 // 月=0 ... 日=6
-  date.setUTCDate(date.getUTCDate() - dayNum) // その週の月曜へ
-  return Math.floor(date.getTime() / (7 * 24 * 60 * 60 * 1000))
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000
+
+// エポック起点の 7 日バケット。最長記録の算出に使う（now に依存しない）。
+const rollingBucket = (d: Date): number => Math.floor(d.getTime() / WEEK_MS)
+
+// `now` から見たローリング 7 日区間。0 = 直近 7 日、1 = 7〜14 日前、…
+const rollingPeriodFromNow = (d: Date, now: Date): number => {
+  const diffMs = now.getTime() - d.getTime()
+  if (diffMs < 0) return -1
+  return Math.floor(diffMs / WEEK_MS)
 }
 
 /**
- * 週次の連続投稿記録を返す。
- * - currentWeeks: 現在まで継続中の連続週数。今週が未投稿でも先週投稿していれば「継続中」とみなす（週の途中の猶予）。
- * - longestWeeks: 全期間での最長連続週数。
+ * 週次の連続投稿記録を返す（ローリング 7 日区間ベース）。
+ * - currentWeeks: 現在まで継続中の連続週数。直近 7 日が空でも 7〜14 日前に投稿があれば「継続中」とみなす。
+ * - longestWeeks: 全期間での最長連続週数（7 日バケットの連続）。
  */
 export function weeklyStreak(
   items: readonly StatsInput[],
   now: Date = new Date(),
 ): { currentWeeks: number; longestWeeks: number } {
-  const weeks = new Set<number>()
+  const buckets = new Set<number>()
+  const periodsFromNow = new Set<number>()
+
   for (const item of items) {
     const d = parse(item.datetime)
     if (!d) continue
-    weeks.add(isoWeekIndex(d))
+    buckets.add(rollingBucket(d))
+    const period = rollingPeriodFromNow(d, now)
+    if (period >= 0) periodsFromNow.add(period)
   }
 
-  if (weeks.size === 0) {
+  if (buckets.size === 0) {
     return { currentWeeks: 0, longestWeeks: 0 }
   }
 
-  // 最長連続週
-  const sorted = Array.from(weeks).sort((a, b) => a - b)
+  // 最長連続週（エポック起点バケットの連続）
+  const sortedBuckets = Array.from(buckets).sort((a, b) => a - b)
   let longest = 1
   let run = 1
-  for (let i = 1; i < sorted.length; i++) {
-    if (sorted[i] === sorted[i - 1] + 1) {
+  for (let i = 1; i < sortedBuckets.length; i++) {
+    if (sortedBuckets[i] === sortedBuckets[i - 1] + 1) {
       run++
     } else {
       run = 1
@@ -101,18 +109,17 @@ export function weeklyStreak(
     if (run > longest) longest = run
   }
 
-  // 現在の連続週（今週、なければ先週を起点に遡る）
-  const currentWeek = isoWeekIndex(now)
+  // 現在の連続週（直近 7 日、なければ 7〜14 日前を起点に遡る）
   let anchor: number | null = null
-  if (weeks.has(currentWeek)) anchor = currentWeek
-  else if (weeks.has(currentWeek - 1)) anchor = currentWeek - 1
+  if (periodsFromNow.has(0)) anchor = 0
+  else if (periodsFromNow.has(1)) anchor = 1
 
   let current = 0
   if (anchor !== null) {
-    let w = anchor
-    while (weeks.has(w)) {
+    let period = anchor
+    while (periodsFromNow.has(period)) {
       current++
-      w--
+      period++
     }
   }
 

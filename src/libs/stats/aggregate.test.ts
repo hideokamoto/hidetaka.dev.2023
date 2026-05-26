@@ -68,7 +68,6 @@ describe('weeklyStreak', () => {
   })
 
   it('counts a single week as streak of 1', () => {
-    // 2025-03-12 is a Wednesday; now in same ISO week
     const now = new Date('2025-03-12T00:00:00Z')
     expect(weeklyStreak([post('2025-03-10T00:00:00Z')], now)).toEqual({
       currentWeeks: 1,
@@ -76,29 +75,34 @@ describe('weeklyStreak', () => {
     })
   })
 
-  it('counts consecutive weeks for current streak', () => {
-    const now = new Date('2025-03-19T00:00:00Z') // ISO week of Mar 17-23
+  it('counts consecutive rolling weeks for current streak', () => {
+    const now = new Date('2025-03-19T00:00:00Z')
     const items = [
-      post('2025-03-18T00:00:00Z'), // current week
-      post('2025-03-11T00:00:00Z'), // previous week
-      post('2025-03-04T00:00:00Z'), // two weeks prior
+      post('2025-03-18T00:00:00Z'), // within last 7 days
+      post('2025-03-11T00:00:00Z'), // 7–14 days ago
+      post('2025-03-04T00:00:00Z'), // 14–21 days ago
     ]
     expect(weeklyStreak(items, now)).toEqual({ currentWeeks: 3, longestWeeks: 3 })
   })
 
-  it('treats last week as still active when current week has no post', () => {
+  it('treats 7–14 days ago as still active when last 7 days have no post', () => {
     const now = new Date('2025-03-19T00:00:00Z')
     const items = [post('2025-03-11T00:00:00Z'), post('2025-03-04T00:00:00Z')]
     expect(weeklyStreak(items, now).currentWeeks).toBe(2)
   })
 
-  it('breaks the current streak when the gap is more than one week', () => {
+  it('breaks the current streak when the gap is more than 14 days', () => {
     const now = new Date('2025-03-26T00:00:00Z')
-    // last post was two weeks before current week → not active
     const items = [post('2025-03-04T00:00:00Z'), post('2025-02-25T00:00:00Z')]
     const result = weeklyStreak(items, now)
     expect(result.currentWeeks).toBe(0)
     expect(result.longestWeeks).toBe(2)
+  })
+
+  it('keeps streak active when last post is 8–14 days ago (calendar week would break)', () => {
+    const now = new Date('2026-05-27T00:00:00Z')
+    const items = [post('2026-05-17T08:55:36Z'), post('2026-05-10T00:00:00Z')]
+    expect(weeklyStreak(items, now).currentWeeks).toBeGreaterThan(0)
   })
 
   it('finds the longest run even when not current', () => {
@@ -118,8 +122,8 @@ describe('weeklyStreak', () => {
     expect(weeklyStreak(items, now)).toEqual({ currentWeeks: 1, longestWeeks: 1 })
   })
 
-  it('counts consecutive weeks across a year boundary', () => {
-    const now = new Date('2025-01-02T00:00:00Z') // ISO week containing Dec 30 2024 - Jan 5 2025
+  it('counts consecutive rolling weeks across a year boundary', () => {
+    const now = new Date('2025-01-02T00:00:00Z')
     const items = [post('2025-01-01T00:00:00Z'), post('2024-12-25T00:00:00Z')]
     expect(weeklyStreak(items, now)).toEqual({ currentWeeks: 2, longestWeeks: 2 })
   })
