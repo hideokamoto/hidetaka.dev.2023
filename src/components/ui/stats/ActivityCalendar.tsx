@@ -1,8 +1,8 @@
 import {
   type ActivityLevel,
   buildActivityCalendar,
-  type CalendarCell,
   calendarMonthLabels,
+  type WeekCell,
 } from '@/libs/stats/aggregate'
 
 const LEVEL_CLASSES: Record<ActivityLevel, string> = {
@@ -13,7 +13,8 @@ const LEVEL_CLASSES: Record<ActivityLevel, string> = {
   4: 'bg-indigo-800 dark:bg-indigo-400',
 }
 
-const CELL_SIZE = 'h-[11px] w-[11px]'
+const CELL_SIZE = 'h-3.5 w-3.5'
+const WEEKS_PER_ROW = 13
 
 type Props = {
   items: { datetime: string }[]
@@ -21,92 +22,88 @@ type Props = {
   weeks?: number
 }
 
-function formatDayLabel(date: string, count: number, isJa: boolean): string {
-  const d = new Date(`${date}T12:00:00Z`)
-  const formatted = new Intl.DateTimeFormat(isJa ? 'ja-JP' : 'en-US', {
-    year: 'numeric',
+function formatWeekLabel(week: WeekCell, isJa: boolean): string {
+  const start = new Date(`${week.weekStart}T12:00:00Z`)
+  const end = new Date(`${week.weekEnd}T12:00:00Z`)
+  const rangeFormatter = new Intl.DateTimeFormat(isJa ? 'ja-JP' : 'en-US', {
     month: 'short',
     day: 'numeric',
     timeZone: 'UTC',
-  }).format(d)
+  })
+  const range = `${rangeFormatter.format(start)} – ${rangeFormatter.format(end)}`
   if (isJa) {
-    return count > 0 ? `${formatted}: ${count}本` : `${formatted}: 投稿なし`
+    return week.count > 0 ? `${range}: ${week.count}本` : `${range}: 投稿なし`
   }
-  return count > 0
-    ? `${formatted}: ${count} post${count === 1 ? '' : 's'}`
-    : `${formatted}: No posts`
+  return week.count > 0
+    ? `${range}: ${week.count} post${week.count === 1 ? '' : 's'}`
+    : `${range}: No posts`
 }
 
 function CalendarGrid({
-  columns,
+  weeks,
   lang,
   monthLabels,
 }: {
-  columns: CalendarCell[][]
+  weeks: WeekCell[]
   lang: string
   monthLabels: { weekIndex: number; label: string }[]
 }) {
   const isJa = lang.startsWith('ja')
-  const weekCount = columns.length
+  const rowCount = Math.ceil(weeks.length / WEEKS_PER_ROW)
   const labelByWeek = new Map(monthLabels.map((m) => [m.weekIndex, m.label]))
 
   return (
     <div className="overflow-x-auto">
-      <div className="inline-block min-w-full">
-        {/* Month labels */}
-        <div
-          className="mb-1 grid text-[10px] text-slate-500 dark:text-slate-400"
-          style={{
-            gridTemplateColumns: `16px repeat(${weekCount}, 13px)`,
-            gap: '3px',
-          }}
-        >
-          <span aria-hidden="true" />
-          {columns.map((week, weekIndex) => (
-            <span key={`month-${week[0].date}`} className="truncate leading-none">
-              {labelByWeek.get(weekIndex) ?? ''}
-            </span>
-          ))}
-        </div>
+      <div className="inline-block min-w-full space-y-1">
+        {Array.from({ length: rowCount }, (_, rowIndex) => {
+          const rowWeeks = weeks.slice(
+            rowIndex * WEEKS_PER_ROW,
+            rowIndex * WEEKS_PER_ROW + WEEKS_PER_ROW,
+          )
+          const rowStartIndex = rowIndex * WEEKS_PER_ROW
 
-        <div className="flex gap-1">
-          {/* Weekday labels (Mon / Wed / Fri like GitHub) */}
-          <div className="flex w-4 shrink-0 flex-col justify-around py-[2px] text-[9px] leading-none text-slate-400 dark:text-slate-500">
-            <span className="invisible h-[11px]">S</span>
-            <span className="h-[11px]">{isJa ? '月' : 'Mon'}</span>
-            <span className="invisible h-[11px]">T</span>
-            <span className="h-[11px]">{isJa ? '水' : 'Wed'}</span>
-            <span className="invisible h-[11px]">T</span>
-            <span className="h-[11px]">{isJa ? '金' : 'Fri'}</span>
-            <span className="invisible h-[11px]">S</span>
-          </div>
+          return (
+            <div key={`row-${rowWeeks[0]?.weekStart ?? rowIndex}`}>
+              <div
+                className="mb-1 grid text-[10px] text-slate-500 dark:text-slate-400"
+                style={{
+                  gridTemplateColumns: `repeat(${rowWeeks.length}, 17px)`,
+                  gap: '3px',
+                }}
+              >
+                {rowWeeks.map((week, columnIndex) => {
+                  const weekIndex = rowStartIndex + columnIndex
+                  return (
+                    <span key={`month-${week.weekStart}`} className="truncate leading-none">
+                      {labelByWeek.get(weekIndex) ?? ''}
+                    </span>
+                  )
+                })}
+              </div>
 
-          {/* Grid: columns = weeks, rows = Sun–Sat */}
-          <div
-            className="grid gap-[3px]"
-            style={{
-              gridTemplateRows: 'repeat(7, 11px)',
-              gridTemplateColumns: `repeat(${weekCount}, 11px)`,
-              gridAutoFlow: 'column',
-            }}
-            role="img"
-            aria-label={
-              isJa
-                ? '直近の執筆アクティビティを日別に示すカレンダー'
-                : 'Calendar showing daily writing activity over the recent period'
-            }
-          >
-            {columns.map((week) =>
-              week.map((cell) => (
-                <span
-                  key={cell.date}
-                  className={`${CELL_SIZE} rounded-sm ${cell.isFuture ? 'bg-transparent' : LEVEL_CLASSES[cell.level]}`}
-                  title={cell.isFuture ? undefined : formatDayLabel(cell.date, cell.count, isJa)}
-                />
-              )),
-            )}
-          </div>
-        </div>
+              <div
+                className="grid gap-[3px]"
+                style={{
+                  gridTemplateColumns: `repeat(${rowWeeks.length}, 14px)`,
+                }}
+                role="img"
+                aria-label={
+                  isJa
+                    ? '直近の執筆アクティビティを週別に示すカレンダー'
+                    : 'Calendar showing weekly writing activity over the recent period'
+                }
+              >
+                {rowWeeks.map((week) => (
+                  <span
+                    key={week.weekStart}
+                    className={`${CELL_SIZE} rounded-sm ${week.isFuture ? 'bg-transparent' : LEVEL_CLASSES[week.level]}`}
+                    title={week.isFuture ? undefined : formatWeekLabel(week, isJa)}
+                  />
+                ))}
+              </div>
+            </div>
+          )
+        })}
       </div>
     </div>
   )
@@ -132,18 +129,18 @@ function CalendarLegend({ lang }: { lang: string }) {
 }
 
 export default function ActivityCalendar({ items, lang, weeks = 53 }: Props) {
-  const { columns } = buildActivityCalendar(items, weeks)
-  const monthLabels = calendarMonthLabels(columns, lang)
+  const { weeks: weekCells } = buildActivityCalendar(items, weeks)
+  const monthLabels = calendarMonthLabels(weekCells, lang)
   const isJa = lang.startsWith('ja')
 
   return (
     <div>
-      <CalendarGrid columns={columns} lang={lang} monthLabels={monthLabels} />
+      <CalendarGrid weeks={weekCells} lang={lang} monthLabels={monthLabels} />
       <CalendarLegend lang={lang} />
       <p className="mt-2 text-xs text-slate-400 dark:text-slate-500">
         {isJa
-          ? '各マスは UTC の日付で 1 日分の投稿数を表します。色が濃いほど投稿が多い日です。'
-          : 'Each square is one UTC day. Darker colors mean more posts that day.'}
+          ? '各マスは日曜始まりの 1 週間の投稿数を表します。色が濃いほどその週の投稿が多いです。'
+          : 'Each square is one week (Sunday–Saturday, UTC). Darker colors mean more posts that week.'}
       </p>
     </div>
   )

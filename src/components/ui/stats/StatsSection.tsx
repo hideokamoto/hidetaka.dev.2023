@@ -47,7 +47,7 @@ export default function StatsSection({ items, lang }: Props) {
 
         <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
           <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
-            {isJa ? '日別の投稿カレンダー' : 'Daily posting calendar'}
+            {isJa ? '週別の投稿カレンダー' : 'Weekly posting calendar'}
           </h3>
           <ActivityCalendar items={items} lang={lang} />
         </div>

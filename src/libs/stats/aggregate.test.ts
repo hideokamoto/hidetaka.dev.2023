@@ -152,39 +152,37 @@ describe('activityLevel', () => {
 })
 
 describe('buildActivityCalendar', () => {
-  it('returns empty-level grid for no items', () => {
+  it('returns empty-level weeks for no items', () => {
     const now = new Date('2025-03-15T12:00:00Z')
-    const { columns, maxCount } = buildActivityCalendar([], 4, now)
+    const { weeks, maxCount } = buildActivityCalendar([], 4, now)
     expect(maxCount).toBe(0)
-    expect(columns).toHaveLength(4)
-    expect(columns.every((week) => week.every((cell) => cell.count === 0))).toBe(true)
+    expect(weeks).toHaveLength(4)
+    expect(weeks.every((week) => week.count === 0)).toBe(true)
   })
 
-  it('counts multiple posts on the same day', () => {
+  it('aggregates multiple posts in the same week', () => {
     const now = new Date('2025-03-15T12:00:00Z')
-    const items = [post('2025-03-10T10:00:00Z'), post('2025-03-10T18:00:00Z')]
-    const { columns, maxCount } = buildActivityCalendar(items, 8, now)
+    const items = [post('2025-03-10T10:00:00Z'), post('2025-03-12T18:00:00Z')]
+    const { weeks, maxCount } = buildActivityCalendar(items, 8, now)
     expect(maxCount).toBe(2)
-    const allCells = columns.flat()
-    const target = allCells.find((c) => c.date === '2025-03-10')
+    const target = weeks.find((w) => w.weekStart === '2025-03-09')
     expect(target?.count).toBe(2)
     expect(target?.level).toBe(4)
   })
 
-  it('marks future days and excludes them from counts', () => {
+  it('marks future weeks and excludes them from counts', () => {
     const now = new Date('2025-03-15T12:00:00Z')
-    const { columns } = buildActivityCalendar([post('2025-03-20T00:00:00Z')], 4, now)
-    const futureCells = columns.flat().filter((c) => c.isFuture)
-    expect(futureCells.length).toBeGreaterThan(0)
-    expect(futureCells.every((c) => c.count === 0)).toBe(true)
+    const { weeks, maxCount } = buildActivityCalendar([post('2025-03-20T00:00:00Z')], 4, now)
+    expect(maxCount).toBe(0)
+    expect(weeks.every((week) => week.count === 0)).toBe(true)
   })
 })
 
 describe('calendarMonthLabels', () => {
   it('emits a label for the first month in the grid', () => {
     const now = new Date('2025-03-15T12:00:00Z')
-    const { columns } = buildActivityCalendar([], 8, now)
-    const labels = calendarMonthLabels(columns, 'en')
+    const { weeks } = buildActivityCalendar([], 8, now)
+    const labels = calendarMonthLabels(weeks, 'en')
     expect(labels.length).toBeGreaterThan(0)
     expect(labels[0].weekIndex).toBeGreaterThanOrEqual(0)
   })

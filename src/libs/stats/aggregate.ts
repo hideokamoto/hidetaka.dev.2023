@@ -72,12 +72,16 @@ const utcMidnight = (d: Date): Date =>
 
 export type ActivityLevel = 0 | 1 | 2 | 3 | 4
 
-export type CalendarCell = {
-  date: string // "YYYY-MM-DD"
+export type WeekCell = {
+  weekStart: string // "YYYY-MM-DD" (Sunday UTC)
+  weekEnd: string // "YYYY-MM-DD" (Saturday UTC)
   count: number
   level: ActivityLevel
   isFuture: boolean
 }
+
+/** @deprecated Use WeekCell */
+export type CalendarCell = WeekCell
 
 /** 最大投稿数に対する比率で GitHub 風の 5 段階レベルを返す。 */
 export function activityLevel(count: number, maxCount: number): ActivityLevel {
@@ -89,12 +93,20 @@ export function activityLevel(count: number, maxCount: number): ActivityLevel {
   return 4
 }
 
-const countPostsByDay = (items: readonly StatsInput[]): Map<string, number> => {
+const weekStartDate = (d: Date): Date => {
+  const date = utcMidnight(d)
+  date.setUTCDate(date.getUTCDate() - date.getUTCDay())
+  return date
+}
+
+const weekStartKey = (d: Date): string => dayKey(weekStartDate(d))
+
+const countPostsByWeek = (items: readonly StatsInput[], today: Date): Map<string, number> => {
   const counts = new Map<string, number>()
   for (const item of items) {
     const d = parse(item.datetime)
-    if (!d) continue
-    const key = dayKey(d)
+    if (!d || utcMidnight(d) > today) continue
+    const key = weekStartKey(d)
     counts.set(key, (counts.get(key) ?? 0) + 1)
   }
   return counts
@@ -108,16 +120,19 @@ const maxMapValue = (counts: Map<string, number>): number => {
   return maxCount
 }
 
-const calendarCell = (
-  cellDate: Date,
+const weekCell = (
+  weekStart: Date,
   today: Date,
   counts: Map<string, number>,
   maxCount: number,
-): CalendarCell => {
-  const isFuture = cellDate > today
-  const count = isFuture ? 0 : (counts.get(dayKey(cellDate)) ?? 0)
+): WeekCell => {
+  const isFuture = weekStart > today
+  const weekEnd = new Date(weekStart)
+  weekEnd.setUTCDate(weekStart.getUTCDate() + 6)
+  const count = isFuture ? 0 : (counts.get(dayKey(weekStart)) ?? 0)
   return {
-    date: dayKey(cellDate),
+    weekStart: dayKey(weekStart),
+    weekEnd: dayKey(weekEnd),
     count,
     level: isFuture ? 0 : activityLevel(count, maxCount),
     isFuture,
@@ -125,42 +140,34 @@ const calendarCell = (
 }
 
 /**
- * GitHub の草カレンダー用グリッドを組み立てる。
- * 列 = 週（日曜始まり）、行 = 曜日。`weeks` 列分さかのぼる。
+ * GitHub の草風カレンダー用データ。1 マス = 1 週（日曜始まり）の投稿数。
  */
 export function buildActivityCalendar(
   items: readonly StatsInput[],
   weeks = 53,
   now: Date = new Date(),
-): { columns: CalendarCell[][]; maxCount: number } {
-  const counts = countPostsByDay(items)
+): { weeks: WeekCell[]; maxCount: number } {
+  const today = utcMidnight(now)
+  const counts = countPostsByWeek(items, today)
   const maxCount = maxMapValue(counts)
 
-  const today = utcMidnight(now)
-  const todayDow = today.getUTCDay()
-  const endSaturday = new Date(today)
-  endSaturday.setUTCDate(today.getUTCDate() + (6 - todayDow))
+  const lastWeekStart = weekStartDate(today)
+  const gridStart = new Date(lastWeekStart)
+  gridStart.setUTCDate(lastWeekStart.getUTCDate() - (weeks - 1) * 7)
 
-  const gridStart = new Date(endSaturday)
-  gridStart.setUTCDate(endSaturday.getUTCDate() - (weeks - 1) * 7)
-
-  const columns: CalendarCell[][] = []
+  const result: WeekCell[] = []
   for (let w = 0; w < weeks; w++) {
-    const column: CalendarCell[] = []
-    for (let dow = 0; dow < 7; dow++) {
-      const cellDate = new Date(gridStart)
-      cellDate.setUTCDate(gridStart.getUTCDate() + w * 7 + dow)
-      column.push(calendarCell(cellDate, today, counts, maxCount))
-    }
-    columns.push(column)
+    const weekStart = new Date(gridStart)
+    weekStart.setUTCDate(gridStart.getUTCDate() + w * 7)
+    result.push(weekCell(weekStart, today, counts, maxCount))
   }
 
-  return { columns, maxCount }
+  return { weeks: result, maxCount }
 }
 
-/** カレンダー列のうち、月ラベルを表示する位置を返す。 */
+/** 週カレンダーのうち、月ラベルを表示する位置を返す。 */
 export function calendarMonthLabels(
-  columns: readonly (readonly CalendarCell[])[],
+  weeks: readonly WeekCell[],
   lang: string,
 ): { weekIndex: number; label: string }[] {
   const isJa = lang.startsWith('ja')
@@ -171,18 +178,15 @@ export function calendarMonthLabels(
   const seenMonths = new Set<string>()
   const labels: { weekIndex: number; label: string }[] = []
 
-  for (let w = 0; w < columns.length; w++) {
-    for (const cell of columns[w]) {
-      if (cell.isFuture) continue
-      const [year, month] = cell.date.split('-')
-      const monthId = `${year}-${month}`
-      if (cell.date.endsWith('-01') || !seenMonths.has(monthId)) {
-        if (!seenMonths.has(monthId)) {
-          seenMonths.add(monthId)
-          const label = monthFormatter.format(new Date(`${cell.date}T12:00:00Z`))
-          labels.push({ weekIndex: w, label })
-        }
-        break
+  for (let w = 0; w < weeks.length; w++) {
+    const cell = weeks[w]
+    if (cell.isFuture) continue
+    const monthId = cell.weekStart.slice(0, 7)
+    if (cell.weekStart.endsWith('-01') || !seenMonths.has(monthId)) {
+      if (!seenMonths.has(monthId)) {
+        seenMonths.add(monthId)
+        const label = monthFormatter.format(new Date(`${cell.weekStart}T12:00:00Z`))
+        labels.push({ weekIndex: w, label })
       }
     }
   }
