@@ -11,27 +11,24 @@ export const loadWPPosts = async (
   }
   // limit + 1件取得して、さらに記事があるかどうかを判定（WP REST APIのper_page上限は100）
   const perPage = Math.min(limit + 1, 100)
-  const wp = await fetch(
+  const response = await fetch(
     `https://wp-api.wp-kyoto.net/wp-json/wp/v2/posts?filter[lang]=${locale}&per_page=${perPage}`,
     {
       next: { revalidate: 1800 }, // 30分ごとに再検証（毎日1〜2記事更新）
     },
   )
-    .then((data) => data.json())
-    .then((posts: WPPost[]) => {
-      const hasMore = posts.length > limit
-      const items = posts.slice(0, limit).map(
-        (post: WPPost): FeedItem => ({
-          title: post.title.rendered,
-          description: post.excerpt.rendered,
-          href: post.link.replace(/wp-api./, ''),
-          datetime: post.date,
-          dataSource,
-          id: post.id,
-        }),
-      )
-      return { items, hasMore }
-    })
-
-  return wp
+  const posts: WPPost[] = await response.json()
+  const totalPages = response.headers.get('X-WP-TotalPages')
+  const hasMore = totalPages ? Number.parseInt(totalPages, 10) > 1 : false
+  const items = posts.slice(0, limit).map(
+    (post: WPPost): FeedItem => ({
+      title: post.title.rendered,
+      description: post.excerpt.rendered,
+      href: post.link.replace(/wp-api./, ''),
+      datetime: post.date,
+      dataSource,
+      id: post.id,
+    }),
+  )
+  return { items, hasMore }
 }

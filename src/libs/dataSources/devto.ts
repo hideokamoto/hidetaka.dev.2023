@@ -9,18 +9,14 @@ export const loadDevToPosts = async (
     color: 'bg-green-100 text-gren-800',
   }
   const perPage = Math.max(limit, 30)
-  const personal = await fetch(
+  const personalResponse = await fetch(
     `https://dev.to/api/articles?username=hideokamoto&per_page=${perPage}`,
-  ).then((data) => {
-    if (data.ok) return data.json()
-    return []
-  })
-  const stripe = await fetch(
+  )
+  const personal = personalResponse.ok ? await personalResponse.json() : []
+  const stripeResponse = await fetch(
     `https://dev.to/api/articles?username=hideokamoto_stripe&per_page=${perPage}`,
-  ).then((data) => {
-    if (data.ok) return data.json()
-    return []
-  })
+  )
+  const stripe = stripeResponse.ok ? await stripeResponse.json() : []
   const allItems = [...personal, ...stripe]
   const hasMore = allItems.length > limit
   const items = allItems.slice(0, limit).map((data): FeedItem => {
