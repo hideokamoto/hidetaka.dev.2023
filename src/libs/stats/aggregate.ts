@@ -60,6 +60,136 @@ export function cumulativeTotal(items: readonly StatsInput[]): number {
   return items.reduce((acc, item) => (parse(item.datetime) ? acc + 1 : acc), 0)
 }
 
+const dayKey = (d: Date): string => {
+  const y = d.getUTCFullYear()
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0')
+  const day = String(d.getUTCDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
+const utcMidnight = (d: Date): Date =>
+  new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()))
+
+export type ActivityLevel = 0 | 1 | 2 | 3 | 4
+
+export type CalendarCell = {
+  date: string // "YYYY-MM-DD"
+  count: number
+  level: ActivityLevel
+  isFuture: boolean
+}
+
+/** 最大投稿数に対する比率で GitHub 風の 5 段階レベルを返す。 */
+export function activityLevel(count: number, maxCount: number): ActivityLevel {
+  if (count <= 0 || maxCount <= 0) return 0
+  const ratio = count / maxCount
+  if (ratio <= 0.25) return 1
+  if (ratio <= 0.5) return 2
+  if (ratio <= 0.75) return 3
+  return 4
+}
+
+const countPostsByDay = (items: readonly StatsInput[]): Map<string, number> => {
+  const counts = new Map<string, number>()
+  for (const item of items) {
+    const d = parse(item.datetime)
+    if (!d) continue
+    const key = dayKey(d)
+    counts.set(key, (counts.get(key) ?? 0) + 1)
+  }
+  return counts
+}
+
+const maxMapValue = (counts: Map<string, number>): number => {
+  let maxCount = 0
+  for (const count of counts.values()) {
+    if (count > maxCount) maxCount = count
+  }
+  return maxCount
+}
+
+const calendarCell = (
+  cellDate: Date,
+  today: Date,
+  counts: Map<string, number>,
+  maxCount: number,
+): CalendarCell => {
+  const isFuture = cellDate > today
+  const count = isFuture ? 0 : (counts.get(dayKey(cellDate)) ?? 0)
+  return {
+    date: dayKey(cellDate),
+    count,
+    level: isFuture ? 0 : activityLevel(count, maxCount),
+    isFuture,
+  }
+}
+
+/**
+ * GitHub の草カレンダー用グリッドを組み立てる。
+ * 列 = 週（日曜始まり）、行 = 曜日。`weeks` 列分さかのぼる。
+ */
+export function buildActivityCalendar(
+  items: readonly StatsInput[],
+  weeks = 53,
+  now: Date = new Date(),
+): { columns: CalendarCell[][]; maxCount: number } {
+  const counts = countPostsByDay(items)
+  const maxCount = maxMapValue(counts)
+
+  const today = utcMidnight(now)
+  const todayDow = today.getUTCDay()
+  const endSaturday = new Date(today)
+  endSaturday.setUTCDate(today.getUTCDate() + (6 - todayDow))
+
+  const gridStart = new Date(endSaturday)
+  gridStart.setUTCDate(endSaturday.getUTCDate() - (weeks - 1) * 7)
+
+  const columns: CalendarCell[][] = []
+  for (let w = 0; w < weeks; w++) {
+    const column: CalendarCell[] = []
+    for (let dow = 0; dow < 7; dow++) {
+      const cellDate = new Date(gridStart)
+      cellDate.setUTCDate(gridStart.getUTCDate() + w * 7 + dow)
+      column.push(calendarCell(cellDate, today, counts, maxCount))
+    }
+    columns.push(column)
+  }
+
+  return { columns, maxCount }
+}
+
+/** カレンダー列のうち、月ラベルを表示する位置を返す。 */
+export function calendarMonthLabels(
+  columns: readonly (readonly CalendarCell[])[],
+  lang: string,
+): { weekIndex: number; label: string }[] {
+  const isJa = lang.startsWith('ja')
+  const monthFormatter = new Intl.DateTimeFormat(isJa ? 'ja-JP' : 'en-US', {
+    month: 'short',
+    timeZone: 'UTC',
+  })
+  const seenMonths = new Set<string>()
+  const labels: { weekIndex: number; label: string }[] = []
+
+  for (let w = 0; w < columns.length; w++) {
+    for (const cell of columns[w]) {
+      if (cell.isFuture) continue
+      const [year, month] = cell.date.split('-')
+      const monthId = `${year}-${month}`
+      if (cell.date.endsWith('-01') || !seenMonths.has(monthId)) {
+        if (!seenMonths.has(monthId)) {
+          seenMonths.add(monthId)
+          const label = monthFormatter.format(new Date(`${cell.date}T12:00:00Z`))
+          labels.push({ weekIndex: w, label })
+        }
+        break
+      }
+    }
+  }
+
+  return labels
+}
+
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000
 
 // エポック起点の 7 日バケット。最長記録の算出に使う（now に依存しない）。

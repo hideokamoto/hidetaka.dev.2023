@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { cumulativeTotal, groupByMonth, type StatsInput, weeklyStreak } from './aggregate'
+import {
+  activityLevel,
+  buildActivityCalendar,
+  calendarMonthLabels,
+  cumulativeTotal,
+  groupByMonth,
+  type StatsInput,
+  weeklyStreak,
+} from './aggregate'
 
 const post = (datetime: string, name = 'Qiita'): StatsInput => ({
   datetime,
@@ -126,5 +134,58 @@ describe('weeklyStreak', () => {
     const now = new Date('2025-01-02T00:00:00Z')
     const items = [post('2025-01-01T00:00:00Z'), post('2024-12-25T00:00:00Z')]
     expect(weeklyStreak(items, now)).toEqual({ currentWeeks: 2, longestWeeks: 2 })
+  })
+})
+
+describe('activityLevel', () => {
+  it('returns 0 for zero count or max', () => {
+    expect(activityLevel(0, 10)).toBe(0)
+    expect(activityLevel(5, 0)).toBe(0)
+  })
+
+  it('maps counts to quartile levels', () => {
+    expect(activityLevel(1, 8)).toBe(1)
+    expect(activityLevel(3, 8)).toBe(2)
+    expect(activityLevel(6, 8)).toBe(3)
+    expect(activityLevel(8, 8)).toBe(4)
+  })
+})
+
+describe('buildActivityCalendar', () => {
+  it('returns empty-level grid for no items', () => {
+    const now = new Date('2025-03-15T12:00:00Z')
+    const { columns, maxCount } = buildActivityCalendar([], 4, now)
+    expect(maxCount).toBe(0)
+    expect(columns).toHaveLength(4)
+    expect(columns.every((week) => week.every((cell) => cell.count === 0))).toBe(true)
+  })
+
+  it('counts multiple posts on the same day', () => {
+    const now = new Date('2025-03-15T12:00:00Z')
+    const items = [post('2025-03-10T10:00:00Z'), post('2025-03-10T18:00:00Z')]
+    const { columns, maxCount } = buildActivityCalendar(items, 8, now)
+    expect(maxCount).toBe(2)
+    const allCells = columns.flat()
+    const target = allCells.find((c) => c.date === '2025-03-10')
+    expect(target?.count).toBe(2)
+    expect(target?.level).toBe(4)
+  })
+
+  it('marks future days and excludes them from counts', () => {
+    const now = new Date('2025-03-15T12:00:00Z')
+    const { columns } = buildActivityCalendar([post('2025-03-20T00:00:00Z')], 4, now)
+    const futureCells = columns.flat().filter((c) => c.isFuture)
+    expect(futureCells.length).toBeGreaterThan(0)
+    expect(futureCells.every((c) => c.count === 0)).toBe(true)
+  })
+})
+
+describe('calendarMonthLabels', () => {
+  it('emits a label for the first month in the grid', () => {
+    const now = new Date('2025-03-15T12:00:00Z')
+    const { columns } = buildActivityCalendar([], 8, now)
+    const labels = calendarMonthLabels(columns, 'en')
+    expect(labels.length).toBeGreaterThan(0)
+    expect(labels[0].weekIndex).toBeGreaterThanOrEqual(0)
   })
 })
