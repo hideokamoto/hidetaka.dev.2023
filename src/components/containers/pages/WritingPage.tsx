@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useCallback, useMemo, useState } from 'react'
+import { type ReactNode, useCallback, useMemo, useState } from 'react'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import FilterItem from '@/components/ui/FilterItem'
@@ -210,16 +210,19 @@ function Sidebar({
  * @param lang - UI 表示に使用する言語コード（例: 'ja' または 'en'）
  * @param externalArticles - 表示対象となる外部記事の配列（FeedItem のリスト）
  * @param hasMoreBySource - 各データソースにさらに記事が存在するかを示すオプションのマッピング。キーはデータソース名、値が真の場合はそのソースのカウント表示が「20+」扱いになる
+ * @param statsSlot - 記事グリッドの下に描画する任意の要素（執筆統計セクションなど）。サーバーコンポーネントを渡せる
  * @returns 執筆一覧ページ全体の JSX 要素
  */
 export default function WritingPageContent({
   lang,
   externalArticles,
   hasMoreBySource = {},
+  statsSlot,
 }: {
   lang: string
   externalArticles: FeedItem[]
   hasMoreBySource?: Record<string, boolean>
+  statsSlot?: ReactNode
 }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [filterDataSource, setFilterDataSource] = useState<FilterDataSource>(null)
@@ -462,6 +465,8 @@ export default function WritingPageContent({
               </div>
             )}
           </SidebarLayout>
+
+          {statsSlot}
         </Container>
       </section>
     </>

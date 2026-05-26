@@ -14,8 +14,10 @@ type QiitaItem = {
   }
 }
 
-// Qiita APIから全記事を取得（ページネーション対応）
-const fetchAllQiitaItems = async (userId: string): Promise<QiitaItem[]> => {
+// Qiita APIから記事を取得（ページネーション対応）。
+// since を渡すと、その日時より古い記事が現れた時点でページ取得を打ち切り、リクエスト数を抑える
+// （Qiita はデフォルトで作成日時の降順を返す）。
+const fetchAllQiitaItems = async (userId: string, since?: Date): Promise<QiitaItem[]> => {
   const allItems: QiitaItem[] = []
   let page = 1
   const perPage = 100 // Qiita APIの最大値
@@ -50,13 +52,23 @@ const fetchAllQiitaItems = async (userId: string): Promise<QiitaItem[]> => {
       break
     }
 
+    // since 指定時、このページに既に古い記事が含まれていれば以降は不要
+    if (since && items.some((item) => new Date(item.created_at).getTime() < since.getTime())) {
+      break
+    }
+
     page++
   }
 
-  return allItems
+  return since
+    ? allItems.filter((item) => new Date(item.created_at).getTime() >= since.getTime())
+    : allItems
 }
 
-export const loadQiitaPosts = async (): Promise<{ items: FeedItem[]; hasMore: boolean }> => {
+export const loadQiitaPosts = async (
+  limit = 20,
+  since?: Date,
+): Promise<{ items: FeedItem[]; hasMore: boolean }> => {
   const dataSource: FeedDataSource = {
     href: 'https://qiita.com/hideokamoto',
     name: 'Qiita',
@@ -66,8 +78,8 @@ export const loadQiitaPosts = async (): Promise<{ items: FeedItem[]; hasMore: bo
   try {
     // 2つのユーザーの記事を並列取得
     const [personalItems, stripeItems] = await Promise.all([
-      fetchAllQiitaItems('motchi0214'),
-      fetchAllQiitaItems('hideokamoto'),
+      fetchAllQiitaItems('motchi0214', since),
+      fetchAllQiitaItems('hideokamoto', since),
     ])
 
     // ソートして、21件取得（20件以上あるかどうかを判定するため）
@@ -75,8 +87,8 @@ export const loadQiitaPosts = async (): Promise<{ items: FeedItem[]; hasMore: bo
       (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
     )
 
-    const hasMore = sortedItems.length > 20
-    const items = sortedItems.slice(0, 20).map((item): FeedItem => {
+    const hasMore = sortedItems.length > limit
+    const items = sortedItems.slice(0, limit).map((item): FeedItem => {
       // HTMLタグを除去してdescriptionを作成
       const description = item.body
         .replace(/<[^>]*>/g, '')
