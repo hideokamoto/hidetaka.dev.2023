@@ -1,24 +1,12 @@
 import type { FeedItem } from '@/libs/dataSources/types'
-import {
-  cumulativeTotal,
-  earliestDate,
-  groupByMonth,
-  weeklyStreak,
-  yearlySummary,
-} from '@/libs/stats/aggregate'
+import { cumulativeTotal, groupByMonth, weeklyStreak } from '@/libs/stats/aggregate'
+import { STATS_WINDOW_MONTHS } from '@/libs/stats/loadStatsPosts'
 import MonthlyPostsChart from './MonthlyPostsChart'
 import StatHighlights from './StatHighlights'
-import YearlySummaryList from './YearlySummaryList'
 
 type Props = {
   items: FeedItem[]
   lang: string
-}
-
-const formatSince = (date: Date, isJa: boolean): string => {
-  const y = date.getUTCFullYear()
-  const m = date.getUTCMonth() + 1
-  return isJa ? `${y}年${m}月` : `${y}-${String(m).padStart(2, '0')}`
 }
 
 export default function StatsSection({ items, lang }: Props) {
@@ -26,25 +14,18 @@ export default function StatsSection({ items, lang }: Props) {
 
   const isJa = lang === 'ja'
 
-  const monthly = groupByMonth(items, 36)
-  // 最初に投稿のある月から表示（先頭の空月を落とす＝「いつ以降のデータか」を正直に出す）
-  const firstActive = monthly.findIndex((b) => b.total > 0)
-  const visibleMonthly = firstActive > 0 ? monthly.slice(firstActive) : monthly
-
-  const yearly = yearlySummary(items)
+  const monthly = groupByMonth(items, STATS_WINDOW_MONTHS)
   const total = cumulativeTotal(items)
   const streak = weeklyStreak(items)
-  const since = earliestDate(items)
 
   const sources = Array.from(new Set(items.map((i) => i.dataSource?.name).filter(Boolean)))
   const hasZenn = sources.includes('Zenn')
 
   const title = isJa ? '執筆アクティビティ' : 'Writing activity'
   const sourcesText = sources.join(' / ')
-  const sinceText = since ? formatSince(since, isJa) : null
   const subtitle = isJa
-    ? `${sourcesText} を横断した集計${sinceText ? `（${sinceText} 以降のデータ）` : ''}。`
-    : `Aggregated across ${sourcesText}${sinceText ? `. Data from ${sinceText} onwards` : ''}.`
+    ? `直近${STATS_WINDOW_MONTHS}ヶ月の集計（${sourcesText}）。`
+    : `Last ${STATS_WINDOW_MONTHS} months across ${sourcesText}.`
 
   return (
     <section className="mt-16 border-t border-zinc-200 pt-16 dark:border-zinc-800">
@@ -67,10 +48,8 @@ export default function StatsSection({ items, lang }: Props) {
           <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
             {isJa ? '月別の投稿本数' : 'Posts per month'}
           </h3>
-          <MonthlyPostsChart data={visibleMonthly} lang={lang} />
+          <MonthlyPostsChart data={monthly} lang={lang} />
         </div>
-
-        <YearlySummaryList data={yearly} lang={lang} />
 
         {hasZenn && (
           <p className="text-xs text-slate-400 dark:text-slate-500">

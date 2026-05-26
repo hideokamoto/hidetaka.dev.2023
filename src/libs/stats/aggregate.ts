@@ -55,37 +55,9 @@ export function groupByMonth(
   return order.map((key) => buckets.get(key) as MonthlyBucket)
 }
 
-/** 年別の投稿数を降順（新しい年が先頭）で返す。 */
-export function yearlySummary(
-  items: readonly StatsInput[],
-): Array<{ year: number; count: number }> {
-  const counts = new Map<number, number>()
-  for (const item of items) {
-    const d = parse(item.datetime)
-    if (!d) continue
-    const y = d.getUTCFullYear()
-    counts.set(y, (counts.get(y) ?? 0) + 1)
-  }
-  return Array.from(counts.entries())
-    .map(([year, count]) => ({ year, count }))
-    .sort((a, b) => b.year - a.year)
-}
-
-/** 有効な日付を持つ投稿の累計件数。 */
+/** 有効な日付を持つ投稿の件数。 */
 export function cumulativeTotal(items: readonly StatsInput[]): number {
   return items.reduce((acc, item) => (parse(item.datetime) ? acc + 1 : acc), 0)
-}
-
-/** 最も古い投稿日時を返す。投稿がなければ null。 */
-export function earliestDate(items: readonly StatsInput[]): Date | null {
-  let min: number | null = null
-  for (const item of items) {
-    const d = parse(item.datetime)
-    if (!d) continue
-    const t = d.getTime()
-    if (min === null || t < min) min = t
-  }
-  return min === null ? null : new Date(min)
 }
 
 // ISO 週（月曜始まり）の連番インデックス。連続する週はちょうど 1 違いになる。

@@ -1,12 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  cumulativeTotal,
-  earliestDate,
-  groupByMonth,
-  type StatsInput,
-  weeklyStreak,
-  yearlySummary,
-} from './aggregate'
+import { cumulativeTotal, groupByMonth, type StatsInput, weeklyStreak } from './aggregate'
 
 const post = (datetime: string, name = 'Qiita'): StatsInput => ({
   datetime,
@@ -56,26 +49,6 @@ describe('groupByMonth', () => {
   })
 })
 
-describe('yearlySummary', () => {
-  it('counts per year, descending', () => {
-    const items = [
-      post('2024-01-01T00:00:00Z'),
-      post('2024-12-31T00:00:00Z'),
-      post('2023-06-01T00:00:00Z'),
-      post('2025-02-01T00:00:00Z'),
-    ]
-    expect(yearlySummary(items)).toEqual([
-      { year: 2025, count: 1 },
-      { year: 2024, count: 2 },
-      { year: 2023, count: 1 },
-    ])
-  })
-
-  it('returns empty array for no items', () => {
-    expect(yearlySummary([])).toEqual([])
-  })
-})
-
 describe('cumulativeTotal', () => {
   it('counts valid-dated items', () => {
     expect(cumulativeTotal([post('2024-01-01T00:00:00Z'), post('bad')])).toBe(1)
@@ -83,17 +56,6 @@ describe('cumulativeTotal', () => {
 
   it('is zero for empty input', () => {
     expect(cumulativeTotal([])).toBe(0)
-  })
-})
-
-describe('earliestDate', () => {
-  it('returns the oldest valid date', () => {
-    const items = [post('2024-05-01T00:00:00Z'), post('2023-02-01T00:00:00Z')]
-    expect(earliestDate(items)?.toISOString()).toBe('2023-02-01T00:00:00.000Z')
-  })
-
-  it('returns null when there are no valid items', () => {
-    expect(earliestDate([post('bad')])).toBeNull()
   })
 })
 

@@ -6,28 +6,41 @@ import type { FeedItem } from '@/libs/dataSources/types'
 import { loadWPPosts } from '@/libs/dataSources/wordpress'
 import { loadZennPosts } from '@/libs/dataSources/zenn'
 
-// 統計用に媒体ごと直近約100件を取得する上限。負荷とAPIレート制限を考慮した値。
+// 統計の表示窓（直近Nヶ月）。取得・集計ともにこの窓に揃える。
+export const STATS_WINDOW_MONTHS = 12
+
+// 窓内に収まらないほど多く投稿する媒体向けの安全上限。日付フィルタが主、これは保険。
 const STATS_LIMIT = 100
 
+// 直近 STATS_WINDOW_MONTHS ヶ月の開始日（窓の最初の月の1日, UTC）を返す。
+const windowStart = (now: Date): Date =>
+  new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() - (STATS_WINDOW_MONTHS - 1), 1))
+
 /**
- * 執筆統計用に全媒体の記事を集約して返す。
+ * 執筆統計用に全媒体の記事を「直近 STATS_WINDOW_MONTHS ヶ月」に絞って集約して返す。
  *
  * カード一覧用の `loadBlogPosts` がロケール毎にソースを出し分けるのに対し、
  * こちらは「執筆活動全体」を表現するため言語を問わず全ソースを取得する。
  * `lang` は将来的な出し分けのために受け取るが、現状は集計対象に影響しない。
  *
- * Zenn は RSS の制約により直近約20件しか取得できない点に注意。
+ * 取得段階で窓を絞る（WP/dev-notes は `after`、Qiita は古い記事到達で打ち切り）ことで、
+ * 過剰なリクエストとデータ量を抑える。Zenn は RSS の制約により直近約20件のみ。
  */
-export async function loadStatsPosts(_lang: 'ja' | 'en' = 'ja'): Promise<FeedItem[]> {
+export async function loadStatsPosts(
+  _lang: 'ja' | 'en' = 'ja',
+  now: Date = new Date(),
+): Promise<FeedItem[]> {
+  const start = windowStart(now)
+  const afterIso = start.toISOString()
   const empty = { items: [] as FeedItem[], hasMore: false }
 
   const [wpJa, wpEn, devto, zenn, qiita, devNotesResult] = await Promise.all([
-    loadWPPosts('ja', STATS_LIMIT).catch(() => empty),
-    loadWPPosts('en', STATS_LIMIT).catch(() => empty),
+    loadWPPosts('ja', STATS_LIMIT, afterIso).catch(() => empty),
+    loadWPPosts('en', STATS_LIMIT, afterIso).catch(() => empty),
     loadDevToPosts(STATS_LIMIT).catch(() => empty),
     loadZennPosts(STATS_LIMIT).catch(() => empty),
-    loadQiitaPosts(STATS_LIMIT).catch(() => empty),
-    loadDevNotes(1, STATS_LIMIT).catch(() => ({
+    loadQiitaPosts(STATS_LIMIT, start).catch(() => empty),
+    loadDevNotes(1, STATS_LIMIT, 'ja', afterIso).catch(() => ({
       items: [],
       totalPages: 0,
       totalItems: 0,
@@ -54,9 +67,16 @@ export async function loadStatsPosts(_lang: 'ja' | 'en' = 'ja'): Promise<FeedIte
     ...devNotesPosts,
   ]
 
+  // 取得段階で絞れない媒体（Dev.to/Zenn/Stripe）も含め、窓外を最終的に除外
+  const startMs = start.getTime()
+  const inWindow = allPosts.filter((item) => {
+    const t = new Date(item.datetime).getTime()
+    return !Number.isNaN(t) && t >= startMs
+  })
+
   // href で重複排除（言語間の同一記事や取得元の重なりを防ぐ）
   const seen = new Set<string>()
-  const deduped = allPosts.filter((item) => {
+  const deduped = inWindow.filter((item) => {
     if (seen.has(item.href)) return false
     seen.add(item.href)
     return true

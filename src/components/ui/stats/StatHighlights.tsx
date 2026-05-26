@@ -18,7 +18,7 @@ export default function StatHighlights({ total, currentWeeks, longestWeeks, lang
 
   const highlights: Highlight[] = [
     {
-      label: isJa ? '累計投稿数' : 'Total posts',
+      label: isJa ? '直近12ヶ月の投稿数' : 'Posts (last 12 months)',
       value: isJa ? `${total.toLocaleString()}本` : total.toLocaleString(),
     },
     {

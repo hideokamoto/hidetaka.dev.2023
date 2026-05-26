@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import {
   Bar,
   BarChart,
@@ -33,8 +34,22 @@ const formatMonthTick = (yearMonth: string): string => {
   return `${year.slice(2)}/${month}`
 }
 
+// ツールチップ見出し用に "2025-03" を "2025/03"（en）/ "2025年3月"（ja）へ整形。
+const formatMonthLabel = (yearMonth: string, isJa: boolean): string => {
+  const [year, month] = yearMonth.split('-')
+  if (!year || !month) return yearMonth
+  return isJa ? `${year}年${Number.parseInt(month, 10)}月` : `${year}/${month}`
+}
+
 export default function MonthlyPostsChart({ data, lang }: Props) {
   const isJa = lang === 'ja'
+
+  // Recharts の ResponsiveContainer は DOM 計測に依存するため、
+  // SSR/初回レンダーではプレースホルダを返してハイドレーション不一致を避ける。
+  const [isMounted, setIsMounted] = useState(false)
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   // 全期間で出現する媒体を、合計件数の多い順に並べて積み上げ順を決める。
   const totalsBySource = new Map<string, number>()
@@ -51,6 +66,10 @@ export default function MonthlyPostsChart({ data, lang }: Props) {
     yearMonth: bucket.yearMonth,
     ...bucket.bySource,
   }))
+
+  if (!isMounted) {
+    return <div className="h-72 w-full" />
+  }
 
   return (
     <div className="h-72 w-full text-slate-500 dark:text-slate-400">
@@ -117,7 +136,9 @@ function StatsTooltip({
 
   return (
     <div className="rounded-lg border border-zinc-200 bg-white/95 px-3 py-2 text-xs shadow-lg dark:border-zinc-700 dark:bg-zinc-900/95">
-      <p className="mb-1 font-semibold text-slate-900 dark:text-white">{label}</p>
+      <p className="mb-1 font-semibold text-slate-900 dark:text-white">
+        {label ? formatMonthLabel(label, isJa) : ''}
+      </p>
       {entries.map((p) => (
         <div key={p.dataKey} className="flex items-center justify-between gap-3">
           <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">

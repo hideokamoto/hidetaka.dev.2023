@@ -17,7 +17,11 @@ export const loadDevToPosts = async (
     `https://dev.to/api/articles?username=hideokamoto_stripe&per_page=${perPage}`,
   )
   const stripe = stripeResponse.ok ? await stripeResponse.json() : []
-  const allItems = [...personal, ...stripe]
+  // 2ユーザー分を結合後、公開日の降順にソートしてから上限で切る
+  // （各リストは個別にソート済みのため、ソートしないと一方に偏る）
+  const allItems = [...personal, ...stripe].sort(
+    (a, b) => new Date(b.published_at).getTime() - new Date(a.published_at).getTime(),
+  )
   const hasMore = allItems.length > limit
   const items = allItems.slice(0, limit).map((data): FeedItem => {
     return {

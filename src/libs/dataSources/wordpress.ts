@@ -3,6 +3,7 @@ import type { FeedDataSource, FeedItem, WPPost } from './types'
 export const loadWPPosts = async (
   locale: 'en' | 'ja',
   limit = 20,
+  after?: string,
 ): Promise<{ items: FeedItem[]; hasMore: boolean }> => {
   const dataSource: FeedDataSource = {
     href: 'https://wp-kyoto.net',
@@ -10,9 +11,11 @@ export const loadWPPosts = async (
     color: 'bg-indigo-100 text-indigo-800',
   }
   // limit + 1件取得して、さらに記事があるかどうかを判定（WP REST APIのper_page上限は100）
+  // after を渡すとその日時以降の記事のみ取得し、過剰なデータ取得を避ける
   const perPage = Math.min(limit + 1, 100)
+  const afterParam = after ? `&after=${encodeURIComponent(after)}` : ''
   const response = await fetch(
-    `https://wp-api.wp-kyoto.net/wp-json/wp/v2/posts?filter[lang]=${locale}&per_page=${perPage}`,
+    `https://wp-api.wp-kyoto.net/wp-json/wp/v2/posts?filter[lang]=${locale}&per_page=${perPage}${afterParam}`,
     {
       next: { revalidate: 1800 }, // 30分ごとに再検証（毎日1〜2記事更新）
     },
