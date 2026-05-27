@@ -29,10 +29,7 @@ function CapabilityCard({ capability }: { capability: Capability }) {
 }
 
 export default function Capabilities({ lang }: { lang: string }) {
-  const sectionTitle =
-    lang === 'ja'
-      ? 'SaaSグロースのためのフルスタックエンジニアリング'
-      : 'Full-stack engineering for SaaS growth'
+  const sectionTitle = lang === 'ja' ? '私ができること' : 'What I Bring to the Table'
   const sectionDescription =
     lang === 'ja'
       ? 'Stripeの決済導線設計からAWS/Lambdaによるサーバーレス構築、WordPressによるメディア・マーケティング基盤まで。プロダクトの継続的な収益化と高速な実験を支援します。'
@@ -71,6 +68,16 @@ export default function Capabilities({ lang }: { lang: string }) {
               '編集体験と高速表示を両立するユーザー体験',
             ],
           },
+          {
+            title: 'システムデザインでスケーラブルなアーキテクチャを構築',
+            description:
+              '堅牢で保守性の高いシステムを設計。マイクロサービスやイベント駆動型アーキテクチャで、製品の成長に合わせたバックエンドを構築します。',
+            highlights: [
+              'マイクロサービス・API・イベント駆動型アーキテクチャ設計',
+              '成長に対応するデータベース設計と最適化',
+              'レジリエント設計とフェイルオーバー戦略',
+            ],
+          },
         ]
       : [
           {
@@ -103,6 +110,16 @@ export default function Capabilities({ lang }: { lang: string }) {
               'User experience balancing editing UX and speed',
             ],
           },
+          {
+            title: 'Design scalable architectures with System Design expertise',
+            description:
+              'Craft robust, maintainable systems that grow with your product. I design distributed architectures that balance scalability, reliability, and developer productivity for long-term success.',
+            highlights: [
+              'Microservices, APIs, and event-driven architectures',
+              'Database design and optimization for growth',
+              'System resilience and failover strategies',
+            ],
+          },
         ]
 
   return (
@@ -110,7 +127,7 @@ export default function Capabilities({ lang }: { lang: string }) {
       <Container>
         <SectionHeader title={sectionTitle} description={sectionDescription} align="center" />
 
-        <div className="mt-20 grid gap-10 lg:grid-cols-3 lg:gap-12">
+        <div className="mt-20 grid gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-12">
           {capabilities.map((capability) => (
             <CapabilityCard key={capability.title} capability={capability} />
           ))}

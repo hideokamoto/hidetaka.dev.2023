@@ -2,7 +2,9 @@ import { logger } from '@/libs/logger'
 import { loadFeedPosts } from './feed.utils'
 import type { FeedDataSource, FeedItem, ZennFeed } from './types'
 
-export const loadZennPosts = async (): Promise<{ items: FeedItem[]; hasMore: boolean }> => {
+export const loadZennPosts = async (
+  limit = 20,
+): Promise<{ items: FeedItem[]; hasMore: boolean }> => {
   const dataSource: FeedDataSource = {
     href: 'https://zenn.dev/hideokamoto',
     name: 'Zenn',
@@ -15,8 +17,8 @@ export const loadZennPosts = async (): Promise<{ items: FeedItem[]; hasMore: boo
     (a, b) => new Date(b.isoDate).getTime() - new Date(a.isoDate).getTime(),
   )
 
-  const hasMore = sortedItems.length > 20
-  const items = sortedItems.slice(0, 20).map((data): FeedItem => {
+  const hasMore = sortedItems.length > limit
+  const items = sortedItems.slice(0, limit).map((data): FeedItem => {
     // Ensure datetime is properly formatted
     // Zenn RSS feeds use RFC 822 format (e.g., "Mon, 10 Nov 2025 10:14:00 GMT")
     // which should be parseable by new Date(), but we'll ensure it's valid

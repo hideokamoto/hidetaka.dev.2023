@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
 import ArticleActions from '@/components/ui/ArticleActions'
+import ArticleCTA from '@/components/ui/ArticleCTA'
 import DateDisplay from '@/components/ui/DateDisplay'
 import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
@@ -13,7 +14,7 @@ import { DETAIL_PAGE_SECTION_CLASS } from '@/libs/utils/detailPageStyles'
 
 type NewsDetailPageProps = {
   product: WPProduct
-  lang: string
+  lang: 'ja' | 'en'
   basePath: string
   previousProduct?: WPProduct | null
   nextProduct?: WPProduct | null
@@ -124,6 +125,9 @@ export default function NewsDetailPage({
           enableHatenaStar={enableHatenaStar}
           className={DETAIL_PAGE_SECTION_CLASS}
         />
+
+        {/* CTA（コールトゥアクション） */}
+        <ArticleCTA articleType="news_article" lang={lang} className="mt-12" />
 
         {/* 関連記事 */}
         <RelatedArticles articles={relatedArticles} lang={lang} />

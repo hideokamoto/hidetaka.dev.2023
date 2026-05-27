@@ -4,22 +4,28 @@
  */
 
 // Badge component types
-export type BadgeVariant = 'default' | 'indigo'
+export type BadgeVariant = 'default' | 'indigo' | 'green' | 'gray'
 
 // Badge style constants (defined at module level for performance)
 const BADGE_VARIANT_STYLES = {
   default: 'border-zinc-200 bg-zinc-50/80 dark:border-zinc-500/30 dark:bg-zinc-500/10',
   indigo: 'border-indigo-200 bg-indigo-50/80 dark:border-indigo-500/30 dark:bg-indigo-500/10',
+  green: 'border-green-200 bg-green-50/80 dark:border-green-500/30 dark:bg-green-500/10',
+  gray: 'border-gray-200 bg-gray-50/80 dark:border-gray-500/30 dark:bg-gray-500/10',
 } as const
 
 const BADGE_TEXT_STYLES = {
   default: 'text-sm font-semibold uppercase tracking-wider text-zinc-700 dark:text-zinc-400',
   indigo: 'text-sm font-semibold uppercase tracking-wider text-indigo-700 dark:text-indigo-400',
+  green: 'text-sm font-semibold uppercase tracking-wider text-green-700 dark:text-green-400',
+  gray: 'text-sm font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-400',
 } as const
 
 const BADGE_DOT_STYLES = {
   default: 'h-2 w-2 rounded-full bg-zinc-500 animate-pulse',
   indigo: 'h-2 w-2 rounded-full bg-indigo-500 animate-pulse',
+  green: 'h-2 w-2 rounded-full bg-green-500 animate-pulse',
+  gray: 'h-2 w-2 rounded-full bg-gray-500 animate-pulse',
 } as const
 
 /**
@@ -84,17 +90,19 @@ export function getSectionHeaderAlignStyles(align: SectionHeaderAlign): string {
 }
 
 // CTA Button component types
-export type CTAButtonVariant = 'primary' | 'secondary'
+export type CTAButtonVariant = 'primary' | 'secondary' | 'outline'
 
 // CTA Button style constants (defined at module level for performance)
 const CTA_BUTTON_BASE_STYLES =
-  'group inline-flex items-center gap-2 rounded-lg px-8 py-3.5 text-base font-bold shadow-lg transition-all hover:scale-105 hover:shadow-xl'
+  'group inline-flex items-center gap-2 rounded-lg px-10 py-4 text-base font-bold shadow-lg transition-all hover:scale-105 hover:shadow-xl'
 
 const CTA_BUTTON_VARIANT_STYLES = {
   primary:
     'bg-indigo-600 text-white shadow-indigo-500/30 hover:bg-indigo-700 hover:shadow-indigo-500/40 dark:bg-indigo-500 dark:hover:bg-indigo-400',
   secondary:
     'border border-zinc-200 bg-white text-zinc-900 shadow-zinc-500/20 hover:bg-zinc-50 hover:shadow-zinc-500/30 dark:border-zinc-700 dark:bg-zinc-900 dark:text-white dark:hover:bg-zinc-800',
+  outline:
+    'border-2 border-indigo-600 bg-transparent text-indigo-600 shadow-indigo-500/20 hover:bg-indigo-50 hover:shadow-indigo-500/30 dark:border-indigo-400 dark:text-indigo-400 dark:hover:bg-indigo-950',
 } as const
 
 /**

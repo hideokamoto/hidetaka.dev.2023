@@ -10,11 +10,11 @@ import { SITE_CONFIG } from '@/config'
 
 export default function Hero({ lang }: { lang: string }) {
   const name = SITE_CONFIG.author.name
-  const role = lang === 'ja' ? '開発者' : 'Developer'
+  const role = lang === 'ja' ? 'Developer Experience Engineer' : 'Developer Experience Engineer'
   const tagline =
     lang === 'ja'
-      ? 'SaaSの収益を最大化するエンジニアリング'
-      : 'Engineering that maximizes SaaS revenue'
+      ? 'シームレスな体験で開発者をエンパワーする'
+      : 'Empowering developers with seamless experiences'
 
   const description =
     lang === 'ja'

@@ -48,10 +48,13 @@ export const loadDevNotes = async (
   page: number = 1,
   perPage: number = 20,
   lang: string = 'ja',
+  after?: string,
 ): Promise<DevNotesResult> => {
   try {
+    // after を渡すとその日時以降の記事のみ取得し、過剰なデータ取得を避ける
+    const afterParam = after ? `&after=${encodeURIComponent(after)}` : ''
     const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?page=${page}&per_page=${perPage}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
+      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?page=${page}&per_page=${perPage}${afterParam}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
       {
         next: { revalidate: 1800 }, // 30分ごとに再検証（WordPress記事）
       },

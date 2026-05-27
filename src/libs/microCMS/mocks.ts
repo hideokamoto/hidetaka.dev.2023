@@ -19,6 +19,7 @@ export const MICROCMS_MOCK_BOOKs: MicroCMSProjectsRecord[] = [
     },
     lang: ['Japanese'],
     is_solo: true,
+    status: 'active',
   },
   {
     id: 'iutgcn7l3ad',
@@ -38,5 +39,6 @@ export const MICROCMS_MOCK_BOOKs: MicroCMSProjectsRecord[] = [
     },
     lang: ['Japanese'],
     is_solo: true,
+    status: 'deprecated',
   },
 ]

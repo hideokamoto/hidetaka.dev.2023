@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { useCallback, useMemo, useState } from 'react'
+import { type ReactNode, useCallback, useMemo, useState } from 'react'
 import Container from '@/components/tailwindui/Container'
 import DateDisplay from '@/components/ui/DateDisplay'
 import FilterItem from '@/components/ui/FilterItem'
@@ -204,14 +204,25 @@ function Sidebar({
   )
 }
 
+/**
+ * 検索、データソースによる絞り込み、および記事カードのグリッドを含む執筆一覧ページのコンテンツを描画するコンポーネント。
+ *
+ * @param lang - UI 表示に使用する言語コード（例: 'ja' または 'en'）
+ * @param externalArticles - 表示対象となる外部記事の配列（FeedItem のリスト）
+ * @param hasMoreBySource - 各データソースにさらに記事が存在するかを示すオプションのマッピング。キーはデータソース名、値が真の場合はそのソースのカウント表示が「20+」扱いになる
+ * @param statsSlot - 記事グリッドの下に描画する任意の要素（執筆統計セクションなど）。サーバーコンポーネントを渡せる
+ * @returns 執筆一覧ページ全体の JSX 要素
+ */
 export default function WritingPageContent({
   lang,
   externalArticles,
   hasMoreBySource = {},
+  statsSlot,
 }: {
   lang: string
   externalArticles: FeedItem[]
   hasMoreBySource?: Record<string, boolean>
+  statsSlot?: ReactNode
 }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [filterDataSource, setFilterDataSource] = useState<FilterDataSource>(null)
@@ -300,8 +311,8 @@ export default function WritingPageContent({
   const title = lang === 'ja' ? 'Writing' : 'Writing'
   const description =
     lang === 'ja'
-      ? '技術記事、ブログ投稿、ニュースなどの執筆活動を紹介しています。'
-      : "A collection of technical articles, blog posts, news, and other writing I've published."
+      ? '技術記事とチュートリアル。一部は外部サイト（Zenn、Qiita、Dev.to等）で公開しています。'
+      : 'Technical articles and tutorials. Some are published on external platforms like Zenn, Qiita, and Dev.to.'
   const filterButtonText = lang === 'ja' ? 'フィルター' : 'Filter'
 
   // アクティブなフィルターの数を計算
@@ -454,6 +465,8 @@ export default function WritingPageContent({
               </div>
             )}
           </SidebarLayout>
+
+          {statsSlot}
         </Container>
       </section>
     </>

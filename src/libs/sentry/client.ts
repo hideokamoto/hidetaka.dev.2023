@@ -1,9 +1,9 @@
 /**
  * Browser-side Sentry configuration
- * Uses @sentry/browser for client-side error tracking
+ * Uses @sentry/nextjs for client-side error tracking
  */
 
-import * as Sentry from '@sentry/browser'
+import * as Sentry from '@sentry/nextjs'
 
 /**
  * Common non-actionable errors that should be ignored

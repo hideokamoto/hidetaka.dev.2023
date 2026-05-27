@@ -57,4 +57,4 @@ export default function SocialLink({
   )
 }
 
-export { TwitterIcon, GitHubIcon, LinkedInIcon }
+export { GitHubIcon, LinkedInIcon, TwitterIcon }

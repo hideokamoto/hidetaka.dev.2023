@@ -8,7 +8,7 @@ type BadgeProps = {
 
 export default function Badge({ label, variant = 'indigo', className = '' }: BadgeProps) {
   const baseStyles =
-    'inline-flex items-center gap-3 rounded-full border px-4 py-1.5 backdrop-blur-sm shadow-sm'
+    'inline-flex items-center gap-3 rounded-full border px-6 py-2.5 backdrop-blur-sm shadow-sm'
 
   const styles = getBadgeStyles(variant)
 

@@ -6,8 +6,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { captureException, captureMessage, initSentry } from './client'
 
-// Mock @sentry/browser module
-vi.mock('@sentry/browser', () => ({
+// Mock @sentry/nextjs module
+vi.mock('@sentry/nextjs', () => ({
   init: vi.fn(),
   isInitialized: vi.fn(),
   captureException: vi.fn(),
@@ -16,7 +16,7 @@ vi.mock('@sentry/browser', () => ({
 
 describe('Sentry Client Functions', () => {
   // Import mocked Sentry after mocking
-  let Sentry: typeof import('@sentry/browser')
+  let Sentry: typeof import('@sentry/nextjs')
 
   // Spy on console methods
   let consoleLogSpy: ReturnType<typeof vi.spyOn>
@@ -30,7 +30,7 @@ describe('Sentry Client Functions', () => {
     originalEnv = { ...process.env }
 
     // Import the mocked Sentry module
-    Sentry = await import('@sentry/browser')
+    Sentry = await import('@sentry/nextjs')
 
     // Create spies on console methods
     consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {})

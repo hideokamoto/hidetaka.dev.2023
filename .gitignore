@@ -6,6 +6,7 @@ out/
 
 # Dependencies
 node_modules/
+package-lock.json
 
 # Environment variables
 .env
@@ -43,3 +44,5 @@ coverage/
 .envrc
 RELEASE_NOTES_*.md
 docs/reports/
+
+content-*.md

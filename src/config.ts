@@ -11,6 +11,12 @@ export const SITE_CONFIG = {
   // 著者情報
   author: {
     name: 'Hidetaka Okamoto',
+    jobTitle: 'Developer Experience Engineer',
+    image: '/images/profile.jpg',
+    worksFor: {
+      name: 'DigitalCube',
+      url: 'https://en.digitalcube.jp/',
+    },
   },
 
   // ソーシャルリンク（全サイトで共通）

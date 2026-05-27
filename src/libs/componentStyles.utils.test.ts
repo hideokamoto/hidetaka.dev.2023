@@ -156,7 +156,7 @@ describe('Component Styles Utils', () => {
       expect(styles).toContain('inline-flex')
       expect(styles).toContain('gap-2')
       expect(styles).toContain('rounded-lg')
-      expect(styles).toContain('px-8')
+      expect(styles).toContain('px-10')
       expect(styles).toContain('font-bold')
 
       // Primary variant tokens
@@ -174,7 +174,7 @@ describe('Component Styles Utils', () => {
       expect(styles).toContain('inline-flex')
       expect(styles).toContain('gap-2')
       expect(styles).toContain('rounded-lg')
-      expect(styles).toContain('px-8')
+      expect(styles).toContain('px-10')
       expect(styles).toContain('font-bold')
 
       // Secondary variant tokens

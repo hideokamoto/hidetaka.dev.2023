@@ -184,7 +184,13 @@ function BlogSidebar({
   )
 }
 
-// ページタイトルと説明文を取得するヘルパー関数
+/**
+ * ページのタイトルと説明文を生成する。
+ *
+ * @param lang - 表示言語のコード。`'ja'` の場合は日本語、それ以外は英語を使用する
+ * @param categoryName - 指定するとカテゴリ名を含めたタイトルと説明文を生成する（省略可）
+ * @returns `title` に表示するページタイトル、`description` に表示するページ説明文を含むオブジェクト。カテゴリ名が与えられた場合はそれを明示する文言になる
+ */
 function getPageContent(lang: string, categoryName?: string) {
   const title = categoryName
     ? lang === 'ja'
@@ -199,8 +205,8 @@ function getPageContent(lang: string, categoryName?: string) {
       ? `「${categoryName}」カテゴリのブログ記事一覧です。`
       : `Blog posts in the "${categoryName}" category.`
     : lang === 'ja'
-      ? '技術的ではないトピックを中心としたブログ記事を掲載しています。'
-      : 'A collection of blog posts focusing on non-technical topics.'
+      ? 'キャリア論、振り返り、個人的な考察などを掲載しています。'
+      : 'Career insights, reflections, and personal perspectives.'
 
   return { title, description }
 }

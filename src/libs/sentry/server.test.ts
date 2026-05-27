@@ -1,15 +1,15 @@
 /**
- * Tests for server-side Sentry with @sentry/cloudflare
- * These tests verify Sentry integration for Cloudflare Workers
+ * Tests for server-side Sentry with @sentry/nextjs
+ * These tests verify Sentry integration for Next.js on Cloudflare Workers
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-// Mock @sentry/cloudflare before importing the module
-vi.mock('@sentry/cloudflare', () => ({
+// Mock @sentry/nextjs before importing the module
+vi.mock('@sentry/nextjs', () => ({
   captureException: vi.fn(),
   captureMessage: vi.fn(),
-  isInitialized: vi.fn(() => false), // Always returns false (no manual init)
+  isEnabled: vi.fn(() => true), // Returns true when properly initialized
 }))
 
 describe('Sentry Server Functions', () => {
@@ -53,7 +53,7 @@ describe('Sentry Server Functions', () => {
       expect(consoleLogSpy).not.toHaveBeenCalled()
     })
 
-    it('should log Wrangler configuration info in development mode with DSN', async () => {
+    it('should log initialization message in development mode', async () => {
       process.env.SENTRY_DSN = 'https://test@sentry.io/123'
       process.env.NODE_ENV = 'development'
 
@@ -61,25 +61,18 @@ describe('Sentry Server Functions', () => {
       initSentry()
 
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        '[Sentry] Server-side Sentry is configured (via Wrangler compatibility settings)',
-      )
-      expect(consoleLogSpy).toHaveBeenCalledWith('[Sentry] Ensure wrangler.jsonc has:')
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        '[Sentry]   - compatibility_date: "2025-08-16" or later',
-      )
-      expect(consoleLogSpy).toHaveBeenCalledWith(
-        '[Sentry]   - compatibility_flags: ["nodejs_compat"]',
+        '[Sentry] Initialized automatically via instrumentation.ts',
       )
     })
 
-    it('should not log anything in production mode (Sentry works automatically)', async () => {
+    it('should not log anything in production mode (Sentry initialized via instrumentation.ts)', async () => {
       process.env.SENTRY_DSN = 'https://test@sentry.io/123'
       process.env.NODE_ENV = 'production'
 
       const { initSentry } = await import('./server')
       initSentry()
 
-      // No initialization needed in production, Wrangler config handles it
+      // No logs in production, initialization via instrumentation.ts
       expect(consoleWarnSpy).not.toHaveBeenCalled()
       expect(consoleLogSpy).not.toHaveBeenCalled()
     })
@@ -100,7 +93,7 @@ describe('Sentry Server Functions', () => {
       process.env.SENTRY_DSN = 'https://test@sentry.io/123'
       process.env.NODE_ENV = 'production'
 
-      const Sentry = await import('@sentry/cloudflare')
+      const Sentry = await import('@sentry/nextjs')
       const { captureException } = await import('./server')
 
       const testError = new Error('Test error')
@@ -121,7 +114,7 @@ describe('Sentry Server Functions', () => {
       process.env.SENTRY_DSN = 'https://test@sentry.io/123'
       process.env.NODE_ENV = 'development'
 
-      const Sentry = await import('@sentry/cloudflare')
+      const Sentry = await import('@sentry/nextjs')
       const { captureException } = await import('./server')
 
       const testError = new Error('Test error')
@@ -136,7 +129,7 @@ describe('Sentry Server Functions', () => {
       process.env.SENTRY_DSN = 'https://test@sentry.io/123'
       process.env.NODE_ENV = 'production'
 
-      const Sentry = await import('@sentry/cloudflare')
+      const Sentry = await import('@sentry/nextjs')
       // Make captureException throw an error
       vi.mocked(Sentry.captureException).mockImplementation(() => {
         throw new Error('Sentry error')
@@ -184,7 +177,7 @@ describe('Sentry Server Functions', () => {
       process.env.SENTRY_DSN = 'https://test@sentry.io/123'
       process.env.NODE_ENV = 'production'
 
-      const Sentry = await import('@sentry/cloudflare')
+      const Sentry = await import('@sentry/nextjs')
       const { captureMessage } = await import('./server')
 
       captureMessage('Test message', 'warning', { component: 'test' })
@@ -203,7 +196,7 @@ describe('Sentry Server Functions', () => {
       process.env.SENTRY_DSN = 'https://test@sentry.io/123'
       process.env.NODE_ENV = 'development'
 
-      const Sentry = await import('@sentry/cloudflare')
+      const Sentry = await import('@sentry/nextjs')
       const { captureMessage } = await import('./server')
 
       captureMessage('Test message')
@@ -216,7 +209,7 @@ describe('Sentry Server Functions', () => {
       process.env.SENTRY_DSN = 'https://test@sentry.io/123'
       process.env.NODE_ENV = 'production'
 
-      const Sentry = await import('@sentry/cloudflare')
+      const Sentry = await import('@sentry/nextjs')
       // Make captureMessage throw an error
       vi.mocked(Sentry.captureMessage).mockImplementation(() => {
         throw new Error('Sentry error')
@@ -235,33 +228,33 @@ describe('Sentry Server Functions', () => {
   })
 
   describe('isSentryInitialized', () => {
-    it('should return false when Sentry.init() is not called', async () => {
+    it('should return true when Sentry is enabled (via instrumentation.ts)', async () => {
       delete process.env.SENTRY_DSN
 
       const { isSentryInitialized } = await import('./server')
-      // Uses Sentry.isInitialized() which returns false without manual init
-      expect(isSentryInitialized()).toBe(false)
+      // Uses Sentry.isEnabled() which returns true when initialized via instrumentation.ts
+      expect(isSentryInitialized()).toBe(true)
     })
 
-    it('should return false even when DSN is configured (no auto-init)', async () => {
+    it('should return true when DSN is configured (auto-init via instrumentation.ts)', async () => {
       process.env.SENTRY_DSN = 'https://test@sentry.io/123'
       process.env.NODE_ENV = 'production'
 
       const { isSentryInitialized } = await import('./server')
 
-      // Returns false because Sentry.init() is never called
-      expect(isSentryInitialized()).toBe(false)
+      // Returns true because Sentry.init() is automatically called by instrumentation.ts
+      expect(isSentryInitialized()).toBe(true)
     })
 
-    it('should return false after initSentry() is called (no-op)', async () => {
+    it('should return true after initSentry() is called (no-op but SDK is initialized)', async () => {
       process.env.SENTRY_DSN = 'https://test@sentry.io/123'
       process.env.NODE_ENV = 'production'
 
       const { initSentry, isSentryInitialized } = await import('./server')
 
-      expect(isSentryInitialized()).toBe(false)
-      initSentry() // This is a no-op
-      expect(isSentryInitialized()).toBe(false)
+      expect(isSentryInitialized()).toBe(true)
+      initSentry() // This is a no-op, but SDK is already initialized
+      expect(isSentryInitialized()).toBe(true)
     })
   })
 
