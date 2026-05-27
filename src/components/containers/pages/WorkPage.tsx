@@ -311,31 +311,6 @@ function OSSContributionLink({ project }: { project: MicroCMSProjectsRecord }) {
   )
 }
 
-// Render OSS item based on type (keys are applied at map call site)
-function renderOSSItem(item: OSSItem, lang: string): React.ReactNode {
-  if (item.type === 'project') {
-    return <UnifiedProjectCard project={item.data as MicroCMSProjectsRecord} lang={lang} />
-  }
-  if (item.type === 'npm') {
-    return (
-      <UnifiedOSSCard
-        item={{ type: 'npm', data: item.data as NPMRegistrySearchResult }}
-        lang={lang}
-      />
-    )
-  }
-  // wordpress
-  return (
-    <UnifiedOSSCard
-      item={{
-        type: 'wordpress',
-        data: item.data as WordPressPluginDetail,
-      }}
-      lang={lang}
-    />
-  )
-}
-
 // Helper functions to categorize items by status
 
 /**
