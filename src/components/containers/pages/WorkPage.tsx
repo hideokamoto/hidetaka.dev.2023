@@ -55,7 +55,6 @@ function sortByDateDesc<T>(items: T[], getDate: (item: T) => string): T[] {
   })
 }
 
-
 // OSSアイテムをフィルタリングするヘルパー関数
 export function filterOSSItem(item: OSSItem, matchesSearch: (text: string) => boolean): boolean {
   if (item.type === 'project') {
