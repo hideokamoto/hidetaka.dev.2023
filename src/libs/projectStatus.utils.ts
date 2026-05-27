@@ -3,7 +3,7 @@
  * Determines active/deprecated status based on last update date
  */
 
-import type { MicroCMSProjectStatus } from './microCMS/types'
+import type { MicroCMSProjectStatus } from '@/libs/microCMS/types'
 
 /**
  * Status threshold in months (6 months)
