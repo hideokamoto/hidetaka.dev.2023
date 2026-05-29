@@ -21,7 +21,9 @@ import type { WordPressPluginDetail } from '@/libs/dataSources/wporg'
 import type { MicroCMSProjectsRecord } from '@/libs/microCMS/types'
 import {
   getMicroCMSProjectStatus,
+  getStatusBadgeVariant,
   getStatusFromLastUpdate,
+  getStatusLabel,
   isActiveStatus,
   type UnifiedProjectStatus,
 } from '@/libs/projectStatus.utils'
@@ -51,36 +53,6 @@ function sortByDateDesc<T>(items: T[], getDate: (item: T) => string): T[] {
     const dateB = getDate(b)
     return new Date(dateB).getTime() - new Date(dateA).getTime()
   })
-}
-
-// Map project status to badge variant
-function getStatusBadgeVariant(status: UnifiedProjectStatus): 'green' | 'gray' {
-  return status === 'active' ? 'green' : 'gray'
-}
-
-// Get status label for display
-function getStatusLabel(status: UnifiedProjectStatus, lang: string): string {
-  // Ensure status is a string for safety
-  if (!status || typeof status !== 'string') {
-    return lang === 'ja' ? 'アクティブ' : 'Active'
-  }
-
-  if (lang === 'ja') {
-    switch (status) {
-      case 'active':
-        return 'アクティブ'
-      case 'deprecated':
-        return '非推奨'
-      case 'archived':
-        return 'アーカイブ'
-      case 'completed':
-        return '完了'
-      default:
-        // Fallback to English label for unknown status
-        break
-    }
-  }
-  return status.charAt(0).toUpperCase() + status.slice(1)
 }
 
 // OSSアイテムをフィルタリングするヘルパー関数
@@ -864,7 +836,7 @@ export default function WorkPageContent({
                 {(filterCategory === 'all' || filterCategory === 'projects') &&
                   categorizedProjects.active.length > 0 && (
                     <div className="mb-12">
-                      <h3 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
+                      <h3 className="mb-6 text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white">
                         {lang === 'ja' ? 'プロジェクト' : 'Projects'}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
@@ -879,7 +851,7 @@ export default function WorkPageContent({
                 {(filterCategory === 'all' || filterCategory === 'books') &&
                   categorizedBooks.active.length > 0 && (
                     <div className="mb-12">
-                      <h3 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
+                      <h3 className="mb-6 text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white">
                         {lang === 'ja' ? '書籍' : 'Books'}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
@@ -894,7 +866,7 @@ export default function WorkPageContent({
                 {(filterCategory === 'all' || filterCategory === 'open-source') &&
                   categorizedOSS.active.length > 0 && (
                     <div className="mb-12">
-                      <h3 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
+                      <h3 className="mb-6 text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white">
                         {lang === 'ja' ? 'オープンソース' : 'Open Source'}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
@@ -909,7 +881,7 @@ export default function WorkPageContent({
                 {(filterCategory === 'all' || filterCategory === 'oss-contribution') &&
                   categorizedOSSContributions.active.length > 0 && (
                     <div className="mb-12">
-                      <h3 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
+                      <h3 className="mb-6 text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white">
                         {lang === 'ja' ? 'OSS貢献' : 'OSS Contributions'}
                       </h3>
                       <div className="space-y-3">
@@ -936,7 +908,7 @@ export default function WorkPageContent({
                 {(filterCategory === 'all' || filterCategory === 'projects') &&
                   categorizedProjects.archived.length > 0 && (
                     <div className="mb-12">
-                      <h3 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
+                      <h3 className="mb-6 text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white">
                         {lang === 'ja' ? 'プロジェクト' : 'Projects'}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
@@ -951,7 +923,7 @@ export default function WorkPageContent({
                 {(filterCategory === 'all' || filterCategory === 'books') &&
                   categorizedBooks.archived.length > 0 && (
                     <div className="mb-12">
-                      <h3 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
+                      <h3 className="mb-6 text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white">
                         {lang === 'ja' ? '書籍' : 'Books'}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
@@ -966,7 +938,7 @@ export default function WorkPageContent({
                 {(filterCategory === 'all' || filterCategory === 'open-source') &&
                   categorizedOSS.archived.length > 0 && (
                     <div className="mb-12">
-                      <h3 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
+                      <h3 className="mb-6 text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white">
                         {lang === 'ja' ? 'オープンソース' : 'Open Source'}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
@@ -981,7 +953,7 @@ export default function WorkPageContent({
                 {(filterCategory === 'all' || filterCategory === 'oss-contribution') &&
                   categorizedOSSContributions.archived.length > 0 && (
                     <div className="mb-12">
-                      <h3 className="mb-6 text-2xl font-bold text-slate-900 dark:text-white">
+                      <h3 className="mb-6 text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white">
                         {lang === 'ja' ? 'OSS貢献' : 'OSS Contributions'}
                       </h3>
                       <div className="space-y-3">

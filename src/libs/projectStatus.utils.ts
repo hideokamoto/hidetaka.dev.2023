@@ -3,7 +3,7 @@
  * Determines active/deprecated status based on last update date
  */
 
-import type { MicroCMSProjectStatus } from './microCMS/types'
+import type { MicroCMSProjectStatus } from '@/libs/microCMS/types'
 
 /**
  * Status threshold in months (6 months)
@@ -65,4 +65,42 @@ export function getStatusFromLastUpdate(lastUpdated: string | Date): 'active' | 
  */
 export function getMicroCMSProjectStatus(status?: MicroCMSProjectStatus): UnifiedProjectStatus {
   return status || 'active'
+}
+
+/**
+ * Get the badge variant for a given status
+ * @param status - Project status
+ * @returns Badge variant: 'green' for active, 'gray' for others
+ */
+export function getStatusBadgeVariant(status: UnifiedProjectStatus): 'green' | 'gray' {
+  return status === 'active' ? 'green' : 'gray'
+}
+
+/**
+ * Get localized status label
+ * @param status - Project status
+ * @param lang - Language code ('ja' or 'en')
+ * @returns Localized status label
+ */
+export function getStatusLabel(status: UnifiedProjectStatus, lang: string): string {
+  const isJapanese = lang.startsWith('ja')
+
+  if (!status || typeof status !== 'string') {
+    return isJapanese ? 'アクティブ' : 'Active'
+  }
+
+  const labels: Record<string, Record<string, string>> = {
+    active: { ja: 'アクティブ', en: 'Active' },
+    deprecated: { ja: '非推奨', en: 'Deprecated' },
+    archived: { ja: 'アーカイブ', en: 'Archived' },
+    completed: { ja: '完了', en: 'Completed' },
+  }
+
+  const entry = labels[status]
+  if (!entry) {
+    const capitalized = status.charAt(0).toUpperCase() + status.slice(1)
+    return capitalized
+  }
+
+  return entry[isJapanese ? 'ja' : 'en']
 }
