@@ -83,13 +83,24 @@ export function getStatusBadgeVariant(status: UnifiedProjectStatus): 'green' | '
  * @returns Localized status label
  */
 export function getStatusLabel(status: UnifiedProjectStatus, lang: string): string {
-  const labels: Record<UnifiedProjectStatus, Record<string, string>> = {
+  const isJapanese = lang.startsWith('ja')
+
+  if (!status || typeof status !== 'string') {
+    return isJapanese ? 'アクティブ' : 'Active'
+  }
+
+  const labels: Record<string, Record<string, string>> = {
     active: { ja: 'アクティブ', en: 'Active' },
     deprecated: { ja: '非推奨', en: 'Deprecated' },
     archived: { ja: 'アーカイブ', en: 'Archived' },
     completed: { ja: '完了', en: 'Completed' },
   }
 
-  const isJapanese = lang.startsWith('ja')
-  return labels[status][isJapanese ? 'ja' : 'en']
+  const entry = labels[status]
+  if (!entry) {
+    const capitalized = status.charAt(0).toUpperCase() + status.slice(1)
+    return capitalized
+  }
+
+  return entry[isJapanese ? 'ja' : 'en']
 }
