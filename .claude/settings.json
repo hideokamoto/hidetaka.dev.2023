@@ -24,5 +24,8 @@
         ]
       }
     ]
+  },
+  "env": {
+    "OTEL_RESOURCE_ATTRIBUTES": "project.name=hidetaka.dev.2023"
   }
 }
