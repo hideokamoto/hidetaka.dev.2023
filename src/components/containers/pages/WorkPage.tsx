@@ -92,7 +92,13 @@ function getOSSItemDate(item: OSSItem): string {
 
 // 統一されたWorkカードコンポーネント（プロジェクト用）
 function UnifiedProjectCard({ project, lang }: { project: MicroCMSProjectsRecord; lang: string }) {
-  const href = lang === 'ja' ? `/ja/work/${project.id}` : `/work/${project.id}`
+  // url が hidetaka.dev 上の専用 LP を指す場合はそちらへ直リンク（Next.js 詳細ページをスキップ）
+  const isInternalLP = project.url.startsWith('https://hidetaka.dev/')
+  const href = isInternalLP
+    ? project.url
+    : lang === 'ja'
+      ? `/ja/work/${project.id}`
+      : `/work/${project.id}`
   const date = project.published_at ? new Date(project.published_at) : null
   const status = getMicroCMSProjectStatus(project.status)
   const statusVariant = getStatusBadgeVariant(status)

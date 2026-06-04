@@ -1,5 +1,25 @@
 import type { MicroCMSProjectsRecord } from './types'
 
+export const MICROCMS_MOCK_OSS_PROJECTS: MicroCMSProjectsRecord[] = [
+  {
+    id: 'wordpress-skills-oss',
+    createdAt: '2026-06-02T00:00:00.000Z',
+    updatedAt: '2026-06-02T00:00:00.000Z',
+    publishedAt: '2026-06-02T00:00:00.000Z',
+    revisedAt: '2026-06-02T00:00:00.000Z',
+    title: 'wordpress-skills',
+    url: 'https://hidetaka.dev/work/wordpress-skills',
+    published_at: '2026-06-02T00:00:00.000Z',
+    tags: ['WordPress', 'AI', 'Claude Code', 'Agent Skills', 'Cloudflare Workers', 'Python'],
+    project_type: ['owned_oss'],
+    lang: ['English'],
+    is_solo: true,
+    status: 'active',
+    about:
+      'Agent Skills that give AI coding agents primary-source grounding for WordPress development. Instead of generating code from memory, the agent searches and reads official WordPress Developer Handbooks at request time.',
+  },
+]
+
 export const MICROCMS_MOCK_BOOKs: MicroCMSProjectsRecord[] = [
   {
     id: '48xxv5o8vt8j',

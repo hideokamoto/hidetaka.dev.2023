@@ -1,6 +1,8 @@
-import { MICROCMS_MOCK_BOOKs } from './mocks'
+import { MICROCMS_MOCK_BOOKs, MICROCMS_MOCK_OSS_PROJECTS } from './mocks'
 import type { MicroCMSClient, MicroCMSProjectsRecord } from './types'
 import { handleMicroCMSRequest } from './utils'
+
+const MICROCMS_MOCK_ALL_PROJECTS = [...MICROCMS_MOCK_BOOKs, ...MICROCMS_MOCK_OSS_PROJECTS]
 
 export class MicroCMSAPI {
   private readonly client: MicroCMSClient
@@ -29,7 +31,7 @@ export class MicroCMSAPI {
   public async listAllProjects(): Promise<MicroCMSProjectsRecord[]> {
     return handleMicroCMSRequest(
       this.client,
-      MICROCMS_MOCK_BOOKs,
+      MICROCMS_MOCK_ALL_PROJECTS,
       async () => {
         return await this.client!.getAllContents({
           endpoint: 'projects',
