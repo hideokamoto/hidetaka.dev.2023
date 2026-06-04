@@ -41,4 +41,24 @@ export const MICROCMS_MOCK_BOOKs: MicroCMSProjectsRecord[] = [
     is_solo: true,
     status: 'deprecated',
   },
+  {
+    // Backed by a dedicated landing page (separate Cloudflare Worker) — see
+    // src/libs/projectLandingPages.ts. The content ID MUST stay in sync with
+    // the PROJECT_LANDING_PAGES key so the card links to the LP.
+    id: 'wordpress-skills',
+    createdAt: '2026-06-04T00:00:00.000Z',
+    updatedAt: '2026-06-04T00:00:00.000Z',
+    publishedAt: '2026-06-04T00:00:00.000Z',
+    revisedAt: '2026-06-04T00:00:00.000Z',
+    title: 'wordpress-skills',
+    url: 'https://github.com/hideokamoto/wordpress-skills',
+    published_at: '2026-06-04T00:00:00.000Z',
+    tags: ['WordPress', 'AI', 'Agent Skills', 'Claude Code'],
+    project_type: ['owned_oss'],
+    lang: ['English'],
+    is_solo: true,
+    status: 'active',
+    about:
+      'Agent Skills that give AI coding agents primary-source grounding for WordPress development. Your agent searches and reads the official WordPress Developer Handbooks on developer.wordpress.org at request time, so answers come from the docs, not a guess.',
+  },
 ]

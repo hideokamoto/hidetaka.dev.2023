@@ -19,6 +19,7 @@ import { SITE_CONFIG } from '@/config'
 import type { NPMRegistrySearchResult } from '@/libs/dataSources/npmjs'
 import type { WordPressPluginDetail } from '@/libs/dataSources/wporg'
 import type { MicroCMSProjectsRecord } from '@/libs/microCMS/types'
+import { getProjectHref, isProjectLandingPage } from '@/libs/projectLandingPages'
 import {
   getMicroCMSProjectStatus,
   getStatusBadgeVariant,
@@ -92,66 +93,82 @@ function getOSSItemDate(item: OSSItem): string {
 
 // 統一されたWorkカードコンポーネント（プロジェクト用）
 function UnifiedProjectCard({ project, lang }: { project: MicroCMSProjectsRecord; lang: string }) {
-  const href = lang === 'ja' ? `/ja/work/${project.id}` : `/work/${project.id}`
+  const href = getProjectHref(project.id, lang)
+  // Landing-page-backed projects are served by a separate Cloudflare Worker,
+  // so they need a full document navigation (plain <a>) rather than a
+  // next/link soft navigation that the Next.js router would intercept.
+  const isLandingPage = isProjectLandingPage(project.id)
   const date = project.published_at ? new Date(project.published_at) : null
   const status = getMicroCMSProjectStatus(project.status)
   const statusVariant = getStatusBadgeVariant(status)
   const statusLabel = getStatusLabel(status, lang)
 
+  const cardBody = (
+    <article className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all hover:border-indigo-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700">
+      {/* Image - Top */}
+      {project.image && (
+        <div className="relative aspect-[4/3] w-full overflow-hidden">
+          <Image
+            src={project.image.url}
+            alt={project.title}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-110"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          />
+        </div>
+      )}
+
+      {/* Content - Bottom */}
+      <div className="p-5 lg:p-6">
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center justify-between gap-2">
+            {date && (
+              <DateDisplay
+                date={date}
+                lang={lang}
+                format="short"
+                className="text-xs font-semibold text-slate-500 dark:text-slate-400"
+              />
+            )}
+            {project.status && <Badge label={statusLabel} variant={statusVariant} />}
+          </div>
+
+          <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+            {project.title}
+          </h3>
+
+          {project.about && (
+            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-2">
+              {project.about.replace(/<[^>]*>/g, '').substring(0, 120)}
+              {project.about.replace(/<[^>]*>/g, '').length > 120 ? '...' : ''}
+            </p>
+          )}
+
+          {project.tags && project.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {project.tags.slice(0, 3).map((tag) => (
+                <Tag key={tag} variant="indigo" size="sm">
+                  {tag}
+                </Tag>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </article>
+  )
+
+  if (isLandingPage) {
+    return (
+      <a href={href} className="group block">
+        {cardBody}
+      </a>
+    )
+  }
+
   return (
     <Link href={href} className="group block">
-      <article className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all hover:border-indigo-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700">
-        {/* Image - Top */}
-        {project.image && (
-          <div className="relative aspect-[4/3] w-full overflow-hidden">
-            <Image
-              src={project.image.url}
-              alt={project.title}
-              fill
-              className="object-cover transition-transform duration-500 group-hover:scale-110"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            />
-          </div>
-        )}
-
-        {/* Content - Bottom */}
-        <div className="p-5 lg:p-6">
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-between gap-2">
-              {date && (
-                <DateDisplay
-                  date={date}
-                  lang={lang}
-                  format="short"
-                  className="text-xs font-semibold text-slate-500 dark:text-slate-400"
-                />
-              )}
-              {project.status && <Badge label={statusLabel} variant={statusVariant} />}
-            </div>
-
-            <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-              {project.title}
-            </h3>
-
-            {project.about && (
-              <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-2">
-                {project.about.replace(/<[^>]*>/g, '').substring(0, 120)}
-                {project.about.replace(/<[^>]*>/g, '').length > 120 ? '...' : ''}
-              </p>
-            )}
-
-            {project.tags && project.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {project.tags.slice(0, 3).map((tag) => (
-                  <Tag key={tag} variant="indigo" size="sm">
-                    {tag}
-                  </Tag>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </article>
+      {cardBody}
     </Link>
   )
 }

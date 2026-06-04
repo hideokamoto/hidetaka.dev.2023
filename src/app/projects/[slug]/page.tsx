@@ -2,13 +2,18 @@ import Image from 'next/image'
 import Container from '@/components/tailwindui/Container'
 import { MicroCMSAPI } from '@/libs/microCMS/apis'
 import { createMicroCMSClient } from '@/libs/microCMS/client'
+import { isProjectLandingPage } from '@/libs/projectLandingPages'
 
 export async function generateStaticParams() {
   const microCMS = new MicroCMSAPI(createMicroCMSClient())
   const projects = await microCMS.listAllProjects()
-  return projects.map((project) => ({
-    slug: project.id,
-  }))
+  // Landing-page-backed projects are served by a separate Cloudflare Worker;
+  // legacy /projects/* paths are redirected to /work/* by the middleware.
+  return projects
+    .filter((project) => !isProjectLandingPage(project.id))
+    .map((project) => ({
+      slug: project.id,
+    }))
 }
 
 export default async function ProjectDetailPage({ params }: { params: Promise<{ slug: string }> }) {

@@ -1,18 +1,28 @@
 import Image from 'next/image'
+import { redirect } from 'next/navigation'
 import Container from '@/components/tailwindui/Container'
 import { MicroCMSAPI } from '@/libs/microCMS/apis'
 import { createMicroCMSClient } from '@/libs/microCMS/client'
+import { getProjectHref, isProjectLandingPage } from '@/libs/projectLandingPages'
 
 export async function generateStaticParams() {
   const microCMS = new MicroCMSAPI(createMicroCMSClient())
   const projects = await microCMS.listAllProjects()
-  return projects.map((project) => ({
-    slug: project.id,
-  }))
+  // Landing-page-backed projects are served by a separate Cloudflare Worker,
+  // so we must not pre-render a competing Next.js detail page for them.
+  return projects
+    .filter((project) => !isProjectLandingPage(project.id))
+    .map((project) => ({
+      slug: project.id,
+    }))
 }
 
 export default async function ProjectDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
+  // Stray hits (e.g. crawled sitemap entries) go to the dedicated landing page.
+  if (isProjectLandingPage(slug)) {
+    redirect(getProjectHref(slug, 'en'))
+  }
   const microCMS = new MicroCMSAPI(createMicroCMSClient())
   const project = await microCMS
     .listAllProjects()
