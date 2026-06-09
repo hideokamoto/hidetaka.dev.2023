@@ -46,3 +46,6 @@ RELEASE_NOTES_*.md
 docs/reports/
 
 content-*.md
+
+# Claude Code agent worktrees (transient)
+.claude/worktrees/
