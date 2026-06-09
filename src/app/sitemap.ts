@@ -36,28 +36,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const microCMS = new MicroCMSAPI(createMicroCMSClient())
 
   // 静的ページ（英語版）
-  const staticRoutes = [
-    '',
-    '/about',
-    '/articles',
-    '/blog',
-    '/news',
-    '/oss',
-    '/projects',
-    '/speaking',
-    '/work',
-    '/writing',
-  ]
+  // /articles, /oss, /projects は middleware でリダイレクトされるため除外
+  const staticRoutes = ['', '/about', '/blog', '/news', '/speaking', '/work', '/writing']
 
   // 静的ページ（日本語版）
+  // /ja/articles, /ja/oss, /ja/projects は middleware でリダイレクトされるため除外
   const jaStaticRoutes = [
     '/ja',
     '/ja/about',
-    '/ja/articles',
     '/ja/blog',
     '/ja/news',
-    '/ja/oss',
-    '/ja/projects',
     '/ja/speaking',
     '/ja/work',
     '/ja/writing',
@@ -100,13 +88,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const projects = await microCMS.listAllProjects()
     projectPages = projects.flatMap((project) => {
       const lastModified = project.updatedAt ? new Date(project.updatedAt) : undefined
-      return createEntriesForPaths(
-        ['/projects', '/ja/projects', '/work', '/ja/work'],
-        project.id,
-        lastModified,
-        'monthly',
-        0.7,
-      )
+      // /projects, /ja/projects は /work系へリダイレクトされる重複のため除外
+      return createEntriesForPaths(['/work', '/ja/work'], project.id, lastModified, 'monthly', 0.7)
     })
   } catch (error) {
     logger.error('Failed to load projects for sitemap', {
