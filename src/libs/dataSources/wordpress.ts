@@ -1,4 +1,8 @@
+import { createWPClient } from 'node-wp-api-client'
 import type { FeedDataSource, FeedItem, WPPost } from './types'
+
+const wp = createWPClient({ baseUrl: 'https://wp-api.wp-kyoto.net' })
+const postsApi = wp.postType<WPPost>('posts')
 
 export const loadWPPosts = async (
   locale: 'en' | 'ja',
@@ -13,16 +17,17 @@ export const loadWPPosts = async (
   // limit + 1件取得して、さらに記事があるかどうかを判定（WP REST APIのper_page上限は100）
   // after を渡すとその日時以降の記事のみ取得し、過剰なデータ取得を避ける
   const perPage = Math.min(limit + 1, 100)
-  const afterParam = after ? `&after=${encodeURIComponent(after)}` : ''
-  const response = await fetch(
-    `https://wp-api.wp-kyoto.net/wp-json/wp/v2/posts?filter[lang]=${locale}&per_page=${perPage}${afterParam}`,
+  const { items: posts, totalPages } = await postsApi.list(
+    {
+      'filter[lang]': locale,
+      per_page: perPage,
+      after,
+    },
     {
       next: { revalidate: 1800 }, // 30分ごとに再検証（毎日1〜2記事更新）
     },
   )
-  const posts: WPPost[] = await response.json()
-  const totalPages = response.headers.get('X-WP-TotalPages')
-  const hasMore = totalPages ? Number.parseInt(totalPages, 10) > 1 : false
+  const hasMore = totalPages > 1
   const items = posts.slice(0, limit).map(
     (post: WPPost): FeedItem => ({
       title: post.title.rendered,

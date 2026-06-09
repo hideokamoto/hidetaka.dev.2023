@@ -47,6 +47,9 @@ importers:
       next:
         specifier: ^16.2.6
         version: 16.2.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      node-wp-api-client:
+        specifier: github:hideokamoto/node-wp-api-client#claude/magical-heisenberg-4ecizq
+        version: https://codeload.github.com/hideokamoto/node-wp-api-client/tar.gz/aaa62530b992bd2749a79b5915481d3ab8901916
       react:
         specifier: 19.2.3
         version: 19.2.3
@@ -3107,6 +3110,11 @@ packages:
 
   node-releases@2.0.27:
     resolution: {integrity: sha512-nmh3lCkYZ3grZvqcCH+fjmQ7X+H0OeZgP40OierEaAptX4XofMh5kwNbWh7lBduUzCcV/8kZ+NDLCwm2iorIlA==}
+
+  node-wp-api-client@https://codeload.github.com/hideokamoto/node-wp-api-client/tar.gz/aaa62530b992bd2749a79b5915481d3ab8901916:
+    resolution: {tarball: https://codeload.github.com/hideokamoto/node-wp-api-client/tar.gz/aaa62530b992bd2749a79b5915481d3ab8901916}
+    version: 0.1.0
+    engines: {node: '>=20.19'}
 
   normalize-path@3.0.0:
     resolution: {integrity: sha512-6eZs5Ls3WtCisHWp9S2GUy8dqkpGi4BVSz3GaqiE6ezub0512ESztXUwUB6C6IKbQkY2Pnb/mD4WYojCRwcwLA==}
@@ -7332,6 +7340,8 @@ snapshots:
       encoding: 0.1.13
 
   node-releases@2.0.27: {}
+
+  node-wp-api-client@https://codeload.github.com/hideokamoto/node-wp-api-client/tar.gz/aaa62530b992bd2749a79b5915481d3ab8901916: {}
 
   normalize-path@3.0.0: {}
 

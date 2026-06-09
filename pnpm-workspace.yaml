@@ -1,3 +1,7 @@
 # pnpm workspace configuration
 packages:
   - '.'
+
+# git依存のnode-wp-api-clientはインストール時にprepareスクリプトでdist/をビルドする必要がある
+onlyBuiltDependencies:
+  - node-wp-api-client

@@ -1,46 +1,18 @@
-import { APIError } from '@/libs/errors'
+import { createWPClient } from 'node-wp-api-client'
 import { logger } from '@/libs/logger'
 import type { BlogItem, WPEvent } from './types'
 
+const wp = createWPClient({ baseUrl: 'https://wp-api.wp-kyoto.net' })
+const eventsApi = wp.postType<WPEvent>('events')
+
 export const loadWPEvents = async (): Promise<WPEvent[]> => {
   try {
-    const allEvents: WPEvent[] = []
-    let currentPage = 1
-    let totalPages = 1
-
-    // 最初のページを取得して総ページ数を確認
-    const firstResponse = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?page=${currentPage}&per_page=100&orderby=date&order=desc`,
-    )
-
-    if (!firstResponse.ok) {
-      throw await APIError.fromResponse(firstResponse, '/wp-json/wp/v2/events', {
-        page: currentPage,
-      })
-    }
-
-    const firstPageEvents: WPEvent[] = await firstResponse.json()
-    allEvents.push(...firstPageEvents)
-
-    // レスポンスヘッダーから総ページ数を取得
-    totalPages = Number.parseInt(firstResponse.headers.get('X-WP-TotalPages') || '1', 10)
-
-    // 残りのページを取得
-    while (currentPage < totalPages) {
-      currentPage++
-      const response = await fetch(
-        `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?page=${currentPage}&per_page=100&orderby=date&order=desc`,
-      )
-
-      if (!response.ok) {
-        throw await APIError.fromResponse(response, '/wp-json/wp/v2/events', {
-          page: currentPage,
-        })
-      }
-
-      const events: WPEvent[] = await response.json()
-      allEvents.push(...events)
-    }
+    // 全ページを取得して結合（総ページ数はX-WP-TotalPagesヘッダーから判定される）
+    const allEvents = await eventsApi.listAll({
+      per_page: 100,
+      orderby: 'date',
+      order: 'desc',
+    })
 
     return allEvents
   } catch (error) {
@@ -53,23 +25,26 @@ export const loadWPEvents = async (): Promise<WPEvent[]> => {
 
 export const getWPEventBySlug = async (slug: string): Promise<WPEvent | null> => {
   try {
-    const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?slug=${encodeURIComponent(slug)}&_fields=id,title,date,date_gmt,modified,modified_gmt,excerpt,content,link,slug,status,type,guid,featured_media`,
-    )
+    const event = await eventsApi.getBySlug(slug, {
+      _fields: [
+        'id',
+        'title',
+        'date',
+        'date_gmt',
+        'modified',
+        'modified_gmt',
+        'excerpt',
+        'content',
+        'link',
+        'slug',
+        'status',
+        'type',
+        'guid',
+        'featured_media',
+      ],
+    })
 
-    if (!response.ok) {
-      throw await APIError.fromResponse(response, '/wp-json/wp/v2/events', {
-        slug,
-      })
-    }
-
-    const events: WPEvent[] = await response.json()
-
-    if (events.length === 0) {
-      return null
-    }
-
-    return events[0]
+    return event
   } catch (error) {
     logger.error('Failed to load WordPress event by slug', {
       error,
@@ -84,26 +59,23 @@ export type AdjacentEvents = {
   next: WPEvent | null
 }
 
-// WordPress APIから記事を取得するヘルパー関数
-const fetchEvent = async (url: string): Promise<WPEvent | null> => {
+// WordPress APIから前後いずれかの記事を取得するヘルパー関数
+const fetchAdjacentEvent = async (
+  query: { before: string; order: 'desc' } | { after: string; order: 'asc' },
+): Promise<WPEvent | null> => {
   try {
-    const response = await fetch(url)
+    const { items: events } = await eventsApi.list({
+      ...query,
+      per_page: 1,
+      orderby: 'date',
+      _fields: ['id', 'title', 'slug'],
+    })
 
-    if (!response.ok) {
-      return null
-    }
-
-    const events: WPEvent[] = await response.json()
-
-    if (events.length === 0) {
-      return null
-    }
-
-    return events[0]
+    return events.length > 0 ? (events[0] as WPEvent) : null
   } catch (error) {
     logger.error('Failed to fetch event', {
       error,
-      url,
+      query,
     })
     return null
   }
@@ -111,14 +83,12 @@ const fetchEvent = async (url: string): Promise<WPEvent | null> => {
 
 export const getAdjacentEvents = async (currentEvent: WPEvent): Promise<AdjacentEvents> => {
   try {
-    // 前の記事を取得（現在の記事より前の日付で最も新しいもの）
-    const previousUrl = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?before=${encodeURIComponent(currentEvent.date)}&per_page=1&orderby=date&order=desc&_fields=id,title,slug`
-
-    // 次の記事を取得（現在の記事より後の日付で最も古いもの）
-    const nextUrl = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?after=${encodeURIComponent(currentEvent.date)}&per_page=1&orderby=date&order=asc&_fields=id,title,slug`
-
-    // 並列で実行
-    const [previous, next] = await Promise.all([fetchEvent(previousUrl), fetchEvent(nextUrl)])
+    // 前の記事（現在の記事より前の日付で最も新しいもの）と
+    // 次の記事（現在の記事より後の日付で最も古いもの）を並列で取得
+    const [previous, next] = await Promise.all([
+      fetchAdjacentEvent({ before: currentEvent.date, order: 'desc' }),
+      fetchAdjacentEvent({ after: currentEvent.date, order: 'asc' }),
+    ])
 
     return {
       previous,
@@ -148,19 +118,13 @@ export const getRelatedEvents = async (
 ): Promise<BlogItem[]> => {
   try {
     // 現在の記事を除外して最新のイベント記事を取得
-    const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/events?exclude=${currentEvent.id}&per_page=${limit}&orderby=date&order=desc&_fields=id,title,date,date_gmt,excerpt,slug`,
-    )
-
-    if (!response.ok) {
-      throw await APIError.fromResponse(response, '/wp-json/wp/v2/events', {
-        currentEventId: currentEvent.id,
-        limit,
-        lang,
-      })
-    }
-
-    const events: WPEvent[] = await response.json()
+    const { items: events } = await eventsApi.list({
+      exclude: [currentEvent.id],
+      per_page: limit,
+      orderby: 'date',
+      order: 'desc',
+      _fields: ['id', 'title', 'date', 'date_gmt', 'excerpt', 'slug'],
+    })
 
     // BlogItem型に変換
     const eventBasePath = basePath || (lang === 'ja' ? '/ja/event-reports' : '/event-reports')

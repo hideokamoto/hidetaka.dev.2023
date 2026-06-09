@@ -1,4 +1,4 @@
-import { APIError } from '@/libs/errors'
+import { createWPClient } from 'node-wp-api-client'
 import { logger } from '@/libs/logger'
 import type { BlogItem, Category, WPThought } from './types'
 
@@ -9,8 +9,28 @@ export type ThoughtsResult = {
   currentPage: number
 }
 
+const wp = createWPClient({ baseUrl: 'https://wp-api.wp-kyoto.net' })
+
+// _fieldsで`_links.wp:term`を指定するため、_linksを含めた型でコレクションを定義する
+type WPThoughtRecord = WPThought & { _links?: Record<string, unknown> }
+const thoughtsApi = wp.postType<WPThoughtRecord>('thoughs')
+
+// 一覧取得時に_embedと組み合わせてカテゴリ情報を取得するためのフィールド指定
+const LIST_FIELDS = [
+  '_links.wp:term',
+  '_embedded',
+  'id',
+  'title',
+  'date',
+  'date_gmt',
+  'excerpt',
+  'slug',
+  'link',
+  'categories',
+] as const
+
 // カテゴリ情報を抽出するヘルパー関数
-const extractCategories = (thought: WPThought): Category[] => {
+const extractCategories = (thought: Pick<WPThought, '_embedded'>): Category[] => {
   if (!thought._embedded?.['wp:term']) {
     return []
   }
@@ -33,6 +53,23 @@ const extractCategories = (thought: WPThought): Category[] => {
   return categories
 }
 
+// 一覧APIのレスポンスをBlogItem型に変換するヘルパー関数
+const toBlogItem = (
+  thought: Pick<WPThought, 'id' | 'title' | 'date' | 'excerpt' | 'slug' | '_embedded'>,
+): BlogItem => {
+  const basePath = '/ja/blog'
+  const href = `${basePath}/${thought.slug}`
+
+  return {
+    id: thought.id.toString(),
+    title: thought.title.rendered,
+    description: thought.excerpt.rendered.replace(/<[^>]*>/g, '').substring(0, 150),
+    datetime: thought.date,
+    href,
+    categories: extractCategories(thought),
+  }
+}
+
 export const loadThoughts = async (
   page: number = 1,
   perPage: number = 20,
@@ -50,41 +87,25 @@ export const loadThoughts = async (
 
   try {
     // _embedと_fieldsを組み合わせてカテゴリ情報を取得
-    const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?page=${page}&per_page=${perPage}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
+    // 総件数・総ページ数はX-WP-Total / X-WP-TotalPagesヘッダーから取得される
+    const {
+      items: thoughts,
+      total: totalItems,
+      totalPages,
+    } = await thoughtsApi.list(
+      {
+        page,
+        per_page: perPage,
+        _embed: 'wp:term',
+        _fields: LIST_FIELDS,
+      },
       {
         next: { revalidate: 1800 }, // 30分ごとに再検証（毎日1〜2記事更新）
       },
     )
 
-    if (!response.ok) {
-      throw await APIError.fromResponse(response, '/wp-json/wp/v2/thoughs', {
-        page,
-        perPage,
-        lang,
-      })
-    }
-
-    const thoughts: WPThought[] = await response.json()
-
-    // WordPress APIのレスポンスヘッダーから総件数と総ページ数を取得
-    const totalItems = parseInt(response.headers.get('X-WP-Total') || '0', 10)
-    const totalPages = parseInt(response.headers.get('X-WP-TotalPages') || '0', 10)
-
     // BlogItem型に変換
-    const items: BlogItem[] = thoughts.map((thought: WPThought): BlogItem => {
-      const basePath = '/ja/blog'
-      const href = `${basePath}/${thought.slug}`
-
-      return {
-        id: thought.id.toString(),
-        title: thought.title.rendered,
-        description: thought.excerpt.rendered.replace(/<[^>]*>/g, '').substring(0, 150),
-        datetime: thought.date,
-        href,
-        categories: extractCategories(thought),
-      }
-    })
+    const items: BlogItem[] = thoughts.map(toBlogItem)
 
     return {
       items,
@@ -136,21 +157,12 @@ export const loadThoughtsByCategory = async (
     }
 
     // WordPress APIのcategoriesエンドポイントでslugからIDを取得
-    const categoryResponse = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/categories?slug=${encodeURIComponent(normalizedCategorySlug)}`,
+    const { items: categories } = await wp.categories.list(
+      { slug: normalizedCategorySlug },
       {
         next: { revalidate: 1800 }, // 30分ごとに再検証
       },
     )
-
-    if (!categoryResponse.ok) {
-      throw await APIError.fromResponse(categoryResponse, '/wp-json/wp/v2/categories', {
-        categorySlug: normalizedCategorySlug,
-        lang,
-      })
-    }
-
-    const categories = await categoryResponse.json()
 
     if (categories.length === 0) {
       // カテゴリが見つからない場合は空の結果を返す
@@ -165,42 +177,25 @@ export const loadThoughtsByCategory = async (
     const categoryId = categories[0].id
 
     // WordPress APIのcategoriesパラメータでフィルタリング
-    const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?categories=${categoryId}&page=${page}&per_page=${perPage}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
+    const {
+      items: thoughts,
+      total: totalItems,
+      totalPages,
+    } = await thoughtsApi.list(
+      {
+        categories: categoryId,
+        page,
+        per_page: perPage,
+        _embed: 'wp:term',
+        _fields: LIST_FIELDS,
+      },
       {
         next: { revalidate: 1800 }, // 30分ごとに再検証
       },
     )
 
-    if (!response.ok) {
-      throw await APIError.fromResponse(response, '/wp-json/wp/v2/thoughs', {
-        categoryId,
-        page,
-        perPage,
-        lang,
-      })
-    }
-
-    const thoughts: WPThought[] = await response.json()
-
-    // WordPress APIのレスポンスヘッダーから総件数と総ページ数を取得
-    const totalItems = parseInt(response.headers.get('X-WP-Total') || '0', 10)
-    const totalPages = parseInt(response.headers.get('X-WP-TotalPages') || '0', 10)
-
     // BlogItem型に変換
-    const items: BlogItem[] = thoughts.map((thought: WPThought): BlogItem => {
-      const basePath = '/ja/blog'
-      const href = `${basePath}/${thought.slug}`
-
-      return {
-        id: thought.id.toString(),
-        title: thought.title.rendered,
-        description: thought.excerpt.rendered.replace(/<[^>]*>/g, '').substring(0, 150),
-        datetime: thought.date,
-        href,
-        categories: extractCategories(thought),
-      }
-    })
+    const items: BlogItem[] = thoughts.map(toBlogItem)
 
     return {
       items,
@@ -238,20 +233,16 @@ export const loadAllCategories = async (lang: 'en' | 'ja' = 'en'): Promise<Categ
   try {
     // 十分な数の記事を取得してカテゴリを抽出
     const fetchPerPage = 100
-    const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?per_page=${fetchPerPage}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
+    const { items: thoughts } = await thoughtsApi.list(
+      {
+        per_page: fetchPerPage,
+        _embed: 'wp:term',
+        _fields: LIST_FIELDS,
+      },
       {
         next: { revalidate: 1800 }, // 30分ごとに再検証
       },
     )
-
-    if (!response.ok) {
-      throw await APIError.fromResponse(response, '/wp-json/wp/v2/thoughs', {
-        lang,
-      })
-    }
-
-    const thoughts: WPThought[] = await response.json()
 
     // カテゴリを集計
     const categoryMap = new Map<string, CategoryWithCount>()
@@ -296,27 +287,30 @@ export const getThoughtBySlug = async (
 
   try {
     // _embedと_fieldsを組み合わせてカテゴリ情報を取得
-    const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?slug=${encodeURIComponent(slug)}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,content,slug,link,categories`,
+    const thought = await thoughtsApi.getBySlug(
+      slug,
+      {
+        _embed: 'wp:term',
+        _fields: [
+          '_links.wp:term',
+          '_embedded',
+          'id',
+          'title',
+          'date',
+          'date_gmt',
+          'excerpt',
+          'content',
+          'slug',
+          'link',
+          'categories',
+        ],
+      },
       {
         next: { revalidate: 1800 }, // 30分ごとに再検証
       },
     )
 
-    if (!response.ok) {
-      throw await APIError.fromResponse(response, '/wp-json/wp/v2/thoughs', {
-        slug,
-        lang,
-      })
-    }
-
-    const thoughts: WPThought[] = await response.json()
-
-    if (thoughts.length === 0) {
-      return null
-    }
-
-    return thoughts[0]
+    return thought as WPThought | null
   } catch (error) {
     logger.error('Failed to load thought by slug', {
       error,
@@ -332,25 +326,27 @@ export type AdjacentThoughts = {
   next: WPThought | null
 }
 
-// WordPress APIから記事を取得するヘルパー関数
-const fetchThought = async (url: string): Promise<WPThought | null> => {
+// WordPress APIから前後いずれかの記事を取得するヘルパー関数
+const fetchAdjacentThought = async (
+  query: { before: string; order: 'desc' } | { after: string; order: 'asc' },
+): Promise<WPThought | null> => {
   try {
-    const response = await fetch(url, {
-      next: { revalidate: 1800 }, // 30分ごとに再検証
-    })
-    if (!response.ok) {
-      logger.error('Failed to fetch thought', {
-        status: response.status,
-        url,
-      })
-      return null
-    }
-    const thoughts: WPThought[] = await response.json()
-    return thoughts.length > 0 ? thoughts[0] : null
+    const { items: thoughts } = await thoughtsApi.list(
+      {
+        ...query,
+        per_page: 1,
+        orderby: 'date',
+        _fields: ['id', 'title', 'slug'],
+      },
+      {
+        next: { revalidate: 1800 }, // 30分ごとに再検証
+      },
+    )
+    return thoughts.length > 0 ? (thoughts[0] as WPThought) : null
   } catch (error) {
     logger.error('Failed to fetch thought', {
       error,
-      url,
+      query,
     })
     return null
   }
@@ -370,14 +366,12 @@ export const getAdjacentThoughts = async (
   }
 
   try {
-    // 前の記事を取得（現在の記事より前の日付で最も新しいもの）
-    const previousUrl = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?before=${encodeURIComponent(currentThought.date)}&per_page=1&orderby=date&order=desc&_fields=id,title,slug`
-
-    // 次の記事を取得（現在の記事より後の日付で最も古いもの）
-    const nextUrl = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?after=${encodeURIComponent(currentThought.date)}&per_page=1&orderby=date&order=asc&_fields=id,title,slug`
-
-    // 並列で実行
-    const [previous, next] = await Promise.all([fetchThought(previousUrl), fetchThought(nextUrl)])
+    // 前の記事（現在の記事より前の日付で最も新しいもの）と
+    // 次の記事（現在の記事より後の日付で最も古いもの）を並列で取得
+    const [previous, next] = await Promise.all([
+      fetchAdjacentThought({ before: currentThought.date, order: 'desc' }),
+      fetchAdjacentThought({ after: currentThought.date, order: 'asc' }),
+    ])
 
     return {
       previous,
@@ -458,38 +452,21 @@ export const getRelatedThoughts = async (
 
     // 同じカテゴリの記事を10件取得（現在の記事を除外）
     const fetchLimit = Math.max(limit * 2.5, 10) // 最低10件、limitの2.5倍まで
-    const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/thoughs?categories=${categoryId}&exclude=${currentThought.id}&per_page=${fetchLimit}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
+    const { items: thoughts } = await thoughtsApi.list(
+      {
+        categories: categoryId,
+        exclude: [currentThought.id],
+        per_page: fetchLimit,
+        _embed: 'wp:term',
+        _fields: LIST_FIELDS,
+      },
       {
         next: { revalidate: 1800 }, // 30分ごとに再検証
       },
     )
 
-    if (!response.ok) {
-      throw await APIError.fromResponse(response, '/wp-json/wp/v2/thoughs', {
-        categoryId,
-        currentThoughtId: currentThought.id,
-        limit,
-        lang,
-      })
-    }
-
-    const thoughts: WPThought[] = await response.json()
-
     // BlogItem型に変換
-    const items: BlogItem[] = thoughts.map((thought: WPThought): BlogItem => {
-      const basePath = '/ja/blog'
-      const href = `${basePath}/${thought.slug}`
-
-      return {
-        id: thought.id.toString(),
-        title: thought.title.rendered,
-        description: thought.excerpt.rendered.replace(/<[^>]*>/g, '').substring(0, 150),
-        datetime: thought.date,
-        href,
-        categories: extractCategories(thought),
-      }
-    })
+    const items: BlogItem[] = thoughts.map(toBlogItem)
 
     // Fisher-Yatesアルゴリズムでシャッフル
     const shuffled = [...items]
