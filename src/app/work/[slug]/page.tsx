@@ -1,5 +1,7 @@
+import type { Metadata } from 'next'
 import Image from 'next/image'
 import Container from '@/components/tailwindui/Container'
+import { generateProjectMetadata } from '@/libs/metadata'
 import { MicroCMSAPI } from '@/libs/microCMS/apis'
 import { createMicroCMSClient } from '@/libs/microCMS/client'
 
@@ -9,6 +11,24 @@ export async function generateStaticParams() {
   return projects.map((project) => ({
     slug: project.id,
   }))
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>
+}): Promise<Metadata> {
+  const { slug } = await params
+  const microCMS = new MicroCMSAPI(createMicroCMSClient())
+  const project = await microCMS
+    .listAllProjects()
+    .then((projects) => projects.find((p) => p.id === slug))
+
+  if (!project) {
+    return { title: 'Work | Hidetaka.dev' }
+  }
+
+  return generateProjectMetadata(project, 'en')
 }
 
 export default async function ProjectDetailPage({ params }: { params: Promise<{ slug: string }> }) {

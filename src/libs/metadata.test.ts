@@ -1,6 +1,29 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import type { WPThought } from './dataSources/types'
-import { generateBlogPostMetadata, generateDevNoteMetadata } from './metadata'
+import {
+  generateBlogPostMetadata,
+  generateDevNoteMetadata,
+  generateProjectMetadata,
+} from './metadata'
+import type { MicroCMSProjectsRecord } from './microCMS/types'
+
+// プロジェクト用のモックデータファクトリ
+const createMockProject = (
+  overrides: Partial<MicroCMSProjectsRecord> = {},
+): MicroCMSProjectsRecord => ({
+  id: 'project-1',
+  createdAt: '2024-01-01T00:00:00.000Z',
+  updatedAt: '2024-01-01T00:00:00.000Z',
+  publishedAt: '2024-01-01T00:00:00.000Z',
+  title: 'Test Project',
+  url: 'https://example.com/project',
+  tags: ['typescript'],
+  project_type: ['owned_oss'],
+  lang: ['English'],
+  is_solo: true,
+  about: '<p>A great project about testing.</p>',
+  ...overrides,
+})
 
 // テスト用のモックデータファクトリ
 const createMockWPThought = (overrides: Partial<WPThought> = {}): WPThought => ({
@@ -213,5 +236,95 @@ describe('generateBlogPostMetadata', () => {
 
     expect(result1.openGraph?.images?.[0]?.url).toContain('/thoughts/1')
     expect(result2.openGraph?.images?.[0]?.url).toContain('/thoughts/2')
+  })
+})
+
+describe('generateProjectMetadata', () => {
+  it('should use project title as the metadata title', () => {
+    const project = createMockProject({ title: 'My OSS Tool' })
+
+    const result = generateProjectMetadata(project, 'en')
+
+    expect(result.title).toBe('My OSS Tool')
+    expect(result.openGraph?.title).toBe('My OSS Tool')
+    expect(result.twitter?.title).toBe('My OSS Tool')
+  })
+
+  it('should strip HTML tags from about to build the description', () => {
+    const project = createMockProject({
+      about: '<p>A <strong>great</strong> project.</p>',
+    })
+
+    const result = generateProjectMetadata(project, 'en')
+
+    expect(result.description).toBe('A great project.')
+    expect(result.description).not.toContain('<')
+    expect(result.openGraph?.description).toBe('A great project.')
+    expect(result.twitter?.description).toBe('A great project.')
+  })
+
+  it('should normalize whitespace in the description', () => {
+    const project = createMockProject({
+      about: '<p>Line one.</p>\n   <p>Line two.</p>',
+    })
+
+    const result = generateProjectMetadata(project, 'en')
+
+    expect(result.description).toBe('Line one. Line two.')
+  })
+
+  it('should truncate long descriptions to about 120 characters', () => {
+    const longText = 'あ'.repeat(300)
+    const project = createMockProject({ about: `<p>${longText}</p>` })
+
+    const result = generateProjectMetadata(project, 'ja')
+
+    expect(result.description).toBeDefined()
+    expect((result.description as string).length).toBeLessThanOrEqual(121)
+  })
+
+  it('should fall back to title when about is missing', () => {
+    const project = createMockProject({ title: 'No About Project', about: undefined })
+
+    const result = generateProjectMetadata(project, 'en')
+
+    expect(result.description).toBe('No About Project')
+    expect(result.openGraph?.description).toBe('No About Project')
+  })
+
+  it('should set openGraph type to website', () => {
+    const project = createMockProject()
+
+    const result = generateProjectMetadata(project, 'en')
+
+    expect(result.openGraph?.type).toBe('website')
+  })
+
+  it('should set twitter card to summary_large_image', () => {
+    const project = createMockProject()
+
+    const result = generateProjectMetadata(project, 'en')
+
+    expect(result.twitter?.card).toBe('summary_large_image')
+  })
+
+  it('should include the project image in openGraph when present', () => {
+    const project = createMockProject({
+      image: { url: 'https://images.microcms-assets.io/test.png', width: 1200, height: 630 },
+    })
+
+    const result = generateProjectMetadata(project, 'en')
+
+    expect(result.openGraph?.images).toBeDefined()
+    expect(result.openGraph?.images).toHaveLength(1)
+    expect(result.openGraph?.images?.[0]?.url).toBe('https://images.microcms-assets.io/test.png')
+  })
+
+  it('should omit openGraph images when the project has no image', () => {
+    const project = createMockProject({ image: undefined })
+
+    const result = generateProjectMetadata(project, 'en')
+
+    expect(result.openGraph?.images).toBeUndefined()
   })
 })
