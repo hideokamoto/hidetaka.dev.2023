@@ -1,6 +1,30 @@
 import type { Metadata } from 'next'
 import type { WPThought } from './dataSources/types'
 import type { MicroCMSProjectsRecord } from './microCMS/types'
+import { removeHtmlTags } from './sanitize'
+
+const MAX_DESCRIPTION_LENGTH = 120
+
+/**
+ * WordPressのexcerpt/contentからmeta description用のプレーンテキストを生成する。
+ * HTMLタグを除去し、空白を正規化したうえで最大120文字程度に切り詰める。
+ * excerpt・contentが空の場合はtitleにフォールバックし、空文字を返さない。
+ */
+function buildDescription(thought: WPThought): string {
+  const candidates = [thought.excerpt?.rendered, thought.content?.rendered, thought.title.rendered]
+
+  for (const candidate of candidates) {
+    const text = (removeHtmlTags(candidate ?? '') ?? '').replace(/\s+/g, ' ').trim()
+    if (!text) continue
+
+    if (text.length <= MAX_DESCRIPTION_LENGTH) {
+      return text
+    }
+    return `${text.slice(0, MAX_DESCRIPTION_LENGTH).trimEnd()}...`
+  }
+
+  return thought.title.rendered
+}
 
 export function generateDevNoteMetadata(note: WPThought): Metadata {
   const ogImageUrl = new URL(
@@ -8,10 +32,14 @@ export function generateDevNoteMetadata(note: WPThought): Metadata {
     process.env.NEXT_PUBLIC_SITE_URL || 'https://hidetaka.dev',
   )
 
+  const description = buildDescription(note)
+
   return {
     title: note.title.rendered,
+    description,
     openGraph: {
       title: note.title.rendered,
+      description,
       type: 'article',
       publishedTime: note.date,
       images: [
@@ -26,6 +54,7 @@ export function generateDevNoteMetadata(note: WPThought): Metadata {
     twitter: {
       card: 'summary_large_image',
       title: note.title.rendered,
+      description,
       images: [ogImageUrl.toString()],
     },
   }
@@ -39,10 +68,14 @@ export function generateBlogPostMetadata(thought: WPThought): Metadata {
     process.env.NEXT_PUBLIC_SITE_URL || 'https://hidetaka.dev',
   )
 
+  const description = buildDescription(thought)
+
   return {
     title: thought.title.rendered,
+    description,
     openGraph: {
       title: thought.title.rendered,
+      description,
       type: 'article',
       publishedTime: thought.date,
       images: [
@@ -57,6 +90,7 @@ export function generateBlogPostMetadata(thought: WPThought): Metadata {
     twitter: {
       card: 'summary_large_image',
       title: thought.title.rendered,
+      description,
       images: [ogImageUrl.toString()],
     },
   }

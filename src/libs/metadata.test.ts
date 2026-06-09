@@ -133,6 +133,88 @@ describe('generateDevNoteMetadata', () => {
     expect(result.twitter?.images).toHaveLength(1)
     expect(result.twitter?.images?.[0]).toBe('https://hidetaka.dev/api/thumbnail/dev-notes/123')
   })
+
+  describe('description', () => {
+    it('should generate a description from the excerpt', () => {
+      const note = createMockWPThought({
+        excerpt: { rendered: '<p>This is a useful summary of the note.</p>' },
+      })
+
+      const result = generateDevNoteMetadata(note)
+
+      expect(result.description).toBe('This is a useful summary of the note.')
+      expect(result.openGraph?.description).toBe('This is a useful summary of the note.')
+      expect(result.twitter?.description).toBe('This is a useful summary of the note.')
+    })
+
+    it('should strip HTML tags from the description', () => {
+      const note = createMockWPThought({
+        excerpt: { rendered: '<p>Hello <strong>world</strong> from <a href="#">here</a>.</p>' },
+      })
+
+      const result = generateDevNoteMetadata(note)
+
+      expect(result.description).toBe('Hello world from here.')
+      expect(result.description).not.toMatch(/<[^>]*>/)
+    })
+
+    it('should normalize whitespace in the description', () => {
+      const note = createMockWPThought({
+        excerpt: { rendered: '<p>Multiple   spaces\n\nand newlines</p>' },
+      })
+
+      const result = generateDevNoteMetadata(note)
+
+      expect(result.description).toBe('Multiple spaces and newlines')
+    })
+
+    it('should truncate the description to roughly 120 characters', () => {
+      const longText = 'A'.repeat(300)
+      const note = createMockWPThought({
+        excerpt: { rendered: `<p>${longText}</p>` },
+      })
+
+      const result = generateDevNoteMetadata(note)
+
+      expect(result.description).toBeDefined()
+      expect((result.description as string).length).toBeLessThanOrEqual(123)
+    })
+
+    it('should fall back to content when the excerpt is empty', () => {
+      const note = createMockWPThought({
+        excerpt: { rendered: '' },
+        content: { rendered: '<p>Fallback content body.</p>' },
+      })
+
+      const result = generateDevNoteMetadata(note)
+
+      expect(result.description).toBe('Fallback content body.')
+    })
+
+    it('should fall back to the title when excerpt and content are empty', () => {
+      const note = createMockWPThought({
+        title: { rendered: 'Only Title Available' },
+        excerpt: { rendered: '' },
+        content: { rendered: '' },
+      })
+
+      const result = generateDevNoteMetadata(note)
+
+      expect(result.description).toBe('Only Title Available')
+    })
+
+    it('should never produce an empty string description', () => {
+      const note = createMockWPThought({
+        title: { rendered: 'Some Title' },
+        excerpt: { rendered: '<p>   </p>' },
+        content: { rendered: '<p></p>' },
+      })
+
+      const result = generateDevNoteMetadata(note)
+
+      expect(result.description).toBeTruthy()
+    })
+  })
 })
 
 describe('generateBlogPostMetadata', () => {
@@ -236,6 +318,88 @@ describe('generateBlogPostMetadata', () => {
 
     expect(result1.openGraph?.images?.[0]?.url).toContain('/thoughts/1')
     expect(result2.openGraph?.images?.[0]?.url).toContain('/thoughts/2')
+  })
+
+  describe('description', () => {
+    it('should generate a description from the excerpt', () => {
+      const thought = createMockWPThought({
+        excerpt: { rendered: '<p>This is a useful summary of the post.</p>' },
+      })
+
+      const result = generateBlogPostMetadata(thought)
+
+      expect(result.description).toBe('This is a useful summary of the post.')
+      expect(result.openGraph?.description).toBe('This is a useful summary of the post.')
+      expect(result.twitter?.description).toBe('This is a useful summary of the post.')
+    })
+
+    it('should strip HTML tags from the description', () => {
+      const thought = createMockWPThought({
+        excerpt: { rendered: '<p>Hello <strong>world</strong> from <a href="#">here</a>.</p>' },
+      })
+
+      const result = generateBlogPostMetadata(thought)
+
+      expect(result.description).toBe('Hello world from here.')
+      expect(result.description).not.toMatch(/<[^>]*>/)
+    })
+
+    it('should normalize whitespace in the description', () => {
+      const thought = createMockWPThought({
+        excerpt: { rendered: '<p>Multiple   spaces\n\nand newlines</p>' },
+      })
+
+      const result = generateBlogPostMetadata(thought)
+
+      expect(result.description).toBe('Multiple spaces and newlines')
+    })
+
+    it('should truncate the description to roughly 120 characters', () => {
+      const longText = 'A'.repeat(300)
+      const thought = createMockWPThought({
+        excerpt: { rendered: `<p>${longText}</p>` },
+      })
+
+      const result = generateBlogPostMetadata(thought)
+
+      expect(result.description).toBeDefined()
+      expect((result.description as string).length).toBeLessThanOrEqual(123)
+    })
+
+    it('should fall back to content when the excerpt is empty', () => {
+      const thought = createMockWPThought({
+        excerpt: { rendered: '' },
+        content: { rendered: '<p>Fallback content body.</p>' },
+      })
+
+      const result = generateBlogPostMetadata(thought)
+
+      expect(result.description).toBe('Fallback content body.')
+    })
+
+    it('should fall back to the title when excerpt and content are empty', () => {
+      const thought = createMockWPThought({
+        title: { rendered: 'Only Title Available' },
+        excerpt: { rendered: '' },
+        content: { rendered: '' },
+      })
+
+      const result = generateBlogPostMetadata(thought)
+
+      expect(result.description).toBe('Only Title Available')
+    })
+
+    it('should never produce an empty string description', () => {
+      const thought = createMockWPThought({
+        title: { rendered: 'Some Title' },
+        excerpt: { rendered: '<p>   </p>' },
+        content: { rendered: '<p></p>' },
+      })
+
+      const result = generateBlogPostMetadata(thought)
+
+      expect(result.description).toBeTruthy()
+    })
   })
 })
 
