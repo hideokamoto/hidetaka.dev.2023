@@ -92,10 +92,7 @@ function buildDescription(thought: WPThought): string {
 }
 
 export function generateDevNoteMetadata(note: WPThought, path: string): Metadata {
-  const ogImageUrl = new URL(
-    `/api/thumbnail/dev-notes/${note.id}`,
-    process.env.NEXT_PUBLIC_SITE_URL || 'https://hidetaka.dev',
-  )
+  const ogImageUrl = new URL(`/api/thumbnail/dev-notes/${note.id}`, SITE_CONFIG.url)
 
   const description = buildDescription(note)
   const lang = getLanguageFromURL(path)
@@ -139,10 +136,7 @@ export function generateBlogPostMetadata(
 ): Metadata {
   // セキュリティ強化: post_idからWordPress APIで記事を取得してタイトルを使用
   // これにより、任意の文字列で画像を生成することを防止
-  const ogImageUrl = new URL(
-    `/api/thumbnail/thoughts/${thought.id}`,
-    process.env.NEXT_PUBLIC_SITE_URL || 'https://hidetaka.dev',
-  )
+  const ogImageUrl = new URL(`/api/thumbnail/thoughts/${thought.id}`, SITE_CONFIG.url)
 
   const description = buildDescription(thought)
   const lang = getLanguageFromURL(path)
