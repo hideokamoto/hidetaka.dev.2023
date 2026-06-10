@@ -109,7 +109,8 @@ describe('generateDevNoteMetadata', () => {
     )
   })
 
-  it('should use custom site URL from environment variable', () => {
+  it('should use SITE_CONFIG.url even when NEXT_PUBLIC_SITE_URL is set', () => {
+    // canonicalやog:urlはSITE_CONFIG.url基準のため、og:imageも同じ正本に揃える
     process.env.NEXT_PUBLIC_SITE_URL = 'https://custom.example.com'
 
     const note = createMockWPThought({
@@ -119,7 +120,7 @@ describe('generateDevNoteMetadata', () => {
     const result = generateDevNoteMetadata(note, '/writing/dev-notes/test-post')
 
     expect(result.openGraph?.images?.[0]?.url).toBe(
-      'https://custom.example.com/api/thumbnail/dev-notes/111',
+      'https://hidetaka.dev/api/thumbnail/dev-notes/111',
     )
   })
 
@@ -284,7 +285,8 @@ describe('generateBlogPostMetadata', () => {
     )
   })
 
-  it('should use custom site URL from environment variable', () => {
+  it('should use SITE_CONFIG.url even when NEXT_PUBLIC_SITE_URL is set', () => {
+    // canonicalやog:urlはSITE_CONFIG.url基準のため、og:imageも同じ正本に揃える
     process.env.NEXT_PUBLIC_SITE_URL = 'https://custom.example.com'
 
     const thought = createMockWPThought({
@@ -294,7 +296,7 @@ describe('generateBlogPostMetadata', () => {
     const result = generateBlogPostMetadata(thought, '/blog/test-post')
 
     expect(result.openGraph?.images?.[0]?.url).toBe(
-      'https://custom.example.com/api/thumbnail/thoughts/111',
+      'https://hidetaka.dev/api/thumbnail/thoughts/111',
     )
   })
 
