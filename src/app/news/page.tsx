@@ -1,7 +1,9 @@
 import NewsPageContent from '@/components/containers/pages/NewsPage'
 import { loadProducts } from '@/libs/dataSources/products'
+import { buildAlternates } from '@/libs/metadata'
 
 export const metadata = {
+  alternates: buildAlternates('/news'),
   title: 'News',
 }
 
