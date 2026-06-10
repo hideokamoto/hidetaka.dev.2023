@@ -165,7 +165,7 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
-        aria-label="Menu"
+        aria-label={lang === 'ja' ? 'メニュー' : 'Menu'}
         className="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-white/95 backdrop-blur-md shadow-2xl ring-1 ring-zinc-900/5 dark:bg-zinc-900/95 dark:ring-white/10 lg:hidden"
       >
         <div className="flex flex-col h-full">

@@ -79,16 +79,32 @@ export function useDialogA11y<T extends HTMLElement = HTMLDivElement>(
       const first = elements[0]
       const last = elements[elements.length - 1]
       const active = document.activeElement
-      const isInside = active instanceof HTMLElement && dialogRef.current?.contains(active)
+      // ダイアログ内であっても tabindex="-1" の要素(パネル自身など)に
+      // フォーカスがある場合は active が elements に含まれないため、
+      // 前後にフォーカス可能要素が存在するかを文書順で判定してラップする
+      const activeInDialog =
+        active instanceof HTMLElement && dialogRef.current?.contains(active) ? active : null
 
       if (event.shiftKey) {
-        if (!isInside || active === first) {
+        const hasFocusableBefore = elements.some(
+          (el) =>
+            activeInDialog !== null &&
+            (el.compareDocumentPosition(activeInDialog) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0,
+        )
+        if (!hasFocusableBefore) {
           event.preventDefault()
           last.focus()
         }
-      } else if (!isInside || active === last) {
-        event.preventDefault()
-        first.focus()
+      } else {
+        const hasFocusableAfter = elements.some(
+          (el) =>
+            activeInDialog !== null &&
+            (el.compareDocumentPosition(activeInDialog) & Node.DOCUMENT_POSITION_PRECEDING) !== 0,
+        )
+        if (!hasFocusableAfter) {
+          event.preventDefault()
+          first.focus()
+        }
       }
     }
 
