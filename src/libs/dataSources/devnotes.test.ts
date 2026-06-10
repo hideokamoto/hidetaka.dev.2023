@@ -444,6 +444,7 @@ describe('getRelatedDevNotes', () => {
 
     const mockResponse = {
       ok: true,
+      headers: new Headers(),
       json: async () => mockNotes,
     }
 
@@ -481,6 +482,7 @@ describe('getRelatedDevNotes', () => {
 
     const mockResponse = {
       ok: true,
+      headers: new Headers(),
       json: async () => [
         {
           id: 2,
