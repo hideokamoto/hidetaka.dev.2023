@@ -22,7 +22,7 @@ export default function ErrorUI({
   return (
     <main
       className={cn(
-        'flex min-h-screen items-center justify-center px-4 bg-zinc-50 dark:bg-black',
+        'flex min-h-dvh items-center justify-center px-4 bg-zinc-50 dark:bg-black',
         className,
       )}
       role="alert"
