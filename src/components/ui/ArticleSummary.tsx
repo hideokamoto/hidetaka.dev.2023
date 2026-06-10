@@ -190,7 +190,10 @@ export default function ArticleSummary({ content, locale, className = '' }: Arti
 
       {/* ローディング状態 */}
       {isLoading && (
-        <div className="mt-3 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+        <output
+          aria-live="polite"
+          className="mt-3 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400"
+        >
           <svg className="animate-spin size-4" fill="none" viewBox="0 0 24 24" aria-hidden="true">
             <circle
               className="opacity-25"
@@ -207,12 +210,15 @@ export default function ArticleSummary({ content, locale, className = '' }: Arti
             />
           </svg>
           {text.loading}
-        </div>
+        </output>
       )}
 
       {/* エラーメッセージ */}
       {error && (
-        <div className="mt-3 rounded-lg bg-red-50 p-4 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400">
+        <div
+          role="alert"
+          className="mt-3 rounded-lg bg-red-50 p-4 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400"
+        >
           {error}
         </div>
       )}

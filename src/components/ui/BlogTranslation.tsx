@@ -376,7 +376,10 @@ export default function BlogTranslation({
 
       {/* エラーメッセージ */}
       {error && (
-        <div className="mt-3 rounded-lg bg-red-50 p-4 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400">
+        <div
+          role="alert"
+          className="mt-3 rounded-lg bg-red-50 p-4 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400"
+        >
           {error}
         </div>
       )}

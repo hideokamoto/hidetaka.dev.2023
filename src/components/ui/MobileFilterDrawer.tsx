@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import FilterItem from '@/components/ui/FilterItem'
 import SearchBar from '@/components/ui/SearchBar'
+import { useDialogA11y } from '@/libs/hooks/useDialogA11y'
 
 export type FilterGroup = {
   title: string
@@ -37,6 +38,8 @@ export default function MobileFilterDrawer({
   title = 'Filter',
   lang = 'ja',
 }: MobileFilterDrawerProps) {
+  const dialogRef = useDialogA11y<HTMLDivElement>(isOpen, onClose)
+
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
@@ -61,7 +64,13 @@ export default function MobileFilterDrawer({
       />
 
       {/* Drawer Panel */}
-      <div className="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-white/95 backdrop-blur-md shadow-2xl ring-1 ring-zinc-900/5 dark:bg-zinc-900/95 dark:ring-white/10 lg:hidden">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+        className="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-white/95 backdrop-blur-md shadow-2xl ring-1 ring-zinc-900/5 dark:bg-zinc-900/95 dark:ring-white/10 lg:hidden"
+      >
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">

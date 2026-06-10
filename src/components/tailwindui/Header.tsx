@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
+import { useDialogA11y } from '@/libs/hooks/useDialogA11y'
 import {
   changeLanguageURL,
   getLanguageFromURL,
@@ -134,6 +135,7 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
   const currentLang = lang
 
   const navItems = getNavItems(lang)
+  const dialogRef = useDialogA11y<HTMLDivElement>(isOpen, onClose)
 
   useEffect(() => {
     if (isOpen) {
@@ -159,7 +161,13 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
       />
 
       {/* Menu Panel */}
-      <div className="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-white/95 backdrop-blur-md shadow-2xl ring-1 ring-zinc-900/5 dark:bg-zinc-900/95 dark:ring-white/10 lg:hidden">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Menu"
+        className="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-white/95 backdrop-blur-md shadow-2xl ring-1 ring-zinc-900/5 dark:bg-zinc-900/95 dark:ring-white/10 lg:hidden"
+      >
         <div className="flex flex-col h-full">
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
@@ -320,9 +328,9 @@ export default function Header() {
               <Link href="/" className="group relative flex-shrink-0">
                 <span className="sr-only">Hidetaka.dev</span>
                 <div className="relative">
-                  <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white transition-colors group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                  <p className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white transition-colors group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
                     Hidetaka.dev
-                  </h1>
+                  </p>
                   <div className="absolute -bottom-1 left-0 h-0.5 w-0 bg-indigo-600 transition-all duration-300 group-hover:w-full dark:bg-indigo-400" />
                 </div>
               </Link>
