@@ -3,12 +3,14 @@ import CategoryTagList, { type Category } from '@/components/ui/CategoryTagList'
 import ProfileCard from '@/components/ui/ProfileCard'
 import type { WPThought } from '@/libs/dataSources/types'
 
+type AdjacentNote = Pick<WPThought, 'id' | 'title' | 'slug'>
+
 interface DevNoteDetailSidebarProps {
   lang: 'ja' | 'en'
   basePath: string
   categories: Category[]
-  previousNote?: WPThought | null
-  nextNote?: WPThought | null
+  previousNote?: AdjacentNote | null
+  nextNote?: AdjacentNote | null
   className?: string
 }
 

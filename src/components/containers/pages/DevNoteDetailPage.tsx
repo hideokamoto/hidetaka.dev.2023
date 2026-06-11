@@ -15,12 +15,14 @@ import { SITE_CONFIG } from '@/config'
 import type { BlogItem, WPThought } from '@/libs/dataSources/types'
 import { DETAIL_PAGE_SECTION_CLASS } from '@/libs/utils/detailPageStyles'
 
+type AdjacentNote = Pick<WPThought, 'id' | 'title' | 'slug'>
+
 type DevNoteDetailPageProps = {
   note: WPThought
   basePath: string
   lang: 'ja' | 'en'
-  previousNote?: WPThought | null
-  nextNote?: WPThought | null
+  previousNote?: AdjacentNote | null
+  nextNote?: AdjacentNote | null
   relatedArticles?: BlogItem[]
   enableHatenaStar: boolean
 }
