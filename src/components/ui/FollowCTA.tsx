@@ -4,6 +4,7 @@ import GitHubIcon from '@/components/tailwindui/SocialIcons/GitHub'
 import LinkedInIcon from '@/components/tailwindui/SocialIcons/LinkedIn'
 import TwitterIcon from '@/components/tailwindui/SocialIcons/Twitter'
 import { SITE_CONFIG } from '@/config'
+import { cn } from '@/libs/utils/cn'
 
 function RssIcon({ className }: { className?: string }) {
   return (
@@ -53,7 +54,7 @@ export default function FollowCTA({ lang, className = '' }: FollowCTAProps) {
     : 'First-hand notes on Stripe, AWS Serverless, WordPress, and developer communities. Follow along via RSS or social.'
 
   return (
-    <section className={`relative ${className}`}>
+    <section className={cn('relative', className)}>
       <div className="mx-auto max-w-4xl rounded-3xl border border-zinc-200 bg-gradient-to-br from-white via-indigo-50/40 to-purple-50/30 p-10 text-center shadow-sm dark:border-zinc-800 dark:from-zinc-900 dark:via-indigo-950/30 dark:to-purple-950/20 sm:p-12">
         <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
           {title}
