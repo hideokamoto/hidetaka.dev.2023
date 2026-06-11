@@ -173,9 +173,11 @@ export const getDevNoteBySlug = async (slug: string): Promise<WPThought | null> 
   }
 }
 
+export type AdjacentNote = Pick<WPThought, 'id' | 'title' | 'slug'>
+
 export type AdjacentDevNotes = {
-  previous: Pick<WPThought, 'id' | 'title' | 'slug'> | null
-  next: Pick<WPThought, 'id' | 'title' | 'slug'> | null
+  previous: AdjacentNote | null
+  next: AdjacentNote | null
 }
 
 /**

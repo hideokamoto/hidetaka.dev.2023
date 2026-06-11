@@ -12,6 +12,7 @@ import BlogReactions from '@/components/ui/reactions/BlogReactions'
 import SidebarLayout from '@/components/ui/SidebarLayout'
 import SocialShareButtons from '@/components/ui/SocialShareButtons'
 import { SITE_CONFIG } from '@/config'
+import type { AdjacentNote } from '@/libs/dataSources/devnotes'
 import type { BlogItem, WPThought } from '@/libs/dataSources/types'
 import { DETAIL_PAGE_SECTION_CLASS } from '@/libs/utils/detailPageStyles'
 
@@ -19,8 +20,8 @@ type DevNoteDetailPageProps = {
   note: WPThought
   basePath: string
   lang: 'ja' | 'en'
-  previousNote?: WPThought | null
-  nextNote?: WPThought | null
+  previousNote?: AdjacentNote | null
+  nextNote?: AdjacentNote | null
   relatedArticles?: BlogItem[]
   enableHatenaStar: boolean
 }
