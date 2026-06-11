@@ -174,8 +174,8 @@ export const getDevNoteBySlug = async (slug: string): Promise<WPThought | null> 
 }
 
 export type AdjacentDevNotes = {
-  previous: WPThought | null
-  next: WPThought | null
+  previous: Pick<WPThought, 'id' | 'title' | 'slug'> | null
+  next: Pick<WPThought, 'id' | 'title' | 'slug'> | null
 }
 
 /**
@@ -216,8 +216,8 @@ export const getAdjacentDevNotes = async (currentNote: WPThought): Promise<Adjac
     const next =
       (nextResult.items[0] as Pick<WPThought, 'id' | 'title' | 'slug'> | undefined) ?? null
     return {
-      previous: previous as WPThought | null,
-      next: next as WPThought | null,
+      previous,
+      next,
     }
   } catch (error) {
     logger.error('Failed to load adjacent dev-notes', {
