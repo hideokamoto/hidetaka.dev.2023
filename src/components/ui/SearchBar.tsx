@@ -2,6 +2,7 @@ type SearchBarProps = {
   value: string
   onChange: (value: string) => void
   placeholder?: string
+  label?: string
   className?: string
 }
 
@@ -9,6 +10,7 @@ export default function SearchBar({
   value,
   onChange,
   placeholder = 'Search...',
+  label,
   className = '',
 }: SearchBarProps) {
   return (
@@ -19,6 +21,7 @@ export default function SearchBar({
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
+          aria-hidden="true"
         >
           <path
             strokeLinecap="round"
@@ -29,10 +32,11 @@ export default function SearchBar({
         </svg>
       </div>
       <input
-        type="text"
+        type="search"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
+        aria-label={label ?? placeholder}
         className="block w-full rounded-lg border border-zinc-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:placeholder-slate-500 dark:focus:border-indigo-400 dark:focus:ring-indigo-400"
       />
     </div>

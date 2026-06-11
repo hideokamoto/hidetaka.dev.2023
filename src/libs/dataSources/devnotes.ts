@@ -1,6 +1,7 @@
-import { APIError } from '@/libs/errors'
+import type { WPQueryValue } from 'node-wp-api-client'
 import { logger } from '@/libs/logger'
 import type { BlogItem, Category, WPThought } from './types'
+import { wpClient } from './wpClient'
 
 export type DevNotesResult = {
   items: BlogItem[]
@@ -9,11 +10,41 @@ export type DevNotesResult = {
   currentPage: number
 }
 
+const devNotesCollection = () => wpClient.postType<WPThought>('dev-notes')
+
+const DEV_NOTE_LIST_FIELDS = [
+  '_links.wp:term',
+  '_embedded',
+  'id',
+  'title',
+  'date',
+  'date_gmt',
+  'excerpt',
+  'slug',
+  'link',
+  'categories',
+] as const
+
+// _embedded.wp:term のみを参照する最小限の入力型
+// （node-wp-api-client が _fields 指定で返す絞り込み型でも受け取れるようにするため）
+type EmbeddedTermSource = {
+  _embedded?: {
+    'wp:term'?: ReadonlyArray<
+      ReadonlyArray<{
+        id: number
+        name: string
+        slug: string
+        taxonomy: string
+      }>
+    >
+  }
+}
+
 // カテゴリ情報を抽出するヘルパー関数
 // dev-notesのカスタム投稿タイプでは、カテゴリのタクソノミー名が異なる可能性があるため、
 // すべてのタクソノミーからカテゴリを抽出する
 // テスト可能にするためにexport
-export const extractCategories = (note: WPThought): Category[] => {
+export const extractCategories = (note: EmbeddedTermSource): Category[] => {
   if (!note._embedded?.['wp:term']) {
     return []
   }
@@ -52,28 +83,24 @@ export const loadDevNotes = async (
 ): Promise<DevNotesResult> => {
   try {
     // after を渡すとその日時以降の記事のみ取得し、過剰なデータ取得を避ける
-    const afterParam = after ? `&after=${encodeURIComponent(after)}` : ''
-    const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?page=${page}&per_page=${perPage}${afterParam}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`,
+    const {
+      items: notes,
+      total: totalItems,
+      totalPages,
+    } = await devNotesCollection().list(
+      {
+        page,
+        per_page: perPage,
+        ...(after ? { after } : {}),
+        _embed: 'wp:term',
+        _fields: DEV_NOTE_LIST_FIELDS,
+      },
       {
         next: { revalidate: 1800 }, // 30分ごとに再検証（WordPress記事）
       },
     )
 
-    if (!response.ok) {
-      throw await APIError.fromResponse(response, '/wp-json/wp/v2/dev-notes', {
-        page,
-        perPage,
-        lang,
-      })
-    }
-
-    const notes: WPThought[] = await response.json()
-
-    const totalItems = Number.parseInt(response.headers.get('X-WP-Total') || '0', 10)
-    const totalPages = Number.parseInt(response.headers.get('X-WP-TotalPages') || '0', 10)
-
-    const items: BlogItem[] = notes.map((note: WPThought): BlogItem => {
+    const items: BlogItem[] = notes.map((note): BlogItem => {
       const basePath = lang === 'ja' ? '/ja/writing/dev-notes' : '/writing/dev-notes'
       const href = `${basePath}/${note.slug}`
 
@@ -113,26 +140,30 @@ export const loadDevNotes = async (
  */
 export const getDevNoteBySlug = async (slug: string): Promise<WPThought | null> => {
   try {
-    const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?slug=${encodeURIComponent(slug)}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,content,slug,link,categories`,
+    return await devNotesCollection().getBySlug(
+      slug,
+      {
+        _embed: 'wp:term',
+        _fields: [
+          '_links.wp:term',
+          '_embedded',
+          'id',
+          'title',
+          'date',
+          'date_gmt',
+          'modified',
+          'modified_gmt',
+          'excerpt',
+          'content',
+          'slug',
+          'link',
+          'categories',
+        ],
+      },
       {
         next: { revalidate: 1800 }, // 30分ごとに再検証
       },
     )
-
-    if (!response.ok) {
-      throw await APIError.fromResponse(response, '/wp-json/wp/v2/dev-notes', {
-        slug,
-      })
-    }
-
-    const notes: WPThought[] = await response.json()
-
-    if (notes.length === 0) {
-      return null
-    }
-
-    return notes[0]
   } catch (error) {
     logger.error('Failed to load dev-note by slug', {
       error,
@@ -147,43 +178,42 @@ export type AdjacentDevNotes = {
   next: WPThought | null
 }
 
-// WordPress APIから記事を取得するヘルパー関数
-const fetchDevNote = async (url: string): Promise<WPThought | null> => {
-  try {
-    const response = await fetch(url, {
-      next: { revalidate: 1800 }, // 30分ごとに再検証
-    })
-    if (!response.ok) {
-      logger.error('Failed to fetch dev-note', {
-        status: response.status,
-        url,
-      })
-      return null
-    }
-    const notes: WPThought[] = await response.json()
-    return notes.length > 0 ? notes[0] : null
-  } catch (error) {
-    logger.error('Failed to fetch dev-note', {
-      error,
-      url,
-    })
-    return null
-  }
-}
-
 /**
  * 前後の記事を取得
  */
 export const getAdjacentDevNotes = async (currentNote: WPThought): Promise<AdjacentDevNotes> => {
   try {
-    const previousUrl = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?before=${encodeURIComponent(currentNote.date)}&per_page=1&orderby=date&order=desc&_fields=id,title,slug`
-    const nextUrl = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?after=${encodeURIComponent(currentNote.date)}&per_page=1&orderby=date&order=asc&_fields=id,title,slug`
+    const previousPromise = devNotesCollection().list(
+      {
+        before: currentNote.date,
+        per_page: 1,
+        orderby: 'date',
+        order: 'desc',
+        _fields: ['id', 'title', 'slug'],
+      },
+      {
+        next: { revalidate: 1800 }, // 30分ごとに再検証
+      },
+    )
+    const nextPromise = devNotesCollection().list(
+      {
+        after: currentNote.date,
+        per_page: 1,
+        orderby: 'date',
+        order: 'asc',
+        _fields: ['id', 'title', 'slug'],
+      },
+      {
+        next: { revalidate: 1800 }, // 30分ごとに再検証
+      },
+    )
 
-    const [previous, next] = await Promise.all([fetchDevNote(previousUrl), fetchDevNote(nextUrl)])
+    const [previousResult, nextResult] = await Promise.all([previousPromise, nextPromise])
 
+    // _fields で id/title/slug のみ取得しているため、WPThought として返すためにキャスト
     return {
-      previous,
-      next,
+      previous: (previousResult.items[0] as WPThought | undefined) ?? null,
+      next: (nextResult.items[0] as WPThought | undefined) ?? null,
     }
   } catch (error) {
     logger.error('Failed to load adjacent dev-notes', {
@@ -215,33 +245,29 @@ export const getRelatedDevNotes = async (
     const fetchLimit = Math.max(limit * 2.5, 10)
 
     // カテゴリがある場合は同じカテゴリの記事を取得、ない場合はすべての記事を取得
-    let url: string
+    const taxonomyFilter: Record<string, WPQueryValue> = {}
     if (categories.length > 0) {
       const category = categories[0]
       // カスタム投稿タイプでは、カテゴリのタクソノミー名をパラメータとして使用
       // 例: categories (デフォルト) または dev-note-category (カスタム)
       const taxonomyParam = category.taxonomy === 'category' ? 'categories' : category.taxonomy
-      url = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?${taxonomyParam}=${category.id}&exclude=${currentNote.id}&per_page=${fetchLimit}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`
-    } else {
-      url = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/dev-notes?exclude=${currentNote.id}&per_page=${fetchLimit}&_embed=wp:term&_fields=_links.wp:term,_embedded,id,title,date,date_gmt,excerpt,slug,link,categories`
+      taxonomyFilter[taxonomyParam] = category.id
     }
 
-    const response = await fetch(url, {
-      next: { revalidate: 1800 }, // 30分ごとに再検証
-    })
+    const { items: notes } = await devNotesCollection().list(
+      {
+        ...taxonomyFilter,
+        exclude: [currentNote.id],
+        per_page: fetchLimit,
+        _embed: 'wp:term',
+        _fields: DEV_NOTE_LIST_FIELDS,
+      },
+      {
+        next: { revalidate: 1800 }, // 30分ごとに再検証
+      },
+    )
 
-    if (!response.ok) {
-      throw await APIError.fromResponse(response, '/wp-json/wp/v2/dev-notes', {
-        currentNoteId: currentNote.id,
-        categories: categories.map((c) => c.id),
-        limit,
-        lang,
-      })
-    }
-
-    const notes: WPThought[] = await response.json()
-
-    const items: BlogItem[] = notes.map((note: WPThought): BlogItem => {
+    const items: BlogItem[] = notes.map((note): BlogItem => {
       const basePath = lang === 'ja' ? '/ja/writing/dev-notes' : '/writing/dev-notes'
       const href = `${basePath}/${note.slug}`
 

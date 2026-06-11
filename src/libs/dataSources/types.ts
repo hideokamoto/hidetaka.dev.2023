@@ -80,6 +80,7 @@ export type WPThought = {
   slug: string
   featured_media?: number
   categories?: number[]
+  _links?: Record<string, unknown>
   _embedded?: {
     'wp:term'?: Array<
       Array<{

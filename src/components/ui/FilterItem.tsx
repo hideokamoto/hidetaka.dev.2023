@@ -17,6 +17,7 @@ export default function FilterItem({
     <button
       type="button"
       onClick={onClick}
+      aria-pressed={active}
       className={`w-full flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${
         active
           ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'

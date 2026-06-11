@@ -1,6 +1,6 @@
-import { APIError } from '@/libs/errors'
 import { logger } from '@/libs/logger'
 import type { BlogItem } from './types'
+import { wpClient } from './wpClient'
 
 export type WPProduct = {
   id: number
@@ -29,6 +29,22 @@ export type ProductsResult = {
   currentPage: number
 }
 
+const productsCollection = () => wpClient.postType<WPProduct>('products')
+
+const PRODUCT_DETAIL_FIELDS = [
+  'id',
+  'title',
+  'date',
+  'date_gmt',
+  'modified',
+  'modified_gmt',
+  'excerpt',
+  'content',
+  'slug',
+  'link',
+  'featured_media',
+] as const
+
 /**
  * WordPress API から products カスタム投稿タイプを取得
  * @param page ページ番号（デフォルト: 1）
@@ -42,30 +58,26 @@ export const loadProducts = async (
   lang: 'en' | 'ja' = 'en',
 ): Promise<ProductsResult> => {
   try {
-    const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/products?page=${page}&per_page=${perPage}&orderby=date&order=desc&_fields=id,title,date,date_gmt,modified,modified_gmt,excerpt,content,slug,link,featured_media`,
+    const {
+      items: products,
+      total: totalItems,
+      totalPages,
+    } = await productsCollection().list(
+      {
+        page,
+        per_page: perPage,
+        orderby: 'date',
+        order: 'desc',
+        _fields: PRODUCT_DETAIL_FIELDS,
+      },
       {
         next: { revalidate: 1800 }, // 30分ごとに再検証
       },
     )
 
-    if (!response.ok) {
-      throw await APIError.fromResponse(response, '/wp-json/wp/v2/products', {
-        page,
-        perPage,
-        lang,
-      })
-    }
-
-    const products: WPProduct[] = await response.json()
-
-    // WordPress APIのレスポンスヘッダーから総件数と総ページ数を取得
-    const totalItems = Number.parseInt(response.headers.get('X-WP-Total') || '0', 10)
-    const totalPages = Number.parseInt(response.headers.get('X-WP-TotalPages') || '0', 10)
-
     // BlogItem型に変換
     const basePath = lang === 'ja' ? '/ja/news' : '/news'
-    const items: BlogItem[] = products.map((product: WPProduct): BlogItem => {
+    const items: BlogItem[] = products.map((product): BlogItem => {
       const excerptText = product.excerpt?.rendered
         ? product.excerpt.rendered.replace(/<[^>]*>/g, '').substring(0, 150)
         : ''
@@ -110,26 +122,15 @@ export const getProductBySlug = async (
   _lang: 'en' | 'ja' = 'en',
 ): Promise<WPProduct | null> => {
   try {
-    const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/products?slug=${slug}&_fields=id,title,date,date_gmt,modified,modified_gmt,excerpt,content,slug,link,featured_media`,
+    return await productsCollection().getBySlug(
+      slug,
+      {
+        _fields: PRODUCT_DETAIL_FIELDS,
+      },
       {
         next: { revalidate: 1800 }, // 30分ごとに再検証
       },
     )
-
-    if (!response.ok) {
-      throw await APIError.fromResponse(response, '/wp-json/wp/v2/products', {
-        slug,
-      })
-    }
-
-    const products: WPProduct[] = await response.json()
-
-    if (products.length === 0) {
-      return null
-    }
-
-    return products[0]
   } catch (error) {
     logger.error('Failed to load product by slug', {
       error,
@@ -144,30 +145,6 @@ export type AdjacentProducts = {
   next: WPProduct | null
 }
 
-// WordPress APIから記事を取得するヘルパー関数
-const fetchProduct = async (url: string): Promise<WPProduct | null> => {
-  try {
-    const response = await fetch(url, {
-      next: { revalidate: 1800 }, // 30分ごとに再検証
-    })
-    if (!response.ok) {
-      logger.error('Failed to fetch product', {
-        status: response.status,
-        url,
-      })
-      return null
-    }
-    const products: WPProduct[] = await response.json()
-    return products.length > 0 ? products[0] : null
-  } catch (error) {
-    logger.error('Failed to fetch product', {
-      error,
-      url,
-    })
-    return null
-  }
-}
-
 /**
  * 前後の製品ニュース記事を取得
  * @param currentProduct 現在の記事
@@ -176,17 +153,39 @@ const fetchProduct = async (url: string): Promise<WPProduct | null> => {
 export const getAdjacentProducts = async (currentProduct: WPProduct): Promise<AdjacentProducts> => {
   try {
     // 前の記事を取得（現在の記事より前の日付で最も新しいもの）
-    const previousUrl = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/products?before=${encodeURIComponent(currentProduct.date)}&per_page=1&orderby=date&order=desc&_fields=id,title,date,date_gmt,modified,modified_gmt,excerpt,content,slug,link,featured_media`
+    const previousPromise = productsCollection().list(
+      {
+        before: currentProduct.date,
+        per_page: 1,
+        orderby: 'date',
+        order: 'desc',
+        _fields: PRODUCT_DETAIL_FIELDS,
+      },
+      {
+        next: { revalidate: 1800 }, // 30分ごとに再検証
+      },
+    )
 
     // 次の記事を取得（現在の記事より後の日付で最も古いもの）
-    const nextUrl = `https://wp-api.wp-kyoto.net/wp-json/wp/v2/products?after=${encodeURIComponent(currentProduct.date)}&per_page=1&orderby=date&order=asc&_fields=id,title,date,date_gmt,modified,modified_gmt,excerpt,content,slug,link,featured_media`
+    const nextPromise = productsCollection().list(
+      {
+        after: currentProduct.date,
+        per_page: 1,
+        orderby: 'date',
+        order: 'asc',
+        _fields: PRODUCT_DETAIL_FIELDS,
+      },
+      {
+        next: { revalidate: 1800 }, // 30分ごとに再検証
+      },
+    )
 
     // 並列で実行
-    const [previous, next] = await Promise.all([fetchProduct(previousUrl), fetchProduct(nextUrl)])
+    const [previousResult, nextResult] = await Promise.all([previousPromise, nextPromise])
 
     return {
-      previous,
-      next,
+      previous: previousResult.items[0] ?? null,
+      next: nextResult.items[0] ?? null,
     }
   } catch (error) {
     logger.error('Failed to load adjacent products', {
@@ -215,26 +214,22 @@ export const getRelatedProducts = async (
   try {
     // 現在の記事を除外して最新記事を取得
     const fetchLimit = Math.max(limit * 2, 10) // 最低10件、limitの2倍まで
-    const response = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/products?exclude=${currentProduct.id}&per_page=${fetchLimit}&orderby=date&order=desc&_fields=id,title,date,date_gmt,excerpt,slug,link`,
+    const { items: products } = await productsCollection().list(
+      {
+        exclude: [currentProduct.id],
+        per_page: fetchLimit,
+        orderby: 'date',
+        order: 'desc',
+        _fields: ['id', 'title', 'date', 'date_gmt', 'excerpt', 'slug', 'link'],
+      },
       {
         next: { revalidate: 1800 }, // 30分ごとに再検証
       },
     )
 
-    if (!response.ok) {
-      throw await APIError.fromResponse(response, '/wp-json/wp/v2/products', {
-        currentProductId: currentProduct.id,
-        limit,
-        lang,
-      })
-    }
-
-    const products: WPProduct[] = await response.json()
-
     // BlogItem型に変換
     const basePath = lang === 'ja' ? '/ja/news' : '/news'
-    const items: BlogItem[] = products.map((product: WPProduct): BlogItem => {
+    const items: BlogItem[] = products.map((product): BlogItem => {
       const excerptText = product.excerpt?.rendered
         ? product.excerpt.rendered.replace(/<[^>]*>/g, '').substring(0, 150)
         : ''
@@ -272,51 +267,19 @@ export const getRelatedProducts = async (
  */
 export const loadAllProducts = async (): Promise<WPProduct[]> => {
   try {
-    const allProducts: WPProduct[] = []
-    let currentPage = 1
-    let totalPages = 1
-
-    // 最初のページを取得して総ページ数を確認
-    const firstResponse = await fetch(
-      `https://wp-api.wp-kyoto.net/wp-json/wp/v2/products?page=${currentPage}&per_page=100&orderby=date&order=desc&_fields=id,title,date,modified,slug`,
+    // sitemap 用途のため id/title/date/modified/slug のみ取得し、WPProduct[] としてキャスト
+    const products = await productsCollection().listAll(
+      {
+        per_page: 100,
+        orderby: 'date',
+        order: 'desc',
+        _fields: ['id', 'title', 'date', 'modified', 'slug'],
+      },
       {
         next: { revalidate: 3600 }, // 1時間ごとに再検証
       },
     )
-
-    if (!firstResponse.ok) {
-      throw await APIError.fromResponse(firstResponse, '/wp-json/wp/v2/products', {
-        page: currentPage,
-      })
-    }
-
-    const firstPageProducts: WPProduct[] = await firstResponse.json()
-    allProducts.push(...firstPageProducts)
-
-    // レスポンスヘッダーから総ページ数を取得
-    totalPages = Number.parseInt(firstResponse.headers.get('X-WP-TotalPages') || '1', 10)
-
-    // 残りのページを取得
-    while (currentPage < totalPages) {
-      currentPage++
-      const response = await fetch(
-        `https://wp-api.wp-kyoto.net/wp-json/wp/v2/products?page=${currentPage}&per_page=100&orderby=date&order=desc&_fields=id,title,date,modified,slug`,
-        {
-          next: { revalidate: 3600 }, // 1時間ごとに再検証
-        },
-      )
-
-      if (!response.ok) {
-        throw await APIError.fromResponse(response, '/wp-json/wp/v2/products', {
-          page: currentPage,
-        })
-      }
-
-      const products: WPProduct[] = await response.json()
-      allProducts.push(...products)
-    }
-
-    return allProducts
+    return products as unknown as WPProduct[]
   } catch (error) {
     logger.error('Failed to load all products', {
       error,

@@ -50,7 +50,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // WPProductをWPThought形式に変換してメタデータを生成
   const thought = productToThought(product)
 
-  return generateBlogPostMetadata(thought)
+  return generateBlogPostMetadata(thought, `/ja/news/${slug}`)
 }
 
 export default async function NewsDetailPage({ params }: { params: Promise<{ slug: string }> }) {

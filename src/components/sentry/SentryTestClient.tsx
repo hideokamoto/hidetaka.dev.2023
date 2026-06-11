@@ -97,7 +97,7 @@ export default function SentryTestClient() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-black py-12 px-4">
+    <div className="min-h-dvh bg-zinc-50 dark:bg-black py-12 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-8">
           <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">

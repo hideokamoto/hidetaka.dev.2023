@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
   }
 
-  return generateDevNoteMetadata(note)
+  return generateDevNoteMetadata(note, `/ja/writing/dev-notes/${slug}`)
 }
 
 export default async function DevNoteDetailPage({ params }: { params: Promise<{ slug: string }> }) {
