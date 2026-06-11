@@ -25,7 +25,7 @@ export async function generateMetadata({
     .then((projects) => projects.find((p) => p.id === slug))
 
   if (!project) {
-    return { title: 'Work | Hidetaka.dev' }
+    return { title: 'Work' }
   }
 
   return generateProjectMetadata(project, 'ja')

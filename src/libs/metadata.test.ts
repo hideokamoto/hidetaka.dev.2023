@@ -1,9 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import type { WPThought } from './dataSources/types'
 import {
+  buildAlternates,
   generateBlogPostMetadata,
   generateDevNoteMetadata,
   generateProjectMetadata,
+  getOpenGraphLocale,
 } from './metadata'
 import type { MicroCMSProjectsRecord } from './microCMS/types'
 
@@ -64,7 +66,7 @@ describe('generateDevNoteMetadata', () => {
       date: '2024-07-01T12:00:00',
     })
 
-    const result = generateDevNoteMetadata(note)
+    const result = generateDevNoteMetadata(note, '/writing/dev-notes/test-post')
 
     expect(result.title).toBe('Test Dev Note')
     expect(result.openGraph).toBeDefined()
@@ -81,7 +83,7 @@ describe('generateDevNoteMetadata', () => {
       id: 789,
     })
 
-    const result = generateDevNoteMetadata(note)
+    const result = generateDevNoteMetadata(note, '/writing/dev-notes/test-post')
 
     expect(result.openGraph?.images).toBeDefined()
     expect(result.openGraph?.images).toHaveLength(1)
@@ -100,24 +102,25 @@ describe('generateDevNoteMetadata', () => {
       id: 999,
     })
 
-    const result = generateDevNoteMetadata(note)
+    const result = generateDevNoteMetadata(note, '/writing/dev-notes/test-post')
 
     expect(result.openGraph?.images?.[0]?.url).toBe(
       'https://hidetaka.dev/api/thumbnail/dev-notes/999',
     )
   })
 
-  it('should use custom site URL from environment variable', () => {
+  it('should use SITE_CONFIG.url even when NEXT_PUBLIC_SITE_URL is set', () => {
+    // canonicalやog:urlはSITE_CONFIG.url基準のため、og:imageも同じ正本に揃える
     process.env.NEXT_PUBLIC_SITE_URL = 'https://custom.example.com'
 
     const note = createMockWPThought({
       id: 111,
     })
 
-    const result = generateDevNoteMetadata(note)
+    const result = generateDevNoteMetadata(note, '/writing/dev-notes/test-post')
 
     expect(result.openGraph?.images?.[0]?.url).toBe(
-      'https://custom.example.com/api/thumbnail/dev-notes/111',
+      'https://hidetaka.dev/api/thumbnail/dev-notes/111',
     )
   })
 
@@ -126,7 +129,7 @@ describe('generateDevNoteMetadata', () => {
       title: { rendered: 'My Custom Title' },
     })
 
-    const result = generateDevNoteMetadata(note)
+    const result = generateDevNoteMetadata(note, '/writing/dev-notes/test-post')
 
     expect(result.twitter?.title).toBe('My Custom Title')
     expect(result.twitter?.images).toBeDefined()
@@ -140,7 +143,7 @@ describe('generateDevNoteMetadata', () => {
         excerpt: { rendered: '<p>This is a useful summary of the note.</p>' },
       })
 
-      const result = generateDevNoteMetadata(note)
+      const result = generateDevNoteMetadata(note, '/writing/dev-notes/test-post')
 
       expect(result.description).toBe('This is a useful summary of the note.')
       expect(result.openGraph?.description).toBe('This is a useful summary of the note.')
@@ -152,7 +155,7 @@ describe('generateDevNoteMetadata', () => {
         excerpt: { rendered: '<p>Hello <strong>world</strong> from <a href="#">here</a>.</p>' },
       })
 
-      const result = generateDevNoteMetadata(note)
+      const result = generateDevNoteMetadata(note, '/writing/dev-notes/test-post')
 
       expect(result.description).toBe('Hello world from here.')
       expect(result.description).not.toMatch(/<[^>]*>/)
@@ -163,7 +166,7 @@ describe('generateDevNoteMetadata', () => {
         excerpt: { rendered: '<p>Multiple   spaces\n\nand newlines</p>' },
       })
 
-      const result = generateDevNoteMetadata(note)
+      const result = generateDevNoteMetadata(note, '/writing/dev-notes/test-post')
 
       expect(result.description).toBe('Multiple spaces and newlines')
     })
@@ -174,7 +177,7 @@ describe('generateDevNoteMetadata', () => {
         excerpt: { rendered: `<p>${longText}</p>` },
       })
 
-      const result = generateDevNoteMetadata(note)
+      const result = generateDevNoteMetadata(note, '/writing/dev-notes/test-post')
 
       expect(result.description).toBeDefined()
       expect((result.description as string).length).toBeLessThanOrEqual(123)
@@ -186,7 +189,7 @@ describe('generateDevNoteMetadata', () => {
         content: { rendered: '<p>Fallback content body.</p>' },
       })
 
-      const result = generateDevNoteMetadata(note)
+      const result = generateDevNoteMetadata(note, '/writing/dev-notes/test-post')
 
       expect(result.description).toBe('Fallback content body.')
     })
@@ -198,7 +201,7 @@ describe('generateDevNoteMetadata', () => {
         content: { rendered: '' },
       })
 
-      const result = generateDevNoteMetadata(note)
+      const result = generateDevNoteMetadata(note, '/writing/dev-notes/test-post')
 
       expect(result.description).toBe('Only Title Available')
     })
@@ -210,7 +213,7 @@ describe('generateDevNoteMetadata', () => {
         content: { rendered: '<p></p>' },
       })
 
-      const result = generateDevNoteMetadata(note)
+      const result = generateDevNoteMetadata(note, '/writing/dev-notes/test-post')
 
       expect(result.description).toBeTruthy()
     })
@@ -239,7 +242,7 @@ describe('generateBlogPostMetadata', () => {
       date: '2024-07-01T12:00:00',
     })
 
-    const result = generateBlogPostMetadata(thought)
+    const result = generateBlogPostMetadata(thought, '/blog/test-post')
 
     expect(result.title).toBe('Test Blog Post')
     expect(result.openGraph).toBeDefined()
@@ -256,7 +259,7 @@ describe('generateBlogPostMetadata', () => {
       id: 789,
     })
 
-    const result = generateBlogPostMetadata(thought)
+    const result = generateBlogPostMetadata(thought, '/blog/test-post')
 
     expect(result.openGraph?.images).toBeDefined()
     expect(result.openGraph?.images).toHaveLength(1)
@@ -275,24 +278,25 @@ describe('generateBlogPostMetadata', () => {
       id: 999,
     })
 
-    const result = generateBlogPostMetadata(thought)
+    const result = generateBlogPostMetadata(thought, '/blog/test-post')
 
     expect(result.openGraph?.images?.[0]?.url).toBe(
       'https://hidetaka.dev/api/thumbnail/thoughts/999',
     )
   })
 
-  it('should use custom site URL from environment variable', () => {
+  it('should use SITE_CONFIG.url even when NEXT_PUBLIC_SITE_URL is set', () => {
+    // canonicalやog:urlはSITE_CONFIG.url基準のため、og:imageも同じ正本に揃える
     process.env.NEXT_PUBLIC_SITE_URL = 'https://custom.example.com'
 
     const thought = createMockWPThought({
       id: 111,
     })
 
-    const result = generateBlogPostMetadata(thought)
+    const result = generateBlogPostMetadata(thought, '/blog/test-post')
 
     expect(result.openGraph?.images?.[0]?.url).toBe(
-      'https://custom.example.com/api/thumbnail/thoughts/111',
+      'https://hidetaka.dev/api/thumbnail/thoughts/111',
     )
   })
 
@@ -301,7 +305,7 @@ describe('generateBlogPostMetadata', () => {
       title: { rendered: 'My Custom Blog Title' },
     })
 
-    const result = generateBlogPostMetadata(thought)
+    const result = generateBlogPostMetadata(thought, '/blog/test-post')
 
     expect(result.twitter?.title).toBe('My Custom Blog Title')
     expect(result.twitter?.images).toBeDefined()
@@ -313,8 +317,8 @@ describe('generateBlogPostMetadata', () => {
     const thought1 = createMockWPThought({ id: 1 })
     const thought2 = createMockWPThought({ id: 2 })
 
-    const result1 = generateBlogPostMetadata(thought1)
-    const result2 = generateBlogPostMetadata(thought2)
+    const result1 = generateBlogPostMetadata(thought1, '/blog/post-1')
+    const result2 = generateBlogPostMetadata(thought2, '/blog/post-2')
 
     expect(result1.openGraph?.images?.[0]?.url).toContain('/thoughts/1')
     expect(result2.openGraph?.images?.[0]?.url).toContain('/thoughts/2')
@@ -326,7 +330,7 @@ describe('generateBlogPostMetadata', () => {
         excerpt: { rendered: '<p>This is a useful summary of the post.</p>' },
       })
 
-      const result = generateBlogPostMetadata(thought)
+      const result = generateBlogPostMetadata(thought, '/blog/test-post')
 
       expect(result.description).toBe('This is a useful summary of the post.')
       expect(result.openGraph?.description).toBe('This is a useful summary of the post.')
@@ -338,7 +342,7 @@ describe('generateBlogPostMetadata', () => {
         excerpt: { rendered: '<p>Hello <strong>world</strong> from <a href="#">here</a>.</p>' },
       })
 
-      const result = generateBlogPostMetadata(thought)
+      const result = generateBlogPostMetadata(thought, '/blog/test-post')
 
       expect(result.description).toBe('Hello world from here.')
       expect(result.description).not.toMatch(/<[^>]*>/)
@@ -349,7 +353,7 @@ describe('generateBlogPostMetadata', () => {
         excerpt: { rendered: '<p>Multiple   spaces\n\nand newlines</p>' },
       })
 
-      const result = generateBlogPostMetadata(thought)
+      const result = generateBlogPostMetadata(thought, '/blog/test-post')
 
       expect(result.description).toBe('Multiple spaces and newlines')
     })
@@ -360,7 +364,7 @@ describe('generateBlogPostMetadata', () => {
         excerpt: { rendered: `<p>${longText}</p>` },
       })
 
-      const result = generateBlogPostMetadata(thought)
+      const result = generateBlogPostMetadata(thought, '/blog/test-post')
 
       expect(result.description).toBeDefined()
       expect((result.description as string).length).toBeLessThanOrEqual(123)
@@ -372,7 +376,7 @@ describe('generateBlogPostMetadata', () => {
         content: { rendered: '<p>Fallback content body.</p>' },
       })
 
-      const result = generateBlogPostMetadata(thought)
+      const result = generateBlogPostMetadata(thought, '/blog/test-post')
 
       expect(result.description).toBe('Fallback content body.')
     })
@@ -384,7 +388,7 @@ describe('generateBlogPostMetadata', () => {
         content: { rendered: '' },
       })
 
-      const result = generateBlogPostMetadata(thought)
+      const result = generateBlogPostMetadata(thought, '/blog/test-post')
 
       expect(result.description).toBe('Only Title Available')
     })
@@ -396,7 +400,7 @@ describe('generateBlogPostMetadata', () => {
         content: { rendered: '<p></p>' },
       })
 
-      const result = generateBlogPostMetadata(thought)
+      const result = generateBlogPostMetadata(thought, '/blog/test-post')
 
       expect(result.description).toBeTruthy()
     })
@@ -490,5 +494,174 @@ describe('generateProjectMetadata', () => {
     const result = generateProjectMetadata(project, 'en')
 
     expect(result.openGraph?.images).toBeUndefined()
+  })
+})
+
+describe('buildAlternates', () => {
+  it('should build canonical and hreflang for an English path', () => {
+    const result = buildAlternates('/work')
+
+    expect(result.canonical).toBe('https://hidetaka.dev/work')
+    expect(result.languages).toEqual({
+      en: 'https://hidetaka.dev/work',
+      ja: 'https://hidetaka.dev/ja/work',
+      'x-default': 'https://hidetaka.dev/work',
+    })
+  })
+
+  it('should build canonical and hreflang for a Japanese path', () => {
+    const result = buildAlternates('/ja/work')
+
+    expect(result.canonical).toBe('https://hidetaka.dev/ja/work')
+    expect(result.languages).toEqual({
+      en: 'https://hidetaka.dev/work',
+      ja: 'https://hidetaka.dev/ja/work',
+      'x-default': 'https://hidetaka.dev/work',
+    })
+  })
+
+  it('should handle the root path', () => {
+    const result = buildAlternates('/')
+
+    expect(result.canonical).toBe('https://hidetaka.dev')
+    expect(result.languages).toEqual({
+      en: 'https://hidetaka.dev',
+      ja: 'https://hidetaka.dev/ja',
+      'x-default': 'https://hidetaka.dev',
+    })
+  })
+
+  it('should handle the Japanese root path', () => {
+    const result = buildAlternates('/ja')
+
+    expect(result.canonical).toBe('https://hidetaka.dev/ja')
+    expect(result.languages).toEqual({
+      en: 'https://hidetaka.dev',
+      ja: 'https://hidetaka.dev/ja',
+      'x-default': 'https://hidetaka.dev',
+    })
+  })
+
+  it('should normalize canonical to the Japanese path when canonicalLang is ja', () => {
+    const result = buildAlternates('/writing/dev-notes/my-note', { canonicalLang: 'ja' })
+
+    expect(result.canonical).toBe('https://hidetaka.dev/ja/writing/dev-notes/my-note')
+    expect(result.languages).toEqual({
+      en: 'https://hidetaka.dev/writing/dev-notes/my-note',
+      ja: 'https://hidetaka.dev/ja/writing/dev-notes/my-note',
+      'x-default': 'https://hidetaka.dev/writing/dev-notes/my-note',
+    })
+  })
+
+  it('should normalize canonical to the English path when canonicalLang is en', () => {
+    const result = buildAlternates('/ja/blog/my-post', { canonicalLang: 'en' })
+
+    expect(result.canonical).toBe('https://hidetaka.dev/blog/my-post')
+  })
+
+  it('should limit hreflang to available languages for single-language pages', () => {
+    const result = buildAlternates('/ja/events/my-event', { availableLanguages: ['ja'] })
+
+    expect(result.canonical).toBe('https://hidetaka.dev/ja/events/my-event')
+    expect(result.languages).toEqual({
+      ja: 'https://hidetaka.dev/ja/events/my-event',
+      'x-default': 'https://hidetaka.dev/ja/events/my-event',
+    })
+  })
+})
+
+describe('getOpenGraphLocale', () => {
+  it('should return en_US for English', () => {
+    expect(getOpenGraphLocale('en')).toBe('en_US')
+  })
+
+  it('should return ja_JP for Japanese', () => {
+    expect(getOpenGraphLocale('ja')).toBe('ja_JP')
+  })
+})
+
+describe('canonical / hreflang / og:url integration', () => {
+  it('generateBlogPostMetadata should use the given path as canonical and og:url', () => {
+    const thought = createMockWPThought()
+
+    const result = generateBlogPostMetadata(thought, '/blog/test-post')
+
+    expect(result.alternates?.canonical).toBe('https://hidetaka.dev/blog/test-post')
+    expect(result.alternates?.languages).toEqual({
+      en: 'https://hidetaka.dev/blog/test-post',
+      ja: 'https://hidetaka.dev/ja/blog/test-post',
+      'x-default': 'https://hidetaka.dev/blog/test-post',
+    })
+    expect(result.openGraph?.url).toBe('https://hidetaka.dev/blog/test-post')
+    expect(result.openGraph?.siteName).toBe('Hidetaka.dev')
+    expect(result.openGraph?.locale).toBe('en_US')
+  })
+
+  it('generateBlogPostMetadata should use ja locale for Japanese paths', () => {
+    const thought = createMockWPThought()
+
+    const result = generateBlogPostMetadata(thought, '/ja/blog/test-post')
+
+    expect(result.alternates?.canonical).toBe('https://hidetaka.dev/ja/blog/test-post')
+    expect(result.openGraph?.url).toBe('https://hidetaka.dev/ja/blog/test-post')
+    expect(result.openGraph?.locale).toBe('ja_JP')
+  })
+
+  it('generateBlogPostMetadata should respect availableLanguages option', () => {
+    const thought = createMockWPThought()
+
+    const result = generateBlogPostMetadata(thought, '/ja/events/test-event', {
+      availableLanguages: ['ja'],
+    })
+
+    expect(result.alternates?.canonical).toBe('https://hidetaka.dev/ja/events/test-event')
+    expect(result.alternates?.languages).toEqual({
+      ja: 'https://hidetaka.dev/ja/events/test-event',
+      'x-default': 'https://hidetaka.dev/ja/events/test-event',
+    })
+  })
+
+  it('generateDevNoteMetadata should normalize canonical and og:url to the Japanese path', () => {
+    const note = createMockWPThought()
+
+    const enResult = generateDevNoteMetadata(note, '/writing/dev-notes/test-post')
+    const jaResult = generateDevNoteMetadata(note, '/ja/writing/dev-notes/test-post')
+
+    // en/jaで同一コンテンツのため、どちらもja側のURLをcanonicalとする
+    expect(enResult.alternates?.canonical).toBe(
+      'https://hidetaka.dev/ja/writing/dev-notes/test-post',
+    )
+    expect(jaResult.alternates?.canonical).toBe(
+      'https://hidetaka.dev/ja/writing/dev-notes/test-post',
+    )
+    expect(enResult.openGraph?.url).toBe('https://hidetaka.dev/ja/writing/dev-notes/test-post')
+    expect(enResult.alternates?.languages).toEqual({
+      en: 'https://hidetaka.dev/writing/dev-notes/test-post',
+      ja: 'https://hidetaka.dev/ja/writing/dev-notes/test-post',
+      'x-default': 'https://hidetaka.dev/writing/dev-notes/test-post',
+    })
+    // og:localeは表示中のページの言語に従う
+    expect(enResult.openGraph?.locale).toBe('en_US')
+    expect(jaResult.openGraph?.locale).toBe('ja_JP')
+  })
+
+  it('generateProjectMetadata should build canonical from lang and project id', () => {
+    const project = createMockProject({ id: 'my-project' })
+
+    const enResult = generateProjectMetadata(project, 'en')
+    const jaResult = generateProjectMetadata(project, 'ja')
+
+    expect(enResult.alternates?.canonical).toBe('https://hidetaka.dev/work/my-project')
+    expect(enResult.openGraph?.url).toBe('https://hidetaka.dev/work/my-project')
+    expect(enResult.openGraph?.locale).toBe('en_US')
+    expect(enResult.openGraph?.siteName).toBe('Hidetaka.dev')
+    expect(jaResult.alternates?.canonical).toBe('https://hidetaka.dev/ja/work/my-project')
+    expect(jaResult.openGraph?.url).toBe('https://hidetaka.dev/ja/work/my-project')
+    expect(jaResult.openGraph?.locale).toBe('ja_JP')
+    expect(jaResult.alternates?.languages).toEqual({
+      en: 'https://hidetaka.dev/work/my-project',
+      ja: 'https://hidetaka.dev/ja/work/my-project',
+      'x-default': 'https://hidetaka.dev/work/my-project',
+    })
   })
 })

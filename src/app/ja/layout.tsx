@@ -2,7 +2,10 @@ import type { Metadata } from 'next'
 import { SITE_DESCRIPTION_JA, SITE_TITLE_JA } from '@/consts'
 
 export const metadata: Metadata = {
-  title: SITE_TITLE_JA,
+  title: {
+    default: SITE_TITLE_JA,
+    template: '%s | 岡本 秀高',
+  },
   description: SITE_DESCRIPTION_JA,
   metadataBase: new URL('https://hidetaka.dev'),
   openGraph: {

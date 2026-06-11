@@ -11,7 +11,10 @@ import Header from '@/components/tailwindui/Header'
 import { generatePersonJsonLd } from '@/libs/jsonLd'
 
 export const metadata: Metadata = {
-  title: SITE_TITLE,
+  title: {
+    default: SITE_TITLE,
+    template: '%s | Hidetaka Okamoto',
+  },
   description: SITE_DESCRIPTION,
   metadataBase: new URL('https://hidetaka.dev'),
   openGraph: {

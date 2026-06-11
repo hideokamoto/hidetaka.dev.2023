@@ -37,7 +37,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // WPEventをWPThought形式に変換してメタデータを生成
   const thought = eventToThought(event)
 
-  return generateBlogPostMetadata(thought)
+  // イベントページは日本語版のみ存在するため、hreflangは日本語のみ出力する
+  return generateBlogPostMetadata(thought, `/ja/events/${slug}`, {
+    availableLanguages: ['ja'],
+  })
 }
 
 export default async function EventDetailPage({ params }: { params: Promise<{ slug: string }> }) {

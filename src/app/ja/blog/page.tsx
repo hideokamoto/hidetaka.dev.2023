@@ -3,8 +3,10 @@ import BlogPageContent from '@/components/containers/pages/BlogPage'
 import JsonLd from '@/components/JsonLd'
 import { loadAllCategories, loadThoughts } from '@/libs/dataSources/thoughts'
 import { generateBlogListJsonLd } from '@/libs/jsonLd'
+import { buildAlternates } from '@/libs/metadata'
 
 export const metadata = {
+  alternates: buildAlternates('/ja/blog'),
   title: 'ブログ',
 }
 

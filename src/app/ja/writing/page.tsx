@@ -1,9 +1,11 @@
 import WritingPageContent from '@/components/containers/pages/WritingPage'
 import StatsSection from '@/components/ui/stats/StatsSection'
 import { loadBlogPosts } from '@/libs/dataSources/blogs'
+import { buildAlternates } from '@/libs/metadata'
 import { loadStatsPosts } from '@/libs/stats/loadStatsPosts'
 
 export const metadata = {
+  alternates: buildAlternates('/ja/writing'),
   title: 'Writing',
 }
 

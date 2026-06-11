@@ -117,26 +117,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   }
 
-  // Dev Notes（WordPress API、日本語版と英語版）
+  // Dev Notes（WordPress API）
+  // en/jaで同一コンテンツを返すため、canonicalである日本語版URLのみ登録する
+  // （英語版URLはhreflang/canonicalで日本語版へ正規化される）
   let devNotesPages: MetadataRoute.Sitemap = []
   try {
-    const [allDevNotesJa, allDevNotesEn] = await Promise.all([
-      loadAllDevNotes('ja'),
-      loadAllDevNotes('en'),
-    ])
-    const jaPages = allDevNotesJa.map((item) => ({
+    const allDevNotesJa = await loadAllDevNotes('ja')
+    devNotesPages = allDevNotesJa.map((item) => ({
       url: `${SITE_CONFIG.url}${item.href}`,
       lastModified: new Date(item.datetime),
       changeFrequency: 'monthly' as const,
       priority: 0.7,
     }))
-    const enPages = allDevNotesEn.map((item) => ({
-      url: `${SITE_CONFIG.url}${item.href}`,
-      lastModified: new Date(item.datetime),
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    }))
-    devNotesPages = [...jaPages, ...enPages]
   } catch (error) {
     logger.error('Failed to load dev-notes for sitemap', {
       error,
