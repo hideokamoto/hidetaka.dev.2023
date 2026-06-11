@@ -85,7 +85,7 @@ function buildDescription(thought: WPThought): string {
     if (text.length <= MAX_DESCRIPTION_LENGTH) {
       return text
     }
-    return `${text.slice(0, MAX_DESCRIPTION_LENGTH).trimEnd()}...`
+    return `${Array.from(text).slice(0, MAX_DESCRIPTION_LENGTH).join('').trimEnd()}...`
   }
 
   return thought.title.rendered
