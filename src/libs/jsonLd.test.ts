@@ -363,12 +363,13 @@ describe('generatePersonJsonLd', () => {
     expect(result.sameAs).toContain('https://twitter.com/hidetaka_dev')
     expect(result.sameAs).toContain('https://github.com/hideokamoto')
     expect(result.sameAs).toContain('https://www.linkedin.com/in/hideokamoto/')
+    expect(result.sameAs).toContain('https://bsky.app/profile/hidetaka.bsky.social')
   })
 
-  it('should have exactly 3 social profiles in sameAs', () => {
+  it('should have exactly 4 social profiles in sameAs', () => {
     const result = generatePersonJsonLd()
 
-    expect(result.sameAs).toHaveLength(3)
+    expect(result.sameAs).toHaveLength(4)
   })
 
   it('should have all required Person schema properties', () => {

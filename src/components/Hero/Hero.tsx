@@ -1,3 +1,4 @@
+import BlueskyIcon from '@/components/tailwindui/SocialIcons/Bluesky'
 import GitHubIcon from '@/components/tailwindui/SocialIcons/GitHub'
 import LinkedInIcon from '@/components/tailwindui/SocialIcons/LinkedIn'
 import TwitterIcon from '@/components/tailwindui/SocialIcons/Twitter'
@@ -9,20 +10,26 @@ import ProfileImage from '@/components/ui/ProfileImage'
 import { SITE_CONFIG } from '@/config'
 
 export default function Hero({ lang }: { lang: string }) {
+  const isJa = lang.startsWith('ja')
   const name = SITE_CONFIG.author.name
-  const role = lang === 'ja' ? 'Developer Experience Engineer' : 'Developer Experience Engineer'
+  const role = 'Developer Advocate · Community Organizer'
   const tagline =
     lang === 'ja'
       ? 'シームレスな体験で開発者をエンパワーする'
       : 'Empowering developers with seamless experiences'
 
-  const description =
-    lang === 'ja'
-      ? 'Stripe、AWS Serverless、WordPressを専門とする開発者。EC ASP開発とStripe Developer Advocateとしての経験を活かし、SaaS・ECサイトの収益最大化を支援します。'
-      : 'Engineering partner specializing in Stripe, AWS Serverless, and WordPress. Leveraging experience in EC ASP development and as a Stripe Developer Advocate to help SaaS and e-commerce sites maximize revenue.'
+  const description = isJa
+    ? '元Stripe Developer Advocate。Stripe・AWS Serverless・WordPressについて発信し、WordCamp KansaiやJP_Stripesなどの開発者コミュニティを運営しています。'
+    : 'Former Stripe Developer Advocate writing about Stripe, AWS Serverless, and WordPress — and organizing developer communities like WordCamp Kansai and JP_Stripes.'
 
-  const ctaText = lang === 'ja' ? 'プロジェクトを見る' : 'View my projects'
-  const ctaHref = lang === 'ja' ? '/ja/work' : '/work'
+  const primaryCta = {
+    text: isJa ? '記事を読む' : 'Read my writing',
+    href: isJa ? '/ja/writing' : '/writing',
+  }
+  const secondaryCta = {
+    text: isJa ? '登壇・実績' : 'Speaking & work',
+    href: isJa ? '/ja/speaking' : '/speaking',
+  }
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-white via-indigo-50/30 to-purple-50/20 dark:from-zinc-900 dark:via-indigo-950/30 dark:to-purple-950/20 -mt-[var(--header-height)] pt-[var(--header-height)]">
@@ -47,7 +54,12 @@ export default function Hero({ lang }: { lang: string }) {
             </p>
 
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 pt-4">
-              <CTAButton href={ctaHref}>{ctaText}</CTAButton>
+              <div className="flex flex-wrap items-center gap-4">
+                <CTAButton href={primaryCta.href}>{primaryCta.text}</CTAButton>
+                <CTAButton href={secondaryCta.href} variant="outline">
+                  {secondaryCta.text}
+                </CTAButton>
+              </div>
               <div className="flex items-center gap-5">
                 <SocialLink
                   href={SITE_CONFIG.social.twitter.url}
@@ -55,6 +67,13 @@ export default function Hero({ lang }: { lang: string }) {
                   icon={TwitterIcon}
                 >
                   <span className="sr-only">{SITE_CONFIG.social.twitter.ariaLabel}</span>
+                </SocialLink>
+                <SocialLink
+                  href={SITE_CONFIG.social.bluesky.url}
+                  aria-label={SITE_CONFIG.social.bluesky.ariaLabel}
+                  icon={BlueskyIcon}
+                >
+                  <span className="sr-only">{SITE_CONFIG.social.bluesky.ariaLabel}</span>
                 </SocialLink>
                 <SocialLink
                   href={SITE_CONFIG.social.github.url}

@@ -10,6 +10,7 @@ export function generatePersonJsonLd() {
     SITE_CONFIG.social.twitter.url,
     SITE_CONFIG.social.github.url,
     SITE_CONFIG.social.linkedin.url,
+    SITE_CONFIG.social.bluesky.url,
   ]
 
   const jsonLd = {

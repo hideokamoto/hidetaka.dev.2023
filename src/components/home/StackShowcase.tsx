@@ -38,14 +38,11 @@ export default function StackShowcase({ lang }: { lang: string }) {
     },
   ]
 
-  const title =
-    lang === 'ja'
-      ? '信頼するスタックで、事業のスピードを最大化'
-      : 'Move faster on a trusted platform stack'
+  const title = lang === 'ja' ? '専門としている技術スタック' : 'The stack I work and write about'
   const subtitle =
     lang === 'ja'
-      ? 'パートナー企業との共創やエコシステム構築を前提に、開発から運用までをシームレスに繋ぎます。'
-      : 'Built for collaborative ecosystems—seamless from development to operations.'
+      ? '決済・サーバーレス・WordPressを軸に、登壇や記事を通じて知見を共有しています。'
+      : 'Centered on payments, serverless, and WordPress—shared through talks and writing.'
 
   return (
     <section className="relative py-24 sm:py-32">

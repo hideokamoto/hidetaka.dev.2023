@@ -1,16 +1,11 @@
 import Image from 'next/image'
 import Profile from '@/components/content/Profile'
 import Container from '@/components/tailwindui/Container'
-import SocialLink, {
-  GitHubIcon,
-  LinkedInIcon,
-  TwitterIcon,
-} from '@/components/tailwindui/SocialLink'
 import BackgroundDecoration from '@/components/ui/BackgroundDecoration'
+import FollowCTA from '@/components/ui/FollowCTA'
 import PageHeader from '@/components/ui/PageHeader'
 import ProfileImage from '@/components/ui/ProfileImage'
 import SectionHeader from '@/components/ui/SectionHeader'
-import { SITE_CONFIG } from '@/config'
 
 function SpeakerProfile({ lang }: { lang: 'ja' | 'en' }) {
   if (lang === 'ja') {
@@ -25,8 +20,8 @@ function SpeakerProfile({ lang }: { lang: 'ja' | 'en' }) {
         </a>
         のディベロッパーアドボケイトとして、開発者・ユーザーコミュニティとの対話やコンテンツ・サンプルの提供に取り組んだ。ECサービスやSaaSサービスの開発・運用保守の経験とコミュニティとの会話を元に、サービスの収益化戦略やテクノロジー活用方法について情報発信している。複数の開発者コミュニティに参加し、WordCamp
         Kansai 2024やJP_Stripes Connect
-        2019など、ユーザーカンファレンスの実行委員長を務めた経験を持つ。 AWS Sumurai 2017, Alexa
-        Champions, AWS Community Builders
+        2019など、ユーザーカンファレンスの実行委員長を務めた経験を持つ。技術ブログ「wp-kyoto」を10年以上運営している。
+        AWS Samurai 2017, Alexa Champions, AWS Community Builders。
       </>
     )
   }
@@ -56,9 +51,11 @@ function SpeakerProfile({ lang }: { lang: 'ja' | 'en' }) {
       >
         JP_Stripes Connect 2019
       </a>
-      , the first Stripe user conference in Japan. Prior to Stripe, Hide was a lead Software
-      Engineer at DigitalCube, focused on building plugins, open source, and developing SaaS
-      application dashboards. Hide lives in Hyogo, Japan with his family and two cats.
+      , the first Stripe user conference in Japan. He has run the technical blog
+      &quot;wp-kyoto&quot; for over 10 years and is an AWS Samurai 2017, Alexa Champion, and AWS
+      Community Builder. Prior to Stripe, Hide was a lead Software Engineer at DigitalCube, focused
+      on building plugins, open source, and developing SaaS application dashboards. Hide lives in
+      Hyogo, Japan with his family and two cats.
     </>
   )
 }
@@ -269,9 +266,14 @@ export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
           {/* Additional Profile */}
           <div className="mt-16 max-w-3xl mx-auto">
             <div className="rounded-2xl border border-zinc-200 bg-white p-10 dark:border-zinc-800 dark:bg-zinc-900">
-              <h3 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white mb-6">
-                {isJa ? '詳細プロフィール' : 'More About Me'}
+              <h3 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white mb-2">
+                {isJa ? 'スピーカープロフィール' : 'Speaker Bio'}
               </h3>
+              <p className="mb-6 text-sm text-slate-500 dark:text-slate-400">
+                {isJa
+                  ? '登壇・取材の依頼時に、以下のプロフィールと上部のプロフィール写真をそのままご利用ください。'
+                  : 'For speaking or interview requests, feel free to copy the bio below along with the profile photo above.'}
+              </p>
               <div className="space-y-6 text-base leading-relaxed text-slate-700 dark:text-slate-400">
                 <SpeakerProfile lang={lang} />
               </div>
@@ -302,34 +304,14 @@ export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
         <Container>
           <SectionHeader
             title={connectTitle}
-            description={isJa ? 'SNSやGitHubでフォローしてください' : 'Follow me on social media'}
+            description={
+              isJa ? 'RSSやSNSでフォローしてください' : 'Follow along via RSS or social media'
+            }
             align="center"
           />
 
-          <div className="mt-16 flex justify-center">
-            <ul className="space-y-6">
-              <SocialLink
-                href={SITE_CONFIG.social.twitter.url}
-                icon={TwitterIcon}
-                aria-label={SITE_CONFIG.social.twitter.ariaLabel}
-              >
-                {isJa ? 'Twitterでフォロー' : 'Follow on Twitter'}
-              </SocialLink>
-              <SocialLink
-                href={SITE_CONFIG.social.github.url}
-                icon={GitHubIcon}
-                aria-label={SITE_CONFIG.social.github.ariaLabel}
-              >
-                {isJa ? 'GitHubでフォロー' : 'Follow on GitHub'}
-              </SocialLink>
-              <SocialLink
-                href={SITE_CONFIG.social.linkedin.url}
-                icon={LinkedInIcon}
-                aria-label={SITE_CONFIG.social.linkedin.ariaLabel}
-              >
-                {isJa ? 'LinkedInでフォロー' : 'Follow on LinkedIn'}
-              </SocialLink>
-            </ul>
+          <div className="mt-16">
+            <FollowCTA lang={lang} />
           </div>
         </Container>
       </section>

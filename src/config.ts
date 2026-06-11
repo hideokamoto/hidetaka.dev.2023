@@ -36,5 +36,15 @@ export const SITE_CONFIG = {
       label: 'LinkedIn',
       ariaLabel: 'Follow on LinkedIn',
     },
+    bluesky: {
+      url: 'https://bsky.app/profile/hidetaka.bsky.social',
+      label: 'Bluesky',
+      ariaLabel: 'Follow on Bluesky',
+    },
+  },
+
+  // RSSフィード（自前コンテンツの配信）
+  rss: {
+    path: '/projects/rss.xml',
   },
 } as const
