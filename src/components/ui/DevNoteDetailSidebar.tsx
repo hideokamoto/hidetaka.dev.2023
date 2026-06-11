@@ -1,9 +1,7 @@
 import Link from 'next/link'
 import CategoryTagList, { type Category } from '@/components/ui/CategoryTagList'
 import ProfileCard from '@/components/ui/ProfileCard'
-import type { WPThought } from '@/libs/dataSources/types'
-
-type AdjacentNote = Pick<WPThought, 'id' | 'title' | 'slug'>
+import type { AdjacentNote } from '@/libs/dataSources/devnotes'
 
 interface DevNoteDetailSidebarProps {
   lang: 'ja' | 'en'
