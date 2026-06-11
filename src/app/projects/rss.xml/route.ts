@@ -13,10 +13,14 @@ export async function GET() {
   const notes = await loadAllDevNotes('en')
 
   const items: RssItem[] = notes
-    .filter((note) => Boolean(note.datetime))
-    .sort((a, b) => new Date(b.datetime).getTime() - new Date(a.datetime).getTime())
-    .slice(0, 30)
     .map((note) => ({
+      note,
+      time: note.datetime ? new Date(note.datetime).getTime() : Number.NaN,
+    }))
+    .filter(({ time }) => !Number.isNaN(time))
+    .sort((a, b) => b.time - a.time)
+    .slice(0, 30)
+    .map(({ note }) => ({
       title: note.title,
       link: `${SITE_CONFIG.url}${note.href}`,
       description: note.description,

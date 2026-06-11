@@ -17,8 +17,8 @@ export type RssChannel = {
 /**
  * XML特殊文字をエスケープする
  */
-export function escapeXml(unsafe: string): string {
-  return unsafe
+export function escapeXml(unsafe: string | null | undefined): string {
+  return (unsafe ?? '')
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
@@ -29,7 +29,11 @@ export function escapeXml(unsafe: string): string {
 /**
  * RFC822形式の日付文字列に変換する（不正な日付はnullを返す）
  */
-export function toRfc822(input: string): string | null {
+export function toRfc822(input: string | null | undefined): string | null {
+  // new Date(null) は 1970-01-01 を返すため、先に falsy を弾く
+  if (!input) {
+    return null
+  }
   const date = new Date(input)
   if (Number.isNaN(date.getTime())) {
     return null

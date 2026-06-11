@@ -11,6 +11,11 @@ describe('escapeXml', () => {
   it('returns plain text unchanged', () => {
     expect(escapeXml('Hello World')).toBe('Hello World')
   })
+
+  it('returns an empty string for null or undefined', () => {
+    expect(escapeXml(null)).toBe('')
+    expect(escapeXml(undefined)).toBe('')
+  })
 })
 
 describe('toRfc822', () => {
@@ -20,6 +25,12 @@ describe('toRfc822', () => {
 
   it('returns null for invalid date', () => {
     expect(toRfc822('not-a-date')).toBeNull()
+  })
+
+  it('returns null for falsy input instead of the 1970 epoch', () => {
+    expect(toRfc822(null)).toBeNull()
+    expect(toRfc822(undefined)).toBeNull()
+    expect(toRfc822('')).toBeNull()
   })
 })
 
