@@ -1,10 +1,12 @@
 import WorkPageContent from '@/components/containers/pages/WorkPage'
 import { listMyNPMPackages } from '@/libs/dataSources/npmjs'
 import { listMyWordPressPlugins } from '@/libs/dataSources/wporg'
+import { buildAlternates } from '@/libs/metadata'
 import { MicroCMSAPI } from '@/libs/microCMS/apis'
 import { createMicroCMSClient } from '@/libs/microCMS/client'
 
 export const metadata = {
+  alternates: buildAlternates('/ja/work'),
   title: 'Work',
 }
 

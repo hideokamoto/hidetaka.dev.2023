@@ -1,20 +1,21 @@
-import { createWPClient } from 'node-wp-api-client'
 import { logger } from '@/libs/logger'
 import type { BlogItem, WPEvent } from './types'
+import { wpClient } from './wpClient'
 
-const wp = createWPClient({ baseUrl: 'https://wp-api.wp-kyoto.net' })
-const eventsApi = wp.postType<WPEvent>('events')
+const eventsCollection = () => wpClient.postType<WPEvent>('events')
 
 export const loadWPEvents = async (): Promise<WPEvent[]> => {
   try {
-    // 全ページを取得して結合（総ページ数はX-WP-TotalPagesヘッダーから判定される）
-    const allEvents = await eventsApi.listAll({
-      per_page: 100,
-      orderby: 'date',
-      order: 'desc',
-    })
-
-    return allEvents
+    return await eventsCollection().listAll(
+      {
+        per_page: 100,
+        orderby: 'date',
+        order: 'desc',
+      },
+      {
+        next: { revalidate: 3600 },
+      },
+    )
   } catch (error) {
     logger.error('Failed to load WordPress events', {
       error,
@@ -25,7 +26,7 @@ export const loadWPEvents = async (): Promise<WPEvent[]> => {
 
 export const getWPEventBySlug = async (slug: string): Promise<WPEvent | null> => {
   try {
-    const event = await eventsApi.getBySlug(slug, {
+    return await eventsCollection().getBySlug(slug, {
       _fields: [
         'id',
         'title',
@@ -43,8 +44,6 @@ export const getWPEventBySlug = async (slug: string): Promise<WPEvent | null> =>
         'featured_media',
       ],
     })
-
-    return event
   } catch (error) {
     logger.error('Failed to load WordPress event by slug', {
       error,
@@ -59,40 +58,36 @@ export type AdjacentEvents = {
   next: WPEvent | null
 }
 
-// WordPress APIから前後いずれかの記事を取得するヘルパー関数
-const fetchAdjacentEvent = async (
-  query: { before: string; order: 'desc' } | { after: string; order: 'asc' },
-): Promise<WPEvent | null> => {
+export const getAdjacentEvents = async (currentEvent: WPEvent): Promise<AdjacentEvents> => {
   try {
-    const { items: events } = await eventsApi.list({
-      ...query,
+    // 前の記事を取得（現在の記事より前の日付で最も新しいもの）
+    const previousPromise = eventsCollection().list({
+      before: currentEvent.date,
       per_page: 1,
       orderby: 'date',
+      order: 'desc',
       _fields: ['id', 'title', 'slug'],
     })
 
-    return events.length > 0 ? (events[0] as WPEvent) : null
-  } catch (error) {
-    logger.error('Failed to fetch event', {
-      error,
-      query,
+    // 次の記事を取得（現在の記事より後の日付で最も古いもの）
+    const nextPromise = eventsCollection().list({
+      after: currentEvent.date,
+      per_page: 1,
+      orderby: 'date',
+      order: 'asc',
+      _fields: ['id', 'title', 'slug'],
     })
-    return null
-  }
-}
 
-export const getAdjacentEvents = async (currentEvent: WPEvent): Promise<AdjacentEvents> => {
-  try {
-    // 前の記事（現在の記事より前の日付で最も新しいもの）と
-    // 次の記事（現在の記事より後の日付で最も古いもの）を並列で取得
-    const [previous, next] = await Promise.all([
-      fetchAdjacentEvent({ before: currentEvent.date, order: 'desc' }),
-      fetchAdjacentEvent({ after: currentEvent.date, order: 'asc' }),
-    ])
+    // 並列で実行
+    const [previousResult, nextResult] = await Promise.all([previousPromise, nextPromise])
 
+    // _fields で id/title/slug のみ取得しているため、型安全性のためPick型を経由してキャスト
+    const previous =
+      (previousResult.items[0] as Pick<WPEvent, 'id' | 'title' | 'slug'> | undefined) ?? null
+    const next = (nextResult.items[0] as Pick<WPEvent, 'id' | 'title' | 'slug'> | undefined) ?? null
     return {
-      previous,
-      next,
+      previous: previous as WPEvent | null,
+      next: next as WPEvent | null,
     }
   } catch (error) {
     logger.error('Failed to load adjacent events', {
@@ -118,7 +113,7 @@ export const getRelatedEvents = async (
 ): Promise<BlogItem[]> => {
   try {
     // 現在の記事を除外して最新のイベント記事を取得
-    const { items: events } = await eventsApi.list({
+    const { items: events } = await eventsCollection().list({
       exclude: [currentEvent.id],
       per_page: limit,
       orderby: 'date',

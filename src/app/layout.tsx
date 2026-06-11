@@ -11,7 +11,10 @@ import Header from '@/components/tailwindui/Header'
 import { generatePersonJsonLd } from '@/libs/jsonLd'
 
 export const metadata: Metadata = {
-  title: SITE_TITLE,
+  title: {
+    default: SITE_TITLE,
+    template: '%s | Hidetaka Okamoto',
+  },
   description: SITE_DESCRIPTION,
   metadataBase: new URL('https://hidetaka.dev'),
   openGraph: {
@@ -53,7 +56,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <JsonLd data={generatePersonJsonLd()} />
       </head>
       <body className="flex h-full flex-col bg-zinc-50 dark:bg-black">
-        <JsonLd data={generatePersonJsonLd()} />
         <SentryProvider>
           <GoogleAnalytics gaId="G-RV8PYHHYHN" />
           <DarkModeScript />
@@ -64,8 +66,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </div>
           </div>
           <div className="relative">
+            <a
+              href="#main-content"
+              className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-indigo-600 focus:shadow-lg dark:focus:bg-zinc-800 dark:focus:text-indigo-400"
+            >
+              Skip to content
+            </a>
             <Header />
-            <main>{children}</main>
+            <main id="main-content" tabIndex={-1} className="focus:outline-none">
+              {children}
+            </main>
             <Footer />
           </div>
         </SentryProvider>

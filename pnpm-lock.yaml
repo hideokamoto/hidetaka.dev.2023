@@ -48,8 +48,8 @@ importers:
         specifier: ^16.2.6
         version: 16.2.6(@babel/core@7.29.0)(@opentelemetry/api@1.9.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       node-wp-api-client:
-        specifier: github:hideokamoto/node-wp-api-client#main
-        version: https://codeload.github.com/hideokamoto/node-wp-api-client/tar.gz/b401fb6ec69ebeb6059be626c19d03cfcf33e2ff
+        specifier: 0.1.0
+        version: 0.1.0
       react:
         specifier: 19.2.3
         version: 19.2.3
@@ -3111,9 +3111,8 @@ packages:
   node-releases@2.0.27:
     resolution: {integrity: sha512-nmh3lCkYZ3grZvqcCH+fjmQ7X+H0OeZgP40OierEaAptX4XofMh5kwNbWh7lBduUzCcV/8kZ+NDLCwm2iorIlA==}
 
-  node-wp-api-client@https://codeload.github.com/hideokamoto/node-wp-api-client/tar.gz/b401fb6ec69ebeb6059be626c19d03cfcf33e2ff:
-    resolution: {tarball: https://codeload.github.com/hideokamoto/node-wp-api-client/tar.gz/b401fb6ec69ebeb6059be626c19d03cfcf33e2ff}
-    version: 0.1.0
+  node-wp-api-client@0.1.0:
+    resolution: {integrity: sha512-MVngjZBqrEQsXaNk8mG+V9jc5shRzlNdoOQCfpm4UJfo/ozQTfOWc/pcb/stKxbWreSmUS9POOuJHa3R8l72YA==}
     engines: {node: '>=20.19'}
 
   normalize-path@3.0.0:
@@ -7341,7 +7340,7 @@ snapshots:
 
   node-releases@2.0.27: {}
 
-  node-wp-api-client@https://codeload.github.com/hideokamoto/node-wp-api-client/tar.gz/b401fb6ec69ebeb6059be626c19d03cfcf33e2ff: {}
+  node-wp-api-client@0.1.0: {}
 
   normalize-path@3.0.0: {}
 

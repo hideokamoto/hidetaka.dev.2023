@@ -5,13 +5,18 @@
  * Only accessible in development mode.
  */
 
+import type { Metadata } from 'next'
 import SentryTestClient from '@/components/sentry/SentryTestClient'
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+}
 
 export default async function TestSentryPage() {
   // Check if we're in development mode
   if (process.env.NODE_ENV !== 'development') {
     return (
-      <div className="flex min-h-screen items-center justify-center px-4">
+      <div className="flex min-h-dvh items-center justify-center px-4">
         <div className="text-center max-w-md">
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
             Not Available in Production

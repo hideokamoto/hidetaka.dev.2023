@@ -40,7 +40,7 @@
     "fast-xml-parser": "^5.8.0",
     "microcms-js-sdk": "^2.3.2",
     "next": "^16.2.6",
-    "node-wp-api-client": "github:hideokamoto/node-wp-api-client#main",
+    "node-wp-api-client": "0.1.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "recharts": "^3.8.1",

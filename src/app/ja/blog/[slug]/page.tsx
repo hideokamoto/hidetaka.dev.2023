@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
   }
 
-  return generateBlogPostMetadata(thought)
+  return generateBlogPostMetadata(thought, `/ja/blog/${slug}`)
 }
 
 export default async function BlogDetailPage({ params }: { params: Promise<{ slug: string }> }) {

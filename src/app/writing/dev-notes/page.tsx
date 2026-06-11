@@ -3,20 +3,23 @@ import DevNotesArchivePage from '@/components/containers/pages/DevNotesArchivePa
 import JsonLd from '@/components/JsonLd'
 import { loadDevNotes } from '@/libs/dataSources/devnotes'
 import { generateBlogListJsonLd } from '@/libs/jsonLd'
+import { buildAlternates } from '@/libs/metadata'
 
 export const metadata: Metadata = {
-  title: 'Development Notes | Hidetaka.dev',
+  title: 'Development Notes',
   description: 'A collection of notes and learnings from daily development work.',
+  alternates: buildAlternates('/writing/dev-notes'),
   openGraph: {
-    title: 'Development Notes | Hidetaka.dev',
+    title: 'Development Notes',
     description: 'A collection of notes and learnings from daily development work.',
     type: 'website',
     url: 'https://hidetaka.dev/writing/dev-notes',
     siteName: 'Hidetaka.dev',
+    locale: 'en_US',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Development Notes | Hidetaka.dev',
+    title: 'Development Notes',
     description: 'A collection of notes and learnings from daily development work.',
   },
 }
