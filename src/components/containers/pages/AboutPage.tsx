@@ -25,7 +25,7 @@ function SpeakerProfile({ lang }: { lang: 'ja' | 'en' }) {
         </a>
         のディベロッパーアドボケイトとして、開発者・ユーザーコミュニティとの対話やコンテンツ・サンプルの提供に取り組んだ。ECサービスやSaaSサービスの開発・運用保守の経験とコミュニティとの会話を元に、サービスの収益化戦略やテクノロジー活用方法について情報発信している。複数の開発者コミュニティに参加し、WordCamp
         Kansai 2024やJP_Stripes Connect
-        2019など、ユーザーカンファレンスの実行委員長を務めた経験を持つ。 AWS Sumurai 2017, Alexa
+        2019など、ユーザーカンファレンスの実行委員長を務めた経験を持つ。 AWS Samurai 2017, Alexa
         Champions, AWS Community Builders
       </>
     )
@@ -120,6 +120,15 @@ function CertificationBadge({ title, link, src }: { title: string; link?: string
   }
 
   return content
+}
+
+function RecognitionBadge({ title, issuer }: { title: string; issuer: string }) {
+  return (
+    <div className="inline-flex flex-col items-center rounded-xl border border-zinc-200 bg-white px-6 py-4 text-center shadow-sm transition-all hover:scale-105 hover:shadow-md dark:border-zinc-700 dark:bg-zinc-800">
+      <span className="text-base font-semibold text-slate-900 dark:text-white">{title}</span>
+      <span className="mt-1 text-sm text-slate-500 dark:text-slate-400">{issuer}</span>
+    </div>
+  )
 }
 
 export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
@@ -225,7 +234,13 @@ export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
     },
   ]
 
-  const certificationsTitle = isJa ? '認定証' : 'Certifications'
+  const recognitions = [
+    { title: 'AWS Samurai 2017', issuer: 'Amazon Web Services' },
+    { title: 'Alexa Champions', issuer: 'Amazon Alexa' },
+    { title: 'AWS Community Builders', issuer: 'Amazon Web Services' },
+  ]
+
+  const certificationsTitle = isJa ? '認定・受賞' : 'Certifications & Recognition'
   const experienceTitle = isJa ? '経歴' : 'Experience'
   const connectTitle = isJa ? '連絡先' : 'Connect'
 
@@ -285,13 +300,31 @@ export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
         <Container>
           <SectionHeader
             title={certificationsTitle}
-            description={isJa ? 'Stripe認定資格' : 'Stripe certifications'}
+            description={
+              isJa
+                ? '認定資格とコミュニティでの評価・受賞歴'
+                : 'Certifications and community recognition'
+            }
             align="center"
           />
 
-          <div className="mt-16 flex flex-wrap justify-center gap-8 lg:gap-10">
+          {/* Stripe Certifications */}
+          <h3 className="mt-16 text-center text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            {isJa ? 'Stripe 認定資格' : 'Stripe Certifications'}
+          </h3>
+          <div className="mt-8 flex flex-wrap justify-center gap-8 lg:gap-10">
             {certifications.map((cert) => (
               <CertificationBadge key={cert.title} {...cert} />
+            ))}
+          </div>
+
+          {/* Community Recognition */}
+          <h3 className="mt-16 text-center text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            {isJa ? 'コミュニティでの評価・受賞' : 'Community Recognition'}
+          </h3>
+          <div className="mt-8 flex flex-wrap justify-center gap-6">
+            {recognitions.map((recognition) => (
+              <RecognitionBadge key={recognition.title} {...recognition} />
             ))}
           </div>
         </Container>
