@@ -58,7 +58,8 @@ function SpeakerProfile({ lang }: { lang: 'ja' | 'en' }) {
       </a>
       , the first Stripe user conference in Japan. Prior to Stripe, Hide was a lead Software
       Engineer at DigitalCube, focused on building plugins, open source, and developing SaaS
-      application dashboards. Hide lives in Hyogo, Japan with his family and two cats.
+      application dashboards. He is also recognized as an AWS Samurai 2017, Alexa Champion, and AWS
+      Community Builder. Hide lives in Hyogo, Japan with his family and two cats.
     </>
   )
 }
@@ -122,9 +123,15 @@ function CertificationBadge({ title, link, src }: { title: string; link?: string
   return content
 }
 
+const RECOGNITIONS = [
+  { title: 'AWS Samurai 2017', issuer: 'Amazon Web Services' },
+  { title: 'Alexa Champions', issuer: 'Amazon Alexa' },
+  { title: 'AWS Community Builders', issuer: 'Amazon Web Services' },
+]
+
 function RecognitionBadge({ title, issuer }: { title: string; issuer: string }) {
   return (
-    <div className="inline-flex flex-col items-center rounded-xl border border-zinc-200 bg-white px-6 py-4 text-center shadow-sm transition-all hover:scale-105 hover:shadow-md dark:border-zinc-700 dark:bg-zinc-800">
+    <div className="flex w-full sm:w-64 flex-col items-center rounded-xl border border-zinc-200 bg-white px-6 py-4 text-center shadow-sm transition-all hover:scale-105 hover:shadow-md dark:border-zinc-700 dark:bg-zinc-800">
       <span className="text-base font-semibold text-slate-900 dark:text-white">{title}</span>
       <span className="mt-1 text-sm text-slate-500 dark:text-slate-400">{issuer}</span>
     </div>
@@ -234,12 +241,6 @@ export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
     },
   ]
 
-  const recognitions = [
-    { title: 'AWS Samurai 2017', issuer: 'Amazon Web Services' },
-    { title: 'Alexa Champions', issuer: 'Amazon Alexa' },
-    { title: 'AWS Community Builders', issuer: 'Amazon Web Services' },
-  ]
-
   const certificationsTitle = isJa ? '認定・受賞' : 'Certifications & Recognition'
   const experienceTitle = isJa ? '経歴' : 'Experience'
   const connectTitle = isJa ? '連絡先' : 'Connect'
@@ -323,7 +324,7 @@ export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
             {isJa ? 'コミュニティでの評価・受賞' : 'Community Recognition'}
           </h3>
           <div className="mt-8 flex flex-wrap justify-center gap-6">
-            {recognitions.map((recognition) => (
+            {RECOGNITIONS.map((recognition) => (
               <RecognitionBadge key={recognition.title} {...recognition} />
             ))}
           </div>
