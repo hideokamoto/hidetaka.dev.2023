@@ -81,10 +81,13 @@ export const getAdjacentEvents = async (currentEvent: WPEvent): Promise<Adjacent
     // 並列で実行
     const [previousResult, nextResult] = await Promise.all([previousPromise, nextPromise])
 
-    // _fields で id/title/slug のみ取得しているため、WPEvent として返すためにキャスト
+    // _fields で id/title/slug のみ取得しているため、型安全性のためPick型を経由してキャスト
+    const previous =
+      (previousResult.items[0] as Pick<WPEvent, 'id' | 'title' | 'slug'> | undefined) ?? null
+    const next = (nextResult.items[0] as Pick<WPEvent, 'id' | 'title' | 'slug'> | undefined) ?? null
     return {
-      previous: (previousResult.items[0] as WPEvent | undefined) ?? null,
-      next: (nextResult.items[0] as WPEvent | undefined) ?? null,
+      previous: previous as WPEvent | null,
+      next: next as WPEvent | null,
     }
   } catch (error) {
     logger.error('Failed to load adjacent events', {

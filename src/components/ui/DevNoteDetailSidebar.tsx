@@ -1,14 +1,14 @@
 import Link from 'next/link'
 import CategoryTagList, { type Category } from '@/components/ui/CategoryTagList'
 import ProfileCard from '@/components/ui/ProfileCard'
-import type { WPThought } from '@/libs/dataSources/types'
+import type { AdjacentNote } from '@/libs/dataSources/devnotes'
 
 interface DevNoteDetailSidebarProps {
   lang: 'ja' | 'en'
   basePath: string
   categories: Category[]
-  previousNote?: WPThought | null
-  nextNote?: WPThought | null
+  previousNote?: AdjacentNote | null
+  nextNote?: AdjacentNote | null
   className?: string
 }
 

@@ -82,10 +82,11 @@ function buildDescription(thought: WPThought): string {
     const text = (removeHtmlTags(candidate ?? '') ?? '').replace(/\s+/g, ' ').trim()
     if (!text) continue
 
-    if (text.length <= MAX_DESCRIPTION_LENGTH) {
+    const chars = Array.from(text)
+    if (chars.length <= MAX_DESCRIPTION_LENGTH) {
       return text
     }
-    return `${text.slice(0, MAX_DESCRIPTION_LENGTH).trimEnd()}...`
+    return `${chars.slice(0, MAX_DESCRIPTION_LENGTH).join('').trimEnd()}...`
   }
 
   return thought.title.rendered
