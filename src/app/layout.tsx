@@ -66,15 +66,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="fixed inset-0 flex justify-center sm:px-8">
             <div className="flex w-full max-w-7xl lg:px-4">
               <div
-                className="w-full ring-1 ring-zinc-100 dark:ring-zinc-300/10"
-                style={{ background: 'var(--rvt-bg)' }}
+                className="w-full"
+                style={{ background: 'var(--rvt-bg)', outline: '1px solid var(--rvt-border)' }}
               />
             </div>
           </div>
           <div className="relative">
             <a
               href="#main-content"
-              className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-indigo-600 focus:shadow-lg dark:focus:bg-zinc-800 dark:focus:text-indigo-400"
+              className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-[var(--rvt-bg)] focus:px-4 focus:py-2 focus:text-[var(--rvt-accent)] focus:shadow-lg"
             >
               Skip to content
             </a>
