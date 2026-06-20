@@ -32,16 +32,16 @@ export default function BlogReactions({
   return (
     <div className={`blog-reactions ${className}`}>
       {/* セクションヘッダー */}
-      <div className="border-b border-zinc-200 dark:border-zinc-700 mb-6">
-        <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
+      <div className="border-b mb-6" style={{ borderColor: 'var(--rvt-border)' }}>
+        <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--rvt-fg)' }}>
           {lang === 'ja' ? '⭐ この記事への反応' : '⭐ Reactions'}
         </h2>
       </div>
 
       {/* はてなスター */}
-      <div className="p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50">
+      <div className="p-4 rounded-lg" style={{ background: 'var(--rvt-bg3)' }}>
         <HatenaStar url={url} title={title} />
-        <p className="text-xs text-slate-600 dark:text-slate-400 mt-3">
+        <p className="text-xs mt-3" style={{ color: 'var(--rvt-fg2)' }}>
           {lang === 'ja'
             ? 'はてなアカウントでスターを付けることができます'
             : 'You can add stars with your Hatena account'}

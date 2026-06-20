@@ -116,18 +116,11 @@ export default function BlogTranslation({
   // 開発環境ではデバッグ情報を表示
   if (process.env.NODE_ENV === 'development' && availability === 'unavailable') {
     return (
-      <div
-        className={cn(
-          'mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg',
-          className,
-        )}
-      >
-        <p className="text-sm text-yellow-800 dark:text-yellow-200 mb-2">
-          ⚠️ Translator API Debug Info
-        </p>
-        <details className="text-xs text-yellow-700 dark:text-yellow-300">
+      <div className={cn('mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg', className)}>
+        <p className="text-sm text-yellow-800 mb-2">⚠️ Translator API Debug Info</p>
+        <details className="text-xs text-yellow-700">
           <summary className="cursor-pointer mb-2">Debug details</summary>
-          <pre className="mt-2 p-2 bg-yellow-100 dark:bg-yellow-900/40 rounded overflow-auto">
+          <pre className="mt-2 p-2 bg-yellow-100 rounded overflow-auto">
             {JSON.stringify(
               {
                 availability,
@@ -334,19 +327,22 @@ export default function BlogTranslation({
 
       {/* 利用できない場合の注記 */}
       {availability === 'unavailable' && (
-        <p className="mt-2 text-xs text-slate-600 dark:text-slate-400">{text.unavailable}</p>
+        <p className="mt-2 text-xs" style={{ color: 'var(--rvt-fg2)' }}>
+          {text.unavailable}
+        </p>
       )}
 
       {/* ダウンロード中の警告 */}
       {availability === 'downloading' && (
-        <p className="mt-2 text-sm text-amber-600 dark:text-amber-400">⚠️ {text.downloading}</p>
+        <p className="mt-2 text-sm text-amber-600">⚠️ {text.downloading}</p>
       )}
 
       {/* ローディング状態 */}
       {isTranslating && (
         <output
           aria-live="polite"
-          className="mt-3 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400"
+          className="mt-3 flex items-center gap-2 text-sm"
+          style={{ color: 'var(--rvt-fg2)' }}
         >
           <svg className="animate-spin size-4" fill="none" viewBox="0 0 24 24" aria-hidden="true">
             <circle
@@ -369,17 +365,20 @@ export default function BlogTranslation({
 
       {/* 翻訳完了メッセージ */}
       {isTranslated && (
-        <div className="mt-3 rounded-lg bg-indigo-50 p-4 text-sm text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-300">
+        <div
+          className="mt-3 rounded-lg p-4 text-sm"
+          style={{
+            background: 'color-mix(in oklch, var(--rvt-accent) 10%, transparent)',
+            color: 'var(--rvt-accent)',
+          }}
+        >
           {text.translationNote}
         </div>
       )}
 
       {/* エラーメッセージ */}
       {error && (
-        <div
-          role="alert"
-          className="mt-3 rounded-lg bg-red-50 p-4 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400"
-        >
+        <div role="alert" className="mt-3 rounded-lg bg-red-50 p-4 text-sm text-red-700">
           {error}
         </div>
       )}

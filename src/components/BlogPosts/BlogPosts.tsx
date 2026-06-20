@@ -17,7 +17,7 @@ function CardTitle({ href, children }: { href?: string; children: React.ReactNod
   return (
     <Component
       href={href || '#'}
-      className="text-base font-semibold tracking-tight text-zinc-800 dark:text-zinc-100"
+      className="text-base font-semibold tracking-tight [color:var(--rvt-fg)]"
     >
       {children}
     </Component>
@@ -41,14 +41,14 @@ function CardEyebrow({
 }: CardEyebrowProps) {
   return (
     <Component
-      className={`relative z-10 order-first mb-3 flex items-center text-sm text-zinc-400 dark:text-zinc-500 ${
+      className={`relative z-10 order-first mb-3 flex items-center text-sm [color:var(--rvt-fg3)] ${
         decorate ? 'pl-3.5' : ''
       } ${className}`}
       {...props}
     >
       {decorate && (
         <span className="absolute inset-y-0 left-0 flex items-center" aria-hidden="true">
-          <span className="h-4 w-0.5 rounded-full bg-zinc-200 dark:bg-zinc-500" />
+          <span className="h-4 w-0.5 rounded-full [background:var(--rvt-border)]" />
         </span>
       )}
       {children}
@@ -57,7 +57,7 @@ function CardEyebrow({
 }
 
 function CardDescription({ children }: { children: React.ReactNode }) {
-  return <p className="relative z-10 mt-2 text-sm text-zinc-600 dark:text-zinc-400">{children}</p>
+  return <p className="relative z-10 mt-2 text-sm [color:var(--rvt-fg2)]">{children}</p>
 }
 
 function ChevronRightIcon({ className }: { className?: string }) {
@@ -88,7 +88,7 @@ function CardCta({ children }: { children: React.ReactNode }) {
 export default function BlogPosts({ lang, posts }: { lang: string; posts: FeedItem[] }) {
   return (
     <div className="flex flex-col gap-16">
-      <div className="md:border-l md:border-zinc-100 md:pl-6 md:dark:border-zinc-700/40">
+      <div className="md:border-l md:pl-6 [border-color:var(--rvt-border)]">
         <div className="flex max-w-3xl flex-col space-y-16">
           {posts.map((article) => (
             <article key={article.href} className="md:grid md:grid-cols-4 md:items-baseline">

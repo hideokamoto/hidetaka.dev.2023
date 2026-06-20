@@ -14,6 +14,19 @@ type PaginationProps = {
   lang: string
 }
 
+const btnBase: React.CSSProperties = {
+  border: '1px solid var(--rvt-border)',
+  background: 'var(--rvt-bg2)',
+  color: 'var(--rvt-fg2)',
+  borderRadius: 'var(--rvt-radius-sm)',
+}
+
+const btnDisabled: React.CSSProperties = {
+  ...btnBase,
+  color: 'var(--rvt-fg3)',
+  cursor: 'not-allowed',
+}
+
 export default function Pagination({ currentPage, totalPages, basePath, lang }: PaginationProps) {
   if (!shouldShowPagination(totalPages)) {
     return null
@@ -31,14 +44,16 @@ export default function Pagination({ currentPage, totalPages, basePath, lang }: 
 
   return (
     <nav
-      className="flex items-center justify-between border-t border-zinc-200 dark:border-zinc-800 px-4 py-3 sm:px-6 mt-12"
+      className="flex items-center justify-between px-4 py-3 sm:px-6 mt-12"
+      style={{ borderTop: '1px solid var(--rvt-border)' }}
       aria-label="Pagination"
     >
       <div className="flex flex-1 justify-between sm:justify-start">
         {prevPage ? (
           <Link
             href={prevHref}
-            className="relative inline-flex items-center rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+            className="relative inline-flex items-center px-4 py-2 text-sm font-medium transition-colors"
+            style={btnBase}
           >
             <svg className="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
@@ -51,7 +66,10 @@ export default function Pagination({ currentPage, totalPages, basePath, lang }: 
             {prevText}
           </Link>
         ) : (
-          <div className="relative inline-flex items-center rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-400 dark:text-zinc-600 cursor-not-allowed">
+          <div
+            className="relative inline-flex items-center px-4 py-2 text-sm font-medium"
+            style={btnDisabled}
+          >
             <svg className="mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
                 strokeLinecap="round"
@@ -66,21 +84,20 @@ export default function Pagination({ currentPage, totalPages, basePath, lang }: 
       </div>
 
       <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-center">
-        <div>
-          <p className="text-sm text-zinc-700 dark:text-zinc-300">
-            <span className="font-medium">{currentPage}</span>
-            <span className="mx-1">/</span>
-            <span className="font-medium">{totalPages}</span>
-            <span className="ml-1">{pageText}</span>
-          </p>
-        </div>
+        <p className="text-sm" style={{ color: 'var(--rvt-fg2)' }}>
+          <span className="font-medium">{currentPage}</span>
+          <span className="mx-1">/</span>
+          <span className="font-medium">{totalPages}</span>
+          <span className="ml-1">{pageText}</span>
+        </p>
       </div>
 
       <div className="flex flex-1 justify-end">
         {nextPage ? (
           <Link
             href={nextHref}
-            className="relative inline-flex items-center rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+            className="relative inline-flex items-center px-4 py-2 text-sm font-medium transition-colors"
+            style={btnBase}
           >
             {nextText}
             <svg className="ml-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -88,7 +105,10 @@ export default function Pagination({ currentPage, totalPages, basePath, lang }: 
             </svg>
           </Link>
         ) : (
-          <div className="relative inline-flex items-center rounded-md border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 py-2 text-sm font-medium text-zinc-400 dark:text-zinc-600 cursor-not-allowed">
+          <div
+            className="relative inline-flex items-center px-4 py-2 text-sm font-medium"
+            style={btnDisabled}
+          >
             {nextText}
             <svg className="ml-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

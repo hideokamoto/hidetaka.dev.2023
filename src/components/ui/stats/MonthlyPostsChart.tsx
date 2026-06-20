@@ -72,7 +72,7 @@ export default function MonthlyPostsChart({ data, lang }: Props) {
   }
 
   return (
-    <div className="h-72 w-full text-slate-500 dark:text-slate-400">
+    <div className="h-72 w-full" style={{ color: 'var(--rvt-fg2)' }}>
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="currentColor" strokeOpacity={0.15} />
@@ -135,25 +135,33 @@ function StatsTooltip({
   const total = entries.reduce((sum, p) => sum + (p.value ?? 0), 0)
 
   return (
-    <div className="rounded-lg border border-zinc-200 bg-white/95 px-3 py-2 text-xs shadow-lg dark:border-zinc-700 dark:bg-zinc-900/95">
-      <p className="mb-1 font-semibold text-slate-900 dark:text-white">
+    <div
+      className="rounded-lg px-3 py-2 text-xs shadow-lg"
+      style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+    >
+      <p className="mb-1 font-semibold" style={{ color: 'var(--rvt-fg)' }}>
         {label ? formatMonthLabel(label, isJa) : ''}
       </p>
       {entries.map((p) => (
         <div key={p.dataKey} className="flex items-center justify-between gap-3">
-          <span className="flex items-center gap-1.5 text-slate-600 dark:text-slate-300">
+          <span className="flex items-center gap-1.5" style={{ color: 'var(--rvt-fg2)' }}>
             <span
               className="inline-block h-2 w-2 rounded-full"
               style={{ backgroundColor: p.color }}
             />
             {p.dataKey}
           </span>
-          <span className="font-medium text-slate-900 dark:text-white">{p.value}</span>
+          <span className="font-medium" style={{ color: 'var(--rvt-fg)' }}>
+            {p.value}
+          </span>
         </div>
       ))}
-      <div className="mt-1 flex items-center justify-between gap-3 border-t border-zinc-200 pt-1 dark:border-zinc-700">
-        <span className="text-slate-600 dark:text-slate-300">{isJa ? '合計' : 'Total'}</span>
-        <span className="font-semibold text-slate-900 dark:text-white">
+      <div
+        className="mt-1 flex items-center justify-between gap-3 border-t pt-1"
+        style={{ borderColor: 'var(--rvt-border)' }}
+      >
+        <span style={{ color: 'var(--rvt-fg2)' }}>{isJa ? '合計' : 'Total'}</span>
+        <span className="font-semibold" style={{ color: 'var(--rvt-fg)' }}>
           {total}
           {isJa ? '本' : ''}
         </span>

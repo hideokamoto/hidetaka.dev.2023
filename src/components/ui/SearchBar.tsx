@@ -17,11 +17,12 @@ export default function SearchBar({
     <div className={`relative ${className}`}>
       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
         <svg
-          className="h-5 w-5 text-slate-400"
+          className="h-5 w-5"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
           aria-hidden="true"
+          style={{ color: 'var(--rvt-fg3)' }}
         >
           <path
             strokeLinecap="round"
@@ -37,7 +38,13 @@ export default function SearchBar({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         aria-label={label ?? placeholder}
-        className="block w-full rounded-lg border border-zinc-200 bg-white py-2.5 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white dark:placeholder-slate-500 dark:focus:border-indigo-400 dark:focus:ring-indigo-400"
+        className="block w-full py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 transition-colors"
+        style={{
+          border: '1px solid var(--rvt-border)',
+          background: 'var(--rvt-bg2)',
+          color: 'var(--rvt-fg)',
+          borderRadius: 'var(--rvt-radius-md)',
+        }}
       />
     </div>
   )

@@ -42,8 +42,10 @@ function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string })
   })()
 
   const CardContent = (
-    <article className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all hover:border-indigo-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700">
-      {/* Image - Top (if available) */}
+    <article
+      className="relative overflow-hidden rounded-2xl transition-all hover:border-indigo-300 hover:shadow-xl"
+      style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+    >
       {imageUrl && (
         <div className="relative aspect-[4/3] w-full overflow-hidden">
           <Image
@@ -56,16 +58,14 @@ function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string })
         </div>
       )}
 
-      {/* Content */}
       <div className={`p-5 lg:p-6 ${imageUrl ? '' : 'pt-6'}`}>
         <div className="flex flex-col gap-3">
-          {/* Date and DataSource */}
           <div className="flex items-center gap-3 flex-wrap">
             <DateDisplay
               date={date}
               lang={lang}
               format="short"
-              className="text-xs font-semibold text-slate-500 dark:text-slate-400"
+              className="text-xs font-semibold [color:var(--rvt-fg2)]"
             />
             {item.dataSource && (
               <Tag variant="purple" size="sm">
@@ -74,21 +74,24 @@ function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string })
             )}
           </div>
 
-          {/* Title */}
-          <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+          <h3
+            className="text-lg font-bold leading-tight transition-colors group-hover:text-indigo-600"
+            style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+          >
             {title}
           </h3>
 
-          {/* Description */}
           {description && (
-            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-3">
+            <p className="text-sm leading-relaxed line-clamp-3" style={{ color: 'var(--rvt-fg2)' }}>
               {description}
               {description.length >= 150 ? '...' : ''}
             </p>
           )}
 
-          {/* Read more indicator */}
-          <div className="flex items-center text-sm font-medium text-indigo-600 dark:text-indigo-400 mt-1">
+          <div
+            className="flex items-center text-sm font-medium mt-1"
+            style={{ color: 'var(--rvt-accent)' }}
+          >
             {lang === 'ja' ? '記事を読む' : 'Read article'}
             <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -149,7 +152,10 @@ function Sidebar({
       {/* データソースフィルター */}
       {availableDataSources.length > 0 && (
         <div>
-          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
+          <h3
+            className="mb-3 text-sm font-semibold uppercase tracking-wider"
+            style={{ fontFamily: 'var(--rvt-font-mono)', color: 'var(--rvt-fg)' }}
+          >
             {sourceTitle}
           </h3>
           <nav className="space-y-1">
@@ -176,7 +182,8 @@ function Sidebar({
                       href={sourceHref}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="ml-4 text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-1"
+                      className="ml-4 text-xs flex items-center gap-1 hover:opacity-80"
+                      style={{ color: 'var(--rvt-accent)' }}
                     >
                       {lang === 'ja' ? '元のサイトで見る' : 'View on original site'}
                       <svg
@@ -371,7 +378,7 @@ export default function WritingPageContent({
       />
 
       {/* Heroセクション + メインコンテンツ */}
-      <section className="pt-12 sm:pt-16 pb-8 sm:pb-12 bg-white dark:bg-zinc-900">
+      <section className="pt-12 sm:pt-16 pb-8 sm:pb-12" style={{ background: 'var(--rvt-bg)' }}>
         <Container>
           <PageHeader title={title} description={description} />
 
@@ -414,12 +421,15 @@ export default function WritingPageContent({
 
                 {/* 外部動線セクション */}
                 {availableDataSources.length > 0 && (
-                  <div className="mt-16 pt-16 border-t border-zinc-200 dark:border-zinc-800">
+                  <div className="mt-16 pt-16" style={{ borderTop: '1px solid var(--rvt-border)' }}>
                     <div className="text-center">
-                      <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
+                      <h3
+                        className="text-lg font-semibold mb-4"
+                        style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+                      >
                         {lang === 'ja' ? 'もっと記事を見る' : 'View More Articles'}
                       </h3>
-                      <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
+                      <p className="text-sm mb-6" style={{ color: 'var(--rvt-fg2)' }}>
                         {lang === 'ja'
                           ? '最新20件を表示しています。それ以前の記事は各サイトでご覧ください。'
                           : 'Showing the latest 20 articles. View older articles on each site.'}
@@ -433,7 +443,13 @@ export default function WritingPageContent({
                               href={sourceHref}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:border-indigo-400 dark:hover:border-indigo-600 transition-colors"
+                              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-colors hover:border-indigo-400"
+                              style={{
+                                border: '1px solid var(--rvt-border)',
+                                background: 'var(--rvt-bg2)',
+                                color: 'var(--rvt-fg2)',
+                                borderRadius: 'var(--rvt-radius-sm)',
+                              }}
                             >
                               <span className="font-medium">{source}</span>
                               <svg
@@ -459,7 +475,7 @@ export default function WritingPageContent({
               </>
             ) : (
               <div className="py-12 text-center">
-                <p className="text-slate-600 dark:text-slate-400">
+                <p style={{ color: 'var(--rvt-fg2)' }}>
                   {lang === 'ja' ? '該当する記事が見つかりませんでした。' : 'No articles found.'}
                 </p>
               </div>

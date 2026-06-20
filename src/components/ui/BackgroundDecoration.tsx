@@ -9,29 +9,70 @@ export default function BackgroundDecoration({
 }: BackgroundDecorationProps) {
   if (variant === 'hero') {
     return (
-      <>
-        {/* Background decoration */}
-        <div className={`absolute inset-0 overflow-hidden ${className}`}>
-          <div className="absolute right-0 top-0 h-[600px] w-[600px] rounded-full bg-indigo-200/50 blur-3xl dark:bg-indigo-900/20" />
-          <div className="absolute bottom-0 left-0 h-[500px] w-[500px] rounded-full bg-purple-200/40 blur-3xl dark:bg-purple-900/15" />
-          <div className="absolute left-1/2 top-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-cyan-200/30 blur-3xl dark:bg-cyan-900/10" />
-        </div>
-
-        {/* Grid pattern overlay */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000003_1px,transparent_1px),linear-gradient(to_bottom,#00000003_1px,transparent_1px)] bg-[size:4rem_4rem]" />
-      </>
+      <div
+        aria-hidden="true"
+        className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            top: -200,
+            right: -200,
+            width: 700,
+            height: 700,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, var(--rvt-accent-glow) 0%, transparent 65%)',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            bottom: -100,
+            left: '20%',
+            width: 400,
+            height: 400,
+            borderRadius: '50%',
+            background:
+              'radial-gradient(circle, color-mix(in oklch, var(--rvt-accent2) 15%, transparent) 0%, transparent 65%)',
+          }}
+        />
+      </div>
     )
   }
 
   if (variant === 'section') {
     return (
-      <div className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}>
-        <div className="absolute top-0 right-1/4 h-[500px] w-[500px] rounded-full bg-indigo-100/30 blur-3xl dark:bg-indigo-900/10" />
-        <div className="absolute bottom-0 left-1/4 h-[500px] w-[500px] rounded-full bg-purple-100/30 blur-3xl dark:bg-purple-900/10" />
+      <div
+        aria-hidden="true"
+        className={`absolute inset-0 overflow-hidden pointer-events-none ${className}`}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            right: '25%',
+            width: 500,
+            height: 500,
+            borderRadius: '50%',
+            background:
+              'radial-gradient(circle, color-mix(in oklch, var(--rvt-accent) 8%, transparent) 0%, transparent 70%)',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: '25%',
+            width: 400,
+            height: 400,
+            borderRadius: '50%',
+            background:
+              'radial-gradient(circle, color-mix(in oklch, var(--rvt-accent2) 8%, transparent) 0%, transparent 70%)',
+          }}
+        />
       </div>
     )
   }
 
-  // custom variant - no default decoration
   return null
 }

@@ -24,16 +24,18 @@ function BlogCard({ item, lang }: { item: BlogItem; lang: string }) {
 
   return (
     <Link href={item.href} className="group block">
-      <article className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all hover:border-indigo-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700">
+      <article
+        className="relative overflow-hidden rounded-2xl transition-all hover:border-indigo-300 hover:shadow-xl"
+        style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+      >
         <div className="p-5 lg:p-6">
           <div className="flex flex-col gap-3">
-            {/* Date and Categories */}
             <div className="flex items-center gap-3 flex-wrap">
               <DateDisplay
                 date={date}
                 lang={lang}
                 format="short"
-                className="text-xs font-semibold text-slate-500 dark:text-slate-400"
+                className="text-xs font-semibold [color:var(--rvt-fg2)]"
               />
               {item.categories &&
                 item.categories.length > 0 &&
@@ -44,21 +46,27 @@ function BlogCard({ item, lang }: { item: BlogItem; lang: string }) {
                 ))}
             </div>
 
-            {/* Title */}
-            <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+            <h3
+              className="text-lg font-bold leading-tight transition-colors group-hover:text-indigo-600"
+              style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+            >
               {item.title}
             </h3>
 
-            {/* Description */}
             {item.description && (
-              <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-3">
+              <p
+                className="text-sm leading-relaxed line-clamp-3"
+                style={{ color: 'var(--rvt-fg2)' }}
+              >
                 {item.description}
                 {item.description.length >= 150 ? '...' : ''}
               </p>
             )}
 
-            {/* Read more indicator */}
-            <div className="flex items-center text-sm font-medium text-indigo-600 dark:text-indigo-400 mt-1">
+            <div
+              className="flex items-center text-sm font-medium mt-1"
+              style={{ color: 'var(--rvt-accent)' }}
+            >
               {lang === 'ja' ? '続きを読む' : 'Read more'}
               <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -81,7 +89,7 @@ function NoArticlesMessage({ lang }: { lang: string }) {
   if (lang === 'ja') {
     return (
       <div className="py-12 text-center">
-        <p className="text-slate-600 dark:text-slate-400">記事が見つかりませんでした。</p>
+        <p style={{ color: 'var(--rvt-fg2)' }}>記事が見つかりませんでした。</p>
       </div>
     )
   }
@@ -89,15 +97,21 @@ function NoArticlesMessage({ lang }: { lang: string }) {
   return (
     <div className="py-12 text-center">
       <div className="max-w-2xl mx-auto space-y-4">
-        <p className="text-slate-600 dark:text-slate-400">No articles found in English.</p>
-        <div className="rounded-lg border border-indigo-200 bg-indigo-50 dark:border-indigo-800 dark:bg-indigo-900/20 p-6">
-          <p className="text-sm text-slate-700 dark:text-slate-300 mb-4">
+        <p style={{ color: 'var(--rvt-fg2)' }}>No articles found in English.</p>
+        <div
+          className="rounded-lg p-6"
+          style={{
+            border: '1px solid var(--rvt-border-accent)',
+            background: 'color-mix(in oklch, var(--rvt-accent) 8%, transparent)',
+          }}
+        >
+          <p className="text-sm mb-4" style={{ color: 'var(--rvt-fg2)' }}>
             However, we have articles available in Japanese! You can view them using a translation
             tool if needed.
           </p>
           <Link
             href="/ja/blog"
-            className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600"
+            className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-700"
           >
             View Japanese Blog
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -133,22 +147,28 @@ function BlogSidebar({
   return (
     <div className="hidden lg:block space-y-6">
       <div>
-        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
+        <h3
+          className="mb-3 text-sm font-semibold uppercase tracking-wider"
+          style={{ fontFamily: 'var(--rvt-font-mono)', color: 'var(--rvt-fg)' }}
+        >
           {categoryTitle}
         </h3>
         <nav className="space-y-1">
           <Link
             href={blogBasePath}
-            className={`w-full flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${
+            className="w-full flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors"
+            style={
               !currentCategorySlug
-                ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'
-                : 'text-slate-700 hover:bg-zinc-50 dark:text-slate-300 dark:hover:bg-zinc-800'
-            }`}
+                ? {
+                    background: 'color-mix(in oklch, var(--rvt-accent) 10%, transparent)',
+                    color: 'var(--rvt-accent)',
+                  }
+                : { color: 'var(--rvt-fg2)' }
+            }
           >
             <span>{allText}</span>
           </Link>
           {categories.map((category) => {
-            // category.slugが既にエンコードされている可能性があるので、一度デコードしてからエンコード
             const normalizedSlug = category.slug.includes('%')
               ? decodeURIComponent(category.slug)
               : category.slug
@@ -159,19 +179,27 @@ function BlogSidebar({
               <Link
                 key={category.id}
                 href={categoryUrl}
-                className={`w-full flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${
+                className="w-full flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors"
+                style={
                   isActive
-                    ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'
-                    : 'text-slate-700 hover:bg-zinc-50 dark:text-slate-300 dark:hover:bg-zinc-800'
-                }`}
+                    ? {
+                        background: 'color-mix(in oklch, var(--rvt-accent) 10%, transparent)',
+                        color: 'var(--rvt-accent)',
+                      }
+                    : { color: 'var(--rvt-fg2)' }
+                }
               >
                 <span>{category.name}</span>
                 <span
-                  className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
+                  className="ml-2 rounded-full px-2 py-0.5 text-xs"
+                  style={
                     isActive
-                      ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300'
-                      : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400'
-                  }`}
+                      ? {
+                          background: 'color-mix(in oklch, var(--rvt-accent) 15%, transparent)',
+                          color: 'var(--rvt-accent)',
+                        }
+                      : { background: 'var(--rvt-bg3)', color: 'var(--rvt-fg3)' }
+                  }
                 >
                   {category.count > 20 ? '20+' : category.count}
                 </span>
@@ -228,7 +256,7 @@ export default function BlogPageContent({
     : undefined
 
   return (
-    <section className="pt-12 sm:pt-16 pb-8 sm:pb-12 bg-white dark:bg-zinc-900">
+    <section className="pt-12 sm:pt-16 pb-8 sm:pb-12" style={{ background: 'var(--rvt-bg)' }}>
       <Container>
         <PageHeader title={title} description={description} />
 

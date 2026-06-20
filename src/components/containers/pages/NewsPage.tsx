@@ -15,34 +15,42 @@ function NewsCard({ item, lang }: { item: BlogItem; lang: string }) {
 
   return (
     <Link href={item.href} className="group block">
-      <article className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all hover:border-indigo-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700">
+      <article
+        className="relative overflow-hidden rounded-2xl transition-all hover:border-indigo-300 hover:shadow-xl"
+        style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+      >
         <div className="p-5 lg:p-6">
           <div className="flex flex-col gap-3">
-            {/* Date */}
             <div className="flex items-center gap-3 flex-wrap">
               <DateDisplay
                 date={date}
                 lang={lang}
                 format="short"
-                className="text-xs font-semibold text-slate-500 dark:text-slate-400"
+                className="text-xs font-semibold [color:var(--rvt-fg2)]"
               />
             </div>
 
-            {/* Title */}
-            <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+            <h3
+              className="text-lg font-bold leading-tight transition-colors group-hover:text-indigo-600"
+              style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+            >
               {item.title}
             </h3>
 
-            {/* Description */}
             {item.description && (
-              <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-3">
+              <p
+                className="text-sm leading-relaxed line-clamp-3"
+                style={{ color: 'var(--rvt-fg2)' }}
+              >
                 {item.description}
                 {item.description.length >= 150 ? '...' : ''}
               </p>
             )}
 
-            {/* Read more indicator */}
-            <div className="flex items-center text-sm font-medium text-indigo-600 dark:text-indigo-400 mt-1">
+            <div
+              className="flex items-center text-sm font-medium mt-1"
+              style={{ color: 'var(--rvt-accent)' }}
+            >
               {lang === 'ja' ? '続きを読む' : 'Read more'}
               <svg className="ml-1 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path
@@ -64,7 +72,7 @@ function NewsCard({ item, lang }: { item: BlogItem; lang: string }) {
 function NoArticlesMessage({ lang }: { lang: string }) {
   return (
     <div className="py-12 text-center">
-      <p className="text-slate-600 dark:text-slate-400">
+      <p style={{ color: 'var(--rvt-fg2)' }}>
         {lang === 'ja' ? '製品ニュースが見つかりませんでした。' : 'No product news found.'}
       </p>
     </div>
@@ -79,7 +87,7 @@ export default function NewsPageContent({ lang, products }: NewsPageProps) {
       : 'Product releases, updates, and announcements for my projects and libraries.'
 
   return (
-    <section className="pt-12 sm:pt-16 pb-8 sm:pb-12 bg-white dark:bg-zinc-900">
+    <section className="pt-12 sm:pt-16 pb-8 sm:pb-12" style={{ background: 'var(--rvt-bg)' }}>
       <Container>
         <PageHeader title={title} description={description} />
 

@@ -88,7 +88,8 @@ export default function BlogDetailPage({
             <div className="flex items-center text-sm">
               <Link
                 href={basePath}
-                className="font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors"
+                className="font-medium text-slate-500 hover:text-slate-900 transition-colors"
+                style={{ color: 'var(--rvt-fg2)' }}
               >
                 {blogLabel}
               </Link>
@@ -96,7 +97,7 @@ export default function BlogDetailPage({
                 viewBox="0 0 20 20"
                 fill="currentColor"
                 aria-hidden="true"
-                className="ml-2 size-5 shrink-0 text-slate-300 dark:text-slate-600"
+                className="ml-2 size-5 shrink-0 text-slate-300"
               >
                 <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
               </svg>
@@ -104,7 +105,10 @@ export default function BlogDetailPage({
           </li>
           <li>
             <div className="flex items-center text-sm">
-              <span className="font-medium text-slate-900 dark:text-slate-100 line-clamp-1">
+              <span
+                className="font-medium text-slate-900 line-clamp-1"
+                style={{ color: 'var(--rvt-fg)' }}
+              >
                 {thought.title.rendered}
               </span>
             </div>
@@ -132,12 +136,15 @@ export default function BlogDetailPage({
             date={date}
             lang={lang}
             format="long"
-            className="mb-4 text-sm font-medium text-slate-600 dark:text-slate-400"
+            className="mb-4 text-sm font-medium [color:var(--rvt-fg2)]"
           />
 
           {/* タイトル */}
           <header className="mb-6">
-            <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-5xl">
+            <h1
+              className="text-4xl font-bold tracking-tight text-zinc-900 sm:text-5xl"
+              style={{ color: 'var(--rvt-fg)' }}
+            >
               {thought.title.rendered}
             </h1>
           </header>
@@ -175,17 +182,16 @@ export default function BlogDetailPage({
           />
 
           {/* コンテンツ */}
-          <TransformedBlogContent
-            thought={thought}
-            className="blog-content text-zinc-700 dark:text-zinc-300 leading-relaxed"
-          />
+          <div style={{ color: 'var(--rvt-fg2)' }}>
+            <TransformedBlogContent thought={thought} className="blog-content leading-relaxed" />
+          </div>
 
           {/* SNS共有ボタン */}
           <SocialShareButtons
             url={new URL(`${basePath}/${thought.slug}`, SITE_CONFIG.url).toString()}
             title={thought.title.rendered}
             lang={lang}
-            className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700"
+            className="mt-12 pt-8 border-t border-zinc-200 [border-color:var(--rvt-border)]"
           />
 
           {/* CTA（行動喚起） */}
@@ -203,7 +209,7 @@ export default function BlogDetailPage({
             slug={thought.slug}
             lang={lang}
             enableHatenaStar={enableHatenaStar}
-            className="mt-12 pt-8 border-t border-zinc-200 dark:border-zinc-700"
+            className="mt-12 pt-8 border-t border-zinc-200 [border-color:var(--rvt-border)]"
           />
 
           {/* 関連記事 */}
@@ -213,19 +219,27 @@ export default function BlogDetailPage({
           {(previousThought || nextThought) && (
             <nav
               aria-label="記事ナビゲーション"
-              className="mt-16 pt-8 border-t border-zinc-200 dark:border-zinc-700 lg:hidden"
+              className="mt-16 pt-8 border-t border-zinc-200 lg:hidden"
+              style={{ borderColor: 'var(--rvt-border)' }}
             >
               <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
                 {/* 次の記事 */}
                 {nextThought && (
                   <Link
                     href={`${basePath}/${nextThought.slug}`}
-                    className="group flex flex-col flex-1 p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors"
+                    className="group flex flex-col flex-1 p-4 rounded-lg border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 transition-colors"
+                    style={{ borderColor: 'var(--rvt-border)', background: 'var(--rvt-bg2)' }}
                   >
-                    <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">
+                    <span
+                      className="text-sm font-medium text-zinc-500 mb-1"
+                      style={{ color: 'var(--rvt-fg2)' }}
+                    >
                       ← {nextLabel}
                     </span>
-                    <span className="text-base font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2">
+                    <span
+                      className="text-base font-semibold text-zinc-900 group-hover:text-indigo-600 transition-colors line-clamp-2"
+                      style={{ color: 'var(--rvt-fg)' }}
+                    >
                       {nextThought.title.rendered}
                     </span>
                   </Link>
@@ -235,12 +249,19 @@ export default function BlogDetailPage({
                 {previousThought && (
                   <Link
                     href={`${basePath}/${previousThought.slug}`}
-                    className="group flex flex-col flex-1 p-4 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors text-right"
+                    className="group flex flex-col flex-1 p-4 rounded-lg border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 transition-colors text-right"
+                    style={{ borderColor: 'var(--rvt-border)', background: 'var(--rvt-bg2)' }}
                   >
-                    <span className="text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-1">
+                    <span
+                      className="text-sm font-medium text-zinc-500 mb-1"
+                      style={{ color: 'var(--rvt-fg2)' }}
+                    >
                       {previousLabel} →
                     </span>
-                    <span className="text-base font-semibold text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-2">
+                    <span
+                      className="text-base font-semibold text-zinc-900 group-hover:text-indigo-600 transition-colors line-clamp-2"
+                      style={{ color: 'var(--rvt-fg)' }}
+                    >
                       {previousThought.title.rendered}
                     </span>
                   </Link>

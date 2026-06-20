@@ -17,15 +17,19 @@ export default function StackItemCard({
 }: StackItemCardProps) {
   return (
     <div
-      className={`group flex flex-col items-center justify-center rounded-2xl border border-zinc-200 bg-white p-8 text-center transition-all hover:shadow-lg hover:border-indigo-200 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-800 ${className}`}
+      className={`group flex flex-col items-center justify-center rounded-2xl p-8 text-center transition-all hover:shadow-lg hover:border-indigo-200 ${className}`}
+      style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
     >
       <GradientBadge gradient={gradient}>{name}</GradientBadge>
       {focusLabel && (
-        <p className="mt-6 text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+        <p
+          className="mt-6 text-xs font-semibold uppercase tracking-widest"
+          style={{ color: 'var(--rvt-fg2)' }}
+        >
           {focusLabel}
         </p>
       )}
-      <p className="mt-3 text-sm font-medium leading-relaxed text-slate-700 dark:text-slate-300">
+      <p className="mt-3 text-sm font-medium leading-relaxed" style={{ color: 'var(--rvt-fg2)' }}>
         {description}
       </p>
     </div>

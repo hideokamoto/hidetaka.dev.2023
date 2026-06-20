@@ -16,13 +16,19 @@ export default function PageHeader({
   return (
     <header className={`max-w-3xl mb-8 ${className}`}>
       <h1
-        className={`text-4xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-5xl ${titleClassName}`}
+        className={`text-4xl font-bold tracking-tight sm:text-5xl ${titleClassName}`}
+        style={{
+          fontFamily: 'var(--rvt-font-display)',
+          color: 'var(--rvt-fg)',
+          letterSpacing: '-0.03em',
+        }}
       >
         {title}
       </h1>
       {description && (
         <p
-          className={`mt-3 text-lg leading-relaxed text-slate-600 dark:text-slate-400 ${descriptionClassName}`}
+          className={`mt-3 text-lg leading-relaxed ${descriptionClassName}`}
+          style={{ color: 'var(--rvt-fg2)' }}
         >
           {description}
         </p>

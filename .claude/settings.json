@@ -46,8 +46,6 @@
     ]
   },
   "permissions": {
-    "allow": [
-      "Bash(chunk:*)"
-    ]
+    "allow": ["Bash(chunk:*)"]
   }
 }

@@ -100,8 +100,10 @@ function UnifiedProjectCard({ project, lang }: { project: MicroCMSProjectsRecord
 
   return (
     <Link href={href} className="group block">
-      <article className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all hover:border-indigo-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700">
-        {/* Image - Top */}
+      <article
+        className="relative overflow-hidden rounded-2xl transition-all hover:border-indigo-300 hover:shadow-xl"
+        style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+      >
         {project.image && (
           <div className="relative aspect-[4/3] w-full overflow-hidden">
             <Image
@@ -114,7 +116,6 @@ function UnifiedProjectCard({ project, lang }: { project: MicroCMSProjectsRecord
           </div>
         )}
 
-        {/* Content - Bottom */}
         <div className="p-5 lg:p-6">
           <div className="flex flex-col gap-3">
             <div className="flex items-center justify-between gap-2">
@@ -123,18 +124,24 @@ function UnifiedProjectCard({ project, lang }: { project: MicroCMSProjectsRecord
                   date={date}
                   lang={lang}
                   format="short"
-                  className="text-xs font-semibold text-slate-500 dark:text-slate-400"
+                  className="text-xs font-semibold [color:var(--rvt-fg2)]"
                 />
               )}
               {project.status && <Badge label={statusLabel} variant={statusVariant} />}
             </div>
 
-            <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+            <h3
+              className="text-lg font-bold leading-tight transition-colors group-hover:text-indigo-600"
+              style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+            >
               {project.title}
             </h3>
 
             {project.about && (
-              <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-2">
+              <p
+                className="text-sm leading-relaxed line-clamp-2"
+                style={{ color: 'var(--rvt-fg2)' }}
+              >
                 {project.about.replace(/<[^>]*>/g, '').substring(0, 120)}
                 {project.about.replace(/<[^>]*>/g, '').length > 120 ? '...' : ''}
               </p>
@@ -174,8 +181,10 @@ function UnifiedOSSCard({
 
     return (
       <a href={href} target="_blank" rel="noopener noreferrer" className="group block">
-        <article className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all hover:border-indigo-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700">
-          {/* Content */}
+        <article
+          className="relative overflow-hidden rounded-2xl transition-all hover:border-indigo-300 hover:shadow-xl"
+          style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+        >
           <div className="p-5 lg:p-6">
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between gap-2">
@@ -183,17 +192,23 @@ function UnifiedOSSCard({
                   date={date}
                   lang={lang}
                   format="short"
-                  className="text-xs font-semibold text-slate-500 dark:text-slate-400"
+                  className="text-xs font-semibold [color:var(--rvt-fg2)]"
                 />
                 <Badge label={statusLabel} variant={statusVariant} />
               </div>
 
-              <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+              <h3
+                className="text-lg font-bold leading-tight transition-colors group-hover:text-indigo-600"
+                style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+              >
                 {pkg.name}
               </h3>
 
               {pkg.description && (
-                <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-2">
+                <p
+                  className="text-sm leading-relaxed line-clamp-2"
+                  style={{ color: 'var(--rvt-fg2)' }}
+                >
                   {pkg.description}
                 </p>
               )}
@@ -216,8 +231,10 @@ function UnifiedOSSCard({
 
     return (
       <a href={href} target="_blank" rel="noopener noreferrer" className="group block">
-        <article className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all hover:border-indigo-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700">
-          {/* Content */}
+        <article
+          className="relative overflow-hidden rounded-2xl transition-all hover:border-indigo-300 hover:shadow-xl"
+          style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+        >
           <div className="p-5 lg:p-6">
             <div className="flex flex-col gap-3">
               <div className="flex items-center justify-between gap-2">
@@ -225,17 +242,23 @@ function UnifiedOSSCard({
                   date={date}
                   lang={lang}
                   format="short"
-                  className="text-xs font-semibold text-slate-500 dark:text-slate-400"
+                  className="text-xs font-semibold [color:var(--rvt-fg2)]"
                 />
                 <Badge label={statusLabel} variant={statusVariant} />
               </div>
 
-              <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+              <h3
+                className="text-lg font-bold leading-tight transition-colors group-hover:text-indigo-600"
+                style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+              >
                 {plugin.name}
               </h3>
 
               {plugin.short_description && (
-                <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-2">
+                <p
+                  className="text-sm leading-relaxed line-clamp-2"
+                  style={{ color: 'var(--rvt-fg2)' }}
+                >
                   {plugin.short_description}
                 </p>
               )}
@@ -258,21 +281,26 @@ function OSSContributionLink({ project }: { project: MicroCMSProjectsRecord }) {
       href={project.url}
       target="_blank"
       rel="noopener noreferrer"
-      className="group flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-4 py-3 transition-all hover:border-indigo-300 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700"
+      className="group flex items-center justify-between rounded-lg px-4 py-3 transition-all hover:border-indigo-300 hover:shadow-md"
+      style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
     >
       <div className="flex flex-col gap-1">
-        <span className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+        <span
+          className="text-sm font-semibold transition-colors group-hover:text-indigo-600"
+          style={{ color: 'var(--rvt-fg)' }}
+        >
           {project.title}
         </span>
         {project.about && (
-          <span className="text-xs text-slate-600 dark:text-slate-400 line-clamp-1">
+          <span className="text-xs line-clamp-1" style={{ color: 'var(--rvt-fg2)' }}>
             {project.about.replace(/<[^>]*>/g, '').substring(0, 80)}
             {project.about.replace(/<[^>]*>/g, '').length > 80 ? '...' : ''}
           </span>
         )}
       </div>
       <svg
-        className="h-5 w-5 shrink-0 text-slate-400 transition-transform group-hover:translate-x-1 group-hover:text-indigo-600 dark:text-slate-500 dark:group-hover:text-indigo-400"
+        className="h-5 w-5 shrink-0 transition-transform group-hover:translate-x-1 group-hover:text-indigo-600"
+        style={{ color: 'var(--rvt-fg3)' }}
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
@@ -409,12 +437,15 @@ function StatsBar({
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 text-center transition-all hover:border-indigo-300 hover:shadow-md dark:hover:border-indigo-700"
+          className="rounded-xl p-4 text-center transition-all hover:border-indigo-300 hover:shadow-md"
+          style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
         >
-          <div className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">
+          <div className="text-3xl font-bold" style={{ color: 'var(--rvt-accent)' }}>
             {stat.value}
           </div>
-          <div className="mt-2 text-sm text-slate-600 dark:text-slate-400">{stat.label}</div>
+          <div className="mt-2 text-sm" style={{ color: 'var(--rvt-fg2)' }}>
+            {stat.label}
+          </div>
         </div>
       ))}
     </div>
@@ -428,43 +459,52 @@ function WorkCTA({ lang }: { lang: string }) {
   const subtitle = lang === 'ja' ? 'お気軽にご連絡ください。' : 'Feel free to reach out'
 
   return (
-    <section className="py-12 sm:py-16 bg-slate-50 dark:bg-zinc-800/50 border-t border-zinc-200 dark:border-zinc-700">
+    <section
+      className="py-12 sm:py-16"
+      style={{ background: 'var(--rvt-bg2)', borderTop: '1px solid var(--rvt-border)' }}
+    >
       <Container>
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+          <h2
+            className="text-3xl sm:text-4xl font-bold mb-4"
+            style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+          >
             {title}
           </h2>
-          <p className="text-lg text-slate-600 dark:text-slate-400 mb-8">{subtitle}</p>
+          <p className="text-lg mb-8" style={{ color: 'var(--rvt-fg2)' }}>
+            {subtitle}
+          </p>
 
-          {/* ソーシャルリンク */}
           <div className="flex justify-center gap-4">
-            <a
-              href={SITE_CONFIG.social.twitter.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={SITE_CONFIG.social.twitter.ariaLabel}
-              className="group flex items-center justify-center h-12 w-12 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 transition hover:border-indigo-300 hover:bg-indigo-50 dark:hover:border-indigo-700 dark:hover:bg-zinc-800"
-            >
-              <TwitterIcon className="h-5 w-5 fill-slate-500 transition group-hover:fill-indigo-600 dark:fill-slate-400 dark:group-hover:fill-indigo-400" />
-            </a>
-            <a
-              href={SITE_CONFIG.social.github.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={SITE_CONFIG.social.github.ariaLabel}
-              className="group flex items-center justify-center h-12 w-12 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 transition hover:border-indigo-300 hover:bg-indigo-50 dark:hover:border-indigo-700 dark:hover:bg-zinc-800"
-            >
-              <GitHubIcon className="h-5 w-5 fill-slate-500 transition group-hover:fill-indigo-600 dark:fill-slate-400 dark:group-hover:fill-indigo-400" />
-            </a>
-            <a
-              href={SITE_CONFIG.social.linkedin.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={SITE_CONFIG.social.linkedin.ariaLabel}
-              className="group flex items-center justify-center h-12 w-12 rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-700 transition hover:border-indigo-300 hover:bg-indigo-50 dark:hover:border-indigo-700 dark:hover:bg-zinc-800"
-            >
-              <LinkedInIcon className="h-5 w-5 fill-slate-500 transition group-hover:fill-indigo-600 dark:fill-slate-400 dark:group-hover:fill-indigo-400" />
-            </a>
+            {[
+              {
+                href: SITE_CONFIG.social.twitter.url,
+                aria: SITE_CONFIG.social.twitter.ariaLabel,
+                Icon: TwitterIcon,
+              },
+              {
+                href: SITE_CONFIG.social.github.url,
+                aria: SITE_CONFIG.social.github.ariaLabel,
+                Icon: GitHubIcon,
+              },
+              {
+                href: SITE_CONFIG.social.linkedin.url,
+                aria: SITE_CONFIG.social.linkedin.ariaLabel,
+                Icon: LinkedInIcon,
+              },
+            ].map(({ href, aria, Icon }) => (
+              <a
+                key={href}
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={aria}
+                className="group flex items-center justify-center h-12 w-12 rounded-lg transition hover:border-indigo-300"
+                style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg)' }}
+              >
+                <Icon className="h-5 w-5 fill-[var(--rvt-fg3)] transition group-hover:fill-indigo-600" />
+              </a>
+            ))}
           </div>
         </div>
       </Container>
@@ -511,7 +551,10 @@ function Sidebar({
 
       {/* フィルター */}
       <div>
-        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
+        <h3
+          className="mb-3 text-sm font-semibold uppercase tracking-wider"
+          style={{ fontFamily: 'var(--rvt-font-mono)', color: 'var(--rvt-fg)' }}
+        >
           {filterTitle}
         </h3>
         <nav className="space-y-1">
@@ -781,7 +824,10 @@ export default function WorkPageContent({
       />
 
       {/* Heroセクション + メインコンテンツ */}
-      <section className="relative pt-12 sm:pt-16 pb-8 sm:pb-12 bg-white dark:bg-zinc-900">
+      <section
+        className="relative pt-12 sm:pt-16 pb-8 sm:pb-12"
+        style={{ background: 'var(--rvt-bg)' }}
+      >
         <BackgroundDecoration variant="section" />
 
         <Container className="relative">
@@ -828,7 +874,10 @@ export default function WorkPageContent({
               categorizedOSS.active.length > 0 ||
               categorizedOSSContributions.active.length > 0) && (
               <div className="mb-16">
-                <h2 className="mb-8 text-3xl font-bold text-slate-900 dark:text-white">
+                <h2
+                  className="mb-8 text-3xl font-bold"
+                  style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+                >
                   {lang === 'ja' ? 'アクティブな製品' : 'Active Products'}
                 </h2>
 
@@ -836,7 +885,10 @@ export default function WorkPageContent({
                 {(filterCategory === 'all' || filterCategory === 'projects') &&
                   categorizedProjects.active.length > 0 && (
                     <div className="mb-12">
-                      <h3 className="mb-6 text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white">
+                      <h3
+                        className="mb-6 text-xl sm:text-2xl lg:text-3xl font-bold"
+                        style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+                      >
                         {lang === 'ja' ? 'プロジェクト' : 'Projects'}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
@@ -851,7 +903,10 @@ export default function WorkPageContent({
                 {(filterCategory === 'all' || filterCategory === 'books') &&
                   categorizedBooks.active.length > 0 && (
                     <div className="mb-12">
-                      <h3 className="mb-6 text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white">
+                      <h3
+                        className="mb-6 text-xl sm:text-2xl lg:text-3xl font-bold"
+                        style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+                      >
                         {lang === 'ja' ? '書籍' : 'Books'}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
@@ -866,7 +921,10 @@ export default function WorkPageContent({
                 {(filterCategory === 'all' || filterCategory === 'open-source') &&
                   categorizedOSS.active.length > 0 && (
                     <div className="mb-12">
-                      <h3 className="mb-6 text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white">
+                      <h3
+                        className="mb-6 text-xl sm:text-2xl lg:text-3xl font-bold"
+                        style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+                      >
                         {lang === 'ja' ? 'オープンソース' : 'Open Source'}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
@@ -881,7 +939,10 @@ export default function WorkPageContent({
                 {(filterCategory === 'all' || filterCategory === 'oss-contribution') &&
                   categorizedOSSContributions.active.length > 0 && (
                     <div className="mb-12">
-                      <h3 className="mb-6 text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white">
+                      <h3
+                        className="mb-6 text-xl sm:text-2xl lg:text-3xl font-bold"
+                        style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+                      >
                         {lang === 'ja' ? 'OSS貢献' : 'OSS Contributions'}
                       </h3>
                       <div className="space-y-3">
@@ -900,7 +961,10 @@ export default function WorkPageContent({
               categorizedOSS.archived.length > 0 ||
               categorizedOSSContributions.archived.length > 0) && (
               <div className="mb-12">
-                <h2 className="mb-8 text-3xl font-bold text-slate-900 dark:text-white">
+                <h2
+                  className="mb-8 text-3xl font-bold"
+                  style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+                >
                   {lang === 'ja' ? 'アーカイブ' : 'Archive'}
                 </h2>
 
@@ -908,7 +972,10 @@ export default function WorkPageContent({
                 {(filterCategory === 'all' || filterCategory === 'projects') &&
                   categorizedProjects.archived.length > 0 && (
                     <div className="mb-12">
-                      <h3 className="mb-6 text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white">
+                      <h3
+                        className="mb-6 text-xl sm:text-2xl lg:text-3xl font-bold"
+                        style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+                      >
                         {lang === 'ja' ? 'プロジェクト' : 'Projects'}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
@@ -923,7 +990,10 @@ export default function WorkPageContent({
                 {(filterCategory === 'all' || filterCategory === 'books') &&
                   categorizedBooks.archived.length > 0 && (
                     <div className="mb-12">
-                      <h3 className="mb-6 text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white">
+                      <h3
+                        className="mb-6 text-xl sm:text-2xl lg:text-3xl font-bold"
+                        style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+                      >
                         {lang === 'ja' ? '書籍' : 'Books'}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
@@ -938,7 +1008,10 @@ export default function WorkPageContent({
                 {(filterCategory === 'all' || filterCategory === 'open-source') &&
                   categorizedOSS.archived.length > 0 && (
                     <div className="mb-12">
-                      <h3 className="mb-6 text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white">
+                      <h3
+                        className="mb-6 text-xl sm:text-2xl lg:text-3xl font-bold"
+                        style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+                      >
                         {lang === 'ja' ? 'オープンソース' : 'Open Source'}
                       </h3>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
@@ -953,7 +1026,10 @@ export default function WorkPageContent({
                 {(filterCategory === 'all' || filterCategory === 'oss-contribution') &&
                   categorizedOSSContributions.archived.length > 0 && (
                     <div className="mb-12">
-                      <h3 className="mb-6 text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white">
+                      <h3
+                        className="mb-6 text-xl sm:text-2xl lg:text-3xl font-bold"
+                        style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+                      >
                         {lang === 'ja' ? 'OSS貢献' : 'OSS Contributions'}
                       </h3>
                       <div className="space-y-3">
@@ -976,7 +1052,7 @@ export default function WorkPageContent({
               categorizedOSSContributions.active.length === 0 &&
               categorizedOSSContributions.archived.length === 0 && (
                 <div className="py-12 text-center">
-                  <p className="text-slate-600 dark:text-slate-400">
+                  <p style={{ color: 'var(--rvt-fg2)' }}>
                     {lang === 'ja' ? '該当する項目が見つかりませんでした。' : 'No items found.'}
                   </p>
                 </div>

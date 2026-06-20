@@ -32,13 +32,17 @@ export default function SpeakingDetailSidebar({
           {/* 次のレポート */}
           {nextReport && (
             <div>
-              <h3 className="lg:mb-2 lg:text-sm lg:font-semibold text-slate-900 dark:text-white">
+              <h3
+                className="lg:mb-2 lg:text-sm lg:font-semibold"
+                style={{ color: 'var(--rvt-fg)' }}
+              >
                 {nextLabel}
               </h3>
               <Link
                 href={`${basePath}/${nextReport.slug}`}
                 aria-label={`${nextLabel}: ${nextReport.title.rendered}`}
-                className="block lg:p-3 lg:text-sm lg:font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/20 lg:rounded-lg transition-colors line-clamp-2"
+                className="block lg:p-3 lg:text-sm lg:font-medium text-indigo-600 hover:text-indigo-700 lg:rounded-lg transition-colors line-clamp-2"
+                style={{ background: 'color-mix(in oklch, var(--rvt-accent) 10%, transparent)' }}
               >
                 {nextReport.title.rendered}
               </Link>
@@ -48,13 +52,17 @@ export default function SpeakingDetailSidebar({
           {/* 前のレポート */}
           {previousReport && (
             <div>
-              <h3 className="lg:mb-2 lg:text-sm lg:font-semibold text-slate-900 dark:text-white">
+              <h3
+                className="lg:mb-2 lg:text-sm lg:font-semibold"
+                style={{ color: 'var(--rvt-fg)' }}
+              >
                 {previousLabel}
               </h3>
               <Link
                 href={`${basePath}/${previousReport.slug}`}
                 aria-label={`${previousLabel}: ${previousReport.title.rendered}`}
-                className="block lg:p-3 lg:text-sm lg:font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/20 lg:rounded-lg transition-colors line-clamp-2"
+                className="block lg:p-3 lg:text-sm lg:font-medium text-indigo-600 hover:text-indigo-700 lg:rounded-lg transition-colors line-clamp-2"
+                style={{ background: 'color-mix(in oklch, var(--rvt-accent) 10%, transparent)' }}
               >
                 {previousReport.title.rendered}
               </Link>
@@ -67,7 +75,8 @@ export default function SpeakingDetailSidebar({
       <Link
         href={lang === 'ja' ? '/ja/speaking' : '/speaking'}
         aria-label={backLabel}
-        className="block lg:text-sm lg:font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+        className="block lg:text-sm lg:font-medium hover:text-slate-900 transition-colors"
+        style={{ color: 'var(--rvt-fg2)' }}
       >
         ← {backLabel}
       </Link>

@@ -44,7 +44,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
 
   return (
     <Container className="mt-8 sm:mt-16">
-      <div className="bg-white dark:bg-zinc-900">
+      <div style={{ background: 'var(--rvt-bg)' }}>
         <div className="mx-auto max-w-2xl px-4 pb-16 sm:px-6 sm:pb-24 lg:grid lg:max-w-7xl lg:grid-cols-2 lg:gap-x-8 lg:px-8">
           <div className="lg:max-w-lg lg:self-end">
             <nav aria-label="Breadcrumb">
@@ -53,7 +53,8 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                   <div className="flex items-center text-sm">
                     <a
                       href="/ja/work"
-                      className="font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+                      className="font-medium text-zinc-500 hover:text-zinc-900"
+                      style={{ color: 'var(--rvt-fg2)' }}
                     >
                       Work
                     </a>
@@ -61,7 +62,8 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                       viewBox="0 0 20 20"
                       fill="currentColor"
                       aria-hidden="true"
-                      className="ml-2 size-5 shrink-0 text-zinc-300 dark:text-zinc-600"
+                      className="ml-2 size-5 shrink-0 text-zinc-300"
+                      style={{ color: 'var(--rvt-fg3)' }}
                     >
                       <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
                     </svg>
@@ -70,12 +72,18 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                 {project.project_type.map((type) => (
                   <li key={type}>
                     <div className="flex items-center text-sm">
-                      <span className="font-medium text-zinc-500 dark:text-zinc-400">{type}</span>
+                      <span
+                        className="font-medium text-zinc-500"
+                        style={{ color: 'var(--rvt-fg2)' }}
+                      >
+                        {type}
+                      </span>
                       <svg
                         viewBox="0 0 20 20"
                         fill="currentColor"
                         aria-hidden="true"
-                        className="ml-2 size-5 shrink-0 text-zinc-300 dark:text-zinc-600"
+                        className="ml-2 size-5 shrink-0 text-zinc-300"
+                        style={{ color: 'var(--rvt-fg3)' }}
                       >
                         <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
                       </svg>
@@ -85,7 +93,10 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
               </ol>
             </nav>
             <div className="mt-4">
-              <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-4xl">
+              <h1
+                className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl"
+                style={{ color: 'var(--rvt-fg)' }}
+              >
                 {project.title}
               </h1>
             </div>
@@ -94,12 +105,17 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                 Product information
               </h2>
               <div className="flex items-center">
-                <p className="text-lg text-zinc-900 dark:text-white sm:text-xl">Free to use</p>
+                <p className="text-lg text-zinc-900 sm:text-xl" style={{ color: 'var(--rvt-fg)' }}>
+                  Free to use
+                </p>
                 {project.published_at && (
-                  <div className="ml-4 border-l border-zinc-300 dark:border-zinc-600 pl-4">
+                  <div
+                    className="ml-4 border-l border-zinc-300 pl-4"
+                    style={{ borderColor: 'var(--rvt-border)' }}
+                  >
                     <h2 className="sr-only">Release date</h2>
                     <div className="flex items-center">
-                      <p className="ml-2 text-sm text-zinc-500 dark:text-zinc-400">
+                      <p className="ml-2 text-sm text-zinc-500" style={{ color: 'var(--rvt-fg2)' }}>
                         Released at{' '}
                         {new Date(project.published_at).toLocaleDateString('ja-JP', {
                           day: 'numeric',
@@ -114,7 +130,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
               </div>
               {project.about && (
                 <div className="mt-4 space-y-6">
-                  <p className="text-base text-zinc-500 dark:text-zinc-400">
+                  <p className="text-base text-zinc-500" style={{ color: 'var(--rvt-fg2)' }}>
                     {project.about.replace(/<[^>]*>/g, '')}
                   </p>
                 </div>
@@ -151,7 +167,12 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
               </h2>
               <div className="mt-8">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-sm font-medium text-zinc-900 dark:text-white">tools</h2>
+                  <h2
+                    className="text-sm font-medium text-zinc-900"
+                    style={{ color: 'var(--rvt-fg)' }}
+                  >
+                    tools
+                  </h2>
                 </div>
                 <div className="grid grid-cols-3 gap-3 sm:grid-cols-4">
                   {project.tags.map((tag) => (
@@ -169,7 +190,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
                   href={project.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-zinc-50 dark:focus:ring-offset-zinc-900"
+                  className="flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                 >
                   Visit application
                 </a>
@@ -180,11 +201,15 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
       </div>
       {project.background && (
         <div className="mx-auto max-w-2xl px-4 pb-16 sm:px-6 sm:pb-24 lg:max-w-7xl">
-          <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-3xl my-4">
+          <h2
+            className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-3xl my-4"
+            style={{ color: 'var(--rvt-fg)' }}
+          >
             Background
           </h2>
           <div
-            className="text-zinc-700 dark:text-zinc-300"
+            className="text-zinc-700"
+            style={{ color: 'var(--rvt-fg2)' }}
             // biome-ignore lint/security/noDangerouslySetInnerHtml: Content is from trusted microCMS, controlled by site owner
             dangerouslySetInnerHTML={{
               __html:
@@ -197,11 +222,15 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
       )}
       {project.architecture && (
         <div className="mx-auto max-w-2xl px-4 pb-16 sm:px-6 sm:pb-24 lg:max-w-7xl">
-          <h2 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-3xl my-4">
+          <h2
+            className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-3xl my-4"
+            style={{ color: 'var(--rvt-fg)' }}
+          >
             Architecture
           </h2>
           <div
-            className="text-zinc-700 dark:text-zinc-300"
+            className="text-zinc-700"
+            style={{ color: 'var(--rvt-fg2)' }}
             // biome-ignore lint/security/noDangerouslySetInnerHtml: Content is from trusted microCMS, controlled by site owner
             dangerouslySetInnerHTML={{
               __html:

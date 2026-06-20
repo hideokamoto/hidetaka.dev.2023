@@ -12,18 +12,12 @@ import GitHubIcon from './SocialIcons/GitHub'
 import LinkedInIcon from './SocialIcons/LinkedIn'
 import TwitterIcon from './SocialIcons/Twitter'
 
-/**
- * Renders a styled navigation link used in the footer navigation.
- *
- * @param href - Destination URL or path for the link
- * @param children - Visible label or content for the link
- * @returns A Next.js `Link` element styled for footer navigation
- */
 function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <Link
       href={href}
-      className="text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
+      className="text-sm font-medium transition-colors hover:text-indigo-600"
+      style={{ color: 'var(--rvt-fg2)' }}
     >
       {children}
     </Link>
@@ -64,21 +58,42 @@ export default function Footer() {
 
   return (
     <footer className="relative mt-32 overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute bottom-0 left-0 h-64 w-64 rounded-full bg-indigo-200/20 blur-3xl dark:bg-indigo-900/10" />
-        <div className="absolute bottom-0 right-1/4 h-48 w-48 rounded-full bg-purple-200/15 blur-3xl dark:bg-purple-900/10" />
+      <div aria-hidden="true" className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            width: 300,
+            height: 300,
+            borderRadius: '50%',
+            background: 'radial-gradient(circle, var(--rvt-accent-glow) 0%, transparent 70%)',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            right: '25%',
+            width: 200,
+            height: 200,
+            borderRadius: '50%',
+            background:
+              'radial-gradient(circle, color-mix(in oklch, var(--rvt-accent2) 12%, transparent) 0%, transparent 70%)',
+          }}
+        />
       </div>
 
       <OuterContainer>
-        <div className="relative border-t border-zinc-200 dark:border-zinc-800 pt-16 pb-20">
+        <div className="relative pt-16 pb-20" style={{ borderTop: '1px solid var(--rvt-border)' }}>
           <InnerContainer>
             <div className="flex flex-col gap-12">
-              {/* Top section: Navigation and Social Links */}
               <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
-                {/* Navigation */}
                 <div className="flex flex-col gap-6">
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
+                  <h3
+                    className="text-sm font-semibold uppercase tracking-wider"
+                    style={{ fontFamily: 'var(--rvt-font-mono)', color: 'var(--rvt-fg)' }}
+                  >
                     Navigation
                   </h3>
                   <nav className="flex flex-col gap-4">
@@ -103,9 +118,11 @@ export default function Footer() {
                   </nav>
                 </div>
 
-                {/* Language Switcher */}
                 <div className="flex flex-col gap-6">
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
+                  <h3
+                    className="text-sm font-semibold uppercase tracking-wider"
+                    style={{ fontFamily: 'var(--rvt-font-mono)', color: 'var(--rvt-fg)' }}
+                  >
                     Language
                   </h3>
                   <nav className="flex flex-col gap-4">
@@ -118,49 +135,52 @@ export default function Footer() {
                   </nav>
                 </div>
 
-                {/* Social Links */}
                 <div className="flex flex-col gap-6">
-                  <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
+                  <h3
+                    className="text-sm font-semibold uppercase tracking-wider"
+                    style={{ fontFamily: 'var(--rvt-font-mono)', color: 'var(--rvt-fg)' }}
+                  >
                     Connect
                   </h3>
                   <ul className="flex flex-col gap-4">
-                    <li>
-                      <a
-                        href={SITE_CONFIG.social.twitter.url}
-                        aria-label={SITE_CONFIG.social.twitter.ariaLabel}
-                        className="group flex items-center gap-3 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
-                      >
-                        <TwitterIcon className="h-5 w-5 flex-none fill-slate-500 transition-colors group-hover:fill-indigo-600 dark:fill-slate-400 dark:group-hover:fill-indigo-400" />
-                        <span>{SITE_CONFIG.social.twitter.label}</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href={SITE_CONFIG.social.github.url}
-                        aria-label={SITE_CONFIG.social.github.ariaLabel}
-                        className="group flex items-center gap-3 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
-                      >
-                        <GitHubIcon className="h-5 w-5 flex-none fill-slate-500 transition-colors group-hover:fill-indigo-600 dark:fill-slate-400 dark:group-hover:fill-indigo-400" />
-                        <span>{SITE_CONFIG.social.github.label}</span>
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href={SITE_CONFIG.social.linkedin.url}
-                        aria-label={SITE_CONFIG.social.linkedin.ariaLabel}
-                        className="group flex items-center gap-3 text-sm font-medium text-slate-700 dark:text-slate-300 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
-                      >
-                        <LinkedInIcon className="h-5 w-5 flex-none fill-slate-500 transition-colors group-hover:fill-indigo-600 dark:fill-slate-400 dark:group-hover:fill-indigo-400" />
-                        <span>{SITE_CONFIG.social.linkedin.label}</span>
-                      </a>
-                    </li>
+                    {[
+                      {
+                        href: SITE_CONFIG.social.twitter.url,
+                        ariaLabel: SITE_CONFIG.social.twitter.ariaLabel,
+                        label: SITE_CONFIG.social.twitter.label,
+                        Icon: TwitterIcon,
+                      },
+                      {
+                        href: SITE_CONFIG.social.github.url,
+                        ariaLabel: SITE_CONFIG.social.github.ariaLabel,
+                        label: SITE_CONFIG.social.github.label,
+                        Icon: GitHubIcon,
+                      },
+                      {
+                        href: SITE_CONFIG.social.linkedin.url,
+                        ariaLabel: SITE_CONFIG.social.linkedin.ariaLabel,
+                        label: SITE_CONFIG.social.linkedin.label,
+                        Icon: LinkedInIcon,
+                      },
+                    ].map(({ href, ariaLabel, label, Icon }) => (
+                      <li key={href}>
+                        <a
+                          href={href}
+                          aria-label={ariaLabel}
+                          className="group flex items-center gap-3 text-sm font-medium transition-colors hover:text-indigo-600"
+                          style={{ color: 'var(--rvt-fg2)' }}
+                        >
+                          <Icon className="h-5 w-5 flex-none fill-[var(--rvt-fg3)] transition-colors group-hover:fill-indigo-600" />
+                          <span>{label}</span>
+                        </a>
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </div>
 
-              {/* Bottom section: Copyright */}
-              <div className="border-t border-zinc-200 dark:border-zinc-800 pt-8">
-                <p className="text-sm text-slate-600 dark:text-slate-400 text-center sm:text-left">
+              <div className="pt-8" style={{ borderTop: '1px solid var(--rvt-border)' }}>
+                <p className="text-sm text-center sm:text-left" style={{ color: 'var(--rvt-fg3)' }}>
                   &copy; {new Date().getFullYear()} {SITE_CONFIG.author.name}. All rights reserved.
                 </p>
               </div>

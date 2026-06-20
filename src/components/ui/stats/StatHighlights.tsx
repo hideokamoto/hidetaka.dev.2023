@@ -36,10 +36,16 @@ export default function StatHighlights({ total, currentWeeks, longestWeeks, lang
       {highlights.map((item) => (
         <div
           key={item.label}
-          className="rounded-2xl border border-zinc-200 bg-white p-6 text-center dark:border-zinc-800 dark:bg-zinc-900"
+          className="rounded-2xl p-6 text-center"
+          style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
         >
-          <dt className="text-sm font-medium text-slate-500 dark:text-slate-400">{item.label}</dt>
-          <dd className="mt-2 text-4xl font-extrabold tracking-tight text-indigo-600 dark:text-indigo-400">
+          <dt className="text-sm font-medium" style={{ color: 'var(--rvt-fg2)' }}>
+            {item.label}
+          </dt>
+          <dd
+            className="mt-2 text-4xl font-extrabold tracking-tight"
+            style={{ color: 'var(--rvt-accent)' }}
+          >
             {item.value}
           </dd>
         </div>

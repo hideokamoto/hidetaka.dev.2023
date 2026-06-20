@@ -180,22 +180,21 @@ export default function ArticleSummary({ content, locale, className = '' }: Arti
 
       {/* 利用できない場合の注記 */}
       {availability === 'unavailable' && (
-        <p className="mt-2 text-xs text-slate-600 dark:text-slate-400">{text.unavailable}</p>
+        <p className="mt-2 text-xs" style={{ color: 'var(--rvt-fg2)' }}>
+          {text.unavailable}
+        </p>
       )}
 
       {/* ダウンロード中の警告 */}
       {availability === 'downloading' && (
-        <p className="mt-2 text-sm text-amber-600 dark:text-amber-400">⚠️ {text.downloading}</p>
+        <p className="mt-2 text-sm text-amber-600">⚠️ {text.downloading}</p>
       )}
 
       {/* ローディング状態(aria-live領域は常にマウントし、中身のみ切り替える) */}
       <output
         aria-live="polite"
-        className={
-          isLoading
-            ? 'mt-3 flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400'
-            : undefined
-        }
+        className={isLoading ? 'mt-3 flex items-center gap-2 text-sm' : undefined}
+        style={isLoading ? { color: 'var(--rvt-fg2)' } : undefined}
       >
         {isLoading && (
           <>
@@ -221,21 +220,24 @@ export default function ArticleSummary({ content, locale, className = '' }: Arti
 
       {/* エラーメッセージ */}
       {error && (
-        <div
-          role="alert"
-          className="mt-3 rounded-lg bg-red-50 p-4 text-sm text-red-700 dark:bg-red-900/20 dark:text-red-400"
-        >
+        <div role="alert" className="mt-3 rounded-lg bg-red-50 p-4 text-sm text-red-700">
           {error}
         </div>
       )}
 
       {/* 要約結果 */}
       {summary && (
-        <div className="mt-3 rounded-lg border border-indigo-200 bg-indigo-50 p-6 dark:border-indigo-800 dark:bg-indigo-900/20">
-          <h3 className="text-lg font-semibold text-indigo-900 dark:text-indigo-100 mb-3">
+        <div
+          className="mt-3 rounded-lg p-6"
+          style={{
+            border: '1px solid var(--rvt-border)',
+            background: 'color-mix(in oklch, var(--rvt-accent) 10%, transparent)',
+          }}
+        >
+          <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--rvt-accent)' }}>
             {text.summaryTitle}
           </h3>
-          <div className="prose prose-sm dark:prose-invert max-w-none text-indigo-900 dark:text-indigo-100">
+          <div className="prose prose-sm max-w-none" style={{ color: 'var(--rvt-accent)' }}>
             <div className="whitespace-pre-wrap">{summary}</div>
           </div>
         </div>
