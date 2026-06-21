@@ -1,0 +1,11 @@
+{
+  "skills": [
+    {
+      "name": "hidetaka-okamoto-profile",
+      "description": "Use when the user asks about Hidetaka Okamoto (@hideokamoto) — his background and work history, open-source projects, conference talks and speaking history, or his technical writing on Stripe, SaaS development, WordPress, and developer experience. hidetaka.dev is his bilingual (English by default, Japanese under /ja) portfolio and developer blog. Use to surface his profile, projects, talks, or articles even if the user does not mention hidetaka.dev explicitly.",
+      "files": [
+        "SKILL.md"
+      ]
+    }
+  ]
+}
