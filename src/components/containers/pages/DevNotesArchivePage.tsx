@@ -23,8 +23,8 @@ function DevNoteCard({ item, lang }: { item: BlogItem; lang: string }) {
   return (
     <Link href={item.href} className="group block">
       <article
-        className="relative overflow-hidden rounded-2xl transition-all hover:border-indigo-300 hover:shadow-xl"
-        style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+        className="relative overflow-hidden rounded-2xl border border-[var(--rvt-border)] transition-all hover:border-indigo-300 hover:shadow-xl"
+        style={{ background: 'var(--rvt-bg2)' }}
       >
         <div className="p-5 lg:p-6">
           <div className="flex flex-col gap-3">

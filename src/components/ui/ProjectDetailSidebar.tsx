@@ -90,8 +90,7 @@ export default function ProjectDetailSidebar({
       <Link
         href={basePath}
         aria-label={backLabel}
-        className="block text-sm font-medium transition-colors hover:text-[var(--rvt-fg)]"
-        style={{ color: 'var(--rvt-fg2)' }}
+        className="block text-sm font-medium text-[var(--rvt-fg2)] transition-colors hover:text-[var(--rvt-fg)]"
       >
         ← {backLabel}
       </Link>

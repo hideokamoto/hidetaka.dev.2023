@@ -41,8 +41,8 @@ export default function RelatedArticles({
             <Link
               key={article.id || article.href}
               href={article.href}
-              className="group flex flex-col rounded-2xl p-6 transition-colors hover:border-[var(--rvt-border-accent)]"
-              style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+              className="group flex flex-col rounded-2xl p-6 border border-[var(--rvt-border)] transition-colors hover:border-[var(--rvt-border-accent)]"
+              style={{ background: 'var(--rvt-bg2)' }}
             >
               <h3
                 className="mb-3 text-base font-semibold leading-snug transition-colors line-clamp-2 group-hover:text-[var(--rvt-accent)]"

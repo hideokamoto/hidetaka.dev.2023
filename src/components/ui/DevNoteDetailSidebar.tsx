@@ -89,8 +89,7 @@ export default function DevNoteDetailSidebar({
       <Link
         href={lang === 'ja' ? '/ja/writing' : '/writing'}
         aria-label={backLabel}
-        className="block lg:text-sm lg:font-medium hover:text-[var(--rvt-fg)] transition-colors"
-        style={{ color: 'var(--rvt-fg2)' }}
+        className="block lg:text-sm lg:font-medium text-[var(--rvt-fg2)] hover:text-[var(--rvt-fg)] transition-colors"
       >
         ← {backLabel}
       </Link>

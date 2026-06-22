@@ -38,8 +38,7 @@ export default function PageShell({
             {item.href ? (
               <Link
                 href={item.href}
-                className="transition-colors hover:text-[var(--rvt-fg2)]"
-                style={{ color: 'var(--rvt-fg3)' }}
+                className="text-[var(--rvt-fg3)] transition-colors hover:text-[var(--rvt-fg2)]"
               >
                 {item.label}
               </Link>
