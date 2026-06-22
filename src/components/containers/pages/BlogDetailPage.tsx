@@ -4,9 +4,10 @@ import TransformedBlogContent from '@/components/BlogPosts/TransformedBlogConten
 import Container from '@/components/tailwindui/Container'
 import ArticleActions from '@/components/ui/ArticleActions'
 import ArticleCTA from '@/components/ui/ArticleCTA'
+import ArticleMeta from '@/components/ui/ArticleMeta'
 import BlogDetailSidebar from '@/components/ui/BlogDetailSidebar'
 import CategoryTagList from '@/components/ui/CategoryTagList'
-import DateDisplay from '@/components/ui/DateDisplay'
+import PageShell from '@/components/ui/PageShell'
 import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
 import BlogReactions from '@/components/ui/reactions/BlogReactions'
@@ -58,8 +59,8 @@ export default function BlogDetailPage({
   nextThought,
   relatedArticles = [],
 }: BlogDetailPageProps) {
-  const date = new Date(thought.date)
   const blogLabel = lang === 'ja' ? 'ブログ' : 'Blog'
+  const homeLabel = lang === 'ja' ? 'ホーム' : 'Home'
   const previousLabel = lang === 'ja' ? '前の記事' : 'Previous'
   const nextLabel = lang === 'ja' ? '次の記事' : 'Next'
 
@@ -81,40 +82,15 @@ export default function BlogDetailPage({
 
   return (
     <Container className="mt-16 sm:mt-32">
-      {/* パンくずリスト */}
-      <nav aria-label="Breadcrumb" className="mb-8">
-        <ol className="flex items-center space-x-2">
-          <li>
-            <div className="flex items-center text-sm">
-              <Link
-                href={basePath}
-                className="font-medium text-slate-500 hover:text-slate-900 transition-colors"
-                style={{ color: 'var(--rvt-fg2)' }}
-              >
-                {blogLabel}
-              </Link>
-              <svg
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-                className="ml-2 size-5 shrink-0 text-slate-300"
-              >
-                <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
-              </svg>
-            </div>
-          </li>
-          <li>
-            <div className="flex items-center text-sm">
-              <span
-                className="font-medium text-slate-900 line-clamp-1"
-                style={{ color: 'var(--rvt-fg)' }}
-              >
-                {thought.title.rendered}
-              </span>
-            </div>
-          </li>
-        </ol>
-      </nav>
+      {/* ヘッダー（パンくず + タイトル） */}
+      <PageShell
+        breadcrumb={[
+          { label: homeLabel, href: lang === 'ja' ? '/ja' : '/' },
+          { label: blogLabel, href: basePath },
+          { label: thought.title.rendered },
+        ]}
+        title={thought.title.rendered}
+      />
 
       {/* サイドバーレイアウト（デスクトップのみ） */}
       <SidebarLayout
@@ -131,23 +107,16 @@ export default function BlogDetailPage({
         gap="lg"
       >
         <article>
-          {/* 日付（タイトルの上に移動） */}
-          <DateDisplay
-            date={date}
-            lang={lang}
-            format="long"
-            className="mb-4 text-sm font-medium [color:var(--rvt-fg2)]"
-          />
+          {/* 公開日 / 更新日 */}
+          <ArticleMeta published={thought.date} updated={thought.modified} lang={lang} />
 
-          {/* タイトル */}
-          <header className="mb-6">
-            <h1
-              className="text-4xl font-bold tracking-tight text-zinc-900 sm:text-5xl"
-              style={{ color: 'var(--rvt-fg)' }}
-            >
-              {thought.title.rendered}
-            </h1>
-          </header>
+          {/* SNS共有ボタン */}
+          <SocialShareButtons
+            url={new URL(`${basePath}/${thought.slug}`, SITE_CONFIG.url).toString()}
+            title={thought.title.rendered}
+            lang={lang}
+            className="mb-8"
+          />
 
           {/* カテゴリ（モバイルのみ表示） */}
           {categories.length > 0 && (
@@ -186,14 +155,6 @@ export default function BlogDetailPage({
             <TransformedBlogContent thought={thought} className="blog-content leading-relaxed" />
           </div>
 
-          {/* SNS共有ボタン */}
-          <SocialShareButtons
-            url={new URL(`${basePath}/${thought.slug}`, SITE_CONFIG.url).toString()}
-            title={thought.title.rendered}
-            lang={lang}
-            className="mt-12 pt-8 border-t border-zinc-200 [border-color:var(--rvt-border)]"
-          />
-
           {/* CTA（行動喚起） */}
           <ArticleCTA lang={lang} articleType={articleType} className="mt-12" />
 
@@ -209,7 +170,7 @@ export default function BlogDetailPage({
             slug={thought.slug}
             lang={lang}
             enableHatenaStar={enableHatenaStar}
-            className="mt-12 pt-8 border-t border-zinc-200 [border-color:var(--rvt-border)]"
+            className="mt-12 pt-8 border-t [border-color:var(--rvt-border)]"
           />
 
           {/* 関連記事 */}
@@ -219,7 +180,7 @@ export default function BlogDetailPage({
           {(previousThought || nextThought) && (
             <nav
               aria-label="記事ナビゲーション"
-              className="mt-16 pt-8 border-t border-zinc-200 lg:hidden"
+              className="mt-16 pt-8 border-t lg:hidden"
               style={{ borderColor: 'var(--rvt-border)' }}
             >
               <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
@@ -227,19 +188,17 @@ export default function BlogDetailPage({
                 {nextThought && (
                   <Link
                     href={`${basePath}/${nextThought.slug}`}
-                    className="group flex flex-col flex-1 p-4 rounded-lg border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 transition-colors"
-                    style={{ borderColor: 'var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+                    className="group flex flex-col flex-1 p-4 rounded-lg transition-colors"
+                    style={{
+                      borderColor: 'var(--rvt-border)',
+                      background: 'var(--rvt-bg2)',
+                      border: '1px solid var(--rvt-border)',
+                    }}
                   >
-                    <span
-                      className="text-sm font-medium text-zinc-500 mb-1"
-                      style={{ color: 'var(--rvt-fg2)' }}
-                    >
+                    <span className="text-sm font-medium mb-1" style={{ color: 'var(--rvt-fg2)' }}>
                       ← {nextLabel}
                     </span>
-                    <span
-                      className="text-base font-semibold text-zinc-900 group-hover:text-indigo-600 transition-colors line-clamp-2"
-                      style={{ color: 'var(--rvt-fg)' }}
-                    >
+                    <span className="text-base font-semibold transition-colors line-clamp-2 text-[var(--rvt-fg)] group-hover:text-[var(--rvt-accent)]">
                       {nextThought.title.rendered}
                     </span>
                   </Link>
@@ -249,19 +208,17 @@ export default function BlogDetailPage({
                 {previousThought && (
                   <Link
                     href={`${basePath}/${previousThought.slug}`}
-                    className="group flex flex-col flex-1 p-4 rounded-lg border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 transition-colors text-right"
-                    style={{ borderColor: 'var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+                    className="group flex flex-col flex-1 p-4 rounded-lg transition-colors text-right"
+                    style={{
+                      borderColor: 'var(--rvt-border)',
+                      background: 'var(--rvt-bg2)',
+                      border: '1px solid var(--rvt-border)',
+                    }}
                   >
-                    <span
-                      className="text-sm font-medium text-zinc-500 mb-1"
-                      style={{ color: 'var(--rvt-fg2)' }}
-                    >
+                    <span className="text-sm font-medium mb-1" style={{ color: 'var(--rvt-fg2)' }}>
                       {previousLabel} →
                     </span>
-                    <span
-                      className="text-base font-semibold text-zinc-900 group-hover:text-indigo-600 transition-colors line-clamp-2"
-                      style={{ color: 'var(--rvt-fg)' }}
-                    >
+                    <span className="text-base font-semibold transition-colors line-clamp-2 text-[var(--rvt-fg)] group-hover:text-[var(--rvt-accent)]">
                       {previousThought.title.rendered}
                     </span>
                   </Link>

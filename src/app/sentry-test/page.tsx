@@ -71,10 +71,10 @@ export default function SentryTestPage() {
     return (
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-4xl font-bold text-slate-900 mb-4" style={{ color: 'var(--rvt-fg)' }}>
+          <h1 className="text-4xl font-bold mb-4" style={{ color: 'var(--rvt-fg)' }}>
             Page Not Available
           </h1>
-          <p className="text-lg text-slate-600" style={{ color: 'var(--rvt-fg2)' }}>
+          <p className="text-lg" style={{ color: 'var(--rvt-fg2)' }}>
             This page is only available in development mode.
           </p>
         </div>
@@ -86,10 +86,10 @@ export default function SentryTestPage() {
     <div className="container mx-auto px-4 py-16">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 mb-4" style={{ color: 'var(--rvt-fg)' }}>
+          <h1 className="text-4xl font-bold mb-4" style={{ color: 'var(--rvt-fg)' }}>
             Sentry Error Tracking Test
           </h1>
-          <p className="text-lg text-slate-600 mb-2" style={{ color: 'var(--rvt-fg2)' }}>
+          <p className="text-lg mb-2" style={{ color: 'var(--rvt-fg2)' }}>
             Test various types of errors to verify Sentry integration.
           </p>
           <p className="text-sm text-amber-600">
@@ -106,16 +106,13 @@ export default function SentryTestPage() {
         <div className="space-y-8">
           {/* Browser-side tests */}
           <div
-            className="bg-white border border-slate-200 rounded-lg p-6"
-            style={{ background: 'var(--rvt-bg2)', borderColor: 'var(--rvt-border)' }}
+            className="rounded-lg p-6"
+            style={{ background: 'var(--rvt-bg2)', border: '1px solid var(--rvt-border)' }}
           >
-            <h2
-              className="text-2xl font-bold text-slate-900 mb-4"
-              style={{ color: 'var(--rvt-fg)' }}
-            >
+            <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--rvt-fg)' }}>
               Browser-side Tests
             </h2>
-            <p className="text-sm text-slate-600 mb-4" style={{ color: 'var(--rvt-fg2)' }}>
+            <p className="text-sm mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               These tests run in the browser and should be captured by @sentry/browser
             </p>
             <div className="space-y-3">
@@ -145,16 +142,13 @@ export default function SentryTestPage() {
 
           {/* Server-side tests */}
           <div
-            className="bg-white border border-slate-200 rounded-lg p-6"
-            style={{ background: 'var(--rvt-bg2)', borderColor: 'var(--rvt-border)' }}
+            className="rounded-lg p-6"
+            style={{ background: 'var(--rvt-bg2)', border: '1px solid var(--rvt-border)' }}
           >
-            <h2
-              className="text-2xl font-bold text-slate-900 mb-4"
-              style={{ color: 'var(--rvt-fg)' }}
-            >
+            <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--rvt-fg)' }}>
               Server-side Tests
             </h2>
-            <p className="text-sm text-slate-600 mb-4" style={{ color: 'var(--rvt-fg2)' }}>
+            <p className="text-sm mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               These tests run on the server and should be captured by @sentry/cloudflare
             </p>
             <div className="space-y-3">

@@ -2,7 +2,8 @@ import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
 import ArticleActions from '@/components/ui/ArticleActions'
 import ArticleCTA from '@/components/ui/ArticleCTA'
-import DateDisplay from '@/components/ui/DateDisplay'
+import ArticleMeta from '@/components/ui/ArticleMeta'
+import PageShell from '@/components/ui/PageShell'
 import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
 import BlogReactions from '@/components/ui/reactions/BlogReactions'
@@ -30,68 +31,35 @@ export default function EventDetailPage({
   relatedEvents = [],
   enableHatenaStar,
 }: EventDetailPageProps) {
-  const date = new Date(event.date)
   const eventLabel = lang === 'ja' ? 'イベント' : 'Event'
+  const homeLabel = lang === 'ja' ? 'ホーム' : 'Home'
   const previousLabel = lang === 'ja' ? '前の記事' : 'Previous'
   const nextLabel = lang === 'ja' ? '次の記事' : 'Next'
 
   return (
     <Container className="mt-16 sm:mt-32">
+      <div className="max-w-3xl mx-auto">
+        {/* ヘッダー（パンくず + タイトル） */}
+        <PageShell
+          breadcrumb={[
+            { label: homeLabel, href: lang === 'ja' ? '/ja' : '/' },
+            { label: eventLabel, href: basePath },
+            { label: event.title.rendered },
+          ]}
+          title={event.title.rendered}
+        />
+      </div>
       <article className="max-w-3xl mx-auto">
-        {/* パンくずリスト */}
-        <nav aria-label="Breadcrumb" className="mb-8">
-          <ol className="flex items-center space-x-2">
-            <li>
-              <div className="flex items-center text-sm">
-                <Link
-                  href={basePath}
-                  className="font-medium text-slate-500 hover:text-slate-900 transition-colors"
-                  style={{ color: 'var(--rvt-fg2)' }}
-                >
-                  {eventLabel}
-                </Link>
-                <svg
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  aria-hidden="true"
-                  className="ml-2 size-5 shrink-0 text-slate-300"
-                >
-                  <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
-                </svg>
-              </div>
-            </li>
-            <li>
-              <div className="flex items-center text-sm">
-                <span
-                  className="font-medium text-slate-900 line-clamp-1"
-                  style={{ color: 'var(--rvt-fg)' }}
-                >
-                  {event.title.rendered}
-                </span>
-              </div>
-            </li>
-          </ol>
-        </nav>
+        {/* 公開日 / 更新日 */}
+        <ArticleMeta published={event.date} updated={event.modified} lang={lang} />
 
-        {/* タイトル */}
-        <header className="mb-6">
-          <h1
-            className="text-4xl font-bold tracking-tight text-zinc-900 sm:text-5xl"
-            style={{ color: 'var(--rvt-fg)' }}
-          >
-            {event.title.rendered}
-          </h1>
-        </header>
-
-        {/* 日付 */}
-        <div className="mb-10 flex flex-col gap-4">
-          <DateDisplay
-            date={date}
-            lang={lang}
-            format="long"
-            className="text-sm font-medium [color:var(--rvt-fg2)]"
-          />
-        </div>
+        {/* SNS共有ボタン */}
+        <SocialShareButtons
+          url={new URL(`${basePath}/${event.slug}`, SITE_CONFIG.url).toString()}
+          title={event.title.rendered}
+          lang={lang}
+          className="mb-8"
+        />
 
         {/* 記事アクション（Markdown / 要約） */}
         <ArticleActions
@@ -113,14 +81,6 @@ export default function EventDetailPage({
         {/* プロフィールカード */}
         <ProfileCard lang={lang} imageSrc="/images/profile.jpg" className="mt-12" />
 
-        {/* SNS共有ボタン */}
-        <SocialShareButtons
-          url={new URL(`${basePath}/${event.slug}`, SITE_CONFIG.url).toString()}
-          title={event.title.rendered}
-          lang={lang}
-          className={DETAIL_PAGE_SECTION_CLASS}
-        />
-
         {/* CTA */}
         <ArticleCTA lang={lang} articleType="event_report" className="mt-12" />
 
@@ -141,7 +101,7 @@ export default function EventDetailPage({
         {(previousEvent || nextEvent) && (
           <nav
             aria-label="記事ナビゲーション"
-            className="mt-16 pt-8 border-t border-zinc-200"
+            className="mt-16 pt-8 border-t"
             style={{ borderColor: 'var(--rvt-border)' }}
           >
             <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
@@ -149,19 +109,13 @@ export default function EventDetailPage({
               {nextEvent && (
                 <Link
                   href={`${basePath}/${nextEvent.slug}`}
-                  className="group flex flex-col flex-1 p-4 rounded-lg border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 transition-colors"
-                  style={{ borderColor: 'var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+                  className="group flex flex-col flex-1 p-4 rounded-lg transition-colors"
+                  style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
                 >
-                  <span
-                    className="text-sm font-medium text-zinc-500 mb-1"
-                    style={{ color: 'var(--rvt-fg2)' }}
-                  >
+                  <span className="text-sm font-medium mb-1" style={{ color: 'var(--rvt-fg2)' }}>
                     ← {nextLabel}
                   </span>
-                  <span
-                    className="text-base font-semibold text-zinc-900 group-hover:text-indigo-600 transition-colors line-clamp-2"
-                    style={{ color: 'var(--rvt-fg)' }}
-                  >
+                  <span className="text-base font-semibold transition-colors line-clamp-2 text-[var(--rvt-fg)] group-hover:text-[var(--rvt-accent)]">
                     {nextEvent.title.rendered}
                   </span>
                 </Link>
@@ -171,19 +125,13 @@ export default function EventDetailPage({
               {previousEvent && (
                 <Link
                   href={`${basePath}/${previousEvent.slug}`}
-                  className="group flex flex-col flex-1 p-4 rounded-lg border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 transition-colors text-right"
-                  style={{ borderColor: 'var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+                  className="group flex flex-col flex-1 p-4 rounded-lg transition-colors text-right"
+                  style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
                 >
-                  <span
-                    className="text-sm font-medium text-zinc-500 mb-1"
-                    style={{ color: 'var(--rvt-fg2)' }}
-                  >
+                  <span className="text-sm font-medium mb-1" style={{ color: 'var(--rvt-fg2)' }}>
                     {previousLabel} →
                   </span>
-                  <span
-                    className="text-base font-semibold text-zinc-900 group-hover:text-indigo-600 transition-colors line-clamp-2"
-                    style={{ color: 'var(--rvt-fg)' }}
-                  >
+                  <span className="text-base font-semibold transition-colors line-clamp-2 text-[var(--rvt-fg)] group-hover:text-[var(--rvt-accent)]">
                     {previousEvent.title.rendered}
                   </span>
                 </Link>

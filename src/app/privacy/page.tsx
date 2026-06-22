@@ -18,7 +18,7 @@ export default function PrivacyPolicyPage() {
               <div className="flex items-center text-sm">
                 <Link
                   href="/"
-                  className="font-medium text-slate-500 hover:text-slate-900 transition-colors"
+                  className="font-medium transition-colors"
                   style={{ color: 'var(--rvt-fg2)' }}
                 >
                   Home
@@ -27,7 +27,7 @@ export default function PrivacyPolicyPage() {
                   viewBox="0 0 20 20"
                   fill="currentColor"
                   aria-hidden="true"
-                  className="ml-2 size-5 shrink-0 text-slate-300"
+                  className="ml-2 size-5 shrink-0"
                   style={{ color: 'var(--rvt-fg3)' }}
                 >
                   <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
@@ -36,7 +36,7 @@ export default function PrivacyPolicyPage() {
             </li>
             <li>
               <div className="flex items-center text-sm">
-                <span className="font-medium text-slate-900" style={{ color: 'var(--rvt-fg)' }}>
+                <span className="font-medium" style={{ color: 'var(--rvt-fg)' }}>
                   Privacy Policy
                 </span>
               </div>
@@ -47,12 +47,12 @@ export default function PrivacyPolicyPage() {
         {/* Title */}
         <header className="mb-10">
           <h1
-            className="text-4xl font-bold tracking-tight text-zinc-900 sm:text-5xl"
+            className="text-4xl font-bold tracking-tight sm:text-5xl"
             style={{ color: 'var(--rvt-fg)' }}
           >
             Privacy Policy
           </h1>
-          <p className="mt-4 text-base text-zinc-600" style={{ color: 'var(--rvt-fg2)' }}>
+          <p className="mt-4 text-base" style={{ color: 'var(--rvt-fg2)' }}>
             Last updated: January 4, 2026
           </p>
         </header>
@@ -60,13 +60,10 @@ export default function PrivacyPolicyPage() {
         {/* Content */}
         <div className="prose prose-zinc max-w-none">
           <section className="mb-8">
-            <h2
-              className="text-2xl font-bold text-zinc-900 mb-4"
-              style={{ color: 'var(--rvt-fg)' }}
-            >
+            <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--rvt-fg)' }}>
               1. Introduction
             </h2>
-            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
+            <p className="leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               This Privacy Policy describes how Hidetaka.dev ("we", "us", or "our") collects, uses,
               and shares information when you visit our website at{' '}
               <a
@@ -81,29 +78,23 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section className="mb-8">
-            <h2
-              className="text-2xl font-bold text-zinc-900 mb-4"
-              style={{ color: 'var(--rvt-fg)' }}
-            >
+            <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--rvt-fg)' }}>
               2. Information We Collect
             </h2>
-            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
+            <p className="leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               We collect information about your visit to our Site through various third-party
               services:
             </p>
 
-            <h3
-              className="text-xl font-semibold text-zinc-900 mb-3 mt-6"
-              style={{ color: 'var(--rvt-fg)' }}
-            >
+            <h3 className="text-xl font-semibold mb-3 mt-6" style={{ color: 'var(--rvt-fg)' }}>
               2.1 Google Analytics
             </h3>
-            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
+            <p className="leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               We use Google Analytics to understand how visitors use our Site. Google Analytics
               collects information such as:
             </p>
             <ul
-              className="list-disc list-inside text-zinc-700 mb-4 space-y-2"
+              className="list-disc list-inside mb-4 space-y-2"
               style={{ color: 'var(--rvt-fg2)' }}
             >
               <li>Pages visited and time spent on each page</li>
@@ -112,7 +103,7 @@ export default function PrivacyPolicyPage() {
               <li>Geographic location (country, city)</li>
               <li>Referring websites</li>
             </ul>
-            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
+            <p className="leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               For more information about how Google uses data, please visit{' '}
               <a
                 href="https://policies.google.com/privacy"
@@ -126,25 +117,22 @@ export default function PrivacyPolicyPage() {
               .
             </p>
 
-            <h3
-              className="text-xl font-semibold text-zinc-900 mb-3 mt-6"
-              style={{ color: 'var(--rvt-fg)' }}
-            >
+            <h3 className="text-xl font-semibold mb-3 mt-6" style={{ color: 'var(--rvt-fg)' }}>
               2.2 Microsoft Clarity
             </h3>
-            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
+            <p className="leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               We use Microsoft Clarity to understand user behavior and improve user experience.
               Clarity collects:
             </p>
             <ul
-              className="list-disc list-inside text-zinc-700 mb-4 space-y-2"
+              className="list-disc list-inside mb-4 space-y-2"
               style={{ color: 'var(--rvt-fg2)' }}
             >
               <li>User interactions (clicks, scrolls, mouse movements)</li>
               <li>Session recordings</li>
               <li>Heatmaps of user activity</li>
             </ul>
-            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
+            <p className="leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               For more information, please visit{' '}
               <a
                 href="https://privacy.microsoft.com/privacystatement"
@@ -158,22 +146,19 @@ export default function PrivacyPolicyPage() {
               .
             </p>
 
-            <h3
-              className="text-xl font-semibold text-zinc-900 mb-3 mt-6"
-              style={{ color: 'var(--rvt-fg)' }}
-            >
+            <h3 className="text-xl font-semibold mb-3 mt-6" style={{ color: 'var(--rvt-fg)' }}>
               2.3 Hatena Star
             </h3>
-            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
+            <p className="leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               We use Hatena Star on Japanese blog pages. Hatena Star is a service provided by Hatena
               Co., Ltd. that allows users to add lightweight reactions (stars) to articles.
             </p>
-            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
+            <p className="leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               A Hatena account is required to use Hatena Star. For terms of service and privacy
               policy, please refer to:
             </p>
             <ul
-              className="list-disc list-inside text-zinc-700 mb-4 space-y-2"
+              className="list-disc list-inside mb-4 space-y-2"
               style={{ color: 'var(--rvt-fg2)' }}
             >
               <li>
@@ -202,22 +187,19 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section className="mb-8">
-            <h2
-              className="text-2xl font-bold text-zinc-900 mb-4"
-              style={{ color: 'var(--rvt-fg)' }}
-            >
+            <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--rvt-fg)' }}>
               3. Cookies and Tracking Technologies
             </h2>
-            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
+            <p className="leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               We use cookies and similar tracking technologies to collect and track information
               about your browsing activities. Cookies are small text files that are stored on your
               device.
             </p>
-            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
+            <p className="leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               Types of cookies we use:
             </p>
             <ul
-              className="list-disc list-inside text-zinc-700 mb-4 space-y-2"
+              className="list-disc list-inside mb-4 space-y-2"
               style={{ color: 'var(--rvt-fg2)' }}
             >
               <li>
@@ -229,24 +211,21 @@ export default function PrivacyPolicyPage() {
                 preferences
               </li>
             </ul>
-            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
+            <p className="leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               You can control cookies through your browser settings. However, disabling cookies may
               affect the functionality of our Site.
             </p>
           </section>
 
           <section className="mb-8">
-            <h2
-              className="text-2xl font-bold text-zinc-900 mb-4"
-              style={{ color: 'var(--rvt-fg)' }}
-            >
+            <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--rvt-fg)' }}>
               4. How We Use Information
             </h2>
-            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
+            <p className="leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               We use the collected information for the following purposes:
             </p>
             <ul
-              className="list-disc list-inside text-zinc-700 mb-4 space-y-2"
+              className="list-disc list-inside mb-4 space-y-2"
               style={{ color: 'var(--rvt-fg2)' }}
             >
               <li>To analyze and improve our Site's content and user experience</li>
@@ -256,17 +235,14 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section className="mb-8">
-            <h2
-              className="text-2xl font-bold text-zinc-900 mb-4"
-              style={{ color: 'var(--rvt-fg)' }}
-            >
+            <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--rvt-fg)' }}>
               5. Third-Party Services
             </h2>
-            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
+            <p className="leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               Our Site integrates with the following third-party services:
             </p>
             <ul
-              className="list-disc list-inside text-zinc-700 mb-4 space-y-2"
+              className="list-disc list-inside mb-4 space-y-2"
               style={{ color: 'var(--rvt-fg2)' }}
             >
               <li>
@@ -279,20 +255,17 @@ export default function PrivacyPolicyPage() {
                 <strong>Hatena Star:</strong> Blog reaction feature (Japanese pages only)
               </li>
             </ul>
-            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
+            <p className="leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               These third-party services have their own privacy policies. We encourage you to review
               them.
             </p>
           </section>
 
           <section className="mb-8">
-            <h2
-              className="text-2xl font-bold text-zinc-900 mb-4"
-              style={{ color: 'var(--rvt-fg)' }}
-            >
+            <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--rvt-fg)' }}>
               6. Data Security
             </h2>
-            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
+            <p className="leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               We implement reasonable security measures to protect the information collected through
               our Site. However, no method of transmission over the Internet or electronic storage
               is 100% secure.
@@ -300,45 +273,33 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section className="mb-8">
-            <h2
-              className="text-2xl font-bold text-zinc-900 mb-4"
-              style={{ color: 'var(--rvt-fg)' }}
-            >
+            <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--rvt-fg)' }}>
               7. Children's Privacy
             </h2>
-            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
+            <p className="leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               Our Site is not directed to children under the age of 13. We do not knowingly collect
               personal information from children under 13.
             </p>
           </section>
 
           <section className="mb-8">
-            <h2
-              className="text-2xl font-bold text-zinc-900 mb-4"
-              style={{ color: 'var(--rvt-fg)' }}
-            >
+            <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--rvt-fg)' }}>
               8. Changes to This Privacy Policy
             </h2>
-            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
+            <p className="leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               We may update this Privacy Policy from time to time. The updated version will be
               indicated by an updated "Last updated" date at the top of this page.
             </p>
           </section>
 
           <section className="mb-8">
-            <h2
-              className="text-2xl font-bold text-zinc-900 mb-4"
-              style={{ color: 'var(--rvt-fg)' }}
-            >
+            <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--rvt-fg)' }}>
               9. Contact Us
             </h2>
-            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
+            <p className="leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               If you have any questions about this Privacy Policy, please contact us:
             </p>
-            <ul
-              className="list-none text-zinc-700 mb-4 space-y-2"
-              style={{ color: 'var(--rvt-fg2)' }}
-            >
+            <ul className="list-none mb-4 space-y-2" style={{ color: 'var(--rvt-fg2)' }}>
               <li>
                 <strong>Twitter:</strong>{' '}
                 <a
