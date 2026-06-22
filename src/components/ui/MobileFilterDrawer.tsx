@@ -84,7 +84,7 @@ export default function MobileFilterDrawer({
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg p-2 hover:bg-zinc-100 transition-colors"
+              className="rounded-lg p-2 transition-colors hover:bg-[var(--rvt-bg3)]"
               style={{ color: 'var(--rvt-fg2)' }}
               aria-label="Close filter"
             >

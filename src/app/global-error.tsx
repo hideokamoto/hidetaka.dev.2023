@@ -26,21 +26,18 @@ export default function GlobalError({
       <head>
         <DarkModeScript />
       </head>
-      <body className="flex h-full flex-col bg-zinc-50" style={{ background: 'var(--rvt-bg)' }}>
+      <body className="flex h-full flex-col" style={{ background: 'var(--rvt-bg)' }}>
         <div className="flex flex-grow items-center justify-center px-4">
           <div className="text-center max-w-md">
             <div className="mb-8">
-              <h1
-                className="text-4xl font-bold text-slate-900 mb-4"
-                style={{ color: 'var(--rvt-fg)' }}
-              >
+              <h1 className="text-4xl font-bold mb-4" style={{ color: 'var(--rvt-fg)' }}>
                 Critical Error
               </h1>
-              <p className="text-lg text-slate-600 mb-2" style={{ color: 'var(--rvt-fg2)' }}>
+              <p className="text-lg mb-2" style={{ color: 'var(--rvt-fg2)' }}>
                 A critical error occurred. Please reload the page.
               </p>
               {error.digest && (
-                <p className="text-sm text-slate-500 font-mono" style={{ color: 'var(--rvt-fg2)' }}>
+                <p className="text-sm font-mono" style={{ color: 'var(--rvt-fg2)' }}>
                   Error ID: {error.digest}
                 </p>
               )}

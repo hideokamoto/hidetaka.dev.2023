@@ -23,7 +23,7 @@ function DevNoteCard({ item, lang }: { item: BlogItem; lang: string }) {
   return (
     <Link href={item.href} className="group block">
       <article
-        className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all hover:border-indigo-300 hover:shadow-xl"
+        className="relative overflow-hidden rounded-2xl transition-all hover:border-indigo-300 hover:shadow-xl"
         style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
       >
         <div className="p-5 lg:p-6">
@@ -47,7 +47,7 @@ function DevNoteCard({ item, lang }: { item: BlogItem; lang: string }) {
 
             {/* Title */}
             <h3
-              className="text-lg font-bold leading-tight text-slate-900 group-hover:text-indigo-600 transition-colors"
+              className="text-lg font-bold leading-tight group-hover:text-indigo-600 transition-colors"
               style={{ color: 'var(--rvt-fg)' }}
             >
               {item.title}
@@ -56,7 +56,7 @@ function DevNoteCard({ item, lang }: { item: BlogItem; lang: string }) {
             {/* Description */}
             {item.description && (
               <p
-                className="text-sm leading-relaxed text-slate-600 line-clamp-3"
+                className="text-sm leading-relaxed line-clamp-3"
                 style={{ color: 'var(--rvt-fg2)' }}
               >
                 {item.description}
@@ -65,7 +65,7 @@ function DevNoteCard({ item, lang }: { item: BlogItem; lang: string }) {
 
             {/* Read more indicator */}
             <div
-              className="flex items-center text-sm font-medium text-indigo-600 mt-1"
+              className="flex items-center text-sm font-medium mt-1"
               style={{ color: 'var(--rvt-accent)' }}
             >
               {lang === 'ja' ? '続きを読む' : 'Read more'}
@@ -94,7 +94,7 @@ function DevNoteCard({ item, lang }: { item: BlogItem; lang: string }) {
 function NoArticlesMessage({ lang }: { lang: string }) {
   return (
     <div className="py-12 text-center">
-      <p className="text-slate-600" style={{ color: 'var(--rvt-fg2)' }}>
+      <p style={{ color: 'var(--rvt-fg2)' }}>
         {lang === 'ja' ? '開発メモが見つかりませんでした。' : 'No development notes found.'}
       </p>
     </div>
@@ -116,10 +116,7 @@ export default function DevNotesArchivePage({ lang, items }: DevNotesArchivePage
       : 'A collection of notes and learnings from daily development work.'
 
   return (
-    <section
-      className="pt-12 sm:pt-16 pb-8 sm:pb-12 bg-white"
-      style={{ background: 'var(--rvt-bg)' }}
-    >
+    <section className="pt-12 sm:pt-16 pb-8 sm:pb-12" style={{ background: 'var(--rvt-bg)' }}>
       <Container>
         <PageHeader title={title} description={description} />
 

@@ -103,10 +103,10 @@ export default function SentryTestClient() {
   }
 
   return (
-    <div className="min-h-dvh bg-zinc-50 py-12 px-4" style={{ background: 'var(--rvt-bg)' }}>
+    <div className="min-h-dvh py-12 px-4" style={{ background: 'var(--rvt-bg)' }}>
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-8" style={{ background: 'var(--rvt-bg2)' }}>
-          <h1 className="text-4xl font-bold text-slate-900 mb-4" style={{ color: 'var(--rvt-fg)' }}>
+        <div className="rounded-lg shadow-lg p-8" style={{ background: 'var(--rvt-bg2)' }}>
+          <h1 className="text-4xl font-bold mb-4" style={{ color: 'var(--rvt-fg)' }}>
             Sentryエラートラッキングテスト
           </h1>
 
@@ -120,10 +120,7 @@ export default function SentryTestClient() {
           <div className="space-y-8">
             {/* ブラウザエラーテスト */}
             <section>
-              <h2
-                className="text-2xl font-semibold text-slate-900 mb-4"
-                style={{ color: 'var(--rvt-fg)' }}
-              >
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--rvt-fg)' }}>
                 ブラウザエラーテスト
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -153,10 +150,7 @@ export default function SentryTestClient() {
 
             {/* サーバーエラーテスト */}
             <section>
-              <h2
-                className="text-2xl font-semibold text-slate-900 mb-4"
-                style={{ color: 'var(--rvt-fg)' }}
-              >
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--rvt-fg)' }}>
                 サーバーエラーテスト
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -190,20 +184,11 @@ export default function SentryTestClient() {
             {/* 結果表示 */}
             {lastResult && (
               <section>
-                <h2
-                  className="text-2xl font-semibold text-slate-900 mb-4"
-                  style={{ color: 'var(--rvt-fg)' }}
-                >
+                <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--rvt-fg)' }}>
                   最後の結果
                 </h2>
-                <div
-                  className="p-4 bg-slate-100 rounded-lg"
-                  style={{ background: 'var(--rvt-bg3)' }}
-                >
-                  <p
-                    className="text-slate-800 font-mono text-sm"
-                    style={{ color: 'var(--rvt-fg)' }}
-                  >
+                <div className="p-4 rounded-lg" style={{ background: 'var(--rvt-bg3)' }}>
+                  <p className="font-mono text-sm" style={{ color: 'var(--rvt-fg)' }}>
                     {lastResult}
                   </p>
                 </div>
@@ -211,18 +196,12 @@ export default function SentryTestClient() {
             )}
 
             {/* 検証手順 */}
-            <section
-              className="border-t border-slate-200 pt-6"
-              style={{ borderColor: 'var(--rvt-border)' }}
-            >
-              <h2
-                className="text-2xl font-semibold text-slate-900 mb-4"
-                style={{ color: 'var(--rvt-fg)' }}
-              >
+            <section className="border-t pt-6" style={{ borderColor: 'var(--rvt-border)' }}>
+              <h2 className="text-2xl font-semibold mb-4" style={{ color: 'var(--rvt-fg)' }}>
                 検証手順
               </h2>
               <ol
-                className="list-decimal list-inside space-y-2 text-slate-700"
+                className="list-decimal list-inside space-y-2"
                 style={{ color: 'var(--rvt-fg2)' }}
               >
                 <li>.env.localファイルにNEXT_PUBLIC_SENTRY_DSNを設定してください</li>

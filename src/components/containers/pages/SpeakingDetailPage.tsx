@@ -3,7 +3,8 @@ import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
 import ArticleActions from '@/components/ui/ArticleActions'
 import ArticleCTA from '@/components/ui/ArticleCTA'
-import DateDisplay from '@/components/ui/DateDisplay'
+import ArticleMeta from '@/components/ui/ArticleMeta'
+import PageShell from '@/components/ui/PageShell'
 import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
 import SidebarLayout from '@/components/ui/SidebarLayout'
@@ -29,8 +30,8 @@ export default function SpeakingDetailPage({
   nextEvent,
   relatedEvents = [],
 }: SpeakingDetailPageProps) {
-  const date = new Date(event.date)
   const speakingLabel = lang === 'ja' ? '登壇・講演' : 'Speaking'
+  const homeLabel = lang === 'ja' ? 'ホーム' : 'Home'
   const previousLabel = lang === 'ja' ? '前のレポート' : 'Previous Report'
   const nextLabel = lang === 'ja' ? '次のレポート' : 'Next Report'
   const relatedEventsTitle = lang === 'ja' ? '最近参加した他のイベント' : 'Other Recent Events'
@@ -42,41 +43,15 @@ export default function SpeakingDetailPage({
 
   return (
     <Container className="mt-16 sm:mt-32">
-      {/* パンくずリスト */}
-      <nav aria-label="Breadcrumb" className="mb-8">
-        <ol className="flex items-center space-x-2">
-          <li>
-            <div className="flex items-center text-sm">
-              <Link
-                href={basePath}
-                aria-label={lang === 'ja' ? `${speakingLabel}に戻る` : `Go to ${speakingLabel}`}
-                className="font-medium text-slate-500 hover:text-slate-900 transition-colors"
-                style={{ color: 'var(--rvt-fg2)' }}
-              >
-                {speakingLabel}
-              </Link>
-              <svg
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-                className="ml-2 size-5 shrink-0 text-slate-300"
-              >
-                <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
-              </svg>
-            </div>
-          </li>
-          <li>
-            <div className="flex items-center text-sm">
-              <span
-                className="font-medium text-slate-900 line-clamp-1"
-                style={{ color: 'var(--rvt-fg)' }}
-              >
-                {event.title.rendered}
-              </span>
-            </div>
-          </li>
-        </ol>
-      </nav>
+      {/* ヘッダー（パンくず + タイトル） */}
+      <PageShell
+        breadcrumb={[
+          { label: homeLabel, href: lang === 'ja' ? '/ja' : '/' },
+          { label: speakingLabel, href: basePath },
+          { label: event.title.rendered },
+        ]}
+        title={event.title.rendered}
+      />
 
       {/* サイドバーレイアウト（デスクトップのみ） */}
       <SidebarLayout
@@ -92,23 +67,16 @@ export default function SpeakingDetailPage({
         gap="lg"
       >
         <article>
-          {/* 日付（タイトルの上に移動） */}
-          <DateDisplay
-            date={date}
-            lang={lang}
-            format="long"
-            className="mb-4 text-sm lg:text-base font-medium [color:var(--rvt-fg2)]"
-          />
+          {/* 公開日 / 更新日 */}
+          <ArticleMeta published={event.date} updated={event.modified} lang={lang} />
 
-          {/* タイトル */}
-          <header className="mb-6">
-            <h1
-              className="text-4xl font-bold tracking-tight text-zinc-900 sm:text-5xl"
-              style={{ color: 'var(--rvt-fg)' }}
-            >
-              {event.title.rendered}
-            </h1>
-          </header>
+          {/* SNS共有ボタン */}
+          <SocialShareButtons
+            url={new URL(`${basePath}/${event.slug}`, SITE_CONFIG.url).toString()}
+            title={event.title.rendered}
+            lang={lang}
+            className="mb-8"
+          />
 
           {/* サムネイル画像 (OG画像) */}
           <div className="mb-8 overflow-hidden rounded-lg">
@@ -141,14 +109,6 @@ export default function SpeakingDetailPage({
             dangerouslySetInnerHTML={{ __html: event.content.rendered }}
           />
 
-          {/* SNS共有ボタン */}
-          <SocialShareButtons
-            url={new URL(`${basePath}/${event.slug}`, SITE_CONFIG.url).toString()}
-            title={event.title.rendered}
-            lang={lang}
-            className="mt-12 pt-8 border-t border-zinc-200 [border-color:var(--rvt-border)]"
-          />
-
           {/* CTA */}
           <ArticleCTA lang={lang} articleType="speaking_report" className="mt-12" />
 
@@ -166,7 +126,7 @@ export default function SpeakingDetailPage({
               aria-label={
                 lang === 'ja' ? 'イベントレポートナビゲーション' : 'Event report navigation'
               }
-              className="mt-16 pt-8 border-t border-zinc-200 lg:hidden"
+              className="mt-16 pt-8 border-t lg:hidden"
               style={{ borderColor: 'var(--rvt-border)' }}
             >
               <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
@@ -175,17 +135,14 @@ export default function SpeakingDetailPage({
                   <Link
                     href={`${basePath}/${nextEvent.slug}`}
                     aria-label={`${nextLabel}: ${nextEvent.title.rendered}`}
-                    className="group flex flex-col flex-1 p-4 rounded-lg border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 transition-colors"
-                    style={{ borderColor: 'var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+                    className="group flex flex-col flex-1 p-4 rounded-lg transition-colors"
+                    style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
                   >
-                    <span
-                      className="text-sm font-medium text-zinc-500 mb-1"
-                      style={{ color: 'var(--rvt-fg2)' }}
-                    >
+                    <span className="text-sm font-medium mb-1" style={{ color: 'var(--rvt-fg2)' }}>
                       ← {nextLabel}
                     </span>
                     <span
-                      className="text-base font-semibold text-zinc-900 group-hover:text-indigo-600 transition-colors line-clamp-2"
+                      className="text-base font-semibold group-hover:text-indigo-600 transition-colors line-clamp-2"
                       style={{ color: 'var(--rvt-fg)' }}
                     >
                       {nextEvent.title.rendered}
@@ -198,17 +155,14 @@ export default function SpeakingDetailPage({
                   <Link
                     href={`${basePath}/${previousEvent.slug}`}
                     aria-label={`${previousLabel}: ${previousEvent.title.rendered}`}
-                    className="group flex flex-col flex-1 p-4 rounded-lg border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 transition-colors text-right"
-                    style={{ borderColor: 'var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+                    className="group flex flex-col flex-1 p-4 rounded-lg transition-colors text-right"
+                    style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
                   >
-                    <span
-                      className="text-sm font-medium text-zinc-500 mb-1"
-                      style={{ color: 'var(--rvt-fg2)' }}
-                    >
+                    <span className="text-sm font-medium mb-1" style={{ color: 'var(--rvt-fg2)' }}>
                       {previousLabel} →
                     </span>
                     <span
-                      className="text-base font-semibold text-zinc-900 group-hover:text-indigo-600 transition-colors line-clamp-2"
+                      className="text-base font-semibold group-hover:text-indigo-600 transition-colors line-clamp-2"
                       style={{ color: 'var(--rvt-fg)' }}
                     >
                       {previousEvent.title.rendered}

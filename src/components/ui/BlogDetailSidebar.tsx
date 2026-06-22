@@ -78,7 +78,7 @@ export default function BlogDetailSidebar({
       {/* ブログに戻るリンク */}
       <Link
         href={basePath}
-        className="inline-flex items-center text-sm font-medium hover:text-slate-900 transition-colors"
+        className="inline-flex items-center text-sm font-medium hover:text-[var(--rvt-fg)] transition-colors"
         style={{ color: 'var(--rvt-fg2)' }}
       >
         <svg className="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">

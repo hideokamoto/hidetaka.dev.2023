@@ -3,9 +3,10 @@ import Link from 'next/link'
 import Container from '@/components/tailwindui/Container'
 import ArticleActions from '@/components/ui/ArticleActions'
 import ArticleCTA from '@/components/ui/ArticleCTA'
+import ArticleMeta from '@/components/ui/ArticleMeta'
 import CategoryTagList from '@/components/ui/CategoryTagList'
-import DateDisplay from '@/components/ui/DateDisplay'
 import DevNoteDetailSidebar from '@/components/ui/DevNoteDetailSidebar'
+import PageShell from '@/components/ui/PageShell'
 import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
 import BlogReactions from '@/components/ui/reactions/BlogReactions'
@@ -35,8 +36,9 @@ export default function DevNoteDetailPage({
   relatedArticles = [],
   enableHatenaStar,
 }: DevNoteDetailPageProps) {
-  const date = new Date(note.date)
   const writingLabel = lang === 'ja' ? '技術記事' : 'Writing'
+  const homeLabel = lang === 'ja' ? 'ホーム' : 'Home'
+  const writingHref = lang === 'ja' ? '/ja/writing' : '/writing'
   const previousLabel = lang === 'ja' ? '前の記事' : 'Previous Article'
   const nextLabel = lang === 'ja' ? '次の記事' : 'Next Article'
 
@@ -51,41 +53,15 @@ export default function DevNoteDetailPage({
 
   return (
     <Container className="mt-16 sm:mt-32">
-      {/* パンくずリスト */}
-      <nav aria-label="Breadcrumb" className="mb-8">
-        <ol className="flex items-center space-x-2">
-          <li>
-            <div className="flex items-center text-sm">
-              <Link
-                href={lang === 'ja' ? '/ja/writing' : '/writing'}
-                aria-label={lang === 'ja' ? `${writingLabel}に戻る` : `Go to ${writingLabel}`}
-                className="font-medium text-slate-500 hover:text-slate-900 transition-colors"
-                style={{ color: 'var(--rvt-fg2)' }}
-              >
-                {writingLabel}
-              </Link>
-              <svg
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-                className="ml-2 size-5 shrink-0 text-slate-300"
-              >
-                <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
-              </svg>
-            </div>
-          </li>
-          <li>
-            <div className="flex items-center text-sm">
-              <span
-                className="font-medium text-slate-900 line-clamp-1"
-                style={{ color: 'var(--rvt-fg)' }}
-              >
-                {note.title.rendered}
-              </span>
-            </div>
-          </li>
-        </ol>
-      </nav>
+      {/* ヘッダー（パンくず + タイトル） */}
+      <PageShell
+        breadcrumb={[
+          { label: homeLabel, href: lang === 'ja' ? '/ja' : '/' },
+          { label: writingLabel, href: writingHref },
+          { label: note.title.rendered },
+        ]}
+        title={note.title.rendered}
+      />
 
       {/* サイドバーレイアウト（デスクトップのみ） */}
       <SidebarLayout
@@ -102,23 +78,16 @@ export default function DevNoteDetailPage({
         gap="lg"
       >
         <article>
-          {/* 日付（タイトルの上に移動） */}
-          <DateDisplay
-            date={date}
-            lang={lang}
-            format="long"
-            className="mb-4 text-sm lg:text-base font-medium [color:var(--rvt-fg2)]"
-          />
+          {/* 公開日 / 更新日 */}
+          <ArticleMeta published={note.date} updated={note.modified} lang={lang} />
 
-          {/* タイトル */}
-          <header className="mb-6">
-            <h1
-              className="text-4xl font-bold tracking-tight text-zinc-900 sm:text-5xl"
-              style={{ color: 'var(--rvt-fg)' }}
-            >
-              {note.title.rendered}
-            </h1>
-          </header>
+          {/* SNS共有ボタン */}
+          <SocialShareButtons
+            url={new URL(`${basePath}/${note.slug}`, SITE_CONFIG.url).toString()}
+            title={note.title.rendered}
+            lang={lang}
+            className="mb-8"
+          />
 
           {/* カテゴリ（モバイルのみ表示） */}
           {categories.length > 0 && (
@@ -160,14 +129,6 @@ export default function DevNoteDetailPage({
             dangerouslySetInnerHTML={{ __html: note.content.rendered }}
           />
 
-          {/* SNS共有ボタン */}
-          <SocialShareButtons
-            url={new URL(`${basePath}/${note.slug}`, SITE_CONFIG.url).toString()}
-            title={note.title.rendered}
-            lang={lang}
-            className={DETAIL_PAGE_SECTION_CLASS}
-          />
-
           {/* CTA（コールトゥアクション） */}
           <ArticleCTA lang={lang} articleType="dev_note" />
 
@@ -193,7 +154,7 @@ export default function DevNoteDetailPage({
           {(previousNote || nextNote) && (
             <nav
               aria-label={lang === 'ja' ? 'Dev Notesナビゲーション' : 'Dev Notes navigation'}
-              className="mt-16 pt-8 border-t border-zinc-200 lg:hidden"
+              className="mt-16 pt-8 border-t lg:hidden"
               style={{ borderColor: 'var(--rvt-border)' }}
             >
               <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
@@ -202,17 +163,14 @@ export default function DevNoteDetailPage({
                   <Link
                     href={`${basePath}/${nextNote.slug}`}
                     aria-label={`${nextLabel}: ${nextNote.title.rendered}`}
-                    className="group flex flex-col flex-1 p-4 rounded-lg border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 transition-colors"
-                    style={{ borderColor: 'var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+                    className="group flex flex-col flex-1 p-4 rounded-lg transition-colors"
+                    style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
                   >
-                    <span
-                      className="text-sm font-medium text-zinc-500 mb-1"
-                      style={{ color: 'var(--rvt-fg2)' }}
-                    >
+                    <span className="text-sm font-medium mb-1" style={{ color: 'var(--rvt-fg2)' }}>
                       ← {nextLabel}
                     </span>
                     <span
-                      className="text-base font-semibold text-zinc-900 group-hover:text-indigo-600 transition-colors line-clamp-2"
+                      className="text-base font-semibold group-hover:text-indigo-600 transition-colors line-clamp-2"
                       style={{ color: 'var(--rvt-fg)' }}
                     >
                       {nextNote.title.rendered}
@@ -225,17 +183,14 @@ export default function DevNoteDetailPage({
                   <Link
                     href={`${basePath}/${previousNote.slug}`}
                     aria-label={`${previousLabel}: ${previousNote.title.rendered}`}
-                    className="group flex flex-col flex-1 p-4 rounded-lg border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 transition-colors text-right"
-                    style={{ borderColor: 'var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+                    className="group flex flex-col flex-1 p-4 rounded-lg transition-colors text-right"
+                    style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
                   >
-                    <span
-                      className="text-sm font-medium text-zinc-500 mb-1"
-                      style={{ color: 'var(--rvt-fg2)' }}
-                    >
+                    <span className="text-sm font-medium mb-1" style={{ color: 'var(--rvt-fg2)' }}>
                       {previousLabel} →
                     </span>
                     <span
-                      className="text-base font-semibold text-zinc-900 group-hover:text-indigo-600 transition-colors line-clamp-2"
+                      className="text-base font-semibold group-hover:text-indigo-600 transition-colors line-clamp-2"
                       style={{ color: 'var(--rvt-fg)' }}
                     >
                       {previousNote.title.rendered}
