@@ -62,14 +62,21 @@ export default function ArticleCTA({
 
   return (
     <section
-      className={`my-8 rounded-lg border border-gray-200 bg-gray-50 p-6 shadow-sm transition-shadow hover:shadow-md sm:my-10 sm:p-8 md:my-12 lg:p-10 dark:border-gray-700 dark:bg-gray-800 dark:shadow-gray-900/30 ${className}`}
+      className={`my-8 rounded-lg border p-6 shadow-sm transition-shadow hover:shadow-md sm:my-10 sm:p-8 md:my-12 lg:p-10 ${className}`}
+      style={{ background: 'var(--rvt-bg2)', borderColor: 'var(--rvt-border)' }}
       aria-label={normalizedLang === 'ja' ? 'アクションを促すセクション' : 'Call to action'}
       role="complementary"
     >
-      <h2 className="mb-3 text-xl font-bold leading-tight text-gray-900 sm:mb-4 sm:text-2xl md:text-3xl dark:text-gray-100">
+      <h2
+        className="mb-3 text-xl font-bold leading-tight sm:mb-4 sm:text-2xl md:text-3xl"
+        style={{ color: 'var(--rvt-fg)' }}
+      >
         {selectedCTAData.heading}
       </h2>
-      <p className="mb-5 text-sm leading-relaxed text-gray-700 sm:mb-6 sm:text-base md:text-lg dark:text-gray-300">
+      <p
+        className="mb-5 text-sm leading-relaxed sm:mb-6 sm:text-base md:text-lg"
+        style={{ color: 'var(--rvt-fg2)' }}
+      >
         {selectedCTAData.description}
       </p>
       <nav

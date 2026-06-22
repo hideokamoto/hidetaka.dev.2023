@@ -35,7 +35,7 @@ export default function CategoryTagList({
             <Tag
               variant="indigo"
               size="sm"
-              className="cursor-pointer hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-colors"
+              className="cursor-pointer transition-colors hover:bg-[color-mix(in_oklch,var(--rvt-accent)_10%,transparent)]"
             >
               {category.name}
             </Tag>

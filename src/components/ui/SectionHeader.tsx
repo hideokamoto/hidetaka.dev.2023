@@ -17,11 +17,18 @@ export default function SectionHeader({
 
   return (
     <div className={`mx-auto max-w-3xl ${alignStyles} ${className}`}>
-      <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+      <h2
+        className="text-3xl font-bold tracking-tight sm:text-4xl"
+        style={{
+          fontFamily: 'var(--rvt-font-display)',
+          color: 'var(--rvt-fg)',
+          letterSpacing: '-0.03em',
+        }}
+      >
         {title}
       </h2>
       {description && (
-        <p className="mt-6 text-lg leading-relaxed text-slate-700 dark:text-slate-400">
+        <p className="mt-6 text-lg leading-relaxed" style={{ color: 'var(--rvt-fg2)' }}>
           {description}
         </p>
       )}

@@ -22,7 +22,8 @@ export default function Profile({ lang }: ProfileProps) {
             Skilled in creating content and presentations that introduce service usage and best
             practices. You can follow me on Twitter at{' '}
             <a
-              className="underline text-indigo-600 dark:text-sky-300"
+              className="underline"
+              style={{ color: 'var(--rvt-accent)' }}
               href="https://x.com/hidetaka_dev"
               aria-label="Hidetaka Okamoto on X (formerly Twitter)"
             >

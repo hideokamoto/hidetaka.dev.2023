@@ -28,10 +28,12 @@ export default function StatsSection({ items, lang }: Props) {
     : `Last ${STATS_WINDOW_MONTHS} months across ${sourcesText}.`
 
   return (
-    <section className="mt-16 border-t border-zinc-200 pt-16 dark:border-zinc-800">
+    <section className="mt-16 border-t pt-16" style={{ borderColor: 'var(--rvt-border)' }}>
       <div className="mb-8 text-center">
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white sm:text-3xl">{title}</h2>
-        <p className="mx-auto mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-400">
+        <h2 className="text-2xl font-bold sm:text-3xl" style={{ color: 'var(--rvt-fg)' }}>
+          {title}
+        </h2>
+        <p className="mx-auto mt-2 max-w-2xl text-sm" style={{ color: 'var(--rvt-fg2)' }}>
           {subtitle}
         </p>
       </div>
@@ -44,15 +46,21 @@ export default function StatsSection({ items, lang }: Props) {
           lang={lang}
         />
 
-        <div className="rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
-          <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
+        <div
+          className="rounded-2xl p-6"
+          style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+        >
+          <h3
+            className="mb-4 text-sm font-semibold uppercase tracking-wider"
+            style={{ color: 'var(--rvt-fg)' }}
+          >
             {isJa ? '月別の投稿本数' : 'Posts per month'}
           </h3>
           <MonthlyPostsChart data={monthly} lang={lang} />
         </div>
 
         {hasZenn && (
-          <p className="text-xs text-slate-400 dark:text-slate-500">
+          <p className="text-xs" style={{ color: 'var(--rvt-fg3)' }}>
             {isJa
               ? '注: Zenn は RSS の制約により直近約20本のみを集計しています。'
               : 'Note: Zenn data is limited to the most recent ~20 posts due to RSS constraints.'}

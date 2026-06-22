@@ -12,7 +12,8 @@ export default function ProjectsPageContent({ lang }: { lang: string }) {
         <header className="md:grid md:grid-cols-4 md:items-baseline">
           <h2
             id="guest-posts"
-            className="md:col-span-1 mb-4 sm:mb-8 text-2xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-3xl"
+            className="md:col-span-1 mb-4 sm:mb-8 text-2xl font-bold tracking-tight sm:text-3xl"
+            style={{ color: 'var(--rvt-fg)' }}
           >
             Guest posts
           </h2>
@@ -28,7 +29,8 @@ export default function ProjectsPageContent({ lang }: { lang: string }) {
         <header className="md:grid md:grid-cols-4 md:items-baseline">
           <h2
             id="apps"
-            className="md:col-span-1 mb-4 sm:mb-8 text-2xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-3xl"
+            className="md:col-span-1 mb-4 sm:mb-8 text-2xl font-bold tracking-tight sm:text-3xl"
+            style={{ color: 'var(--rvt-fg)' }}
           >
             Applications / Websites
           </h2>
@@ -44,7 +46,8 @@ export default function ProjectsPageContent({ lang }: { lang: string }) {
         <header className="md:grid md:grid-cols-4 md:items-baseline">
           <h2
             id="books"
-            className="md:col-span-1 mb-4 sm:mb-8 text-2xl font-bold tracking-tight text-zinc-800 dark:text-zinc-100 sm:text-3xl"
+            className="md:col-span-1 mb-4 sm:mb-8 text-2xl font-bold tracking-tight sm:text-3xl"
+            style={{ color: 'var(--rvt-fg)' }}
           >
             Books
           </h2>

@@ -18,7 +18,8 @@ export default function PrivacyPolicyPage() {
               <div className="flex items-center text-sm">
                 <Link
                   href="/ja"
-                  className="font-medium text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-100 transition-colors"
+                  className="font-medium text-slate-500 hover:text-slate-900 transition-colors"
+                  style={{ color: 'var(--rvt-fg2)' }}
                 >
                   ホーム
                 </Link>
@@ -26,7 +27,8 @@ export default function PrivacyPolicyPage() {
                   viewBox="0 0 20 20"
                   fill="currentColor"
                   aria-hidden="true"
-                  className="ml-2 size-5 shrink-0 text-slate-300 dark:text-slate-600"
+                  className="ml-2 size-5 shrink-0 text-slate-300"
+                  style={{ color: 'var(--rvt-fg3)' }}
                 >
                   <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
                 </svg>
@@ -34,7 +36,7 @@ export default function PrivacyPolicyPage() {
             </li>
             <li>
               <div className="flex items-center text-sm">
-                <span className="font-medium text-slate-900 dark:text-slate-100">
+                <span className="font-medium text-slate-900" style={{ color: 'var(--rvt-fg)' }}>
                   プライバシーポリシー
                 </span>
               </div>
@@ -44,25 +46,32 @@ export default function PrivacyPolicyPage() {
 
         {/* タイトル */}
         <header className="mb-10">
-          <h1 className="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100 sm:text-5xl">
+          <h1
+            className="text-4xl font-bold tracking-tight text-zinc-900 sm:text-5xl"
+            style={{ color: 'var(--rvt-fg)' }}
+          >
             プライバシーポリシー
           </h1>
-          <p className="mt-4 text-base text-zinc-600 dark:text-zinc-400">
+          <p className="mt-4 text-base text-zinc-600" style={{ color: 'var(--rvt-fg2)' }}>
             最終更新日: 2026年1月4日
           </p>
         </header>
 
         {/* コンテンツ */}
-        <div className="prose prose-zinc dark:prose-invert max-w-none">
+        <div className="prose prose-zinc max-w-none">
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
+            <h2
+              className="text-2xl font-bold text-zinc-900 mb-4"
+              style={{ color: 'var(--rvt-fg)' }}
+            >
               1. はじめに
             </h2>
-            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               本プライバシーポリシーは、Hidetaka.dev（以下「当サイト」）が、
               <a
                 href="https://hidetaka.dev"
-                className="text-indigo-600 dark:text-indigo-400 hover:underline"
+                className="hover:underline"
+                style={{ color: 'var(--rvt-accent)' }}
               >
                 https://hidetaka.dev
               </a>
@@ -71,83 +80,107 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
+            <h2
+              className="text-2xl font-bold text-zinc-900 mb-4"
+              style={{ color: 'var(--rvt-fg)' }}
+            >
               2. 収集する情報
             </h2>
-            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               当サイトでは、以下のサードパーティサービスを通じて、訪問者の情報を収集しています：
             </p>
 
-            <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3 mt-6">
+            <h3
+              className="text-xl font-semibold text-zinc-900 mb-3 mt-6"
+              style={{ color: 'var(--rvt-fg)' }}
+            >
               2.1 Google Analytics
             </h3>
-            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               当サイトでは、訪問者の利用状況を把握するためにGoogle Analyticsを使用しています。
               Google Analyticsは以下のような情報を収集します：
             </p>
-            <ul className="list-disc list-inside text-zinc-700 dark:text-zinc-300 mb-4 space-y-2">
+            <ul
+              className="list-disc list-inside text-zinc-700 mb-4 space-y-2"
+              style={{ color: 'var(--rvt-fg2)' }}
+            >
               <li>訪問したページと各ページでの滞在時間</li>
               <li>ブラウザの種類とバージョン</li>
               <li>デバイスの種類（デスクトップ、モバイル、タブレット）</li>
               <li>地理的な位置情報（国、都市）</li>
               <li>リファラー（参照元のウェブサイト）</li>
             </ul>
-            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               Googleによるデータの使用方法については、
               <a
                 href="https://policies.google.com/privacy?hl=ja"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-indigo-600 dark:text-indigo-400 hover:underline"
+                className="hover:underline"
+                style={{ color: 'var(--rvt-accent)' }}
               >
                 Googleのプライバシーポリシー
               </a>
               をご覧ください。
             </p>
 
-            <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3 mt-6">
+            <h3
+              className="text-xl font-semibold text-zinc-900 mb-3 mt-6"
+              style={{ color: 'var(--rvt-fg)' }}
+            >
               2.2 Microsoft Clarity
             </h3>
-            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               当サイトでは、ユーザー行動の理解とユーザーエクスペリエンスの向上のために Microsoft
               Clarityを使用しています。Clarityは以下の情報を収集します：
             </p>
-            <ul className="list-disc list-inside text-zinc-700 dark:text-zinc-300 mb-4 space-y-2">
+            <ul
+              className="list-disc list-inside text-zinc-700 mb-4 space-y-2"
+              style={{ color: 'var(--rvt-fg2)' }}
+            >
               <li>ユーザーの操作（クリック、スクロール、マウスの動き）</li>
               <li>セッションの記録</li>
               <li>ユーザー行動のヒートマップ</li>
             </ul>
-            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               詳細については、
               <a
                 href="https://privacy.microsoft.com/ja-jp/privacystatement"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-indigo-600 dark:text-indigo-400 hover:underline"
+                className="hover:underline"
+                style={{ color: 'var(--rvt-accent)' }}
               >
                 Microsoftのプライバシーに関する声明
               </a>
               をご覧ください。
             </p>
 
-            <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-3 mt-6">
+            <h3
+              className="text-xl font-semibold text-zinc-900 mb-3 mt-6"
+              style={{ color: 'var(--rvt-fg)' }}
+            >
               2.3 はてなスター
             </h3>
-            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               当サイトの日本語版ブログページでは、はてなスターを使用しています。
               はてなスターは、株式会社はてなが提供するサービスで、記事に対して軽い反応（スター）を付けることができる機能です。
             </p>
-            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               はてなスターのご利用には、はてなアカウントが必要です。
               はてなスターの利用規約やプライバシーポリシーについては、以下のリンクをご確認ください：
             </p>
-            <ul className="list-disc list-inside text-zinc-700 dark:text-zinc-300 mb-4 space-y-2">
+            <ul
+              className="list-disc list-inside text-zinc-700 mb-4 space-y-2"
+              style={{ color: 'var(--rvt-fg2)' }}
+            >
               <li>
                 <a
                   href="https://www.hatena.ne.jp/rule/rule"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-indigo-600 dark:text-indigo-400 hover:underline"
+                  className="hover:underline"
+                  style={{ color: 'var(--rvt-accent)' }}
                 >
                   はてな利用規約
                 </a>
@@ -157,7 +190,8 @@ export default function PrivacyPolicyPage() {
                   href="https://policies.hatena.ne.jp/privacy"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-indigo-600 dark:text-indigo-400 hover:underline"
+                  className="hover:underline"
+                  style={{ color: 'var(--rvt-accent)' }}
                 >
                   はてなプライバシーポリシー
                 </a>
@@ -166,18 +200,24 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
+            <h2
+              className="text-2xl font-bold text-zinc-900 mb-4"
+              style={{ color: 'var(--rvt-fg)' }}
+            >
               3. Cookieとトラッキング技術
             </h2>
-            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               当サイトでは、CookieおよびCookieに類似するトラッキング技術を使用して、
               訪問者の閲覧活動に関する情報を収集・追跡しています。
               Cookieは、デバイスに保存される小さなテキストファイルです。
             </p>
-            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               使用しているCookieの種類：
             </p>
-            <ul className="list-disc list-inside text-zinc-700 dark:text-zinc-300 mb-4 space-y-2">
+            <ul
+              className="list-disc list-inside text-zinc-700 mb-4 space-y-2"
+              style={{ color: 'var(--rvt-fg2)' }}
+            >
               <li>
                 <strong>分析Cookie:</strong> 訪問者のサイトでの行動を理解するために使用
               </li>
@@ -185,20 +225,26 @@ export default function PrivacyPolicyPage() {
                 <strong>機能Cookie:</strong> テーマの設定など、特定の機能を有効にするために使用
               </li>
             </ul>
-            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               ブラウザの設定を通じてCookieを制御できます。ただし、Cookieを無効にすると、
               当サイトの機能に影響を与える可能性があります。
             </p>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
+            <h2
+              className="text-2xl font-bold text-zinc-900 mb-4"
+              style={{ color: 'var(--rvt-fg)' }}
+            >
               4. 情報の使用目的
             </h2>
-            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               収集した情報は、以下の目的で使用します：
             </p>
-            <ul className="list-disc list-inside text-zinc-700 dark:text-zinc-300 mb-4 space-y-2">
+            <ul
+              className="list-disc list-inside text-zinc-700 mb-4 space-y-2"
+              style={{ color: 'var(--rvt-fg2)' }}
+            >
               <li>当サイトのコンテンツとユーザーエクスペリエンスの分析と改善</li>
               <li>訪問者の行動と嗜好の理解</li>
               <li>当サイトのセキュリティの維持と改善</li>
@@ -206,13 +252,19 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
+            <h2
+              className="text-2xl font-bold text-zinc-900 mb-4"
+              style={{ color: 'var(--rvt-fg)' }}
+            >
               5. サードパーティサービス
             </h2>
-            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               当サイトは、以下のサードパーティサービスと連携しています：
             </p>
-            <ul className="list-disc list-inside text-zinc-700 dark:text-zinc-300 mb-4 space-y-2">
+            <ul
+              className="list-disc list-inside text-zinc-700 mb-4 space-y-2"
+              style={{ color: 'var(--rvt-fg2)' }}
+            >
               <li>
                 <strong>Google Analytics:</strong> ウェブ解析サービス
               </li>
@@ -223,17 +275,20 @@ export default function PrivacyPolicyPage() {
                 <strong>はてなスター:</strong> ブログリアクション機能（日本語版のみ）
               </li>
             </ul>
-            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               これらのサードパーティサービスは、独自のプライバシーポリシーを持っています。
               各サービスのプライバシーポリシーをご確認ください。
             </p>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
+            <h2
+              className="text-2xl font-bold text-zinc-900 mb-4"
+              style={{ color: 'var(--rvt-fg)' }}
+            >
               6. データのセキュリティ
             </h2>
-            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               当サイトでは、収集した情報を保護するために、合理的なセキュリティ対策を実施しています。
               ただし、インターネット上でのデータ送信や電子ストレージの方法に、
               100%安全なものはありません。
@@ -241,40 +296,53 @@ export default function PrivacyPolicyPage() {
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
+            <h2
+              className="text-2xl font-bold text-zinc-900 mb-4"
+              style={{ color: 'var(--rvt-fg)' }}
+            >
               7. 子どものプライバシー
             </h2>
-            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               当サイトは、13歳未満の子どもを対象としていません。
               13歳未満の子どもから意図的に個人情報を収集することはありません。
             </p>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
+            <h2
+              className="text-2xl font-bold text-zinc-900 mb-4"
+              style={{ color: 'var(--rvt-fg)' }}
+            >
               8. プライバシーポリシーの変更
             </h2>
-            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               当サイトでは、随時プライバシーポリシーを更新する場合があります。
               変更があった場合は、このページの上部にある「最終更新日」を更新します。
             </p>
           </section>
 
           <section className="mb-8">
-            <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
+            <h2
+              className="text-2xl font-bold text-zinc-900 mb-4"
+              style={{ color: 'var(--rvt-fg)' }}
+            >
               9. お問い合わせ
             </h2>
-            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-4">
+            <p className="text-zinc-700 leading-relaxed mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               本プライバシーポリシーに関するご質問がございましたら、以下の方法でお問い合わせください：
             </p>
-            <ul className="list-none text-zinc-700 dark:text-zinc-300 mb-4 space-y-2">
+            <ul
+              className="list-none text-zinc-700 mb-4 space-y-2"
+              style={{ color: 'var(--rvt-fg2)' }}
+            >
               <li>
                 <strong>Twitter:</strong>{' '}
                 <a
                   href="https://twitter.com/hidetaka_dev"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-indigo-600 dark:text-indigo-400 hover:underline"
+                  className="hover:underline"
+                  style={{ color: 'var(--rvt-accent)' }}
                 >
                   @hidetaka_dev
                 </a>
@@ -285,7 +353,8 @@ export default function PrivacyPolicyPage() {
                   href="https://github.com/hideokamoto"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-indigo-600 dark:text-indigo-400 hover:underline"
+                  className="hover:underline"
+                  style={{ color: 'var(--rvt-accent)' }}
                 >
                   @hideokamoto
                 </a>

@@ -18,20 +18,31 @@ export default function FilterItem({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`w-full flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${
+      className={`w-full flex items-center justify-between rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${className}`}
+      style={
         active
-          ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400'
-          : 'text-slate-700 hover:bg-zinc-50 dark:text-slate-300 dark:hover:bg-zinc-800'
-      } ${className}`}
+          ? {
+              background: 'color-mix(in oklch, var(--rvt-accent) 10%, transparent)',
+              color: 'var(--rvt-accent)',
+            }
+          : { color: 'var(--rvt-fg2)' }
+      }
     >
       <span>{children}</span>
       {count !== undefined && (
         <span
-          className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
+          className="ml-2 rounded-full px-2 py-0.5 text-xs"
+          style={
             active
-              ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300'
-              : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-700 dark:text-zinc-400'
-          }`}
+              ? {
+                  background: 'color-mix(in oklch, var(--rvt-accent) 15%, transparent)',
+                  color: 'var(--rvt-accent)',
+                }
+              : {
+                  background: 'var(--rvt-bg3)',
+                  color: 'var(--rvt-fg3)',
+                }
+          }
         >
           {count > 20 ? '20+' : count}
         </span>

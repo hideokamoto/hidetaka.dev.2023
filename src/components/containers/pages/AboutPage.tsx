@@ -18,7 +18,8 @@ function SpeakerProfile({ lang }: { lang: 'ja' | 'en' }) {
       <>
         DigitalCubeのBizDevとして、SaaSやECサイトの収益を増やすための方法・生成AIを使った効率化や新しい事業モデルの模索などに挑戦している。前職では
         <a
-          className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 underline"
+          className="underline hover:opacity-80"
+          style={{ color: 'var(--rvt-accent)' }}
           href="https://stripe.com/docs"
         >
           Stripe
@@ -34,7 +35,8 @@ function SpeakerProfile({ lang }: { lang: 'ja' | 'en' }) {
     <>
       Hide (ひで pronounced &quot;Hee-Day&quot;) is a Business Development professional at{' '}
       <a
-        className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 underline"
+        className="underline hover:opacity-80"
+        style={{ color: 'var(--rvt-accent)' }}
         href="https://en.digitalcube.jp/"
       >
         DigitalCube
@@ -43,7 +45,8 @@ function SpeakerProfile({ lang }: { lang: 'ja' | 'en' }) {
       improvements using generative AI, and developing new business models. Previously, he was a
       Developer Advocate at{' '}
       <a
-        className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 underline"
+        className="underline hover:opacity-80"
+        style={{ color: 'var(--rvt-accent)' }}
         href="https://stripe.com/docs"
       >
         Stripe
@@ -51,7 +54,8 @@ function SpeakerProfile({ lang }: { lang: 'ja' | 'en' }) {
       , where he worked on writing, coding, and teaching how to integrate online payments. He has
       organized several community conferences including WordCamp Kansai 2024 and{' '}
       <a
-        className="text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 underline"
+        className="underline hover:opacity-80"
+        style={{ color: 'var(--rvt-accent)' }}
         href="https://connect2019.jpstripes.com/"
       >
         JP_Stripes Connect 2019
@@ -73,23 +77,32 @@ type ExperienceCardProps = {
 
 function ExperienceCard({ title, period, description, highlights }: ExperienceCardProps) {
   return (
-    <article className="group relative flex h-full flex-col rounded-2xl border border-zinc-200 bg-white p-8 transition-all hover:shadow-md hover:border-indigo-200 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-800">
+    <article
+      className="group relative flex h-full flex-col rounded-2xl p-8 transition-all hover:shadow-md hover:border-indigo-300"
+      style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+    >
       <div className="flex items-start justify-between gap-4 mb-4">
-        <h3 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
+        <h3
+          className="text-xl font-semibold tracking-tight"
+          style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+        >
           {title}
         </h3>
-        <span className="text-sm font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
+        <span className="text-sm font-medium whitespace-nowrap" style={{ color: 'var(--rvt-fg2)' }}>
           {period}
         </span>
       </div>
-      <p className="text-base leading-relaxed text-slate-700 dark:text-slate-400 mb-6">
+      <p className="text-base leading-relaxed mb-6" style={{ color: 'var(--rvt-fg2)' }}>
         {description}
       </p>
       {highlights && highlights.length > 0 && (
-        <ul className="mt-auto space-y-3 text-sm leading-6 text-slate-600 dark:text-slate-400">
+        <ul className="mt-auto space-y-3 text-sm leading-6" style={{ color: 'var(--rvt-fg2)' }}>
           {highlights.map((highlight) => (
             <li key={highlight} className="flex items-start gap-3">
-              <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-indigo-600 dark:bg-indigo-400" />
+              <span
+                className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full"
+                style={{ background: 'var(--rvt-accent)' }}
+              />
               <span>{highlight}</span>
             </li>
           ))}
@@ -131,9 +144,16 @@ const RECOGNITIONS = [
 
 function RecognitionBadge({ title, issuer }: { title: string; issuer: string }) {
   return (
-    <div className="flex w-full sm:w-64 flex-col items-center rounded-xl border border-zinc-200 bg-white px-6 py-4 text-center shadow-sm transition-all hover:scale-105 hover:shadow-md dark:border-zinc-700 dark:bg-zinc-800">
-      <span className="text-base font-semibold text-slate-900 dark:text-white">{title}</span>
-      <span className="mt-1 text-sm text-slate-500 dark:text-slate-400">{issuer}</span>
+    <div
+      className="flex w-full sm:w-64 flex-col items-center rounded-xl px-6 py-4 text-center shadow-sm transition-all hover:scale-105 hover:shadow-md"
+      style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+    >
+      <span className="text-base font-semibold" style={{ color: 'var(--rvt-fg)' }}>
+        {title}
+      </span>
+      <span className="mt-1 text-sm" style={{ color: 'var(--rvt-fg2)' }}>
+        {issuer}
+      </span>
     </div>
   )
 }
@@ -248,7 +268,10 @@ export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
   return (
     <>
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-white via-indigo-50/40 to-purple-50/30 dark:from-zinc-900 dark:via-indigo-950/30 dark:to-purple-950/20 -mt-[var(--header-height)] pt-[var(--header-height)]">
+      <section
+        className="relative overflow-hidden -mt-[var(--header-height)] pt-[var(--header-height)]"
+        style={{ background: 'var(--rvt-bg)' }}
+      >
         <BackgroundDecoration variant="hero" />
 
         <Container className="relative py-24 sm:py-32 lg:py-40">
@@ -256,7 +279,10 @@ export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
             {/* Left: Content */}
             <div className="flex-1 space-y-8 lg:max-w-2xl">
               <PageHeader title={pageTitle} description={pageDescription} />
-              <div className="space-y-6 text-base leading-relaxed text-slate-600 dark:text-slate-400">
+              <div
+                className="space-y-6 text-base leading-relaxed"
+                style={{ color: 'var(--rvt-fg2)' }}
+              >
                 <Profile lang={lang} />
               </div>
             </div>
@@ -284,11 +310,20 @@ export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
 
           {/* Additional Profile */}
           <div className="mt-16 max-w-3xl mx-auto">
-            <div className="rounded-2xl border border-zinc-200 bg-white p-10 dark:border-zinc-800 dark:bg-zinc-900">
-              <h3 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white mb-6">
+            <div
+              className="rounded-2xl p-10"
+              style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+            >
+              <h3
+                className="text-xl font-semibold tracking-tight mb-6"
+                style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+              >
                 {isJa ? '詳細プロフィール' : 'More About Me'}
               </h3>
-              <div className="space-y-6 text-base leading-relaxed text-slate-700 dark:text-slate-400">
+              <div
+                className="space-y-6 text-base leading-relaxed"
+                style={{ color: 'var(--rvt-fg2)' }}
+              >
                 <SpeakerProfile lang={lang} />
               </div>
             </div>
@@ -297,7 +332,7 @@ export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
       </section>
 
       {/* Certifications Section */}
-      <section className="relative py-24 sm:py-32 bg-white dark:bg-zinc-900">
+      <section className="relative py-24 sm:py-32" style={{ background: 'var(--rvt-bg2)' }}>
         <Container>
           <SectionHeader
             title={certificationsTitle}
@@ -310,7 +345,10 @@ export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
           />
 
           {/* Stripe Certifications */}
-          <h3 className="mt-16 text-center text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          <h3
+            className="mt-16 text-center text-sm font-semibold uppercase tracking-wider"
+            style={{ fontFamily: 'var(--rvt-font-mono)', color: 'var(--rvt-fg2)' }}
+          >
             {isJa ? 'Stripe 認定資格' : 'Stripe Certifications'}
           </h3>
           <div className="mt-8 flex flex-wrap justify-center gap-8 lg:gap-10">
@@ -320,7 +358,10 @@ export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
           </div>
 
           {/* Community Recognition */}
-          <h3 className="mt-16 text-center text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+          <h3
+            className="mt-16 text-center text-sm font-semibold uppercase tracking-wider"
+            style={{ fontFamily: 'var(--rvt-font-mono)', color: 'var(--rvt-fg2)' }}
+          >
             {isJa ? 'コミュニティでの評価・受賞' : 'Community Recognition'}
           </h3>
           <div className="mt-8 flex flex-wrap justify-center gap-6">

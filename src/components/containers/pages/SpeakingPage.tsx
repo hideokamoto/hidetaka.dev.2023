@@ -34,7 +34,8 @@ function EventLinks({ lang, link }: { lang: string; link: string }) {
   return (
     <Link
       href={link}
-      className="flex items-center text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
+      className="flex items-center text-sm font-medium hover:opacity-80 transition-opacity"
+      style={{ color: 'var(--rvt-accent)' }}
       onClick={(e) => e.stopPropagation()}
     >
       {lang === 'ja' ? '記事を読む' : 'Read Article'}
@@ -74,37 +75,41 @@ function SpeakingCard({
 
   return (
     <Link href={link} className="group block">
-      <article className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all hover:border-indigo-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700">
-        {/* Content */}
+      <article
+        className="relative overflow-hidden rounded-2xl transition-all hover:border-indigo-300 hover:shadow-xl"
+        style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+      >
         <div className="p-5 lg:p-6">
           <div className="flex flex-col gap-3">
-            {/* Date and Year */}
             <div className="flex items-center gap-3 flex-wrap">
               <DateDisplay
                 date={date}
                 lang={lang}
                 format="short"
-                className="text-xs font-semibold text-slate-500 dark:text-slate-400"
+                className="text-xs font-semibold [color:var(--rvt-fg2)]"
               />
               <Tag variant="default" size="sm">
                 {year}
               </Tag>
             </div>
 
-            {/* Title */}
-            <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+            <h3
+              className="text-lg font-bold leading-tight transition-colors group-hover:text-indigo-600"
+              style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+            >
               {title}
             </h3>
 
-            {/* Description */}
             {description && (
-              <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-3">
+              <p
+                className="text-sm leading-relaxed line-clamp-3"
+                style={{ color: 'var(--rvt-fg2)' }}
+              >
                 {description}
                 {description.length > 150 ? '...' : ''}
               </p>
             )}
 
-            {/* Links */}
             <div className="flex items-center gap-4 mt-2">
               <EventLinks lang={lang} link={link} />
             </div>
@@ -150,7 +155,10 @@ function Sidebar({
       {/* 年フィルター */}
       {availableYears.length > 0 && (
         <div>
-          <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
+          <h3
+            className="mb-3 text-sm font-semibold uppercase tracking-wider"
+            style={{ fontFamily: 'var(--rvt-font-mono)', color: 'var(--rvt-fg)' }}
+          >
             {yearTitle}
           </h3>
           <nav className="space-y-1">
@@ -339,7 +347,7 @@ export default function SpeakingPageContent({
       />
 
       {/* Heroセクション + メインコンテンツ */}
-      <section className="pt-12 sm:pt-16 pb-8 sm:pb-12 bg-white dark:bg-zinc-900">
+      <section className="pt-12 sm:pt-16 pb-8 sm:pb-12" style={{ background: 'var(--rvt-bg)' }}>
         <Container>
           <PageHeader title={title} description={description} />
 
@@ -379,7 +387,7 @@ export default function SpeakingPageContent({
               </div>
             ) : (
               <div className="py-12 text-center">
-                <p className="text-slate-600 dark:text-slate-400">
+                <p style={{ color: 'var(--rvt-fg2)' }}>
                   {lang === 'ja' ? '該当するイベントが見つかりませんでした。' : 'No events found.'}
                 </p>
               </div>

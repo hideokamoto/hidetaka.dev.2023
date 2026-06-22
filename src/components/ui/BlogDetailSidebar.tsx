@@ -30,7 +30,9 @@ export default function BlogDetailSidebar({
       {/* タグセクション */}
       {categories.length > 0 && (
         <div>
-          <h3 className="mb-3 text-sm font-semibold text-slate-900 dark:text-white">{tagsLabel}</h3>
+          <h3 className="mb-3 text-sm font-semibold" style={{ color: 'var(--rvt-fg)' }}>
+            {tagsLabel}
+          </h3>
           <CategoryTagList categories={categories} basePath={basePath} />
         </div>
       )}
@@ -44,12 +46,12 @@ export default function BlogDetailSidebar({
           {/* 次の記事 */}
           {nextThought && (
             <div>
-              <h3 className="mb-2 text-sm font-semibold text-slate-900 dark:text-white">
+              <h3 className="mb-2 text-sm font-semibold" style={{ color: 'var(--rvt-fg)' }}>
                 {nextLabel}
               </h3>
               <Link
                 href={`${basePath}/${nextThought.slug}`}
-                className="block text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors line-clamp-2"
+                className="block text-sm text-indigo-600 hover:text-indigo-700 transition-colors line-clamp-2"
               >
                 {nextThought.title.rendered}
               </Link>
@@ -59,12 +61,12 @@ export default function BlogDetailSidebar({
           {/* 前の記事 */}
           {previousThought && (
             <div>
-              <h3 className="mb-2 text-sm font-semibold text-slate-900 dark:text-white">
+              <h3 className="mb-2 text-sm font-semibold" style={{ color: 'var(--rvt-fg)' }}>
                 {previousLabel}
               </h3>
               <Link
                 href={`${basePath}/${previousThought.slug}`}
-                className="block text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors line-clamp-2"
+                className="block text-sm text-indigo-600 hover:text-indigo-700 transition-colors line-clamp-2"
               >
                 {previousThought.title.rendered}
               </Link>
@@ -76,7 +78,8 @@ export default function BlogDetailSidebar({
       {/* ブログに戻るリンク */}
       <Link
         href={basePath}
-        className="inline-flex items-center text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 transition-colors"
+        className="inline-flex items-center text-sm font-medium hover:text-slate-900 transition-colors"
+        style={{ color: 'var(--rvt-fg2)' }}
       >
         <svg className="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path

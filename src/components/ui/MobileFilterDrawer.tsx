@@ -69,16 +69,23 @@ export default function MobileFilterDrawer({
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-white/95 backdrop-blur-md shadow-2xl ring-1 ring-zinc-900/5 dark:bg-zinc-900/95 dark:ring-white/10 lg:hidden"
+        className="fixed inset-y-0 right-0 z-50 w-full max-w-sm backdrop-blur-md shadow-2xl ring-1 ring-zinc-900/5 lg:hidden"
+        style={{ background: 'var(--rvt-bg2)' }}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">{title}</h2>
+          <div
+            className="flex items-center justify-between px-6 py-4 border-b"
+            style={{ borderColor: 'var(--rvt-border)' }}
+          >
+            <h2 className="text-lg font-bold" style={{ color: 'var(--rvt-fg)' }}>
+              {title}
+            </h2>
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg p-2 text-slate-700 dark:text-slate-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              className="rounded-lg p-2 hover:bg-zinc-100 transition-colors"
+              style={{ color: 'var(--rvt-fg2)' }}
               aria-label="Close filter"
             >
               <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -107,7 +114,10 @@ export default function MobileFilterDrawer({
               {/* フィルターグループ */}
               {filterGroups.map((group) => (
                 <div key={group.title}>
-                  <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-slate-900 dark:text-white">
+                  <h3
+                    className="mb-3 text-sm font-semibold uppercase tracking-wider"
+                    style={{ color: 'var(--rvt-fg)' }}
+                  >
                     {group.title}
                   </h3>
                   <nav className="space-y-1">
@@ -121,7 +131,7 @@ export default function MobileFilterDrawer({
                             href={item.externalLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="ml-4 text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-1"
+                            className="ml-4 text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1"
                             onClick={(e) => e.stopPropagation()}
                           >
                             {lang === 'ja' ? '元のサイトで見る' : 'View on original site'}

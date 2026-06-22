@@ -15,12 +15,23 @@ export default function MobileFilterButton({
     <button
       type="button"
       onClick={onClick}
-      className={`w-full flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm font-medium text-slate-900 transition-all hover:border-indigo-300 hover:bg-indigo-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-white dark:hover:border-indigo-700 dark:hover:bg-indigo-900/20 ${className}`}
+      className={`w-full flex items-center justify-between rounded-lg px-4 py-3 text-sm font-medium transition-all hover:border-indigo-300 hover:bg-indigo-50 ${className}`}
+      style={{
+        border: '1px solid var(--rvt-border)',
+        background: 'var(--rvt-bg2)',
+        color: 'var(--rvt-fg)',
+      }}
     >
       <span>{label}</span>
       <div className="flex items-center gap-2">
         {activeFilterCount > 0 && (
-          <span className="rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-semibold text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300">
+          <span
+            className="rounded-full px-2 py-0.5 text-xs font-semibold"
+            style={{
+              background: 'color-mix(in oklch, var(--rvt-accent) 10%, transparent)',
+              color: 'var(--rvt-accent)',
+            }}
+          >
             {activeFilterCount}
           </span>
         )}

@@ -1,30 +1,25 @@
 import Container from '@/components/tailwindui/Container'
-import SectionHeader from '@/components/ui/SectionHeader'
+import RvtCard from '@/components/ui/RvtCard'
+import RvtEyebrow from '@/components/ui/RvtEyebrow'
 
 type Capability = {
   title: string
   description: string
   highlights: string[]
+  index: number
 }
 
 function CapabilityCard({ capability }: { capability: Capability }) {
+  const eyebrow = `0${capability.index} / AREA`
   return (
-    <article className="group relative flex h-full flex-col rounded-2xl border border-zinc-200 bg-white p-10 transition-all hover:shadow-lg hover:border-indigo-200 dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-800">
-      <h3 className="text-xl font-semibold tracking-tight text-slate-900 dark:text-white">
-        {capability.title}
-      </h3>
-      <p className="mt-6 text-base leading-relaxed text-slate-700 dark:text-slate-400">
-        {capability.description}
-      </p>
-      <ul className="mt-8 space-y-4 text-sm leading-6 text-slate-600 dark:text-slate-400">
-        {capability.highlights.map((highlight) => (
-          <li key={highlight} className="flex items-start gap-4">
-            <span className="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full bg-indigo-600 dark:bg-indigo-400" />
-            <span>{highlight}</span>
-          </li>
-        ))}
-      </ul>
-    </article>
+    <RvtCard
+      eyebrow={eyebrow}
+      title={capability.title}
+      description={capability.description}
+      bullets={capability.highlights}
+      accent="top"
+      className="h-full"
+    />
   )
 }
 
@@ -35,7 +30,7 @@ export default function Capabilities({ lang }: { lang: string }) {
       ? 'Stripeの決済導線設計からAWS/Lambdaによるサーバーレス構築、WordPressによるメディア・マーケティング基盤まで。プロダクトの継続的な収益化と高速な実験を支援します。'
       : 'From Stripe monetization flows to AWS serverless architecture and WordPress-powered marketing platforms. I help teams unlock recurring revenue and ship experiments faster.'
 
-  const capabilities: Capability[] =
+  const capabilities: Omit<Capability, 'index'>[] =
     lang === 'ja'
       ? [
           {
@@ -123,13 +118,42 @@ export default function Capabilities({ lang }: { lang: string }) {
         ]
 
   return (
-    <section className="relative py-24 sm:py-32">
+    <section
+      style={{ position: 'relative', zIndex: 1, borderTop: '1px solid var(--rvt-border)' }}
+      className="py-24 sm:py-32"
+    >
       <Container>
-        <SectionHeader title={sectionTitle} description={sectionDescription} align="center" />
+        <div style={{ maxWidth: 720, marginBottom: 56 }}>
+          <RvtEyebrow className="mb-5">CAPABILITIES</RvtEyebrow>
+          <h2
+            style={{
+              margin: '0 0 18px',
+              fontFamily: 'var(--rvt-font-display)',
+              fontSize: 'clamp(1.8rem, 3.4vw, 2.375rem)',
+              fontWeight: 700,
+              lineHeight: 1.15,
+              letterSpacing: '-0.04em',
+              color: 'var(--rvt-fg)',
+            }}
+          >
+            {sectionTitle}
+          </h2>
+          <p
+            style={{
+              margin: 0,
+              fontSize: 16,
+              fontWeight: 300,
+              lineHeight: 1.8,
+              color: 'var(--rvt-fg2)',
+            }}
+          >
+            {sectionDescription}
+          </p>
+        </div>
 
-        <div className="mt-20 grid gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-12">
-          {capabilities.map((capability) => (
-            <CapabilityCard key={capability.title} capability={capability} />
+        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+          {capabilities.map((capability, i) => (
+            <CapabilityCard key={capability.title} capability={{ ...capability, index: i + 1 }} />
           ))}
         </div>
       </Container>

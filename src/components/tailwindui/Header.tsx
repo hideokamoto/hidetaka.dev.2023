@@ -18,13 +18,6 @@ type NavItem = {
   jaOnly?: boolean
 }
 
-/**
- * Get filtered navigation items based on language.
- * Japanese-only items are excluded when language is English.
- *
- * @param lang - Current language ('ja' or 'en')
- * @returns Array of navigation items filtered by language
- */
 function getNavItems(lang: string): NavItem[] {
   const allNavItems: NavItem[] = [
     { path: 'about', label: lang === 'ja' ? '概要' : 'About' },
@@ -34,16 +27,9 @@ function getNavItems(lang: string): NavItem[] {
     { path: 'news', label: lang === 'ja' ? 'ニュース' : 'News' },
     { path: 'speaking', label: lang === 'ja' ? '登壇' : 'Speaking' },
   ]
-
   return allNavItems.filter((item) => !item.jaOnly || lang === 'ja')
 }
 
-/**
- * Render a menu icon that switches between hamburger and close states.
- *
- * @param isOpen - When `true`, displays the close ("X") icon; when `false`, displays the hamburger menu icon.
- * @returns The SVG element representing the current menu icon state.
- */
 function MenuIcon({ isOpen }: { isOpen: boolean }) {
   return (
     <svg
@@ -82,11 +68,15 @@ function MobileNavItem({
     <Link
       href={href}
       onClick={onClick}
-      className={`block px-4 py-3 text-base font-medium rounded-lg transition-all ${
+      className="block px-4 py-3 text-base font-medium rounded-lg transition-all"
+      style={
         isActive
-          ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'
-          : 'text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-500/5'
-      }`}
+          ? {
+              color: 'var(--rvt-accent)',
+              background: 'color-mix(in oklch, var(--rvt-accent) 10%, transparent)',
+            }
+          : { color: 'var(--rvt-fg2)' }
+      }
     >
       {children}
     </Link>
@@ -105,35 +95,31 @@ function DesktopNavItem({
   return (
     <Link
       href={href}
-      className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+      className="relative px-4 py-2 text-sm font-medium rounded-lg transition-all"
+      style={
         isActive
-          ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'
-          : 'text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-indigo-500/5'
-      }`}
+          ? {
+              color: 'var(--rvt-accent)',
+              background: 'color-mix(in oklch, var(--rvt-accent) 10%, transparent)',
+            }
+          : { color: 'var(--rvt-fg2)' }
+      }
     >
       {children}
       {isActive && (
-        <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-0.5 w-6 bg-indigo-600 dark:bg-indigo-400 rounded-full" />
+        <span
+          className="absolute -bottom-1 left-1/2 -translate-x-1/2 h-0.5 w-6 rounded-full"
+          style={{ background: 'var(--rvt-accent)' }}
+        />
       )}
     </Link>
   )
 }
 
-/**
- * モバイル向けのスライドインナビゲーションパネルと背景のバックドロップを表示する。
- *
- * 開いている間はページの背景スクロールを無効化し、閉じるまたはアンマウント時に復元する。
- * 現在のURLに基づいたローカライズ済みのナビゲーション項目と言語切替を含む。
- *
- * @param isOpen - メニューが表示されているかどうか
- * @param onClose - メニューを閉じることを要求する際に呼び出されるコールバック
- * @returns 開いている場合はモバイルメニューのJSX要素、閉じている場合は`null`
- */
 function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const pathname = usePathname()
   const lang = getLanguageFromURL(pathname)
   const currentLang = lang
-
   const navItems = getNavItems(lang)
   const dialogRef = useDialogA11y<HTMLDivElement>(isOpen, onClose)
 
@@ -152,7 +138,6 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
 
   return (
     <>
-      {/* Backdrop */}
       <button
         type="button"
         className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
@@ -160,29 +145,39 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
         aria-label="Close menu"
       />
 
-      {/* Menu Panel */}
       <div
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label={lang === 'ja' ? 'メニュー' : 'Menu'}
-        className="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-white/95 backdrop-blur-md shadow-2xl ring-1 ring-zinc-900/5 dark:bg-zinc-900/95 dark:ring-white/10 lg:hidden"
+        className="fixed inset-y-0 right-0 z-50 w-full max-w-sm backdrop-blur-md shadow-2xl lg:hidden"
+        style={{
+          background: 'color-mix(in oklch, var(--rvt-bg) 95%, transparent)',
+          outline: '1px solid var(--rvt-border)',
+        }}
       >
         <div className="flex flex-col h-full">
-          {/* Header */}
-          <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-200 dark:border-zinc-800">
-            <h2 className="text-lg font-bold text-slate-900 dark:text-white">Menu</h2>
+          <div
+            className="flex items-center justify-between px-6 py-4"
+            style={{ borderBottom: '1px solid var(--rvt-border)' }}
+          >
+            <h2
+              className="text-lg font-bold"
+              style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+            >
+              Menu
+            </h2>
             <button
               type="button"
               onClick={onClose}
-              className="rounded-lg p-2 text-slate-700 dark:text-slate-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              className="rounded-lg p-2 transition-colors"
+              style={{ color: 'var(--rvt-fg2)' }}
               aria-label="Close menu"
             >
               <MenuIcon isOpen={true} />
             </button>
           </div>
 
-          {/* Navigation */}
           <nav className="flex-1 overflow-y-auto px-6 py-6">
             <div className="space-y-2">
               {navItems.map((item) => {
@@ -201,9 +196,11 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
               })}
             </div>
 
-            {/* Language Switcher */}
-            <div className="mt-8 pt-8 border-t border-zinc-200 dark:border-zinc-800">
-              <h3 className="px-4 mb-4 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            <div className="mt-8 pt-8" style={{ borderTop: '1px solid var(--rvt-border)' }}>
+              <h3
+                className="px-4 mb-4 text-xs font-semibold uppercase tracking-wider"
+                style={{ fontFamily: 'var(--rvt-font-mono)', color: 'var(--rvt-fg3)' }}
+              >
                 Language
               </h3>
               <div className="space-y-2">
@@ -225,10 +222,11 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
             </div>
           </nav>
 
-          {/* Footer */}
-          <div className="px-6 py-4 border-t border-zinc-200 dark:border-zinc-800">
+          <div className="px-6 py-4" style={{ borderTop: '1px solid var(--rvt-border)' }}>
             <div className="flex items-center justify-between">
-              <span className="text-sm text-slate-600 dark:text-slate-400">Theme</span>
+              <span className="text-sm" style={{ color: 'var(--rvt-fg2)' }}>
+                Theme
+              </span>
               <ModeToggle />
             </div>
           </div>
@@ -238,18 +236,9 @@ function MobileMenu({ isOpen, onClose }: { isOpen: boolean; onClose: () => void 
   )
 }
 
-/**
- * デスクトップ表示用の水平ナビゲーションをレンダリングする。
- *
- * 現在のパス名とURLから判断した言語に基づき、jaOnly フラグ付きの項目を英語時に除外してナビゲーション項目を構成し、
- * 各項目は現在のパスと完全一致またはプレフィックス一致する場合にアクティブとして表示される。
- *
- * @returns ナビゲーションを含む `<nav>` 要素を表す React 要素
- */
 function DesktopNavigation() {
   const pathname = usePathname()
   const lang = getLanguageFromURL(pathname)
-
   const navItems = getNavItems(lang)
 
   return (
@@ -272,27 +261,33 @@ function DesktopLangSwitcher() {
   const currentLang = getLanguageFromURL(pathname)
 
   return (
-    <div className="hidden lg:flex items-center gap-1 rounded-lg bg-white/80 backdrop-blur-md px-2 py-1.5 shadow-sm ring-1 ring-zinc-900/5 dark:bg-zinc-800/80 dark:ring-white/10">
-      <Link
-        href={changeLanguageURL(pathname, 'ja')}
-        className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
-          currentLang === 'ja'
-            ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'
-            : 'text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400'
-        }`}
-      >
-        JA
-      </Link>
-      <Link
-        href={changeLanguageURL(pathname, 'en')}
-        className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${
-          currentLang === 'en'
-            ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10'
-            : 'text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400'
-        }`}
-      >
-        EN
-      </Link>
+    <div
+      className="hidden lg:flex items-center gap-1 px-2 py-1.5 backdrop-blur-md shadow-sm"
+      style={{
+        borderRadius: 'var(--rvt-radius-sm)',
+        background: 'color-mix(in oklch, var(--rvt-bg2) 90%, transparent)',
+        outline: '1px solid var(--rvt-border)',
+      }}
+    >
+      {(['ja', 'en'] as const).map((l) => (
+        <Link
+          key={l}
+          href={changeLanguageURL(pathname, l)}
+          className="px-3 py-1.5 text-sm font-medium transition-all"
+          style={{
+            borderRadius: 'var(--rvt-radius-sm)',
+            fontFamily: 'var(--rvt-font-mono)',
+            ...(currentLang === l
+              ? {
+                  color: 'var(--rvt-accent)',
+                  background: 'color-mix(in oklch, var(--rvt-accent) 10%, transparent)',
+                }
+              : { color: 'var(--rvt-fg2)' }),
+          }}
+        >
+          {l.toUpperCase()}
+        </Link>
+      ))}
     </div>
   )
 }
@@ -303,16 +298,25 @@ export default function Header() {
   return (
     <>
       <header
-        className="relative z-50 bg-white dark:bg-zinc-900"
+        className="relative z-50"
         style={{
           height: 'var(--header-height)',
           marginBottom: 'var(--header-mb)',
+          background: 'var(--rvt-bg)',
         }}
       >
-        {/* Background decoration - subtle and minimal */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 right-0 h-40 w-40 rounded-full bg-indigo-200/20 blur-3xl dark:bg-indigo-900/10" />
-          <div className="absolute top-0 left-1/4 h-32 w-32 rounded-full bg-purple-200/15 blur-3xl dark:bg-purple-900/10" />
+        <div aria-hidden="true" className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div
+            style={{
+              position: 'absolute',
+              top: -60,
+              right: -60,
+              width: 200,
+              height: 200,
+              borderRadius: '50%',
+              background: 'radial-gradient(circle, var(--rvt-accent-glow) 0%, transparent 70%)',
+            }}
+          />
         </div>
 
         <div
@@ -324,35 +328,36 @@ export default function Header() {
             style={{ position: 'var(--header-inner-position)' } as unknown as React.CSSProperties}
           >
             <div className="flex items-center justify-between gap-4">
-              {/* Logo */}
               <Link href="/" className="group relative flex-shrink-0">
                 <span className="sr-only">Hidetaka.dev</span>
                 <div className="relative">
-                  <p className="text-xl sm:text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white transition-colors group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                  <p
+                    className="text-xl sm:text-2xl font-extrabold tracking-tight transition-colors"
+                    style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+                  >
                     Hidetaka.dev
                   </p>
-                  <div className="absolute -bottom-1 left-0 h-0.5 w-0 bg-indigo-600 transition-all duration-300 group-hover:w-full dark:bg-indigo-400" />
+                  <div
+                    className="absolute -bottom-1 left-0 h-0.5 w-0 transition-all duration-300 group-hover:w-full"
+                    style={{ background: 'var(--rvt-accent)' }}
+                  />
                 </div>
               </Link>
 
-              {/* Desktop Navigation */}
               <div className="hidden lg:flex items-center gap-6 flex-1 justify-center">
                 <DesktopNavigation />
               </div>
 
-              {/* Right side: Language Switcher & Dark Mode Toggle */}
               <div className="flex items-center gap-3 flex-shrink-0">
                 <DesktopLangSwitcher />
-
                 <div className="hidden lg:block">
                   <ModeToggle />
                 </div>
-
-                {/* Mobile Menu Button */}
                 <button
                   type="button"
                   onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                  className="lg:hidden rounded-lg p-2 text-slate-700 dark:text-slate-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                  className="lg:hidden rounded-lg p-2 transition-colors"
+                  style={{ color: 'var(--rvt-fg2)' }}
                   aria-label="Toggle menu"
                   aria-expanded={mobileMenuOpen}
                 >
@@ -364,7 +369,6 @@ export default function Header() {
         </div>
       </header>
 
-      {/* Mobile Menu */}
       <MobileMenu isOpen={mobileMenuOpen} onClose={() => setMobileMenuOpen(false)} />
     </>
   )

@@ -71,10 +71,10 @@ export default function SentryTestPage() {
     return (
       <div className="container mx-auto px-4 py-16">
         <div className="max-w-2xl mx-auto text-center">
-          <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">
+          <h1 className="text-4xl font-bold text-slate-900 mb-4" style={{ color: 'var(--rvt-fg)' }}>
             Page Not Available
           </h1>
-          <p className="text-lg text-slate-600 dark:text-slate-400">
+          <p className="text-lg text-slate-600" style={{ color: 'var(--rvt-fg2)' }}>
             This page is only available in development mode.
           </p>
         </div>
@@ -86,30 +86,36 @@ export default function SentryTestPage() {
     <div className="container mx-auto px-4 py-16">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">
+          <h1 className="text-4xl font-bold text-slate-900 mb-4" style={{ color: 'var(--rvt-fg)' }}>
             Sentry Error Tracking Test
           </h1>
-          <p className="text-lg text-slate-600 dark:text-slate-400 mb-2">
+          <p className="text-lg text-slate-600 mb-2" style={{ color: 'var(--rvt-fg2)' }}>
             Test various types of errors to verify Sentry integration.
           </p>
-          <p className="text-sm text-amber-600 dark:text-amber-400">
+          <p className="text-sm text-amber-600">
             ⚠️ Development Only - This page is disabled in production
           </p>
         </div>
 
         {status && (
-          <div className="mb-6 p-4 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-800 rounded-lg">
-            <p className="text-sm text-indigo-900 dark:text-indigo-100">{status}</p>
+          <div className="mb-6 p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
+            <p className="text-sm text-indigo-900">{status}</p>
           </div>
         )}
 
         <div className="space-y-8">
           {/* Browser-side tests */}
-          <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-lg p-6">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
+          <div
+            className="bg-white border border-slate-200 rounded-lg p-6"
+            style={{ background: 'var(--rvt-bg2)', borderColor: 'var(--rvt-border)' }}
+          >
+            <h2
+              className="text-2xl font-bold text-slate-900 mb-4"
+              style={{ color: 'var(--rvt-fg)' }}
+            >
               Browser-side Tests
             </h2>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+            <p className="text-sm text-slate-600 mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               These tests run in the browser and should be captured by @sentry/browser
             </p>
             <div className="space-y-3">
@@ -138,11 +144,17 @@ export default function SentryTestPage() {
           </div>
 
           {/* Server-side tests */}
-          <div className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 rounded-lg p-6">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
+          <div
+            className="bg-white border border-slate-200 rounded-lg p-6"
+            style={{ background: 'var(--rvt-bg2)', borderColor: 'var(--rvt-border)' }}
+          >
+            <h2
+              className="text-2xl font-bold text-slate-900 mb-4"
+              style={{ color: 'var(--rvt-fg)' }}
+            >
               Server-side Tests
             </h2>
-            <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
+            <p className="text-sm text-slate-600 mb-4" style={{ color: 'var(--rvt-fg2)' }}>
               These tests run on the server and should be captured by @sentry/cloudflare
             </p>
             <div className="space-y-3">
@@ -164,22 +176,16 @@ export default function SentryTestPage() {
           </div>
 
           {/* Instructions */}
-          <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
-            <h3 className="text-xl font-bold text-blue-900 dark:text-blue-100 mb-3">
-              Verification Steps
-            </h3>
-            <ol className="list-decimal list-inside space-y-2 text-sm text-blue-900 dark:text-blue-100">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <h3 className="text-xl font-bold text-blue-900 mb-3">Verification Steps</h3>
+            <ol className="list-decimal list-inside space-y-2 text-sm text-blue-900">
               <li>Set up your Sentry project and get DSN</li>
               <li>
-                Add{' '}
-                <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">
-                  NEXT_PUBLIC_SENTRY_DSN
-                </code>{' '}
-                to .env.local
+                Add <code className="bg-blue-100 px-1 rounded">NEXT_PUBLIC_SENTRY_DSN</code> to
+                .env.local
               </li>
               <li>
-                Add <code className="bg-blue-100 dark:bg-blue-900 px-1 rounded">SENTRY_DSN</code> to
-                .env.local
+                Add <code className="bg-blue-100 px-1 rounded">SENTRY_DSN</code> to .env.local
               </li>
               <li>Restart the dev server</li>
               <li>Click the test buttons above</li>

@@ -18,10 +18,10 @@ export default async function TestSentryPage() {
     return (
       <div className="flex min-h-dvh items-center justify-center px-4">
         <div className="text-center max-w-md">
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
+          <h1 className="text-3xl font-bold mb-4" style={{ color: 'var(--rvt-fg)' }}>
             本番環境では利用できません
           </h1>
-          <p className="text-slate-600 dark:text-slate-400">
+          <p style={{ color: 'var(--rvt-fg2)' }}>
             このテストページは開発モードでのみ利用可能です。
           </p>
         </div>

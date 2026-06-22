@@ -46,3 +46,7 @@ RELEASE_NOTES_*.md
 docs/reports/
 
 content-*.md
+
+# chunk active sidecar tracking
+.chunk/sidecar.json
+.chunk/sidecar.*.json

@@ -97,15 +97,15 @@ export default function SentryTestClient() {
   }
 
   return (
-    <div className="min-h-dvh bg-zinc-50 dark:bg-black py-12 px-4">
+    <div className="min-h-dvh bg-zinc-50 py-12 px-4" style={{ background: 'var(--rvt-bg)' }}>
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white dark:bg-zinc-900 rounded-lg shadow-lg p-8">
-          <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-4">
+        <div className="bg-white rounded-lg shadow-lg p-8" style={{ background: 'var(--rvt-bg2)' }}>
+          <h1 className="text-4xl font-bold text-slate-900 mb-4" style={{ color: 'var(--rvt-fg)' }}>
             Sentry Error Tracking Test
           </h1>
 
-          <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
-            <p className="text-sm text-yellow-800 dark:text-yellow-200">
+          <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p className="text-sm text-yellow-800">
               <strong>Development Mode Only:</strong> This page is for testing Sentry integration.
               Click the buttons below to trigger test errors and verify they appear in your Sentry
               dashboard.
@@ -115,7 +115,10 @@ export default function SentryTestClient() {
           <div className="space-y-8">
             {/* Browser Error Tests */}
             <section>
-              <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mb-4">
+              <h2
+                className="text-2xl font-semibold text-slate-900 mb-4"
+                style={{ color: 'var(--rvt-fg)' }}
+              >
                 Browser Error Tests
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -145,7 +148,10 @@ export default function SentryTestClient() {
 
             {/* Server Error Tests */}
             <section>
-              <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mb-4">
+              <h2
+                className="text-2xl font-semibold text-slate-900 mb-4"
+                style={{ color: 'var(--rvt-fg)' }}
+              >
                 Server Error Tests
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -179,11 +185,20 @@ export default function SentryTestClient() {
             {/* Result Display */}
             {lastResult && (
               <section>
-                <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mb-4">
+                <h2
+                  className="text-2xl font-semibold text-slate-900 mb-4"
+                  style={{ color: 'var(--rvt-fg)' }}
+                >
                   Last Result
                 </h2>
-                <div className="p-4 bg-slate-100 dark:bg-slate-800 rounded-lg">
-                  <p className="text-slate-800 dark:text-slate-200 font-mono text-sm">
+                <div
+                  className="p-4 bg-slate-100 rounded-lg"
+                  style={{ background: 'var(--rvt-bg3)' }}
+                >
+                  <p
+                    className="text-slate-800 font-mono text-sm"
+                    style={{ color: 'var(--rvt-fg)' }}
+                  >
                     {lastResult}
                   </p>
                 </div>
@@ -191,11 +206,20 @@ export default function SentryTestClient() {
             )}
 
             {/* Instructions */}
-            <section className="border-t border-slate-200 dark:border-slate-700 pt-6">
-              <h2 className="text-2xl font-semibold text-slate-900 dark:text-white mb-4">
+            <section
+              className="border-t border-slate-200 pt-6"
+              style={{ borderColor: 'var(--rvt-border)' }}
+            >
+              <h2
+                className="text-2xl font-semibold text-slate-900 mb-4"
+                style={{ color: 'var(--rvt-fg)' }}
+              >
                 Verification Steps
               </h2>
-              <ol className="list-decimal list-inside space-y-2 text-slate-700 dark:text-slate-300">
+              <ol
+                className="list-decimal list-inside space-y-2 text-slate-700"
+                style={{ color: 'var(--rvt-fg2)' }}
+              >
                 <li>Configure NEXT_PUBLIC_SENTRY_DSN in your .env.local file</li>
                 <li>Ensure you're running in development mode (npm run dev)</li>
                 <li>Click any test button above</li>
@@ -209,7 +233,8 @@ export default function SentryTestClient() {
                     href="https://sentry.io"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-indigo-600 dark:text-indigo-400 hover:underline"
+                    className="text-indigo-600 hover:underline"
+                    style={{ color: 'var(--rvt-accent)' }}
                   >
                     sentry.io
                   </a>

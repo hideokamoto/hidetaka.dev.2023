@@ -52,14 +52,17 @@ function ArticleCard({
   if (variant === 'featured') {
     return (
       <CardWrapper>
-        <article className="relative h-full overflow-hidden rounded-3xl border border-zinc-200 bg-gradient-to-br from-white via-indigo-50/50 to-purple-50/30 p-10 transition-all hover:border-indigo-300 hover:shadow-2xl dark:border-zinc-800 dark:from-zinc-900 dark:via-indigo-950/30 dark:to-purple-950/20 dark:hover:border-indigo-700">
+        <article
+          className="relative h-full overflow-hidden rounded-3xl p-10 transition-all hover:border-indigo-300 hover:shadow-2xl"
+          style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+        >
           <div className="flex flex-col gap-6">
             <div className="flex items-center justify-between">
               <DateDisplay
                 date={date}
                 lang={lang}
                 format="short"
-                className="text-sm font-bold text-indigo-600 dark:text-indigo-400"
+                className="text-sm font-bold [color:var(--rvt-accent)]"
               />
               {article.dataSource && (
                 <Tag variant="indigo" size="md" className="px-4 py-1.5 font-bold">
@@ -68,16 +71,29 @@ function ArticleCard({
               )}
             </div>
 
-            <h3 className="text-3xl font-extrabold leading-tight tracking-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+            <h3
+              className="text-3xl font-extrabold leading-tight tracking-tight transition-colors group-hover:text-indigo-600"
+              style={{
+                fontFamily: 'var(--rvt-font-display)',
+                color: 'var(--rvt-fg)',
+                letterSpacing: '-0.03em',
+              }}
+            >
               {title}
             </h3>
 
-            <p className="text-base leading-relaxed text-slate-700 dark:text-slate-300 line-clamp-4">
+            <p
+              className="text-base leading-relaxed line-clamp-4"
+              style={{ color: 'var(--rvt-fg2)' }}
+            >
               {description}
               {description.length >= 200 ? '...' : ''}
             </p>
 
-            <div className="mt-auto flex items-center gap-2 text-sm font-bold text-indigo-600 dark:text-indigo-400">
+            <div
+              className="mt-auto flex items-center gap-2 text-sm font-bold"
+              style={{ color: 'var(--rvt-accent)' }}
+            >
               <span>{lang === 'ja' ? '記事を読む' : 'Read article'}</span>
               <span className="transition-transform group-hover:translate-x-1">→</span>
             </div>
@@ -89,13 +105,16 @@ function ArticleCard({
 
   return (
     <CardWrapper>
-      <article className="flex h-full flex-col rounded-xl border border-zinc-200 bg-white p-6 transition-all hover:border-indigo-300 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-indigo-700">
+      <article
+        className="flex h-full flex-col rounded-xl p-6 transition-all hover:border-indigo-300 hover:shadow-lg"
+        style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+      >
         <div className="flex items-center justify-between mb-3">
           <DateDisplay
             date={date}
             lang={lang}
             format="short"
-            className="text-xs font-semibold text-slate-500 dark:text-slate-400"
+            className="text-xs font-semibold [color:var(--rvt-fg2)]"
           />
           {article.dataSource && (
             <Tag variant="default" size="sm" className="text-[10px]">
@@ -104,11 +123,17 @@ function ArticleCard({
           )}
         </div>
 
-        <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors mb-3">
+        <h3
+          className="text-lg font-bold leading-tight transition-colors group-hover:text-indigo-600 mb-3"
+          style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+        >
           {title}
         </h3>
 
-        <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 line-clamp-2 flex-1">
+        <p
+          className="text-sm leading-relaxed line-clamp-2 flex-1"
+          style={{ color: 'var(--rvt-fg2)' }}
+        >
           {description}
           {description.length >= 120 ? '...' : ''}
         </p>
@@ -132,8 +157,10 @@ function ProjectCard({
   if (variant === 'featured') {
     return (
       <Link href={href} className="group block">
-        <article className="relative overflow-hidden rounded-3xl border border-zinc-200 bg-white transition-all hover:border-purple-300 hover:shadow-2xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-purple-700">
-          {/* Large Image - Top */}
+        <article
+          className="relative overflow-hidden rounded-3xl transition-all hover:border-indigo-300 hover:shadow-2xl"
+          style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+        >
           {project.image && (
             <div className="relative aspect-video w-full overflow-hidden">
               <Image
@@ -148,7 +175,6 @@ function ProjectCard({
             </div>
           )}
 
-          {/* Content - Bottom */}
           <div className="p-8 lg:p-10">
             <div className="flex flex-col gap-4">
               {date && (
@@ -156,11 +182,18 @@ function ProjectCard({
                   date={date}
                   lang={lang}
                   format="short"
-                  className="text-sm font-semibold text-purple-600 dark:text-purple-400"
+                  className="text-sm font-semibold [color:var(--rvt-accent)]"
                 />
               )}
 
-              <h3 className="text-2xl font-bold leading-tight tracking-tight text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors lg:text-3xl">
+              <h3
+                className="text-2xl font-bold leading-tight tracking-tight transition-colors group-hover:text-indigo-600 lg:text-3xl"
+                style={{
+                  fontFamily: 'var(--rvt-font-display)',
+                  color: 'var(--rvt-fg)',
+                  letterSpacing: '-0.03em',
+                }}
+              >
                 {project.title}
               </h3>
 
@@ -174,7 +207,10 @@ function ProjectCard({
                 </div>
               )}
 
-              <div className="mt-4 flex items-center gap-2 text-sm font-semibold text-purple-600 dark:text-purple-400">
+              <div
+                className="mt-4 flex items-center gap-2 text-sm font-semibold"
+                style={{ color: 'var(--rvt-accent)' }}
+              >
                 <span>{lang === 'ja' ? '詳細を見る' : 'View project'}</span>
                 <span className="transition-transform group-hover:translate-x-1">→</span>
               </div>
@@ -187,8 +223,10 @@ function ProjectCard({
 
   return (
     <Link href={href} className="group block">
-      <article className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-white transition-all hover:border-purple-300 hover:shadow-xl dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-purple-700">
-        {/* Image - Top, larger */}
+      <article
+        className="relative overflow-hidden rounded-2xl transition-all hover:border-indigo-300 hover:shadow-xl"
+        style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+      >
         {project.image && (
           <div className="relative aspect-[4/3] w-full overflow-hidden">
             <Image
@@ -201,7 +239,6 @@ function ProjectCard({
           </div>
         )}
 
-        {/* Content - Bottom */}
         <div className="p-5 lg:p-6">
           <div className="flex flex-col gap-3">
             {date && (
@@ -209,11 +246,14 @@ function ProjectCard({
                 date={date}
                 lang={lang}
                 format="short"
-                className="text-xs font-semibold text-slate-500 dark:text-slate-400"
+                className="text-xs font-semibold [color:var(--rvt-fg2)]"
               />
             )}
 
-            <h3 className="text-lg font-bold leading-tight text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+            <h3
+              className="text-lg font-bold leading-tight transition-colors group-hover:text-indigo-600"
+              style={{ fontFamily: 'var(--rvt-font-display)', color: 'var(--rvt-fg)' }}
+            >
               {project.title}
             </h3>
 
@@ -286,12 +326,20 @@ export default async function FeaturedContent({ lang }: { lang: string }) {
           {articles.length > 0 && (
             <div>
               <div className="flex items-center justify-between mb-12">
-                <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+                <h2
+                  className="text-3xl font-bold tracking-tight sm:text-4xl"
+                  style={{
+                    fontFamily: 'var(--rvt-font-display)',
+                    color: 'var(--rvt-fg)',
+                    letterSpacing: '-0.03em',
+                  }}
+                >
                   {latestArticlesText}
                 </h2>
                 <Link
                   href={lang === 'ja' ? '/ja/writing' : '/writing'}
-                  className="group flex items-center gap-1.5 text-sm font-semibold text-indigo-600 transition-all hover:text-indigo-700 hover:gap-2 dark:text-indigo-400 dark:hover:text-indigo-300"
+                  className="group flex items-center gap-1.5 text-sm font-semibold transition-all hover:opacity-80 hover:gap-2"
+                  style={{ color: 'var(--rvt-accent)' }}
                 >
                   <span>{viewAllText}</span>
                   <span className="transition-transform group-hover:translate-x-0.5">→</span>
@@ -320,12 +368,20 @@ export default async function FeaturedContent({ lang }: { lang: string }) {
           {projects.length > 0 && (
             <div>
               <div className="flex items-center justify-between mb-12">
-                <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+                <h2
+                  className="text-3xl font-bold tracking-tight sm:text-4xl"
+                  style={{
+                    fontFamily: 'var(--rvt-font-display)',
+                    color: 'var(--rvt-fg)',
+                    letterSpacing: '-0.03em',
+                  }}
+                >
                   {featuredProjectsText}
                 </h2>
                 <Link
                   href={lang === 'ja' ? '/ja/work' : '/work'}
-                  className="group flex items-center gap-1.5 text-sm font-semibold text-indigo-600 transition-all hover:text-indigo-700 hover:gap-2 dark:text-indigo-400 dark:hover:text-indigo-300"
+                  className="group flex items-center gap-1.5 text-sm font-semibold transition-all hover:opacity-80 hover:gap-2"
+                  style={{ color: 'var(--rvt-accent)' }}
                 >
                   <span>{viewAllText}</span>
                   <span className="transition-transform group-hover:translate-x-0.5">→</span>
