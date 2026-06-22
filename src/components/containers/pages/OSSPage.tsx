@@ -32,7 +32,7 @@ export default async function OSSPageContent({ lang }: { lang: string }) {
           <div />
           <div className="md:col-span-7">
             <div className="flex flex-col gap-16">
-              <div className="md:border-l md:md:pl-6" style={{ borderColor: 'var(--rvt-border)' }}>
+              <div className="md:border-l md:pl-6" style={{ borderColor: 'var(--rvt-border)' }}>
                 <div className="flex max-w-3xl flex-col space-y-16">
                   {npmPackages.map((pkg) => (
                     <article
@@ -100,7 +100,7 @@ export default async function OSSPageContent({ lang }: { lang: string }) {
           <div />
           <div className="md:col-span-7">
             <div className="flex flex-col gap-16">
-              <div className="md:border-l md:md:pl-6" style={{ borderColor: 'var(--rvt-border)' }}>
+              <div className="md:border-l md:pl-6" style={{ borderColor: 'var(--rvt-border)' }}>
                 <div className="flex max-w-3xl flex-col space-y-16">
                   {wpPlugins.map((plugin) => (
                     <article key={plugin.slug} className="md:grid md:grid-cols-4 md:items-baseline">

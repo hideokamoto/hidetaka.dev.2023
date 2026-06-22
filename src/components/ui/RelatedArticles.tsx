@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import type { BlogItem } from '@/libs/dataSources/types'
+import { cn } from '@/libs/utils/cn'
 import DateDisplay from './DateDisplay'
 
 type RelatedArticlesProps = {
@@ -25,7 +26,7 @@ export default function RelatedArticles({
 
   return (
     <section
-      className={['mt-16 border-t pt-12', className].filter(Boolean).join(' ')}
+      className={cn('mt-16 border-t pt-12', className)}
       style={{ borderColor: 'var(--rvt-border)' }}
     >
       <h2

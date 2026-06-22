@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { cn } from '@/libs/utils/cn'
 
 export type Breadcrumb = {
   label: string
@@ -24,7 +25,7 @@ export default function PageShell({
 }: PageShellProps) {
   return (
     <header
-      className={`mb-12 border-b pb-10 ${className}`}
+      className={cn('mb-12 border-b pb-10', className)}
       style={{ borderColor: 'var(--rvt-border)' }}
     >
       <nav

@@ -1,4 +1,5 @@
 import DateDisplay from '@/components/ui/DateDisplay'
+import { cn } from '@/libs/utils/cn'
 
 type ArticleMetaProps = {
   published: Date | string
@@ -50,7 +51,10 @@ export default function ArticleMeta({
 
   return (
     <div
-      className={`mb-8 flex flex-wrap items-center gap-x-4 gap-y-2 border-b pb-6 text-sm ${className}`}
+      className={cn(
+        'mb-8 flex flex-wrap items-center gap-x-4 gap-y-2 border-b pb-6 text-sm',
+        className,
+      )}
       style={{ borderColor: 'var(--rvt-border)', color: 'var(--rvt-fg2)' }}
     >
       <span className="flex items-center gap-1.5">

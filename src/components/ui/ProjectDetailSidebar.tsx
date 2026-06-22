@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import ProfileCard from '@/components/ui/ProfileCard'
 import type { MicroCMSProjectsRecord } from '@/libs/microCMS/types'
+import { cn } from '@/libs/utils/cn'
 
 type ProjectDetailSidebarProps = {
   project: MicroCMSProjectsRecord
@@ -26,7 +27,7 @@ export default function ProjectDetailSidebar({
   const backLabel = lang === 'ja' ? `${sectionLabel}一覧に戻る` : `Back to ${sectionLabel}`
 
   return (
-    <div className={`hidden lg:block lg:space-y-7 ${className}`}>
+    <div className={cn('hidden lg:block lg:space-y-7', className)}>
       {/* CTA */}
       {project.url && (
         <a

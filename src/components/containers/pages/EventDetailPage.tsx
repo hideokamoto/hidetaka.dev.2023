@@ -115,10 +115,7 @@ export default function EventDetailPage({
                   <span className="text-sm font-medium mb-1" style={{ color: 'var(--rvt-fg2)' }}>
                     ← {nextLabel}
                   </span>
-                  <span
-                    className="text-base font-semibold group-hover:text-indigo-600 transition-colors line-clamp-2"
-                    style={{ color: 'var(--rvt-fg)' }}
-                  >
+                  <span className="text-base font-semibold transition-colors line-clamp-2 text-[var(--rvt-fg)] group-hover:text-[var(--rvt-accent)]">
                     {nextEvent.title.rendered}
                   </span>
                 </Link>
@@ -134,10 +131,7 @@ export default function EventDetailPage({
                   <span className="text-sm font-medium mb-1" style={{ color: 'var(--rvt-fg2)' }}>
                     {previousLabel} →
                   </span>
-                  <span
-                    className="text-base font-semibold group-hover:text-indigo-600 transition-colors line-clamp-2"
-                    style={{ color: 'var(--rvt-fg)' }}
-                  >
+                  <span className="text-base font-semibold transition-colors line-clamp-2 text-[var(--rvt-fg)] group-hover:text-[var(--rvt-accent)]">
                     {previousEvent.title.rendered}
                   </span>
                 </Link>

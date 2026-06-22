@@ -1,3 +1,5 @@
+import { cn } from '@/libs/utils/cn'
+
 type SocialShareButtonsProps = {
   url: string
   title: string
@@ -77,7 +79,10 @@ export default function SocialShareButtons({
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`${shareButtonLabel} on ${button.name}`}
-              className={`inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors ${button.color}`}
+              className={cn(
+                'inline-flex h-9 w-9 items-center justify-center rounded-md transition-colors',
+                button.color,
+              )}
               style={{ border: '1px solid var(--rvt-border)', color: 'var(--rvt-fg2)' }}
               title={`${shareButtonLabel} on ${button.name}`}
             >
