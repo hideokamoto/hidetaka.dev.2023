@@ -178,11 +178,11 @@ describe('Component Styles Utils', () => {
       expect(styles).toContain('font-bold')
 
       // Secondary variant tokens
-      expect(styles).toContain('border-zinc-200')
+      expect(styles).toContain('border-zinc-300')
       expect(styles).toContain('bg-white')
       expect(styles).toContain('text-zinc-900')
       expect(styles).toContain('hover:bg-zinc-50')
-      expect(styles).toContain('dark:border-zinc-700')
+      expect(styles).toContain('dark:border-zinc-600')
       expect(styles).toContain('dark:bg-zinc-900')
       expect(styles).toContain('dark:text-white')
       expect(styles).toContain('dark:hover:bg-zinc-800')
