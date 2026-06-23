@@ -51,6 +51,14 @@ export default function StackShowcase({ lang }: { lang: string }) {
           ? ['App Router & RSC', 'ISR & パフォーマンス', 'Cloudflare Workers 対応']
           : ['App Router & RSC', 'ISR & performance', 'Cloudflare Workers deploy'],
     },
+    {
+      name: 'AI Development',
+      description: lang === 'ja' ? 'Claude / OpenAI / MCP' : 'Claude · OpenAI · MCP',
+      highlights:
+        lang === 'ja'
+          ? ['AIエージェント開発', 'LLMアプリ設計', 'MCP・ツール連携']
+          : ['AI agent development', 'LLM app architecture', 'MCP & tool integration'],
+    },
   ]
 
   const title =
@@ -102,7 +110,7 @@ export default function StackShowcase({ lang }: { lang: string }) {
           </p>
         </div>
 
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((item) => (
             <RvtCard
               key={item.name}
