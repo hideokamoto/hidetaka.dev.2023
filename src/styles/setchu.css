@@ -1,0 +1,129 @@
+/* ============================================================
+   折衷 (Setchū) Design System — CSS Tokens
+   Palette 05 · "和紙と墨" (washi & ink)
+
+   和紙と墨のニュートラルを土台に、藍青(あいあお)を主役、
+   松葉緑と山吹を少量のアクセントに。スライド・Web・アプリで
+   一貫して使えるトークン一式。緑と黄は「差し色」に留めるのが
+   この配色を静かに保つ鍵。
+
+   Balance target: neutral ~65% / 藍青 ~25% / 松葉緑・山吹 ~10%
+   (green & gold as small spot accents only — never large areas).
+
+   NOTE: token names keep the historical `--rvt-*` prefix so the
+   existing component tree keeps working unchanged; the *values*
+   are the 折衷 palette. Default (:root) = light, `.dark` = dark.
+   ============================================================ */
+
+/* ---- Light mode (default) ---- */
+:root {
+  /* Surfaces & text (washi paper & sumi ink) */
+  --rvt-bg: #f5f2ec; /* 背景 washi */
+  --rvt-bg2: #ffffff; /* サーフェス — cards sit brighter than the paper bg */
+  --rvt-bg3: #efe9dc; /* subtle sunken / nested tint */
+  --rvt-fg: #23262b; /* テキスト — primary ink */
+  --rvt-fg2: #565a61; /* secondary text (AA on washi) */
+  --rvt-fg3: #7b7e82; /* ミュート — muted labels */
+  --rvt-border: #e4ded2; /* ボーダー */
+  --rvt-border-accent: rgba(47, 83, 117, 0.28);
+  --rvt-accent-glow: rgba(47, 83, 117, 0.1);
+
+  /* Brand */
+  --rvt-accent: #2f5375; /* プライマリ 藍青 — the protagonist */
+  --rvt-accent2: #24425f; /* deeper 藍青 for calm gradients / hover */
+  --rvt-primary-contrast: #ffffff; /* text on 藍青 surfaces */
+  --rvt-secondary: #3e7a55; /* セカンダリ 松葉緑 — spot accent */
+  --rvt-accent-gold: #e0a63c; /* アクセント 山吹 — spot accent */
+
+  /* Fonts — 明朝 for display, Zen Kaku Gothic for body */
+  --rvt-font-display: "Shippori Mincho", "Zen Kaku Gothic New", "Hiragino Mincho ProN", serif;
+  --rvt-font-body: "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", system-ui, sans-serif;
+  --rvt-font-mono: "SF Mono", ui-monospace, "JetBrains Mono", monospace;
+
+  /* Radii — tightened for a calmer, editorial feel */
+  --rvt-radius-sm: 6px;
+  --rvt-radius-md: 8px;
+  --rvt-radius: 10px;
+  --rvt-radius-lg: 12px;
+  --rvt-radius-xl: 14px;
+  --rvt-radius-2xl: 18px;
+  --rvt-radius-pill: 999px;
+
+  --rvt-max-w: 1200px;
+  --rvt-px: 48px;
+
+  --rvt-space-1: 4px;
+  --rvt-space-2: 8px;
+  --rvt-space-3: 12px;
+  --rvt-space-4: 16px;
+  --rvt-space-5: 20px;
+  --rvt-space-6: 24px;
+  --rvt-space-8: 32px;
+  --rvt-space-10: 40px;
+  --rvt-space-12: 48px;
+  --rvt-space-16: 64px;
+  --rvt-space-section: 128px;
+
+  --rvt-transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --rvt-transition-fast: 0.2s ease;
+  --rvt-transition-medium: 0.3s ease;
+
+  /* Shadows — quiet, ink-tinted (no neon glow) */
+  --rvt-shadow-cta: 0 1px 2px rgba(35, 38, 43, 0.06);
+  --rvt-shadow-cta-hover: 0 6px 20px rgba(47, 83, 117, 0.16);
+
+  --rvt-grid-size: 60px;
+  --rvt-grid-size-band: 40px;
+
+  /* Status — kept within the 折衷 world */
+  --success: #3e7a55; /* 松葉緑 */
+  --warning: #e0a63c; /* 山吹 */
+  --error: #b3452f; /* muted vermilion, calmer than neon red */
+  --info: #2f5375; /* 藍青 */
+}
+
+/* ---- Dark mode ---- */
+.dark {
+  --rvt-bg: #16181c;
+  --rvt-bg2: #1f2228;
+  --rvt-bg3: #262a31;
+  --rvt-fg: #e9e7df;
+  --rvt-fg2: #b7b4ac;
+  --rvt-fg3: #8b8e93;
+  --rvt-border: #2e3138;
+  --rvt-border-accent: rgba(110, 155, 192, 0.32);
+  --rvt-accent-glow: rgba(110, 155, 192, 0.18);
+
+  --rvt-accent: #6e9bc0; /* 藍青 (light) */
+  --rvt-accent2: #5a86ab;
+  --rvt-primary-contrast: #12151a;
+  --rvt-secondary: #6fb088; /* 松葉緑 (light) */
+  --rvt-accent-gold: #ecbe56; /* 山吹 (light) */
+
+  --success: #6fb088;
+  --warning: #ecbe56;
+  --error: #d98a76;
+  --info: #6e9bc0;
+}
+
+/* ---- Signature grid background (dark mode only, kept very faint) ---- */
+.dark .rvt-grid-bg::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--rvt-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--rvt-border) 1px, transparent 1px);
+  background-size: var(--rvt-grid-size) var(--rvt-grid-size);
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ---- Japanese text refinements ---- */
+:lang(ja) {
+  font-feature-settings: "palt";
+  overflow-wrap: anywhere;
+  word-break: normal;
+  line-break: strict;
+}

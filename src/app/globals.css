@@ -1,13 +1,20 @@
-@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Noto+Sans+JP:wght@300;400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap");
-@import '../styles/revtrona.css';
+@import url("https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap");
+@import '../styles/setchu.css';
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+/* Base typography: body uses Zen Kaku Gothic New (折衷) site-wide */
+@layer base {
+  body {
+    font-family: var(--rvt-font-body);
+  }
+}
+
 /* Accessibility: visible focus indicator for keyboard navigation */
 @layer base {
   :focus-visible {
-    outline: 2px solid theme('colors.indigo.500');
+    outline: 2px solid var(--rvt-accent);
     outline-offset: 2px;
   }
 }
@@ -36,6 +43,7 @@
 .blog-content h5,
 .blog-content h6 {
   @apply font-bold mt-8 mb-4;
+  font-family: var(--rvt-font-display);
   color: var(--rvt-fg);
 }
 
@@ -152,7 +160,7 @@
 /* Japanese typography utilities */
 @layer utilities {
   .font-japanese {
-    font-family: "Noto Sans JP", "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Helvetica Neue", Arial, sans-serif;
+    font-family: "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Helvetica Neue", Arial, sans-serif;
   }
 
   .japanese-typography {

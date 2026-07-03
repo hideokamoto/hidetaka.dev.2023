@@ -227,13 +227,14 @@ export default async function Page({ params }) {
 
 ### 5. Styling with TailwindCSS
 
-**Approach:** Pure utility classes, no custom CSS
+**Approach:** Utility classes mapped to the **折衷 (Setchū)** design tokens. Canonical tokens live in `src/styles/setchu.css` (CSS variables `--rvt-*`) and `tailwind.config.cjs` (which remaps Tailwind scales onto the palette). See `docs/guides/design-guidelines.md`.
 
-**Design System:**
-- **Primary Color:** Indigo (`indigo-600`, `indigo-700`)
-- **Text Colors:** Slate (`slate-900`, `slate-700`, `slate-600`)
-- **Dark Mode:** Zinc backgrounds (`zinc-800`, `zinc-900`)
-- **Accents:** Purple, Cyan (gradients)
+**Design System — 折衷 (Setchū / "washi & ink"):**
+- **Primary — 藍青 (indigo-blue):** the protagonist, for headings/CTAs/links. `--rvt-accent` / `indigo-*` (`#2F5375` light, `#6E9BC0` dark)
+- **Neutral — 和紙 (washi):** backgrounds & text via `zinc/slate/gray-*` (remapped) — bg `#F5F2EC`, surface `#FFFFFF`, ink text `#23262B`
+- **Spot accents (small areas only):** 松葉緑 pine green `green-*` / `--rvt-secondary`, 山吹 gold `yamabuki-*` / `--rvt-accent-gold`. Keep green & gold as *差し色* — never large or paired in big areas.
+- **Fonts:** display = Shippori Mincho (明朝), body = Zen Kaku Gothic New, mono = SF Mono (`--rvt-font-*` / `font-display`/`font-mono`)
+- **Dark Mode:** `class` strategy; all colors switch automatically through `--rvt-*` tokens
 
 **Key Patterns:**
 ```tsx

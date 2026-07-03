@@ -116,11 +116,13 @@ export default function BlogTranslation({
   // 開発環境ではデバッグ情報を表示
   if (process.env.NODE_ENV === 'development' && availability === 'unavailable') {
     return (
-      <div className={cn('mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg', className)}>
-        <p className="text-sm text-yellow-800 mb-2">⚠️ Translator API Debug Info</p>
-        <details className="text-xs text-yellow-700">
+      <div
+        className={cn('mb-6 p-4 bg-yamabuki-50 border border-yamabuki-200 rounded-lg', className)}
+      >
+        <p className="text-sm text-yamabuki-800 mb-2">⚠️ Translator API Debug Info</p>
+        <details className="text-xs text-yamabuki-700">
           <summary className="cursor-pointer mb-2">Debug details</summary>
-          <pre className="mt-2 p-2 bg-yellow-100 rounded overflow-auto">
+          <pre className="mt-2 p-2 bg-yamabuki-100 rounded overflow-auto">
             {JSON.stringify(
               {
                 availability,
@@ -334,7 +336,7 @@ export default function BlogTranslation({
 
       {/* ダウンロード中の警告 */}
       {availability === 'downloading' && (
-        <p className="mt-2 text-sm text-amber-600">⚠️ {text.downloading}</p>
+        <p className="mt-2 text-sm text-yamabuki-800">⚠️ {text.downloading}</p>
       )}
 
       {/* ローディング状態 */}
