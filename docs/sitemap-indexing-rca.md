@@ -3,10 +3,10 @@
 ## 概要
 
 **確認日**: 2026-07-16
-**影響範囲**: hidetaka.dev の `/sitemap.xml` 配信(Cloudflare Workers / OpenNext)
-**症状**: 2026年3月以降に公開した記事が Google に発見・クロールされない
-**根本原因**: `/sitemap.xml` が Next.js ISR(30分 revalidate)の静的ルートとして配信されており、OpenNext Cloudflare の stale-while-revalidate はリクエストトリガー型のため、アクセス頻度の低い `/sitemap.xml` が実際には revalidate 周期を大幅に超えて古い内容のまま配信され続けていた可能性が高い
-**対策**: `src/app/sitemap.ts` に `export const dynamic = 'force-dynamic'` を追加し、リクエスト毎に最新コンテンツで再計算するよう変更(PR で対応)
+**症状**: 2026年3月以降に公開した記事(特に `/ja/writing/dev-notes/` 配下は公開日の新旧を問わず)が Google に発見・クロールされない
+**結論(訂正版)**: `sitemap.xml` の生成・配信は本番でも正常に最新化されており、コード側に原因はない。原因は Google 側のクロール・インデックス処理(クロール予算、品質シグナルなど)にあると考えられ、コード修正では解決できない。デプロイ後の対応として `docs/gsc-indexing-checklist.md` の手順(サイトマップ再送信・URL検査によるインデックス登録リクエスト)を人間が実施する必要がある。
+
+> **本ドキュメントには調査過程での誤った仮説とその反証の記録を含む。** 最初に立てた「sitemap.xmlがISRキャッシュにより古いまま配信されている」という仮説は、本番の `sitemap.xml` を直接確認した結果、明確に反証された。調査の透明性のため経緯をそのまま残す。
 
 ---
 
@@ -15,82 +15,60 @@
 | 記事 | 公開日 | coverageState | 発見元 |
 |---|---|---|---|
 | /ja/blog/1459 | 2025-09-17 | PASS(送信して登録されました) | — |
-| /ja/blog/recap-2025 | 2025-12-31 | クロール済み・インデックス未登録 | **sitemap.xml** |
-| /ja/blog/join-cci-2026 | 2026-02-24 | クロール済み・インデックス未登録 | **内部リンク**(sitemapではない) |
+| /ja/blog/recap-2025 | 2025-12-31 | クロール済み・インデックス未登録 | sitemap.xml |
+| /ja/blog/join-cci-2026 | 2026-02-24 | クロール済み・インデックス未登録 | 内部リンク(sitemapではない) |
 | /ja/blog/use-gen-ai-for-onboarding-partner | 2026-05-06 | URLが認識されていません | — |
 | /ja/writing/dev-notes/try-claude-code-auto-fix | 2026-03-27 | URLが認識されていません | — |
 | /ja/writing/dev-notes/resolve-npm-ci-error-via-npmrc | 2026-03-11 | URLが認識されていません | — |
 | /ja/writing/dev-notes/deploy-static-html-to-cloudflare-workers-as-a-static-assets | 2025-10-12 | URLが認識されていません | — |
 | /ja/writing/dev-notes 直近5件 | 2026-07-04〜10 | URLが認識されていません | — |
 
-**重要な観察**: `/ja/writing/dev-notes/` 配下は公開日が2025年10月であっても2026年7月であっても、一貫して「URLが認識されていません」。つまりこれは「3月以降の新しい記事だけが問題」なのではなく、**dev-notesという記事系統がsitemap経由で一度も正しく発見されていない**ことを示す。
+**重要な観察**: `/ja/writing/dev-notes/` 配下は公開日が2025年10月であっても2026年7月であっても、一貫して「URLが認識されていません」。つまり「3月以降の新しい記事だけが問題」なのではなく、**dev-notesという記事系統がGoogleのクロールにおいて一貫して優先度が低い(または未処理)** ことを示している。
 
-blog記事では明確な劣化の段階が見える:
-1. 2025-09: sitemap経由で発見・クロール・インデックス(正常)
-2. 2025-12: sitemap経由で発見・クロールされたがインデックス未登録
-3. 2026-02: **sitemap経由ではなく内部リンク経由**で発見(この時点でsitemapに載っていなかった、または既に読まれなくなっていた可能性)
-4. 2026-05以降: 完全に未発見
+blog記事では段階的な劣化が見える: 2025-09(インデックス済み)→2025-12(sitemap経由でクロールされたが未登録)→2026-02(内部リンク経由で発見・未登録)→2026-05以降(完全未発見)。
 
 ## 調査プロセス
 
-### 1. 本番 `/sitemap.xml` への直接アクセス — 環境制約により未実施
+### 1. 本番 `/sitemap.xml` への直接アクセス — セッション環境の制約
 
-このセッションの実行環境ではアウトバウンドの egress ポリシーにより `hidetaka.dev` への直接アクセス(`curl`、`WebFetch` とも)が **`403 policy denial`** でブロックされた(証跡: `curl -sS $HTTPS_PROXY/__agentproxy/status` の `recentRelayFailures` に `"host": "hidetaka.dev:443", "detail": "gateway answered 403 to CONNECT (policy denial or upstream failure)"` が記録されている)。これはサイト側の問題ではなく、このセッションの実行環境固有のネットワークポリシーによるものである。そのため本番配信中の実際のsitemap.xmlの中身は本セッションでは直接確認できていない。
+このセッションの実行環境ではアウトバウンドのegressポリシーにより `hidetaka.dev` への直接アクセス(`curl`、`WebFetch` とも)が `403 policy denial` でブロックされた(証跡: `curl -sS $HTTPS_PROXY/__agentproxy/status` の `recentRelayFailures` に `"host": "hidetaka.dev:443", "detail": "gateway answered 403 to CONNECT (policy denial or upstream failure)"`)。これはサイト側の問題ではなく、セッション環境固有のネットワークポリシーによるもの。
 
-### 2. ローカルビルドでの検証(代替検証)
+### 2. ローカルビルドでの代替検証 → 誤った仮説の形成
 
-`pnpm build` → `pnpm start` でアプリを起動し、`http://localhost:3000/sitemap.xml` を直接取得して検証した。
+`pnpm build` → `pnpm start` でアプリを起動し、`http://localhost:3000/sitemap.xml` を取得したところ、対象記事は全て正しく含まれていた。これ自体は正しい観測だったが、「ローカルではビルド直後だから正しいが、本番はISRキャッシュに依存しているので古いままかもしれない」という**未検証の推測**を重ねてしまった。
 
-```
-$ curl -sD - http://localhost:3000/sitemap.xml
-HTTP/1.1 200 OK
-x-nextjs-cache: HIT
-cache-control: public, max-age=0, must-revalidate
-```
+`open-next.config.ts` / `wrangler.jsonc` でR2/Durable Objectによる ISR インフラは正しく構成されていることを確認したが、「バインディングはあるが、アクセス頻度が低いsitemap.xmlはISRのリクエストトリガー型revalidateの恩恵を受けられず、本番では古いまま配信され続けているのではないか」という仮説を立て、これを検証せずに `export const dynamic = 'force-dynamic'` という修正PRを一度作成した。
 
-内容を確認した結果、`use-gen-ai-for-onboarding-partner`、`recap-2025`、`join-cci-2026`、`import-github-repo-to-harness`、直近の dev-notes 記事(2026-07-04〜10公開分含む)まで **全て正しく含まれていた**(全227URL)。
+### 3. 本番sitemap.xmlの実物確認による反証
 
-→ **`src/app/sitemap.ts` および `loadAllThoughts` / `loadAllDevNotes` のデータ取得・ページネーションロジック自体にバグはない。** ビルド直後(=WordPress APIから最新データを取得した直後)であれば、常に正しい内容が生成される。
+ユーザーがブラウザで実際に `https://hidetaka.dev/sitemap.xml` を開き、その内容をそのまま共有してくれたことで、直接的な証跡が得られた。確認した結果:
 
-### 3. コードベース調査(sitemap.ts / OpenNext Cloudflare設定)
+- `/ja/blog/use-gen-ai-for-onboarding-partner`(公開2026-05-06)は **sitemap.xmlに含まれていた**(`lastmod: 2026-05-06T10:04:25.000Z`)
+- `/ja/blog/join-cci-2026`(公開2026-02-24)も **含まれていた**(`lastmod: 2026-02-24T13:16:45.000Z`)
+- `/ja/blog/recap-2025` も含まれていた
+- `/ja/writing/dev-notes/import-github-repo-to-harness` も含まれていた(`lastmod: 2026-07-04T09:00:00.000Z`)
+- sitemap内の最新エントリは `/ja/writing/dev-notes/add-github-pr-datasource-to-grafana-cloud-with-github-app`(`lastmod: 2026-07-10T16:11:02.000Z`)— **確認時点(2026-07-16)から6日前の記事まで正しく反映されている**
 
-- `src/app/sitemap.ts`: `export const revalidate` の明示なし。配下の各loaderが `next: { revalidate: 1800 }` を指定しているため、Next.jsがそれを推論して30分のISRルートとしてビルドしていた(`.next/prerender-manifest.json` で確認、ビルド出力でも `○ /sitemap.xml 30m 1y` と表示)。
-- `open-next.config.ts` / `wrangler.jsonc`: R2バケット(`NEXT_INC_CACHE_R2_BUCKET`)とDurable Object Queue(`NEXT_CACHE_DO_QUEUE`)が正しく構成されており、「ISR用のバインディングが欠落している」という仮説は**否定された**。
-- `public/_headers`: `/sitemap.xml` に対する独自のCache-Controlルールはなし。CDNエッジ層による上書きは確認されなかった。
-- Git履歴: `sitemap.ts` / `src/libs/dataSources/` は2026-01-06〜2026-06-11の間に16コミット。2026年3月前後に該当箇所への変更はなく、コード変更が3月の境界を作ったわけではない。
+これは「sitemap.xmlがISRキャッシュにより古いまま配信されている」という仮説を **明確に反証する** 直接証拠である。本番のsitemap.xmlは実際には十分新しい状態で配信されており、対象記事はすべて正しく載っている。
 
-### 4. 結論: ISRのリクエストトリガー型再生成という構造的な問題
+→ **`export const dynamic = 'force-dynamic'` の修正コミットは取り消した。** コード側に原因はない。
 
-OpenNext Cloudflare上のISRは、revalidate期限が切れたページに対して**次にリクエストが来たタイミング**でstale-while-revalidateの再生成をトリガーする方式である。バックグラウンドの定期ジョブではない。
+## 訂正後の結論
 
-`/sitemap.xml` は人間のブラウザでほぼ訪問されず、アクセスはGooglebot等のクローラーに依存する。GSCの実測で見られる「sitemap経由の発見が2025年12月を最後に途絶え、2026年2月には内部リンク経由に切り替わり、5月以降は完全に途絶える」というパターンは、**Googlebotがsitemap.xmlを読みに来る頻度自体が低下・途絶えており、その結果として配信されるsitemap.xmlのキャッシュが実質的に長期間(30分をはるかに超えて)更新されないまま固定されていた**、という説明と整合する。
+sitemap.xmlの生成・配信経路(`sitemap.ts`のデータ取得ロジック、OpenNext CloudflareのISR、R2/DOキャッシュ)はすべて正常に機能しており、対象記事は公開後遅くとも数日以内にsitemap.xmlへ反映されている。にもかかわらずGoogleが「URLが認識されていません」と報告し続けているということは、**問題はサイト側の技術的な配信経路ではなく、Google側のクロール・インデックス処理(クロール予算の配分、サイト全体の品質シグナルによるクロール優先度低下など)にある** と考えられる。
 
-これは「コードのバグ」ではなく、低トラフィックなsitemap.xmlに対してISRのstale-while-revalidateモデルを適用したことによる構造的なギャップである。dev-notesが新旧問わず一貫して「未認識」なのも、dev-notesがsitemapに追加された時期(2026年1月のコミット)以降、Googlebotがそのsitemapを十分な頻度で再取得していないため、と考えれば整合する。
+これはコード修正で解決できる性質の問題ではない。有効な対応は、Search Console上でサイトマップを明示的に再送信してGoogleに再取得を促すこと、および個別URLに対してインデックス登録をリクエストすることである。手順は `docs/gsc-indexing-checklist.md` にまとめた。
 
-## 対策
+dev-notes配下が新旧問わず一貫して未認識である点については、この記事系統がsitemap.tsに追加されたのが2026年1月のコミット以降であるため(Git履歴で確認)、Googleがまだこのセクションを十分にクロールしきれていない可能性がある。sitemap再送信後の追跡が必要。
 
-`src/app/sitemap.ts` に以下を追加し、リクエスト毎に確実に最新コンテンツで再計算されるようにした:
+## 見送った対応
 
-```ts
-export const dynamic = 'force-dynamic'
-```
+- **canonical末尾スラッシュの正規化**: 前セッションで見つかった副次的な問題。今回の調査の本題ではないため別途判断とする。
 
-配下の `loadAllThoughts` / `loadAllDevNotes` / `loadAllProducts` などのWordPress fetchは引き続き `next: { revalidate: 1800/3600 }` を指定しているため、Data Cacheにより30分〜1時間はキャッシュされた結果が再利用される。ルート自体をdynamic化しても、WordPress APIへの実リクエスト数が増えるわけではない(Data Cacheが効くため)。変わるのは「sitemap.xmlというレスポンス全体がリクエスト毎に計算される」という点のみで、これによりアクセス頻度に関わらず常に「30分〜1時間以内の鮮度」を保証できる。
+## 今後のアクション
 
-### 検証(ビルド確認)
+1. `docs/gsc-indexing-checklist.md` の手順に沿って、Search Console上でサイトマップの再送信と対象URLのインデックス登録リクエストを人間が実施する
+2. 3週間後(目安: 再送信日+21日)を目処に、対象記事の `coverageState` の変化を再確認する
+3. 改善が見られない場合は、サイト全体の品質シグナル(低品質コンテンツ判定、クロール予算そのものの低さ)を疑い、Search Consoleの「ページ」レポートやcrawl statsをさらに調査する
 
-```
-# 修正前: ○ /sitemap.xml  30m  1y   (Static, ISR)
-# 修正後: ƒ /sitemap.xml               (Dynamic)
-```
-
-`pnpm start` で同一URLに連続リクエストしても `x-nextjs-cache` ヘッダーが付与されなくなり(修正前は `HIT` が返っていた)、常に動的処理されることを確認した。生成内容には対象記事(`use-gen-ai-for-onboarding-partner`、`recap-2025`、`import-github-repo-to-harness` ほか直近のdev-notes)が引き続き正しく含まれることも確認済み。
-
-### 見送った対応(別PR判断)
-
-- **canonical末尾スラッシュの正規化**: 前セッションの副次的発見。本命修正と混ぜず、影響を単独で確認できるよう別PRとして見送る。
-
-## 効果測定
-
-- デプロイ後、`docs/gsc-indexing-checklist.md` の手順でサイトマップの再送信とURL検査によるインデックス登録リクエストを実施する。
-- 観測日: デプロイ + サイトマップ再送信日から **21日後**(2026-07-16時点でのデプロイを想定した場合、目安 **2026-08-06**)。PDCA台帳(id=2, articleKey: `/ja/writing/dev-notes/import-github-repo-to-harness`)に登録済み。baseline: clicks=0, impressions=0。
+コード変更を伴わないため、本件用に開いていたPDCAサイクル(id=2)は `inconclusive` としてクローズ済み。有効な対策(サイトマップ再送信等)が人間によって実施された後、改めてPDCAサイクルを起票することを推奨する。
