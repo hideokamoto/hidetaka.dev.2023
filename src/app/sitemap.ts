@@ -7,6 +7,12 @@ import { logger } from '@/libs/logger'
 import { MicroCMSAPI } from '@/libs/microCMS/apis'
 import { createMicroCMSClient } from '@/libs/microCMS/client'
 
+// sitemap.xmlはGooglebot等からのアクセス頻度が低く、ISR(30分revalidate)の
+// リクエストトリガー型再生成に任せると次のアクセスまで古い内容が配信され続ける。
+// force-dynamicでリクエスト毎に再計算させる（配下のWordPress/microCMS fetchは
+// 各loaderのnext.revalidate設定でData Cacheされるため、APIへの負荷は増えない）。
+export const dynamic = 'force-dynamic'
+
 type SitemapEntry = {
   url: string
   lastModified?: Date
