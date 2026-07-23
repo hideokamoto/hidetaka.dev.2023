@@ -54,7 +54,7 @@ const TAG_SIZE_STYLES = {
 
 const TAG_VARIANT_STYLES = {
   default: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
-  gold: 'bg-yamabuki-100 text-yamabuki-700 dark:bg-yamabuki-500/20 dark:text-yamabuki-400',
+  gold: 'bg-yamabuki-100 text-yamabuki-800 dark:bg-yamabuki-500/20 dark:text-yamabuki-400',
   indigo: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400',
 } as const
 

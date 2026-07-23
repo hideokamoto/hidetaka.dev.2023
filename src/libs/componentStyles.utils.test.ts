@@ -91,7 +91,7 @@ describe('Component Styles Utils', () => {
     it('should return correct variant styles for "gold"', () => {
       const styles = getTagStyles('gold', 'md')
       expect(styles.variant).toBe(
-        'bg-yamabuki-100 text-yamabuki-700 dark:bg-yamabuki-500/20 dark:text-yamabuki-400',
+        'bg-yamabuki-100 text-yamabuki-800 dark:bg-yamabuki-500/20 dark:text-yamabuki-400',
       )
     })
 
@@ -106,7 +106,7 @@ describe('Component Styles Utils', () => {
       const styles = getTagStyles('gold', 'sm')
       expect(styles.size).toBe('px-2.5 py-1 text-xs')
       expect(styles.variant).toBe(
-        'bg-yamabuki-100 text-yamabuki-700 dark:bg-yamabuki-500/20 dark:text-yamabuki-400',
+        'bg-yamabuki-100 text-yamabuki-800 dark:bg-yamabuki-500/20 dark:text-yamabuki-400',
       )
     })
 

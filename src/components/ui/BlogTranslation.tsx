@@ -120,7 +120,7 @@ export default function BlogTranslation({
         className={cn('mb-6 p-4 bg-yamabuki-50 border border-yamabuki-200 rounded-lg', className)}
       >
         <p className="text-sm text-yamabuki-800 mb-2">⚠️ Translator API Debug Info</p>
-        <details className="text-xs text-yamabuki-700">
+        <details className="text-xs text-yamabuki-800">
           <summary className="cursor-pointer mb-2">Debug details</summary>
           <pre className="mt-2 p-2 bg-yamabuki-100 rounded overflow-auto">
             {JSON.stringify(

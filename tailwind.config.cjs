@@ -86,9 +86,6 @@ module.exports = {
 				indigo: aiao,
 				green: matsuba,
 				yamabuki,
-				matsuba,
-				aiao,
-				washi,
 				// Neutrals unified onto the 和紙 scale
 				zinc: washi,
 				slate: washi,
@@ -97,8 +94,8 @@ module.exports = {
 			fontFamily: {
 				display: [
 					'"Shippori Mincho"',
-					'"Zen Kaku Gothic New"',
 					'"Hiragino Mincho ProN"',
+					'"Zen Kaku Gothic New"',
 					'serif',
 				],
 				serif: ['"Shippori Mincho"', '"Hiragino Mincho ProN"', 'serif'],

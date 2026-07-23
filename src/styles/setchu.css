@@ -36,7 +36,7 @@
   --rvt-accent-gold: #e0a63c; /* アクセント 山吹 — spot accent */
 
   /* Fonts — 明朝 for display, Zen Kaku Gothic for body */
-  --rvt-font-display: "Shippori Mincho", "Zen Kaku Gothic New", "Hiragino Mincho ProN", serif;
+  --rvt-font-display: "Shippori Mincho", "Hiragino Mincho ProN", "Zen Kaku Gothic New", serif;
   --rvt-font-body: "Zen Kaku Gothic New", "Hiragino Kaku Gothic ProN", system-ui, sans-serif;
   --rvt-font-mono: "SF Mono", ui-monospace, "JetBrains Mono", monospace;
 
@@ -75,9 +75,11 @@
   --rvt-grid-size: 60px;
   --rvt-grid-size-band: 40px;
 
-  /* Status — kept within the 折衷 world */
+  /* Status — kept within the 折衷 world.
+     --warning uses the yamabuki-800 shade (not the raw #E0A63C accent) so it
+     stays WCAG AA as text/fill on washi backgrounds. */
   --success: #3e7a55; /* 松葉緑 */
-  --warning: #e0a63c; /* 山吹 */
+  --warning: #7e561f; /* 山吹, darkened for AA text contrast */
   --error: #b3452f; /* muted vermilion, calmer than neon red */
   --info: #2f5375; /* 藍青 */
 }
