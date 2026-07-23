@@ -1,231 +1,135 @@
-# デザインガイドライン
+# デザインガイドライン — 折衷 (Setchū)
 
-このドキュメントは、hidetaka.devのデザインリニューアルにおける決定事項とデザイン原則をまとめたものです。
+このドキュメントは、hidetaka.dev の現行デザインシステム **折衷 (Setchū) / Palette 05「和紙と墨」** の決定事項とデザイン原則をまとめたものです。
+
+> トークンの正本は `src/styles/setchu.css`（CSS 変数）と `tailwind.config.cjs`（Tailwind スケールへのマッピング）です。色や書体を変更する場合は、まずこの 2 ファイルを更新してください。
+
+## コンセプト
+
+和紙と墨のニュートラルを土台に、**藍青 (あいあお)** を主役、**松葉緑** と **山吹** を少量のアクセントに。スライド・Web・アプリで一貫して使えるトークン一式です。
+
+**緑と黄は「差し色」に留めるのがこの配色を静かに保つ鍵。** 3 色を均等に使うと途端に賑やかになります。
+
+### 配色バランスの目安
+
+| 役割 | 比率 | 使いどころ |
+|------|------|-----------|
+| ニュートラル（和紙） | 約 65% | 背景・面を広く取る |
+| 藍青（主役） | 約 25% | 見出し・主要ボタン・リンク・エキスパートラベル |
+| 松葉緑・山吹（差し色） | 約 10% | タグ・強調・ステータスなど一点集中 |
+
+**避けたいこと:** 緑と山吹を同じ画面で大面積に併用しない。
 
 ## デザイン原則
 
-### 1. ゼロベースアプローチ
-- 既存のデザインパターンに依存せず、各セクションをゼロベースで設計する
-- コンテンツと情報構造を再考し、最適な提示方法を選択する
-- プロフェッショナルな開発者ポートフォリオサイトとしての洗練されたデザインを目指す
+### 1. 静けさ (Calm)
+- 装飾は控えめに。ネオン的なグロー・鮮やかなグラデーションは使わない
+- 影は墨色で薄く（`--rvt-shadow-cta` / `--rvt-shadow-cta-hover`）
+- 余白を広く取り、コンテンツを呼吸させる
 
-### 2. ファーストビュー最適化
-- Heroセクションはファーストビューに収まるように設計する
-- 冗長な情報は避け、重要なメッセージに焦点を当てる
-- 縦長のレイアウトは避け、横長のコンパクトなレイアウトを採用する
+### 2. 編集的な佇まい (Editorial)
+- 見出しは明朝体（Shippori Mincho）で品よく
+- 情報の階層を明快に。ラベルは等幅（mono）で小さく添える
 
-### 3. プロフェッショナルな印象
-- 適度な装飾と洗練されたデザインのバランスを保つ
-- 「洗練されている」と「素っ気ない」の違いを理解し、適切な装飾を追加する
-- 開発者のポートフォリオサイトとして信頼感を与えるデザイン
+### 3. プロフェッショナルな信頼感
+- 「洗練されている」と「素っ気ない」の違いを理解し、適切な装飾を加える
+- 開発者ポートフォリオとして信頼感を与えるデザイン
 
-## カラーパレット
+## カラートークン
 
-### プライマリカラー
-- **Indigo**: `indigo-600`, `indigo-700` - アクセントカラーとして使用
-- **Slate**: `slate-900`, `slate-700`, `slate-600` - テキストカラーとして使用
-- **White**: `white` - 背景とコントラストとして使用
+CSS 変数（`--rvt-*`）を正本とし、Tailwind のユーティリティは `tailwind.config.cjs` でこのパレットにマッピングしています（`indigo-*` → 藍青、`zinc/slate/gray-*` → 和紙、`green-*` → 松葉緑、`yamabuki-*` → 山吹）。
 
-### セカンダリカラー
-- **Purple**: `purple-200`, `purple-300` - グラデーションの補助色
-- **Cyan**: `cyan-200`, `cyan-300` - グラデーションの補助色
-- **Zinc**: `zinc-800`, `zinc-900` - ダークモード用
+### ライト
 
-### 背景色
-- **Heroセクション**: `bg-gradient-to-br from-white via-indigo-50/40 to-purple-50/30`
-- **セクション背景**: `bg-white` (ライトモード), `bg-zinc-900` (ダークモード)
+| 役割 | HEX | トークン |
+|------|-----|---------|
+| 背景（和紙） | `#F5F2EC` | `--rvt-bg` |
+| サーフェス（面） | `#FFFFFF` | `--rvt-bg2` |
+| テキスト（墨） | `#23262B` | `--rvt-fg` |
+| 副次テキスト | `#565A61` | `--rvt-fg2` |
+| ミュート | `#7B7E82` | `--rvt-fg3` |
+| ボーダー | `#E4DED2` | `--rvt-border` |
+| プライマリ 藍青 | `#2F5375` | `--rvt-accent` |
+| セカンダリ 松葉緑 | `#3E7A55` | `--rvt-secondary` |
+| アクセント 山吹 | `#E0A63C` | `--rvt-accent-gold` |
 
-### グラデーション
-- **背景装飾**: 複数のblurされた円形グラデーションを使用
-  - Indigo: `bg-indigo-200/50 blur-3xl`
-  - Purple: `bg-purple-200/40 blur-3xl`
-  - Cyan: `bg-cyan-200/30 blur-3xl`
+### ダーク
+
+| 役割 | HEX | トークン |
+|------|-----|---------|
+| 背景 | `#16181C` | `--rvt-bg` |
+| サーフェス | `#1F2228` | `--rvt-bg2` |
+| テキスト | `#E9E7DF` | `--rvt-fg` |
+| ミュート | `#8B8E93` | `--rvt-fg3` |
+| ボーダー | `#2E3138` | `--rvt-border` |
+| プライマリ 藍青 | `#6E9BC0` | `--rvt-accent` |
+| セカンダリ 松葉緑 | `#6FB088` | `--rvt-secondary` |
+| アクセント 山吹 | `#ECBE56` | `--rvt-accent-gold` |
 
 ## タイポグラフィ
 
+| 用途 | フォント | 指定 |
+|------|---------|------|
+| 見出し・ディスプレイ | **Shippori Mincho**（明朝） | `var(--rvt-font-display)` / `font-display` |
+| 本文 | **Zen Kaku Gothic New**（ゴシック） | `var(--rvt-font-body)` / 既定の `body` |
+| コード・ラベル | **SF Mono / ui-monospace** | `var(--rvt-font-mono)` / `font-mono` |
+
 ### 見出し
-- **H1 (Hero)**: `text-5xl sm:text-6xl lg:text-7xl font-extrabold`
-- **H2 (セクションタイトル)**: `text-3xl font-bold sm:text-4xl`
-- **H3 (カードタイトル)**: `text-xl font-semibold` または `text-lg font-semibold`
+- **H1 (Hero)**: 明朝、`clamp(2.5rem, 5vw, 4rem)`、`font-weight: 700`、`tracking-tight`
+- **H2 (セクション)**: `text-3xl sm:text-4xl`、明朝
+- **H3 (カード)**: `text-xl` / `text-lg`、明朝
 
-### 本文
-- **リードテキスト**: `text-lg leading-relaxed`
-- **本文**: `text-base leading-relaxed` または `text-sm leading-6`
-- **キャプション**: `text-sm` または `text-xs`
+### 本文・ラベル
+- **リード**: `text-lg leading-relaxed`
+- **本文**: `text-base leading-relaxed`（`--rvt-fg2`）
+- **ラベル / eyebrow**: 等幅・大文字・`tracking-wider`、藍青（`--rvt-accent`）
 
-### フォントウェイト
-- **見出し**: `font-extrabold`, `font-bold`, `font-semibold`
-- **本文**: `font-medium`, `font-normal`
-- **ラベル**: `font-semibold`, `font-medium`
+## スペーシング / レイアウト
 
-### トラッキング
-- **大見出し**: `tracking-tight`
-- **ラベル**: `tracking-wider`, `tracking-widest` (uppercase)
-
-## スペーシング
-
-### セクション間
-- **Hero**: `py-24 sm:py-32 lg:py-40`
-- **通常セクション**: `py-24 sm:py-32`
-- **コンパクトセクション**: `py-20 sm:py-24`
-
-### コンテナ
 - **最大幅**: `max-w-7xl`
 - **パディング**: `px-6 sm:px-8 lg:px-12`
+- **セクション間**: `py-24 sm:py-32`（Hero は `lg:py-40`）
+- **カードグリッド**: `grid`、要素間は `gap-6`〜`gap-12`
+- **Hero**: 横長 2 カラム（`lg:flex-row`）、画像は右
 
-### 要素間
-- **大きな要素間**: `gap-16 lg:gap-20`
-- **中程度の要素間**: `gap-8`, `gap-10`, `gap-12`
-- **小さな要素間**: `gap-4`, `gap-6`
-
-## レイアウト
-
-### Heroセクション
-- **レイアウト**: 横長の2カラムレイアウト（`lg:flex-row`）
-- **画像配置**: 右側に配置（`lg:order-first`は使用しない）
-- **コンテンツ幅**: `lg:max-w-2xl`
-- **画像サイズ**: `lg:w-96`, `max-w-sm`
-
-### セクション構造
-- **コンテナ**: `Container`コンポーネントを使用
-- **中央揃え**: セクションタイトルと説明は中央揃え（`text-center`）
-- **グリッド**: カードレイアウトは`grid`を使用
-
-## コンポーネントデザイン
-
-### Heroセクション
-- **背景**: グラデーション背景 + 複数のblurグラデーション + グリッドパターン
-- **ロールラベル**: 丸いバッジスタイル、アニメーション付きドット
-- **CTAボタン**: `indigo-600`背景、白テキスト、シャドウ、ホバー時にスケール
-- **プロフィール画像**: 丸みのある角、グローエフェクト、白いボーダー
-
-### カードコンポーネント
-- **ボーダー**: `border-zinc-200` (ライト), `border-zinc-800` (ダーク)
-- **背景**: `bg-white` (ライト), `bg-zinc-900` (ダーク)
-- **ホバー**: `hover:shadow-md` でシャドウを追加
-- **角丸**: `rounded-lg` または `rounded-2xl`
+## コンポーネント
 
 ### ボタン
-- **プライマリ**: `bg-indigo-600`, `text-white`, `shadow-lg`
-- **セカンダリ**: `border`, `bg-white`, `text-zinc-900`
-- **ホバー**: `hover:scale-105`, `hover:shadow-xl`
+- **プライマリ**: 藍青背景（`indigo-600`）＋ 白文字、薄い影、`hover:scale-105`
+- **セカンダリ**: 和紙面＋ボーダー、`text-*-900`
+- 定義は `src/libs/componentStyles.utils.ts`（`getCTAButtonStyles` 等）
 
-## 装飾要素
+### タグ / バッジ
+- `default`（和紙）/ `indigo`（藍青）/ `gold`（山吹）
+- 差し色（`gold`）は一点強調に留める
 
-### 背景装飾
-- **グラデーション**: 複数のblurされた円形グラデーションを配置
-- **グリッドパターン**: 控えめなグリッドパターンをオーバーレイ
-- **透明度**: 装飾は控えめに（`/40`, `/50`程度）
+### カード
+- 背景 `bg-white`（ライト）/ `dark:bg-zinc-900`（＝ダークのサーフェス）
+- ボーダー `--rvt-border`、`rounded-lg`〜`rounded-2xl`
+- ホバーは `hover:shadow-md` 程度
 
-### アニメーション
-- **パルス**: ロールラベルのドットに`animate-pulse`
-- **ホバー**: `hover:scale-105`, `hover:translate-x-1`
-- **トランジション**: `transition-all`, `transition-transform`
-
-### シャドウ
-- **カード**: `shadow-sm`, `hover:shadow-md`
-- **ボタン**: `shadow-lg`, `hover:shadow-xl`
-- **画像**: `shadow-2xl`
-
-## 画像デザイン
-
-### プロフィール画像
-- **形状**: 丸みのある角（`rounded-3xl`）
-- **ボーダー**: `border-4 border-white/90`
-- **グロー**: 複数のblurグラデーションでグローエフェクト
-- **サイズ**: `aspect-square`, `max-w-sm`
-
-## インタラクション
-
-### ホバーエフェクト
-- **ボタン**: スケール + シャドウ強化
-- **リンク**: カラー変更（`hover:text-indigo-600`）
-- **カード**: シャドウ追加（`hover:shadow-md`）
-
-### トランジション
-- **デュレーション**: `transition-all` または `transition-transform`
-- **タイミング**: デフォルト（`duration-200`または`duration-300`）
-
-## レスポンシブデザイン
-
-### ブレークポイント
-- **sm**: `640px`
-- **lg**: `1024px`
-
-### モバイル
-- **レイアウト**: 縦積み（`flex-col`）
-- **タイポグラフィ**: 小さめのサイズ
-- **スペーシング**: コンパクトに
-
-### デスクトップ
-- **レイアウト**: 横並び（`lg:flex-row`）
-- **タイポグラフィ**: 大きなサイズ
-- **スペーシング**: 広めに
+### 装飾
+- Hero の径向グラデーション（オーブ）は `--rvt-accent-glow` / `--rvt-accent2` を用い、ごく淡く
+- ダークモードのみ、極薄のグリッド（`.rvt-grid-bg`）で紙面のテクスチャを添える
 
 ## ダークモード
 
-### 背景色
-- **セクション**: `dark:bg-zinc-900`, `dark:bg-zinc-950`
-- **カード**: `dark:bg-zinc-900`
+- `class` ストラテジ。`documentElement` に `.dark` を付与（`DarkModeScript` / `ModeToggle` が `prefers-color-scheme` に追従）
+- 全ての色は `--rvt-*` トークン経由で自動的に切り替わる
 
-### テキスト
-- **見出し**: `dark:text-white`
-- **本文**: `dark:text-zinc-400`, `dark:text-slate-400`
+## アクセシビリティ
 
-### ボーダー
-- **カード**: `dark:border-zinc-800`
-- **ボタン**: `dark:border-zinc-700`
-
-## コンテンツ構造
-
-### Heroセクション
-1. ロールラベル（バッジ形式）
-2. 名前（H1）
-3. タグライン（価値提案）
-4. 説明文
-5. CTAボタン + ソーシャルリンク
-6. プロフィール画像（右側）
-
-### 情報の優先順位
-1. **価値提案** - 何を提供できるか
-2. **専門性** - どの技術領域に強いか
-3. **実績** - 過去の経験と成果
-4. **連絡先** - CTAとソーシャルリンク
-
-## 実装例
-
-### Heroセクションの基本構造
-```tsx
-<section className="relative overflow-hidden bg-gradient-to-br from-white via-indigo-50/40 to-purple-50/30">
-  {/* Background decoration */}
-  <div className="absolute inset-0 overflow-hidden">
-    {/* Blur gradients */}
-  </div>
-  
-  {/* Grid pattern */}
-  <div className="absolute inset-0 bg-[linear-gradient(...)]" />
-  
-  <div className="relative mx-auto max-w-7xl px-6 py-24">
-    {/* Content */}
-  </div>
-</section>
-```
-
-### カードコンポーネントの基本構造
-```tsx
-<article className="group border border-zinc-200 bg-white p-8 transition-shadow hover:shadow-md">
-  {/* Card content */}
-</article>
-```
+- 本文テキスト（`--rvt-fg2`）は和紙背景で AA を確保
+- フォーカスリングは藍青（`--rvt-accent`）
+- `prefers-reduced-motion` を尊重（`globals.css`）
 
 ## 注意事項
 
-1. **過度な装飾を避ける** - プロフェッショナルな印象を保つ
-2. **一貫性を保つ** - カラーパレットとスペーシングを統一
-3. **アクセシビリティ** - コントラスト比とフォーカス状態に注意
-4. **パフォーマンス** - アニメーションは控えめに、必要最小限に
+1. **差し色を守る** — 松葉緑・山吹を大面積に使わない
+2. **静けさを保つ** — 過度な装飾・強いグローを避ける
+3. **トークン経由で色を使う** — 直値の HEX ではなく `--rvt-*` / Tailwind スケールを使う
+4. **一貫性** — カラー・スペーシング・書体を統一
 
 ## 更新履歴
 
-- 2024年: デザインリニューアル - Heroセクションをゼロベースで再設計
-
+- 2026: 折衷 (Setchū / Palette 05「和紙と墨」) へ刷新。Revtrona Design System を置き換え、明朝＋ゴシックの書体と藍青主役のパレットを導入

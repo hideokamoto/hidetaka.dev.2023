@@ -26,9 +26,9 @@ function Badge({ children, tone = 'outline' }: { children: React.ReactNode; tone
     },
     outline: { border: '1px solid var(--rvt-border)', color: 'var(--rvt-fg2)' },
     success: {
-      background: 'color-mix(in oklch, #22c55e 14%, transparent)',
-      color: '#22c55e',
-      border: '1px solid color-mix(in oklch, #22c55e 30%, transparent)',
+      background: 'color-mix(in oklch, var(--success) 14%, transparent)',
+      color: 'var(--success)',
+      border: '1px solid color-mix(in oklch, var(--success) 30%, transparent)',
     },
   }
   return (

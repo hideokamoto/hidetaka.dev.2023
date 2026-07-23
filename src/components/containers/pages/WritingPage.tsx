@@ -68,7 +68,7 @@ function UnifiedWritingCard({ item, lang }: { item: WritingItem; lang: string })
               className="text-xs font-semibold [color:var(--rvt-fg2)]"
             />
             {item.dataSource && (
-              <Tag variant="purple" size="sm">
+              <Tag variant="gold" size="sm">
                 {item.dataSource.name}
               </Tag>
             )}

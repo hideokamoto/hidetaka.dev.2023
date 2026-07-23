@@ -88,10 +88,10 @@ describe('Component Styles Utils', () => {
       )
     })
 
-    it('should return correct variant styles for "purple"', () => {
-      const styles = getTagStyles('purple', 'md')
+    it('should return correct variant styles for "gold"', () => {
+      const styles = getTagStyles('gold', 'md')
       expect(styles.variant).toBe(
-        'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
+        'bg-yamabuki-100 text-yamabuki-800 dark:bg-yamabuki-500/20 dark:text-yamabuki-400',
       )
     })
 
@@ -102,11 +102,11 @@ describe('Component Styles Utils', () => {
       )
     })
 
-    it('should correctly combine small size with purple variant', () => {
-      const styles = getTagStyles('purple', 'sm')
+    it('should correctly combine small size with gold variant', () => {
+      const styles = getTagStyles('gold', 'sm')
       expect(styles.size).toBe('px-2.5 py-1 text-xs')
       expect(styles.variant).toBe(
-        'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
+        'bg-yamabuki-100 text-yamabuki-800 dark:bg-yamabuki-500/20 dark:text-yamabuki-400',
       )
     })
 

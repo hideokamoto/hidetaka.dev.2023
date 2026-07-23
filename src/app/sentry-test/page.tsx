@@ -133,7 +133,7 @@ export default function SentryTestPage() {
               <button
                 type="button"
                 onClick={handleBrowserException}
-                className="w-full px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-colors"
+                className="w-full px-4 py-3 bg-yamabuki-600 hover:bg-yamabuki-700 text-white font-semibold rounded-lg transition-colors"
               >
                 Trigger Browser Exception (throws Error)
               </button>
