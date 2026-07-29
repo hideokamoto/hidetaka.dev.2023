@@ -42,7 +42,8 @@ export function getBadgeStyles(variant: BadgeVariant) {
 }
 
 // Tag component types
-export type TagVariant = 'default' | 'purple' | 'indigo'
+// 'gold' = 山吹 spot accent, 'indigo' = 藍青 primary (折衷 Setchū palette)
+export type TagVariant = 'default' | 'gold' | 'indigo'
 export type TagSize = 'sm' | 'md'
 
 // Tag style constants (defined at module level for performance)
@@ -53,7 +54,7 @@ const TAG_SIZE_STYLES = {
 
 const TAG_VARIANT_STYLES = {
   default: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
-  purple: 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
+  gold: 'bg-yamabuki-100 text-yamabuki-800 dark:bg-yamabuki-500/20 dark:text-yamabuki-400',
   indigo: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-400',
 } as const
 

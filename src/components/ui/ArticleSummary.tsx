@@ -187,7 +187,7 @@ export default function ArticleSummary({ content, locale, className = '' }: Arti
 
       {/* ダウンロード中の警告 */}
       {availability === 'downloading' && (
-        <p className="mt-2 text-sm text-amber-600">⚠️ {text.downloading}</p>
+        <p className="mt-2 text-sm text-yamabuki-800">⚠️ {text.downloading}</p>
       )}
 
       {/* ローディング状態(aria-live領域は常にマウントし、中身のみ切り替える) */}

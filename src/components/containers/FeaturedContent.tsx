@@ -200,7 +200,7 @@ function ProjectCard({
               {project.tags && project.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {project.tags.slice(0, 4).map((tag) => (
-                    <Tag key={tag} variant="purple" size="md">
+                    <Tag key={tag} variant="gold" size="md">
                       {tag}
                     </Tag>
                   ))}
@@ -260,7 +260,7 @@ function ProjectCard({
             {project.tags && project.tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {project.tags.slice(0, 3).map((tag) => (
-                  <Tag key={tag} variant="purple" size="sm">
+                  <Tag key={tag} variant="gold" size="sm">
                     {tag}
                   </Tag>
                 ))}

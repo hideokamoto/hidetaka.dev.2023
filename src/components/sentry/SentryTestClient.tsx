@@ -153,7 +153,7 @@ export default function SentryTestClient() {
                   type="button"
                   onClick={testServerError}
                   disabled={isLoading}
-                  className="px-4 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="px-4 py-3 bg-yamabuki-600 text-white font-semibold rounded-lg hover:bg-yamabuki-700 transition-colors shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? 'Loading...' : 'Log Server Error'}
                 </button>

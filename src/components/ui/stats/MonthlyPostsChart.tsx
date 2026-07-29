@@ -13,16 +13,17 @@ import {
 } from 'recharts'
 import type { MonthlyBucket } from '@/libs/stats/aggregate'
 
-// 媒体名 → チャートの塗り色。未知のソースはフォールバック色。
+// 媒体名 → チャートの塗り色。外部サービスは各ブランド色、
+// 自前コンテンツは折衷パレット（藍青・松葉緑）。未知はフォールバック。
 const SOURCE_COLORS: Record<string, string> = {
-  'WP Kyoto Blog': '#6366f1',
+  'WP Kyoto Blog': '#2f5375', // 藍青
   Qiita: '#55c500',
   Zenn: '#3ea8ff',
   'Dev.to': '#0a0a0a',
-  'Dev Notes': '#22c55e',
+  'Dev Notes': '#3e7a55', // 松葉緑
   'Stripe.dev': '#635bff',
 }
-const FALLBACK_COLOR = '#94a3b8'
+const FALLBACK_COLOR = '#7b7e82' // 和紙ミュート
 
 type Props = {
   data: MonthlyBucket[]

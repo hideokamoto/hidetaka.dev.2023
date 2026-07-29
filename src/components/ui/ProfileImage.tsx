@@ -18,10 +18,10 @@ export default function ProfileImage({ src, alt, size = 'lg', className = '' }: 
   return (
     <div className={`flex-shrink-0 ${sizeStyles[size]} ${className}`}>
       <div className="relative aspect-square w-full mx-auto lg:mx-0">
-        {/* Glow effect */}
-        <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-indigo-400/30 via-purple-400/20 to-cyan-400/20 blur-3xl" />
+        {/* Quiet 藍青 wash with a whisper of 山吹 (spot accent) */}
+        <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-indigo-400/20 via-indigo-300/10 to-yamabuki-300/15 blur-3xl" />
         {/* Border glow */}
-        <div className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-indigo-300/60 via-purple-300/50 to-cyan-300/40 blur-xl opacity-60" />
+        <div className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-indigo-300/40 to-indigo-200/20 blur-xl opacity-50" />
         {/* Image container */}
         <div className="relative h-full w-full rounded-3xl overflow-hidden border-4 border-[var(--rvt-border)] shadow-2xl backdrop-blur-sm">
           <Image src={src} alt={alt} fill className="object-cover" priority />
