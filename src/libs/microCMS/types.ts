@@ -18,6 +18,8 @@ export type MicroCMSProjectType =
   | 'owned_oss'
   | 'oss_contribution'
   | 'community_activities'
+  | 'guest_posts'
+  | 'applications'
 
 export type MicroCMSProjectStatus = 'active' | 'deprecated' | 'archived' | 'completed'
 
@@ -38,6 +40,7 @@ export type MicroCMSProjectsRecord = MicroCMSRecord & {
   about?: string
   background?: string
   architecture?: string
+  'behind-the-scenes'?: string
 }
 
 export type MicroCMSClient = Pick<ReturnType<typeof createClient>, 'get' | 'getAllContents'>

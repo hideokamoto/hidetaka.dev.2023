@@ -76,10 +76,16 @@ export default function ProjectDetailPage({
   const homeLabel = lang === 'ja' ? 'ホーム' : 'Home'
   const backgroundLabel = lang === 'ja' ? '背景' : 'Background'
   const architectureLabel = lang === 'ja' ? 'アーキテクチャ' : 'Architecture'
+  const behindTheScenesLabel = lang === 'ja' ? '開発裏話' : 'Behind the scenes'
   const visitLabel = lang === 'ja' ? 'サイト・リポジトリを見る' : 'Visit site / repository'
 
-  const background = typeof project.background === 'string' ? project.background : ''
-  const architecture = typeof project.architecture === 'string' ? project.architecture : ''
+  const proseSections = [
+    { heading: backgroundLabel, html: project.background },
+    { heading: architectureLabel, html: project.architecture },
+    { heading: behindTheScenesLabel, html: project['behind-the-scenes'] },
+  ].filter(
+    (section): section is { heading: string; html: string } => typeof section.html === 'string',
+  )
 
   return (
     <Container className="mt-16 sm:mt-32">
@@ -134,8 +140,9 @@ export default function ProjectDetailPage({
           )}
 
           {/* 本文セクション */}
-          {background && <ProseSection heading={backgroundLabel} html={background} />}
-          {architecture && <ProseSection heading={architectureLabel} html={architecture} />}
+          {proseSections.map((section) => (
+            <ProseSection key={section.heading} heading={section.heading} html={section.html} />
+          ))}
 
           {/* モバイル向け CTA / プロフィール */}
           <div className="mt-12 space-y-8 lg:hidden">
