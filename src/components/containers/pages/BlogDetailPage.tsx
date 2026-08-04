@@ -7,6 +7,7 @@ import ArticleCTA from '@/components/ui/ArticleCTA'
 import ArticleMeta from '@/components/ui/ArticleMeta'
 import BlogDetailSidebar from '@/components/ui/BlogDetailSidebar'
 import CategoryTagList from '@/components/ui/CategoryTagList'
+import FollowCTA from '@/components/ui/FollowCTA'
 import PageShell from '@/components/ui/PageShell'
 import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
@@ -175,6 +176,9 @@ export default function BlogDetailPage({
 
           {/* 関連記事 */}
           <RelatedArticles articles={relatedArticles} lang={lang} />
+
+          {/* フォロー導線（読者捕捉CTA） */}
+          <FollowCTA lang={lang} variant="card" />
 
           {/* 前後の記事へのナビゲーション（モバイルのみ表示） */}
           {(previousThought || nextThought) && (
