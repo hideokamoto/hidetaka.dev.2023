@@ -11,11 +11,12 @@ export const SITE_CONFIG = {
   // 著者情報
   author: {
     name: 'Hidetaka Okamoto',
-    jobTitle: 'Developer Experience Engineer',
+    nameJa: '岡本 秀高',
+    jobTitle: 'Senior Field Engineer',
     image: '/images/profile.jpg',
     worksFor: {
-      name: 'DigitalCube',
-      url: 'https://en.digitalcube.jp/',
+      name: 'CircleCI',
+      url: 'https://circleci.com/',
     },
   },
 
@@ -36,5 +37,12 @@ export const SITE_CONFIG = {
       label: 'LinkedIn',
       ariaLabel: 'Follow on LinkedIn',
     },
+  },
+
+  // 個人が運営する技術ブログ（人物と検索資産を接続するための情報）
+  wpKyoto: {
+    url: 'https://wp-kyoto.net',
+    label: 'wp-kyoto.net',
+    ariaLabel: 'Visit wp-kyoto.net',
   },
 } as const

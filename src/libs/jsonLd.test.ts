@@ -328,6 +328,12 @@ describe('generatePersonJsonLd', () => {
     expect(result.name).toBe('Hidetaka Okamoto')
   })
 
+  it('should include the Japanese name as alternateName', () => {
+    const result = generatePersonJsonLd()
+
+    expect(result.alternateName).toBe('岡本 秀高')
+  })
+
   it('should include site URL', () => {
     const result = generatePersonJsonLd()
 
@@ -343,7 +349,7 @@ describe('generatePersonJsonLd', () => {
   it('should include jobTitle from SITE_CONFIG', () => {
     const result = generatePersonJsonLd()
 
-    expect(result.jobTitle).toBe('Developer Experience Engineer')
+    expect(result.jobTitle).toBe('Senior Field Engineer')
   })
 
   it('should include worksFor as an Organization object', () => {
@@ -351,8 +357,8 @@ describe('generatePersonJsonLd', () => {
 
     expect(result.worksFor).toBeDefined()
     expect(result.worksFor['@type']).toBe('Organization')
-    expect(result.worksFor.name).toBe('DigitalCube')
-    expect(result.worksFor.url).toBe('https://en.digitalcube.jp/')
+    expect(result.worksFor.name).toBe('CircleCI')
+    expect(result.worksFor.url).toBe('https://circleci.com/')
   })
 
   it('should include sameAs array with social profile URLs', () => {
@@ -363,12 +369,19 @@ describe('generatePersonJsonLd', () => {
     expect(result.sameAs).toContain('https://twitter.com/hidetaka_dev')
     expect(result.sameAs).toContain('https://github.com/hideokamoto')
     expect(result.sameAs).toContain('https://www.linkedin.com/in/hideokamoto/')
+    expect(result.sameAs).toContain('https://wp-kyoto.net')
   })
 
-  it('should have exactly 3 social profiles in sameAs', () => {
+  it('should have exactly 4 profiles in sameAs', () => {
     const result = generatePersonJsonLd()
 
-    expect(result.sameAs).toHaveLength(3)
+    expect(result.sameAs).toHaveLength(4)
+  })
+
+  it('should include knowsAbout with the areas of expertise', () => {
+    const result = generatePersonJsonLd()
+
+    expect(result.knowsAbout).toEqual(['Stripe', 'AWS Serverless', 'WordPress'])
   })
 
   it('should have all required Person schema properties', () => {
@@ -382,5 +395,7 @@ describe('generatePersonJsonLd', () => {
     expect(result).toHaveProperty('jobTitle')
     expect(result).toHaveProperty('worksFor')
     expect(result).toHaveProperty('sameAs')
+    expect(result).toHaveProperty('alternateName')
+    expect(result).toHaveProperty('knowsAbout')
   })
 })
