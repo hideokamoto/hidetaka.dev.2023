@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import FeaturedContent from '@/components/containers/FeaturedContent'
 import Hero from '@/components/Hero/Hero'
-import Capabilities from '@/components/home/Capabilities'
+import Highlights from '@/components/home/Highlights'
 import StackShowcase from '@/components/home/StackShowcase'
 import { buildAlternates } from '@/libs/metadata'
 
@@ -15,7 +15,7 @@ export default async function HomePage() {
   return (
     <>
       <Hero lang={lang} />
-      <Capabilities lang={lang} />
+      <Highlights lang={lang} />
       <StackShowcase lang={lang} />
       <FeaturedContent lang={lang} />
     </>
