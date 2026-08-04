@@ -12,11 +12,11 @@ export const SITE_CONFIG = {
   author: {
     name: 'Hidetaka Okamoto',
     nameJa: '岡本 秀高',
-    jobTitle: 'Developer Experience Engineer',
+    jobTitle: 'Senior Field Engineer',
     image: '/images/profile.jpg',
     worksFor: {
-      name: 'DigitalCube',
-      url: 'https://en.digitalcube.jp/',
+      name: 'CircleCI',
+      url: 'https://circleci.com/',
     },
   },
 

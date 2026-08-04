@@ -16,7 +16,8 @@ function SpeakerProfile({ lang }: { lang: 'ja' | 'en' }) {
   if (lang === 'ja') {
     return (
       <>
-        DigitalCubeのBizDevとして、SaaSやECサイトの収益を増やすための方法・生成AIを使った効率化や新しい事業モデルの模索などに挑戦している。前職では
+        CircleCIのSenior Field Engineer,
+        JAPACとして、開発チームのCI/CD導入・改善やAI駆動開発のフィードバックサイクル設計を支援している。前職では
         <a
           className="underline hover:opacity-80"
           style={{ color: 'var(--rvt-accent)' }}
@@ -41,17 +42,16 @@ function SpeakerProfile({ lang }: { lang: 'ja' | 'en' }) {
   }
   return (
     <>
-      Hide (ひで pronounced &quot;Hee-Day&quot;) is a Business Development professional at{' '}
+      Hide (ひで pronounced &quot;Hee-Day&quot;) is a Senior Field Engineer, JAPAC at{' '}
       <a
         className="underline hover:opacity-80"
         style={{ color: 'var(--rvt-accent)' }}
-        href="https://en.digitalcube.jp/"
+        href="https://circleci.com/"
       >
-        DigitalCube
+        CircleCI
       </a>
-      , where he works on increasing revenue for SaaS and EC sites, exploring efficiency
-      improvements using generative AI, and developing new business models. Previously, he was a
-      Developer Advocate at{' '}
+      , where he helps development teams adopt and improve CI/CD and design feedback loops for
+      AI-driven development. Previously, he was a Developer Advocate at{' '}
       <a
         className="underline hover:opacity-80"
         style={{ color: 'var(--rvt-accent)' }}
@@ -180,20 +180,20 @@ export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
 
   const pageTitle = isJa ? 'Hidetaka Okamotoについて' : 'About Hidetaka Okamoto'
   const pageDescription = isJa
-    ? 'SaaSやECサイトの収益最大化を支援するエンジニア。Stripe、AWS Serverless、WordPressを専門としています。'
-    : 'Engineering partner specializing in Stripe, AWS Serverless, and WordPress. Helping SaaS and e-commerce sites maximize revenue.'
+    ? 'CircleCIでCI/CD・AI駆動開発の支援に取り組むエンジニア。元Stripe Developer Advocate。'
+    : 'Engineer at CircleCI, focused on CI/CD and AI-driven development. Formerly a Developer Advocate at Stripe.'
 
   const experiences: ExperienceCardProps[] = isJa
     ? [
         {
-          title: 'DigitalCube - Business Development',
-          period: '2024 - 現在',
+          title: 'CircleCI - Senior Field Engineer, JAPAC',
+          period: '現在',
           description:
-            'SaaSやECサイトの収益を増やすための方法・生成AIを使った効率化や新しい事業モデルの模索などに挑戦しています。',
+            '開発チームのCI/CD導入・改善や、AI駆動開発におけるフィードバックサイクルの設計を支援しています。',
           highlights: [
-            'SaaS・ECサイトの収益最大化戦略の立案と実行',
-            '生成AIを活用した業務効率化と新規事業開発',
-            '技術とビジネスの橋渡し',
+            'CI/CD導入・改善の技術支援',
+            'AI駆動開発のフィードバックサイクル設計',
+            'コミュニティ向けコンテンツ・イベントの企画',
           ],
         },
         {
@@ -221,14 +221,14 @@ export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
       ]
     : [
         {
-          title: 'DigitalCube - Business Development',
-          period: '2024 - Present',
+          title: 'CircleCI - Senior Field Engineer, JAPAC',
+          period: 'Present',
           description:
-            'Working on methods to increase revenue for SaaS and EC sites, exploring efficiency improvements using generative AI, and developing new business models.',
+            'Helping development teams adopt and improve CI/CD, and designing feedback loops for AI-driven development.',
           highlights: [
-            'Revenue maximization strategies for SaaS and e-commerce',
-            'Generative AI integration for operational efficiency',
-            'Bridging technology and business',
+            'Technical guidance on CI/CD adoption and improvement',
+            'Feedback loop design for AI-driven development',
+            'Planning community content and events',
           ],
         },
         {

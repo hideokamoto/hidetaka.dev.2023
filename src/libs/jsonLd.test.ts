@@ -349,7 +349,7 @@ describe('generatePersonJsonLd', () => {
   it('should include jobTitle from SITE_CONFIG', () => {
     const result = generatePersonJsonLd()
 
-    expect(result.jobTitle).toBe('Developer Experience Engineer')
+    expect(result.jobTitle).toBe('Senior Field Engineer')
   })
 
   it('should include worksFor as an Organization object', () => {
@@ -357,8 +357,8 @@ describe('generatePersonJsonLd', () => {
 
     expect(result.worksFor).toBeDefined()
     expect(result.worksFor['@type']).toBe('Organization')
-    expect(result.worksFor.name).toBe('DigitalCube')
-    expect(result.worksFor.url).toBe('https://en.digitalcube.jp/')
+    expect(result.worksFor.name).toBe('CircleCI')
+    expect(result.worksFor.url).toBe('https://circleci.com/')
   })
 
   it('should include sameAs array with social profile URLs', () => {
