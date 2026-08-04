@@ -33,8 +33,8 @@ export default function Highlights({ lang }: { lang: string }) {
 
   const sectionTitle = isJa ? '実績とコミュニティ活動' : 'Track Record & Community'
   const sectionDescription = isJa
-    ? '肩書きではなく、検証可能な実績で語る。Stripeでの経験、コミュニティ運営、10年以上の技術メディア運営、公開されたプロダクトの積み重ねです。'
-    : 'Judge me by verifiable track record, not job titles. Years at Stripe, community leadership, a decade-plus of publishing, and shipped products you can inspect yourself.'
+    ? 'Stripeでの5年、複数カンファレンスの実行委員長、10年以上運営する技術メディア、公開してきたプロダクト群です。'
+    : "Five years at Stripe, chairing multiple community conferences, a decade-plus running a technical publication, and products I've built and kept running."
 
   const items: Omit<Highlight, 'index'>[] = isJa
     ? [
@@ -72,7 +72,7 @@ export default function Highlights({ lang }: { lang: string }) {
         {
           title: 'OSS・プロダクト開発',
           description:
-            'WordPressプラグイン、npmパッケージ、eorzea-weatherなどのWebアプリケーションを開発・公開しています。実際に動くコードで実力を示します。',
+            'WordPressプラグイン、npmパッケージ、eorzea-weatherなどのWebアプリケーションを開発・公開しています。',
           highlights: [
             'WordPressプラグインの開発・公開',
             'npmパッケージの開発・公開',
@@ -120,7 +120,7 @@ export default function Highlights({ lang }: { lang: string }) {
         {
           title: 'OSS & shipped products',
           description:
-            'I build and publish WordPress plugins, npm packages, and web apps such as eorzea-weather — real code you can go and check for yourself.',
+            'I build and publish WordPress plugins, npm packages, and web apps such as eorzea-weather.',
           highlights: [
             'WordPress plugins, published and maintained',
             'npm packages, published and maintained',
