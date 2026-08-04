@@ -63,6 +63,7 @@ export default function NewsDetailPage({
         }
         sidebarWidth="narrow"
         gap="lg"
+        hideSidebarOnMobile
       >
         <article>
           {/* 公開日 / 更新日 */}
@@ -89,8 +90,7 @@ export default function NewsDetailPage({
 
           {/* コンテンツ */}
           <div
-            className="blog-content leading-relaxed"
-            style={{ color: 'var(--rvt-fg2)' }}
+            className="blog-content leading-relaxed text-[var(--rvt-fg2)]"
             // biome-ignore lint/security/noDangerouslySetInnerHtml: Content is from trusted WordPress CMS, controlled by site owner
             dangerouslySetInnerHTML={{ __html: product.content.rendered }}
           />
@@ -120,21 +120,16 @@ export default function NewsDetailPage({
           {(previousProduct || nextProduct) && (
             <nav
               aria-label="記事ナビゲーション"
-              className="mt-16 pt-8 border-t lg:hidden"
-              style={{ borderColor: 'var(--rvt-border)' }}
+              className="mt-16 pt-8 border-t border-[var(--rvt-border)] lg:hidden"
             >
               <div className="flex flex-col gap-4 sm:flex-row sm:justify-between">
                 {/* 次の記事 */}
                 {nextProduct && (
                   <Link
                     href={`${basePath}/${nextProduct.slug}`}
-                    className="group flex flex-col flex-1 p-4 rounded-lg transition-colors"
-                    style={{
-                      border: '1px solid var(--rvt-border)',
-                      background: 'var(--rvt-bg2)',
-                    }}
+                    className="group flex flex-1 flex-col rounded-lg border border-[var(--rvt-border)] bg-[var(--rvt-bg2)] p-4 transition-colors"
                   >
-                    <span className="text-sm font-medium mb-1" style={{ color: 'var(--rvt-fg2)' }}>
+                    <span className="mb-1 text-sm font-medium text-[var(--rvt-fg2)]">
                       ← {nextLabel}
                     </span>
                     <span className="text-base font-semibold transition-colors line-clamp-2 text-[var(--rvt-fg)] group-hover:text-[var(--rvt-accent)]">
@@ -147,13 +142,9 @@ export default function NewsDetailPage({
                 {previousProduct && (
                   <Link
                     href={`${basePath}/${previousProduct.slug}`}
-                    className="group flex flex-col flex-1 p-4 rounded-lg transition-colors text-right"
-                    style={{
-                      border: '1px solid var(--rvt-border)',
-                      background: 'var(--rvt-bg2)',
-                    }}
+                    className="group flex flex-1 flex-col rounded-lg border border-[var(--rvt-border)] bg-[var(--rvt-bg2)] p-4 text-right transition-colors"
                   >
-                    <span className="text-sm font-medium mb-1" style={{ color: 'var(--rvt-fg2)' }}>
+                    <span className="mb-1 text-sm font-medium text-[var(--rvt-fg2)]">
                       {previousLabel} →
                     </span>
                     <span className="text-base font-semibold transition-colors line-clamp-2 text-[var(--rvt-fg)] group-hover:text-[var(--rvt-accent)]">

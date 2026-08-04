@@ -32,12 +32,10 @@ export default function NewsDetailSidebar({
           {/* 次の記事 */}
           {nextProduct && (
             <div>
-              <h3 className="mb-2 text-sm font-semibold" style={{ color: 'var(--rvt-fg)' }}>
-                {nextLabel}
-              </h3>
+              <h3 className="mb-2 text-sm font-semibold text-[var(--rvt-fg)]">{nextLabel}</h3>
               <Link
                 href={`${basePath}/${nextProduct.slug}`}
-                className="block text-sm text-indigo-600 hover:text-indigo-700 transition-colors line-clamp-2"
+                className="block text-sm text-[var(--rvt-accent)] hover:text-[var(--rvt-fg)] transition-colors line-clamp-2"
               >
                 {nextProduct.title.rendered}
               </Link>
@@ -47,12 +45,10 @@ export default function NewsDetailSidebar({
           {/* 前の記事 */}
           {previousProduct && (
             <div>
-              <h3 className="mb-2 text-sm font-semibold" style={{ color: 'var(--rvt-fg)' }}>
-                {previousLabel}
-              </h3>
+              <h3 className="mb-2 text-sm font-semibold text-[var(--rvt-fg)]">{previousLabel}</h3>
               <Link
                 href={`${basePath}/${previousProduct.slug}`}
-                className="block text-sm text-indigo-600 hover:text-indigo-700 transition-colors line-clamp-2"
+                className="block text-sm text-[var(--rvt-accent)] hover:text-[var(--rvt-fg)] transition-colors line-clamp-2"
               >
                 {previousProduct.title.rendered}
               </Link>
