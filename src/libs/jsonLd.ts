@@ -10,12 +10,14 @@ export function generatePersonJsonLd() {
     SITE_CONFIG.social.twitter.url,
     SITE_CONFIG.social.github.url,
     SITE_CONFIG.social.linkedin.url,
+    SITE_CONFIG.wpKyoto.url,
   ]
 
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Person',
     name: SITE_CONFIG.author.name,
+    alternateName: SITE_CONFIG.author.nameJa,
     url: SITE_CONFIG.url,
     image: `${SITE_CONFIG.url}${SITE_CONFIG.author.image}`,
     jobTitle: SITE_CONFIG.author.jobTitle,
@@ -25,6 +27,7 @@ export function generatePersonJsonLd() {
       url: SITE_CONFIG.author.worksFor.url,
     },
     sameAs,
+    knowsAbout: ['Stripe', 'AWS Serverless', 'WordPress'],
   }
 
   return jsonLd

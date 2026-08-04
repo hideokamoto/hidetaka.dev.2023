@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import Link from 'next/link'
 import Profile from '@/components/content/Profile'
 import Container from '@/components/tailwindui/Container'
 import SocialLink, {
@@ -11,6 +12,7 @@ import PageHeader from '@/components/ui/PageHeader'
 import ProfileImage from '@/components/ui/ProfileImage'
 import SectionHeader from '@/components/ui/SectionHeader'
 import { SITE_CONFIG } from '@/config'
+import { getPathnameWithLangType } from '@/libs/urlUtils/lang.util'
 
 function SpeakerProfile({ lang }: { lang: 'ja' | 'en' }) {
   if (lang === 'ja') {
@@ -27,7 +29,15 @@ function SpeakerProfile({ lang }: { lang: 'ja' | 'en' }) {
         のディベロッパーアドボケイトとして、開発者・ユーザーコミュニティとの対話やコンテンツ・サンプルの提供に取り組んだ。ECサービスやSaaSサービスの開発・運用保守の経験とコミュニティとの会話を元に、サービスの収益化戦略やテクノロジー活用方法について情報発信している。複数の開発者コミュニティに参加し、WordCamp
         Kansai 2024やJP_Stripes Connect
         2019など、ユーザーカンファレンスの実行委員長を務めた経験を持つ。 AWS Samurai 2017, Alexa
-        Champions, AWS Community Builders
+        Champions, AWS Community Builders。技術ブログ{' '}
+        <a
+          className="underline hover:opacity-80"
+          style={{ color: 'var(--rvt-accent)' }}
+          href={SITE_CONFIG.wpKyoto.url}
+        >
+          {SITE_CONFIG.wpKyoto.label}
+        </a>{' '}
+        を10年以上運営している。
       </>
     )
   }
@@ -63,7 +73,16 @@ function SpeakerProfile({ lang }: { lang: 'ja' | 'en' }) {
       , the first Stripe user conference in Japan. Prior to Stripe, Hide was a lead Software
       Engineer at DigitalCube, focused on building plugins, open source, and developing SaaS
       application dashboards. He is also recognized as an AWS Samurai 2017, Alexa Champion, and AWS
-      Community Builder. Hide lives in Hyogo, Japan with his family and two cats.
+      Community Builder. He also runs{' '}
+      <a
+        className="underline hover:opacity-80"
+        style={{ color: 'var(--rvt-accent)' }}
+        href={SITE_CONFIG.wpKyoto.url}
+      >
+        {SITE_CONFIG.wpKyoto.label}
+      </a>
+      , a developer blog, for over a decade. Hide lives in Hyogo, Japan with his family and two
+      cats.
     </>
   )
 }
@@ -134,6 +153,68 @@ function CertificationBadge({ title, link, src }: { title: string; link?: string
   }
 
   return content
+}
+
+function EventOrganizerSection({ lang }: { lang: 'ja' | 'en' }) {
+  const isJa = lang.startsWith('ja')
+
+  const title = isJa ? '登壇依頼の方へ' : 'For Event Organizers'
+  const description = isJa
+    ? 'カンファレンス・イベントへの登壇依頼を検討されている方へ'
+    : 'For organizers considering a speaking invitation'
+  const boxLabel = isJa
+    ? 'イベントサイトへそのままコピーしてご利用いただける公式プロフィールです'
+    : 'An official bio you can copy directly onto your event site'
+  const speakingLinkLabel = isJa ? '登壇実績一覧を見る' : 'View speaking history'
+  const speakingPath = getPathnameWithLangType('speaking', lang)
+
+  const bioJa =
+    '岡本秀高（Hide）。DigitalCubeのBusiness Developmentとして、SaaSやECサイトの収益最大化・生成AIを活用した業務効率化に取り組む。元Stripeのディベロッパーアドボケイトとして、開発者・ユーザーコミュニティとの対話やコンテンツ・サンプルの提供に取り組んだ。WordCamp Kansai 2024やJP_Stripes Connect 2019など、ユーザーカンファレンスの実行委員長を歴任。AWS Samurai 2017、Alexa Champions、AWS Community Buildersとしても認定。技術ブログ wp-kyoto.net を10年以上運営している。'
+
+  const bioEn =
+    'Hidetaka "Hide" Okamoto is a Business Development professional at DigitalCube, where he works on increasing revenue for SaaS and EC sites and exploring efficiency improvements using generative AI. Previously, he was a Developer Advocate at Stripe, engaging with developer and user communities through writing, coding, and teaching. He has chaired several community conferences, including WordCamp Kansai 2024 and JP_Stripes Connect 2019. He is recognized as an AWS Samurai 2017, Alexa Champion, and AWS Community Builder, and runs wp-kyoto.net, a developer blog, for over a decade.'
+
+  return (
+    <section className="relative py-24 sm:py-32">
+      <Container>
+        <SectionHeader title={title} description={description} align="center" />
+
+        <div className="mt-16 max-w-3xl mx-auto">
+          <div
+            className="rounded-2xl p-10"
+            style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+          >
+            <p
+              className="mb-4 text-sm font-semibold uppercase tracking-wider"
+              style={{ fontFamily: 'var(--rvt-font-mono)', color: 'var(--rvt-fg2)' }}
+            >
+              {boxLabel}
+            </p>
+            <blockquote
+              className="text-base leading-relaxed"
+              style={{
+                color: 'var(--rvt-fg)',
+                borderLeft: '3px solid var(--rvt-accent)',
+                paddingLeft: '1.25rem',
+              }}
+            >
+              {isJa ? bioJa : bioEn}
+            </blockquote>
+            <div className="mt-8 text-center">
+              <Link
+                href={speakingPath}
+                className="inline-flex items-center gap-2 text-sm font-semibold underline hover:opacity-80"
+                style={{ color: 'var(--rvt-accent)' }}
+              >
+                {speakingLinkLabel}
+                <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </Container>
+    </section>
+  )
 }
 
 const RECOGNITIONS = [
@@ -330,6 +411,9 @@ export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
           </div>
         </Container>
       </section>
+
+      {/* Event Organizer Section */}
+      <EventOrganizerSection lang={lang} />
 
       {/* Certifications Section */}
       <section className="relative py-24 sm:py-32" style={{ background: 'var(--rvt-bg2)' }}>
