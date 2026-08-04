@@ -1,8 +1,8 @@
 /* ============================================================
    折衷 (Setchū) Design System — CSS Tokens
-   Palette 05 · "和紙と墨" (washi & ink)
+   Palette 05 · "白磁と墨" (washi porcelain & ink)
 
-   和紙と墨のニュートラルを土台に、藍青(あいあお)を主役、
+   白磁と墨のニュートラルを土台に、藍青(あいあお)を主役、
    松葉緑と山吹を少量のアクセントに。スライド・Web・アプリで
    一貫して使えるトークン一式。緑と黄は「差し色」に留めるのが
    この配色を静かに保つ鍵。
@@ -17,14 +17,14 @@
 
 /* ---- Light mode (default) ---- */
 :root {
-  /* Surfaces & text (washi paper & sumi ink) */
-  --rvt-bg: #f5f2ec; /* 背景 washi */
-  --rvt-bg2: #ffffff; /* サーフェス — cards sit brighter than the paper bg */
-  --rvt-bg3: #efe9dc; /* subtle sunken / nested tint */
+  /* Surfaces & text (白磁 white porcelain & sumi ink) */
+  --rvt-bg: #f8faf7; /* 背景 白磁 */
+  --rvt-bg2: #ffffff; /* サーフェス — cards sit brighter than the page bg */
+  --rvt-bg3: #eff2ee; /* subtle sunken / nested tint */
   --rvt-fg: #23262b; /* テキスト — primary ink */
-  --rvt-fg2: #565a61; /* secondary text (AA on washi) */
+  --rvt-fg2: #565a61; /* secondary text (AA on 白磁) */
   --rvt-fg3: #7b7e82; /* ミュート — muted labels */
-  --rvt-border: #e4ded2; /* ボーダー */
+  --rvt-border: #e4e9e2; /* ボーダー */
   --rvt-border-accent: rgba(47, 83, 117, 0.28);
   --rvt-accent-glow: rgba(47, 83, 117, 0.1);
 
@@ -80,8 +80,17 @@
      stays WCAG AA as text/fill on washi backgrounds. */
   --success: #3e7a55; /* 松葉緑 */
   --warning: #7e561f; /* 山吹, darkened for AA text contrast */
-  --error: #b3452f; /* muted vermilion, calmer than neon red */
+  --error: #b4553b; /* 朱, muted vermilion, calmer than neon red */
   --info: #2f5375; /* 藍青 */
+
+  /* Data-visualization extension — spot-accent use only (charts, legends).
+     Fixed across light/dark; not theme-switched like the tokens above. */
+  --chart-1: #2f5375; /* 藍青 */
+  --chart-2: #3e7a55; /* 松葉緑 */
+  --chart-3: #e0a63c; /* 山吹 */
+  --chart-4: #6e9bc0; /* 淡藍 */
+  --chart-5: #6c4e96; /* 京紫 */
+  --chart-6: #b4553b; /* 朱 */
 }
 
 /* ---- Dark mode ---- */

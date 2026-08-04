@@ -7,7 +7,7 @@
 //   indigo   → 藍青 (indigo-blue, the protagonist)
 //   green    → 松葉緑 (pine green, spot accent)
 //   yamabuki → 山吹 (gold, spot accent)  [new scale]
-//   zinc/slate/gray → 和紙 (washi neutral)
+//   zinc/slate/gray → 白磁 (washi porcelain neutral)
 // See src/styles/setchu.css for the canonical CSS-variable tokens.
 // ============================================================
 
@@ -56,12 +56,12 @@ const yamabuki = {
 	950: '#3c280d',
 }
 
-// 和紙 — warm neutral; anchors: 100 = bg, 200 = border, 500 = muted,
+// 白磁 — cool porcelain neutral; anchors: 100 = bg, 200 = border, 500 = muted,
 // 900 = dark surface, 950 = dark bg
 const washi = {
-	50: '#faf8f3',
-	100: '#f5f2ec',
-	200: '#e4ded2',
+	50: '#fbfcfa',
+	100: '#f8faf7',
+	200: '#e4e9e2',
 	300: '#cfc8b9',
 	400: '#a8a69d',
 	500: '#7b7e82',
