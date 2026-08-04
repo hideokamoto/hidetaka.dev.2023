@@ -7,9 +7,10 @@ import RvtButton from '@/components/ui/RvtButton'
 import RvtEyebrow from '@/components/ui/RvtEyebrow'
 import { SITE_CONFIG } from '@/config'
 
+const ROLE = 'Developer Experience Engineer'
+
 export default function Hero({ lang }: { lang: string }) {
   const name = SITE_CONFIG.author.name
-  const role = 'Developer Experience Engineer'
   const tagline =
     lang === 'ja'
       ? 'シームレスな体験で開発者をエンパワーする'
@@ -17,13 +18,13 @@ export default function Hero({ lang }: { lang: string }) {
 
   const description =
     lang === 'ja'
-      ? 'Stripe、AWS Serverless、WordPressを専門とする開発者。EC ASP開発とStripe Developer Advocateとしての経験を活かし、SaaS・ECサイトの収益最大化を支援します。'
-      : 'Engineering partner specializing in Stripe, AWS Serverless, and WordPress. Leveraging experience in EC ASP development and as a Stripe Developer Advocate to help SaaS and e-commerce sites maximize revenue.'
+      ? 'Stripe、AWS Serverless、WordPressを専門とするエンジニア。Stripe Developer Advocateおよび EC ASP開発の経験を通じて、決済とサーバーレスの技術領域に強みを持ちます。'
+      : 'Engineer specializing in Stripe, AWS Serverless, and WordPress. My background as a Stripe Developer Advocate and in EC ASP development shapes my expertise in payments and serverless architecture.'
 
-  const ctaText = lang === 'ja' ? 'プロジェクトを見る' : 'View my projects'
+  const ctaText = lang === 'ja' ? '登壇・実績を見る' : 'View my work & talks'
   const ctaHref = lang === 'ja' ? '/ja/work' : '/work'
-  const blogHref = lang === 'ja' ? '/ja/blog' : '/blog'
-  const blogText = lang === 'ja' ? 'ブログを読む' : 'Read the blog'
+  const blogHref = lang === 'ja' ? '/ja/writing' : '/writing'
+  const blogText = lang === 'ja' ? '記事を読む' : 'Read my writing'
 
   const stats = [
     {
@@ -86,7 +87,7 @@ export default function Hero({ lang }: { lang: string }) {
             style={{ display: 'flex', flexDirection: 'column', gap: 32 }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-              <RvtEyebrow>{role}</RvtEyebrow>
+              <RvtEyebrow>{ROLE}</RvtEyebrow>
 
               <h1
                 style={{
