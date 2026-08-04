@@ -4,6 +4,7 @@ type SidebarLayoutProps = {
   sidebarWidth?: 'narrow' | 'wide'
   gap?: 'sm' | 'md' | 'lg'
   className?: string
+  hideSidebarOnMobile?: boolean
 }
 
 export default function SidebarLayout({
@@ -12,6 +13,7 @@ export default function SidebarLayout({
   sidebarWidth = 'narrow',
   gap = 'md',
   className = '',
+  hideSidebarOnMobile = false,
 }: SidebarLayoutProps) {
   const gapStyles = {
     sm: 'gap-4',
@@ -28,7 +30,11 @@ export default function SidebarLayout({
   return (
     <div className={`grid grid-cols-1 ${gridCols} ${gapStyles[gap]} ${className}`}>
       {/* サイドバー */}
-      <aside className={`${sidebarCols} lg:sticky lg:top-8 h-fit`}>{sidebar}</aside>
+      <aside
+        className={`${sidebarCols} lg:sticky lg:top-8 h-fit${hideSidebarOnMobile ? ' hidden lg:block' : ''}`}
+      >
+        {sidebar}
+      </aside>
 
       {/* メインコンテンツエリア */}
       <div className={mainCols}>{children}</div>
