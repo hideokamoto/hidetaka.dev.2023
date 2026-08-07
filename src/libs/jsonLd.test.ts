@@ -8,6 +8,7 @@ import {
   generateDevNoteJsonLd,
   generatePersonJsonLd,
 } from './jsonLd'
+import type { Profile } from './profile/types'
 
 // テスト用のモックデータファクトリ
 const createMockWPThought = (overrides: Partial<WPThought> = {}): WPThought => ({
@@ -315,77 +316,133 @@ describe('generateBlogListJsonLd', () => {
 })
 
 describe('generatePersonJsonLd', () => {
+  // 上流 profile-as-a-service が返す Person を parse した後の形。
+  const PROFILE: Profile = {
+    name: 'Hidetaka Okamoto',
+    jobTitle: 'Senior Field Engineer',
+    description: 'Senior Field Engineer at CircleCI (JAPAC), ex-Stripe Developer Advocate.',
+    image: 'https://gravatar.com/avatar/abc123',
+    url: 'https://example.cloudfront.net/p/hidetaka/en/',
+    sameAs: [
+      'https://github.com/hideokamoto',
+      'https://twitter.com/hidetaka_dev',
+      'https://www.linkedin.com/in/hideokamoto/',
+      'https://wp-kyoto.net/',
+      'https://hidetaka.dev',
+    ],
+    social: [],
+    worksFor: { name: 'CircleCI' },
+    knowsAbout: ['TypeScript', 'AWS', 'Stripe'],
+    awards: ['AWS Samurai 2017', 'Alexa Champion'],
+  }
+
   it('should generate valid Person JSON-LD structure', () => {
-    const result = generatePersonJsonLd()
+    const result = generatePersonJsonLd(PROFILE)
 
     expect(result['@context']).toBe('https://schema.org')
     expect(result['@type']).toBe('Person')
   })
 
-  it('should include name from SITE_CONFIG', () => {
-    const result = generatePersonJsonLd()
-
-    expect(result.name).toBe('Hidetaka Okamoto')
+  it('should take name from the upstream profile', () => {
+    expect(generatePersonJsonLd(PROFILE).name).toBe('Hidetaka Okamoto')
   })
 
-  it('should include the Japanese name as alternateName', () => {
-    const result = generatePersonJsonLd()
-
-    expect(result.alternateName).toBe('岡本 秀高')
+  it('should include the other language name as alternateName when supplied', () => {
+    expect(generatePersonJsonLd(PROFILE, '岡本 秀高').alternateName).toBe('岡本 秀高')
   })
 
-  it('should include site URL', () => {
-    const result = generatePersonJsonLd()
-
-    expect(result.url).toBe('https://hidetaka.dev')
+  it('should omit alternateName when no other language name is supplied', () => {
+    expect(generatePersonJsonLd(PROFILE)).not.toHaveProperty('alternateName')
   })
 
-  it('should include absolute image URL', () => {
-    const result = generatePersonJsonLd()
-
-    expect(result.image).toBe('https://hidetaka.dev/images/profile.jpg')
+  it('should keep the site URL as the canonical url, not the upstream one', () => {
+    // 上流の url は CloudFront 上の正規URL。人物の代表URLをCDNドメインにしてはいけない。
+    expect(generatePersonJsonLd(PROFILE).url).toBe('https://hidetaka.dev')
   })
 
-  it('should include jobTitle from SITE_CONFIG', () => {
-    const result = generatePersonJsonLd()
+  it('should keep the site-owned absolute image URL, not the upstream avatar', () => {
+    expect(generatePersonJsonLd(PROFILE).image).toBe('https://hidetaka.dev/images/profile.jpg')
+  })
 
-    expect(result.jobTitle).toBe('Senior Field Engineer')
+  it('should take jobTitle from the upstream profile', () => {
+    expect(generatePersonJsonLd(PROFILE).jobTitle).toBe('Senior Field Engineer')
+  })
+
+  it('should include description from the upstream profile', () => {
+    expect(generatePersonJsonLd(PROFILE).description).toContain('CircleCI')
   })
 
   it('should include worksFor as an Organization object', () => {
-    const result = generatePersonJsonLd()
+    const result = generatePersonJsonLd(PROFILE)
 
     expect(result.worksFor).toBeDefined()
-    expect(result.worksFor['@type']).toBe('Organization')
-    expect(result.worksFor.name).toBe('CircleCI')
-    expect(result.worksFor.url).toBe('https://circleci.com/')
+    expect(result.worksFor?.['@type']).toBe('Organization')
+    expect(result.worksFor?.name).toBe('CircleCI')
+  })
+
+  it('should supplement the organization URL when the org name still matches SITE_CONFIG', () => {
+    // 上流の JSON Resume は組織URLを持たないので SITE_CONFIG から補う。
+    expect(generatePersonJsonLd(PROFILE).worksFor?.url).toBe('https://circleci.com/')
+  })
+
+  it('should NOT attach the old employer URL after a job change', () => {
+    const moved = { ...PROFILE, worksFor: { name: 'Some Other Company' } }
+
+    const result = generatePersonJsonLd(moved)
+
+    expect(result.worksFor?.name).toBe('Some Other Company')
+    expect(result.worksFor).not.toHaveProperty('url')
   })
 
   it('should include sameAs array with social profile URLs', () => {
-    const result = generatePersonJsonLd()
+    const result = generatePersonJsonLd(PROFILE)
 
-    expect(result.sameAs).toBeDefined()
     expect(Array.isArray(result.sameAs)).toBe(true)
     expect(result.sameAs).toContain('https://twitter.com/hidetaka_dev')
     expect(result.sameAs).toContain('https://github.com/hideokamoto')
     expect(result.sameAs).toContain('https://www.linkedin.com/in/hideokamoto/')
-    expect(result.sameAs).toContain('https://wp-kyoto.net')
+    expect(result.sameAs).toContain('https://wp-kyoto.net/')
   })
 
-  it('should have exactly 4 profiles in sameAs', () => {
-    const result = generatePersonJsonLd()
+  it('should drop the site own URL from sameAs (it is already the url field)', () => {
+    const result = generatePersonJsonLd(PROFILE)
 
+    expect(result.sameAs).not.toContain('https://hidetaka.dev')
     expect(result.sameAs).toHaveLength(4)
   })
 
-  it('should include knowsAbout with the areas of expertise', () => {
-    const result = generatePersonJsonLd()
+  it('should include knowsAbout from the upstream skills, not a hardcoded list', () => {
+    expect(generatePersonJsonLd(PROFILE).knowsAbout).toEqual(['TypeScript', 'AWS', 'Stripe'])
+  })
 
-    expect(result.knowsAbout).toEqual(['Stripe', 'AWS Serverless', 'WordPress'])
+  it('should include awards from the upstream profile', () => {
+    expect(generatePersonJsonLd(PROFILE).award).toEqual(['AWS Samurai 2017', 'Alexa Champion'])
+  })
+
+  it('should omit optional fields the upstream profile does not carry', () => {
+    const minimal: Profile = {
+      name: 'Hidetaka Okamoto',
+      sameAs: [],
+      social: [],
+      knowsAbout: [],
+      awards: [],
+    }
+
+    const result = generatePersonJsonLd(minimal)
+
+    expect(result).not.toHaveProperty('jobTitle')
+    expect(result).not.toHaveProperty('description')
+    expect(result).not.toHaveProperty('worksFor')
+    expect(result).not.toHaveProperty('sameAs')
+    expect(result).not.toHaveProperty('knowsAbout')
+    expect(result).not.toHaveProperty('award')
+    // 恒久的にサイトが持つ項目は残る。
+    expect(result.name).toBe('Hidetaka Okamoto')
+    expect(result.url).toBe('https://hidetaka.dev')
   })
 
   it('should have all required Person schema properties', () => {
-    const result = generatePersonJsonLd()
+    const result = generatePersonJsonLd(PROFILE, '岡本 秀高')
 
     expect(result).toHaveProperty('@context')
     expect(result).toHaveProperty('@type')

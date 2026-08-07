@@ -9,6 +9,7 @@ import SentryProvider from '@/components/providers/SentryProvider'
 import Footer from '@/components/tailwindui/Footer'
 import Header from '@/components/tailwindui/Header'
 import { generatePersonJsonLd } from '@/libs/jsonLd'
+import { loadProfile } from '@/libs/profile/loadProfile'
 
 export const metadata: Metadata = {
   title: {
@@ -48,12 +49,18 @@ export const metadata: Metadata = {
   manifest: '/favicons/site.webmanifest',
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // 構造化データはHTMLに埋まる必要があるので、ここだけはサーバー側で取得する
+  // （クライアント注入した JSON-LD はクローラに拾われる保証がない）。
+  // 日本語名は `alternateName` として併記するため、両言語ぶんを取得する。ISRキャッシュが
+  // 効くので revalidate 期間あたり実リクエストは各1回。
+  const [profile, profileJa] = await Promise.all([loadProfile('en'), loadProfile('ja')])
+
   return (
     <html lang="en" className="h-full antialiased">
       <head>
         <link rel="alternate" type="application/rss+xml" title="RSS" href="/projects/rss.xml" />
-        <JsonLd data={generatePersonJsonLd()} />
+        <JsonLd data={generatePersonJsonLd(profile, profileJa.name)} />
       </head>
       <body
         className="flex h-full flex-col"

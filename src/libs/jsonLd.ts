@@ -1,33 +1,62 @@
 import { SITE_CONFIG } from '@/config'
 import type { BlogItem, WPThought } from './dataSources/types'
+import type { Profile } from './profile/types'
 import { removeHtmlTags } from './sanitize'
 
 /**
  * サイト著者用のPerson JSON-LDを生成
+ *
+ * 職歴・肩書き・専門領域・ソーシャルリンクは profile-as-a-service（`profile`）から取る。
+ * 以前はここで手書きしていたため、`knowsAbout` が3件のまま実態と乖離していた。
+ *
+ * 一方で **url / image はサイト側が保持する**。上流の `url` は
+ * profile-as-a-service 上の正規URL（CloudFront）を指しており、hidetaka.dev の Person
+ * ノードの正規URLとしてそれを使うと、この人物の代表URLがCDNドメインになってしまう。
+ * 画像も同様に、サイトが用意したプロフィール写真を使い続ける。
+ *
+ * @param profile 表示言語（ルートレイアウトは `lang="en"`）のプロフィール
+ * @param alternateName 別言語での氏名。日本語名を `alternateName` として併記するために使う
  */
-export function generatePersonJsonLd() {
-  const sameAs = [
-    SITE_CONFIG.social.twitter.url,
-    SITE_CONFIG.social.github.url,
-    SITE_CONFIG.social.linkedin.url,
-    SITE_CONFIG.wpKyoto.url,
-  ]
+/**
+ * 勤務先のURLを解決する。
+ *
+ * 上流の JSON Resume は `work[]` に組織名しか持たず、JSON-LD の `worksFor` にもURLは出ない
+ * （`work[].url` はスキーマ上存在するが未使用）。URLは `SITE_CONFIG` にしかないため、
+ * **組織名が一致するときに限り**それを補う。名前が一致しない＝転職しているということなので、
+ * 新しい勤務先に前職のURLを貼り付けないための条件。上流が `work[].url` を持てば不要になる。
+ */
+function resolveOrgUrl(org: Profile['worksFor']): string | undefined {
+  if (org?.url) return org.url
+  if (org?.name === SITE_CONFIG.author.worksFor.name) return SITE_CONFIG.author.worksFor.url
+  return undefined
+}
+
+export function generatePersonJsonLd(profile: Profile, alternateName?: string) {
+  // 上流の sameAs には `basics.url`（= https://hidetaka.dev）が含まれる。この Person ノード
+  // 自身のURLなので、`url` と重複させず sameAs からは落とす。
+  const sameAs = profile.sameAs.filter((url) => url.replace(/\/+$/, '') !== SITE_CONFIG.url)
 
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Person',
-    name: SITE_CONFIG.author.name,
-    alternateName: SITE_CONFIG.author.nameJa,
+    name: profile.name,
+    ...(alternateName ? { alternateName } : {}),
     url: SITE_CONFIG.url,
     image: `${SITE_CONFIG.url}${SITE_CONFIG.author.image}`,
-    jobTitle: SITE_CONFIG.author.jobTitle,
-    worksFor: {
-      '@type': 'Organization',
-      name: SITE_CONFIG.author.worksFor.name,
-      url: SITE_CONFIG.author.worksFor.url,
-    },
-    sameAs,
-    knowsAbout: ['Stripe', 'AWS Serverless', 'WordPress'],
+    ...(profile.jobTitle ? { jobTitle: profile.jobTitle } : {}),
+    ...(profile.description ? { description: profile.description } : {}),
+    ...(profile.worksFor
+      ? {
+          worksFor: {
+            '@type': 'Organization',
+            name: profile.worksFor.name,
+            ...(resolveOrgUrl(profile.worksFor) ? { url: resolveOrgUrl(profile.worksFor) } : {}),
+          },
+        }
+      : {}),
+    ...(sameAs.length > 0 ? { sameAs } : {}),
+    ...(profile.knowsAbout.length > 0 ? { knowsAbout: profile.knowsAbout } : {}),
+    ...(profile.awards.length > 0 ? { award: profile.awards } : {}),
   }
 
   return jsonLd
