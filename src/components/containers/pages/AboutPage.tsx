@@ -10,7 +10,7 @@ import PageHeader from '@/components/ui/PageHeader'
 import ProfileImage from '@/components/ui/ProfileImage'
 import SectionHeader from '@/components/ui/SectionHeader'
 import { SITE_CONFIG } from '@/config'
-import { loadProfile } from '@/libs/profile/loadProfile'
+import { loadProfileForRequest } from '@/libs/profile/loadProfile'
 
 function SpeakerProfile({ lang }: { lang: 'ja' | 'en' }) {
   if (lang === 'ja') {
@@ -178,7 +178,7 @@ function RecognitionBadge({ title, issuer }: { title: string; issuer: string }) 
 export default async function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
   // このページの主題そのものなので、サイドバーのカードと違ってサーバー側で取得する
   // （インデックスされるべき本文であり、クライアント描画に賭ける理由がない）。
-  const profile = await loadProfile(lang)
+  const profile = await loadProfileForRequest(lang)
   const isJa = lang.startsWith('ja')
 
   const pageTitle = isJa ? 'Hidetaka Okamotoについて' : 'About Hidetaka Okamoto'

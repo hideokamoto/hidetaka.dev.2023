@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { profileFallback } from './fallback'
-import { buildProfileUrl, loadProfile } from './loadProfile'
+import { buildProfileUrl, loadProfile, loadProfileForRequest } from './loadProfile'
 
 const BASE = 'https://example.cloudfront.net'
 
@@ -113,5 +113,36 @@ describe('loadProfile', () => {
     await loadProfile('ja')
 
     expect(warn).toHaveBeenCalled()
+  })
+
+  it('bounds the request with an AbortSignal so a stalled upstream cannot hang forever', async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(PERSON))
+    vi.stubGlobal('fetch', fetchMock)
+
+    await loadProfile('ja')
+
+    const options = fetchMock.mock.calls[0]?.[1]
+    expect(options?.signal).toBeInstanceOf(AbortSignal)
+  })
+
+  it('falls back when the request times out (AbortSignal.timeout style rejection)', async () => {
+    // What AbortSignal.timeout() actually produces on abort: a DOMException named
+    // 'TimeoutError' rejecting the fetch promise — not a plain Error.
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockRejectedValue(new DOMException('The operation timed out.', 'TimeoutError')),
+    )
+
+    expect(await loadProfile('ja')).toEqual(profileFallback('ja'))
+  })
+})
+
+describe('loadProfileForRequest', () => {
+  it('behaves like loadProfile for a given language', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(jsonResponse(PERSON)))
+
+    const profile = await loadProfileForRequest('ja')
+
+    expect(profile.name).toBe('岡本 秀高')
   })
 })

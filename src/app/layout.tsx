@@ -9,7 +9,7 @@ import SentryProvider from '@/components/providers/SentryProvider'
 import Footer from '@/components/tailwindui/Footer'
 import Header from '@/components/tailwindui/Header'
 import { generatePersonJsonLd } from '@/libs/jsonLd'
-import { loadProfile } from '@/libs/profile/loadProfile'
+import { loadProfileForRequest } from '@/libs/profile/loadProfile'
 
 export const metadata: Metadata = {
   title: {
@@ -54,7 +54,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // （クライアント注入した JSON-LD はクローラに拾われる保証がない）。
   // 日本語名は `alternateName` として併記するため、両言語ぶんを取得する。ISRキャッシュが
   // 効くので revalidate 期間あたり実リクエストは各1回。
-  const [profile, profileJa] = await Promise.all([loadProfile('en'), loadProfile('ja')])
+  const [profile, profileJa] = await Promise.all([
+    loadProfileForRequest('en'),
+    loadProfileForRequest('ja'),
+  ])
 
   return (
     <html lang="en" className="h-full antialiased">

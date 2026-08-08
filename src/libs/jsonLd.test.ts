@@ -372,6 +372,20 @@ describe('generatePersonJsonLd', () => {
     expect(generatePersonJsonLd(PROFILE).description).toContain('CircleCI')
   })
 
+  it('should render an upstream description containing HTML as plain text', () => {
+    const withMarkup = { ...PROFILE, description: '<p>CircleCI の<b>Senior Field Engineer</b></p>' }
+
+    const result = generatePersonJsonLd(withMarkup)
+
+    expect(result.description).toBe('CircleCI のSenior Field Engineer')
+  })
+
+  it('should omit description when the upstream value is only markup', () => {
+    const onlyMarkup = { ...PROFILE, description: '<div></div>' }
+
+    expect(generatePersonJsonLd(onlyMarkup)).not.toHaveProperty('description')
+  })
+
   it('should include worksFor as an Organization object', () => {
     const result = generatePersonJsonLd(PROFILE)
 
@@ -409,6 +423,17 @@ describe('generatePersonJsonLd', () => {
 
     expect(result.sameAs).not.toContain('https://hidetaka.dev')
     expect(result.sameAs).toHaveLength(4)
+  })
+
+  it('should drop the site own URL from sameAs regardless of scheme/case/trailing slash', () => {
+    const variants = {
+      ...PROFILE,
+      sameAs: ['HTTPS://Hidetaka.Dev/', 'http://hidetaka.dev', 'https://github.com/hideokamoto'],
+    }
+
+    const result = generatePersonJsonLd(variants)
+
+    expect(result.sameAs).toEqual(['https://github.com/hideokamoto'])
   })
 
   it('should include knowsAbout from the upstream skills, not a hardcoded list', () => {

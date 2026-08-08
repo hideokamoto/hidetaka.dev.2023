@@ -53,6 +53,35 @@ function stringArray(value: unknown): string[] {
   return value.filter((entry): entry is string => typeof entry === 'string' && entry.length > 0)
 }
 
+/**
+ * A non-empty string that is an absolute `http:`/`https:` URL, or `undefined`.
+ *
+ * `sameAs`, `url`, `image`, and `worksFor.url` all end up in an `href` (`ProfileCard`'s
+ * social links) or in emitted JSON-LD. Accepting any non-empty string here would let a
+ * `javascript:` or `data:` URI — or a bare relative path — through the trust boundary from
+ * an external document straight into markup.
+ */
+function optionalHttpUrl(value: unknown): string | undefined {
+  const candidate = optionalString(value)?.trim()
+  if (!candidate) return undefined
+
+  try {
+    const url = new URL(candidate)
+    return url.protocol === 'http:' || url.protocol === 'https:' ? candidate : undefined
+  } catch {
+    return undefined
+  }
+}
+
+/** Keep only the http(s)-URL entries of a value that should be an array of URL strings. */
+function httpUrlArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return []
+  return value.flatMap((entry) => {
+    const url = optionalHttpUrl(entry)
+    return url ? [url] : []
+  })
+}
+
 /** `worksFor` is a nested Organization node; anything else (or a nameless one) is dropped. */
 function parseOrganization(value: unknown): ProfileOrganization | undefined {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) return undefined
@@ -61,7 +90,7 @@ function parseOrganization(value: unknown): ProfileOrganization | undefined {
   const name = optionalString(record.name)
   if (!name) return undefined
 
-  return { name, url: optionalString(record.url) }
+  return { name, url: optionalHttpUrl(record.url) }
 }
 
 /**
@@ -80,14 +109,14 @@ export function parsePersonJsonLd(raw: unknown): Profile | null {
   const name = optionalString(record.name)
   if (!name) return null
 
-  const sameAs = stringArray(record.sameAs)
+  const sameAs = httpUrlArray(record.sameAs)
 
   return {
     name,
     jobTitle: optionalString(record.jobTitle),
     description: optionalString(record.description),
-    image: optionalString(record.image),
-    url: optionalString(record.url),
+    image: optionalHttpUrl(record.image),
+    url: optionalHttpUrl(record.url),
     sameAs,
     social: sameAs.map((url) => ({ network: classifySocialUrl(url), url })),
     worksFor: parseOrganization(record.worksFor),

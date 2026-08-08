@@ -85,6 +85,21 @@ describe('ProfileCardLoader', () => {
     expect(screen.getByText(profileFallback('ja').name)).toBeInTheDocument()
   })
 
+  it('shows the new language fallback immediately on a lang change, never the old language', async () => {
+    // A never-resolving fetch pins both renders in "still loading" — the assertion is about
+    // what shows *before* any fetch resolves, i.e. whether the useState lazy initializer trap
+    // (only runs on mount) leaks the previous language into the next one.
+    vi.stubGlobal('fetch', vi.fn().mockReturnValue(new Promise(() => {})))
+
+    const { rerender } = render(<ProfileCardLoader lang="ja" />)
+    expect(screen.getByText(profileFallback('ja').name)).toBeInTheDocument()
+
+    rerender(<ProfileCardLoader lang="en" />)
+
+    expect(screen.getByText(profileFallback('en').name)).toBeInTheDocument()
+    expect(screen.queryByText(profileFallback('ja').name)).not.toBeInTheDocument()
+  })
+
   it('renders only the networks that have an icon, dropping the rest', async () => {
     vi.stubGlobal(
       'fetch',

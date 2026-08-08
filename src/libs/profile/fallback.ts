@@ -26,6 +26,15 @@ const FALLBACK_SAME_AS: readonly string[] = [
   SITE_CONFIG.url,
 ]
 
+/**
+ * Static copies of the fields the pre-integration `generatePersonJsonLd()` used to hardcode.
+ * Leaving these empty on fallback would be a regression: today, a profile-as-a-service outage
+ * makes `Person.knowsAbout`/`Person.award` silently vanish from every page's structured data —
+ * strictly worse than what shipped before this integration existed.
+ */
+const FALLBACK_KNOWS_ABOUT: readonly string[] = ['Stripe', 'AWS Serverless', 'WordPress']
+const FALLBACK_AWARDS: readonly string[] = ['AWS Samurai 2017', 'Alexa Champion']
+
 export function profileFallback(lang: ProfileLang): Profile {
   const sameAs = [...FALLBACK_SAME_AS]
 
@@ -41,7 +50,7 @@ export function profileFallback(lang: ProfileLang): Profile {
       name: SITE_CONFIG.author.worksFor.name,
       url: SITE_CONFIG.author.worksFor.url,
     },
-    knowsAbout: [],
-    awards: [],
+    knowsAbout: [...FALLBACK_KNOWS_ABOUT],
+    awards: [...FALLBACK_AWARDS],
   }
 }

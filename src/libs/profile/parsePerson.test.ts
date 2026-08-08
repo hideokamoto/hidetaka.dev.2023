@@ -112,6 +112,36 @@ describe('parsePersonJsonLd', () => {
     expect(profile?.awards).toEqual(['Alexa Champion'])
   })
 
+  it('drops sameAs/url/image entries that are not http(s) URLs', () => {
+    const profile = parsePersonJsonLd({
+      '@type': 'Person',
+      name: 'Hidetaka Okamoto',
+      sameAs: [
+        'https://github.com/hideokamoto', // kept
+        'javascript:alert(1)',
+        'data:text/html,<script>alert(1)</script>',
+        '/relative/path',
+        'not a url at all',
+      ],
+      url: 'javascript:alert(document.cookie)',
+      image: 'data:image/png;base64,AAAA',
+    })
+
+    expect(profile?.sameAs).toEqual(['https://github.com/hideokamoto'])
+    expect(profile?.social).toEqual([{ network: 'github', url: 'https://github.com/hideokamoto' }])
+    expect(profile?.url).toBeUndefined()
+    expect(profile?.image).toBeUndefined()
+  })
+
+  it('rejects a worksFor.url that is not an http(s) URL', () => {
+    const profile = parsePersonJsonLd({
+      ...VALID_PERSON,
+      worksFor: { '@type': 'Organization', name: 'CircleCI', url: 'javascript:alert(1)' },
+    })
+
+    expect(profile?.worksFor).toEqual({ name: 'CircleCI' })
+  })
+
   it('ignores a worksFor that carries no usable name', () => {
     expect(parsePersonJsonLd({ ...VALID_PERSON, worksFor: {} })?.worksFor).toBeUndefined()
     expect(parsePersonJsonLd({ ...VALID_PERSON, worksFor: 'CircleCI' })?.worksFor).toBeUndefined()

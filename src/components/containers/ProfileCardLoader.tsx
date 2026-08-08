@@ -34,7 +34,13 @@ type ProfileCardLoaderProps = {
  * upstream copy once it arrives.
  */
 export default function ProfileCardLoader({ lang, ...cardProps }: ProfileCardLoaderProps) {
-  const [profile, setProfile] = useState<Profile>(() => profileFallback(lang))
+  // Tracks which language `profile` was resolved for. `useState`'s lazy initializer only runs
+  // on mount, so without this a `lang` prop change on an already-mounted instance would keep
+  // showing the previous language's content until the new fetch resolves.
+  const [state, setState] = useState<{ lang: ProfileLang; profile: Profile }>(() => ({
+    lang,
+    profile: profileFallback(lang),
+  }))
 
   useEffect(() => {
     let active = true
@@ -42,13 +48,18 @@ export default function ProfileCardLoader({ lang, ...cardProps }: ProfileCardLoa
     // `loadProfile` resolves to the fallback on every failure path, so there is no rejection
     // to handle here — a failed load simply leaves the card on the copy it already shows.
     loadProfile(lang).then((loaded) => {
-      if (active) setProfile(loaded)
+      if (active) setState({ lang, profile: loaded })
     })
 
     return () => {
       active = false
     }
   }, [lang])
+
+  // Render fallback synchronously the instant `lang` changes, rather than waiting a render
+  // cycle for the effect above to notice — `state.lang` mismatching the prop is exactly that
+  // one-render window.
+  const profile = state.lang === lang ? state.profile : profileFallback(lang)
 
   return <ProfileCard profile={profile} {...cardProps} />
 }

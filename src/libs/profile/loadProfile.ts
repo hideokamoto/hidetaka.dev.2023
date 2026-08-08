@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { profileFallback } from './fallback'
 import { parsePersonJsonLd } from './parsePerson'
 import type { Profile, ProfileLang } from './types'
@@ -17,6 +18,16 @@ import type { Profile, ProfileLang } from './types'
 
 /** How long a server-side fetch may serve a cached copy. Ignored by browsers. */
 const REVALIDATE_SECONDS = 3600
+
+/**
+ * Hard ceiling on the request itself.
+ *
+ * Without this, an upstream that accepts the connection but never responds (as opposed to
+ * cleanly failing) never reaches the `catch` below — the `await fetch` just hangs. Because
+ * this loader runs unconditionally on every page render (`layout.tsx`) and again on the About
+ * page, a stalled upstream would stall the entire site's SSR, not just the profile card.
+ */
+const FETCH_TIMEOUT_MS = 5000
 
 /** Compose the language-scoped artifact URL, tolerating a trailing slash on the base. */
 export function buildProfileUrl(baseUrl: string, id: string, lang: ProfileLang): string {
@@ -43,7 +54,10 @@ export async function loadProfile(lang: ProfileLang): Promise<Profile> {
   const url = buildProfileUrl(config.baseUrl, config.id, lang)
 
   try {
-    const response = await fetch(url, { next: { revalidate: REVALIDATE_SECONDS } })
+    const response = await fetch(url, {
+      next: { revalidate: REVALIDATE_SECONDS },
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+    })
     if (!response.ok) {
       console.warn(`[profile] ${response.status} from ${url}; using fallback profile`)
       return profileFallback(lang)
@@ -61,3 +75,14 @@ export async function loadProfile(lang: ProfileLang): Promise<Profile> {
     return profileFallback(lang)
   }
 }
+
+/**
+ * Server-only dedup of {@link loadProfile}: multiple server components asking for the same
+ * language within one request (root layout's Person JSON-LD, `AboutPageContent`'s bio) share
+ * a single fetch instead of each re-fetching and re-parsing the same document.
+ *
+ * `React.cache()` is scoped to server rendering — memoizing forever with no invalidation is
+ * exactly wrong for `loadProfile`'s other call site (`ProfileCardLoader`, client-side), so
+ * that one keeps calling the plain, uncached `loadProfile`.
+ */
+export const loadProfileForRequest = cache(loadProfile)

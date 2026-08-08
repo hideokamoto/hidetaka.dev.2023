@@ -4,20 +4,6 @@ import type { Profile } from './profile/types'
 import { removeHtmlTags } from './sanitize'
 
 /**
- * サイト著者用のPerson JSON-LDを生成
- *
- * 職歴・肩書き・専門領域・ソーシャルリンクは profile-as-a-service（`profile`）から取る。
- * 以前はここで手書きしていたため、`knowsAbout` が3件のまま実態と乖離していた。
- *
- * 一方で **url / image はサイト側が保持する**。上流の `url` は
- * profile-as-a-service 上の正規URL（CloudFront）を指しており、hidetaka.dev の Person
- * ノードの正規URLとしてそれを使うと、この人物の代表URLがCDNドメインになってしまう。
- * 画像も同様に、サイトが用意したプロフィール写真を使い続ける。
- *
- * @param profile 表示言語（ルートレイアウトは `lang="en"`）のプロフィール
- * @param alternateName 別言語での氏名。日本語名を `alternateName` として併記するために使う
- */
-/**
  * 勤務先のURLを解決する。
  *
  * 上流の JSON Resume は `work[]` に組織名しか持たず、JSON-LD の `worksFor` にもURLは出ない
@@ -31,12 +17,59 @@ function resolveOrgUrl(org: Profile['worksFor']): string | undefined {
   return undefined
 }
 
-export function generatePersonJsonLd(profile: Profile, alternateName?: string) {
-  // 上流の sameAs には `basics.url`（= https://hidetaka.dev）が含まれる。この Person ノード
-  // 自身のURLなので、`url` と重複させず sameAs からは落とす。
-  const sameAs = profile.sameAs.filter((url) => url.replace(/\/+$/, '') !== SITE_CONFIG.url)
+/** `generatePersonJsonLd()` が返す Schema.org Person オブジェクトの形。 */
+export type PersonJsonLd = {
+  '@context': 'https://schema.org'
+  '@type': 'Person'
+  name: string
+  alternateName?: string
+  url: string
+  image: string
+  jobTitle?: string
+  description?: string
+  worksFor?: { '@type': 'Organization'; name: string; url?: string }
+  sameAs?: string[]
+  knowsAbout?: string[]
+  award?: string[]
+}
 
-  const jsonLd = {
+/**
+ * サイト著者用のPerson JSON-LDを生成
+ *
+ * 職歴・肩書き・専門領域・ソーシャルリンクは profile-as-a-service（`profile`）から取る。
+ * 以前はここで手書きしていたため、`knowsAbout` が3件のまま実態と乖離していた。
+ *
+ * 一方で **url / image はサイト側が保持する**。上流の `url` は
+ * profile-as-a-service 上の正規URL（CloudFront）を指しており、hidetaka.dev の Person
+ * ノードの正規URLとしてそれを使うと、この人物の代表URLがCDNドメインになってしまう。
+ * 画像も同様に、サイトが用意したプロフィール写真を使い続ける。
+ *
+ * `description` は外部（profile-as-a-service）由来なので、他の外部コンテンツ
+ * （`generateBlogPostingJsonLd` 等）と同じ `removeHtmlTags()` を通してからJSON-LDへ入れる。
+ *
+ * @param profile 表示言語（ルートレイアウトは `lang="en"`）のプロフィール
+ * @param alternateName 別言語での氏名。日本語名を `alternateName` として併記するために使う
+ */
+export function generatePersonJsonLd(profile: Profile, alternateName?: string): PersonJsonLd {
+  // 上流の sameAs には `basics.url`（= https://hidetaka.dev）が含まれる。この Person ノード
+  // 自身のURLなので、`url` と重複させず sameAs からは落とす。プロトコル・大文字小文字・末尾
+  // スラッシュの表記ゆれを吸収するため URL オブジェクトで正規化してから比較する。
+  const siteUrl = new URL(SITE_CONFIG.url)
+  const sameAs = profile.sameAs.filter((url) => {
+    try {
+      const parsed = new URL(url)
+      return !(
+        parsed.hostname.toLowerCase() === siteUrl.hostname.toLowerCase() &&
+        parsed.pathname.replace(/\/+$/, '') === siteUrl.pathname.replace(/\/+$/, '')
+      )
+    } catch {
+      return true
+    }
+  })
+
+  const description = profile.description ? removeHtmlTags(profile.description).trim() : undefined
+
+  const jsonLd: PersonJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Person',
     name: profile.name,
@@ -44,7 +77,7 @@ export function generatePersonJsonLd(profile: Profile, alternateName?: string) {
     url: SITE_CONFIG.url,
     image: `${SITE_CONFIG.url}${SITE_CONFIG.author.image}`,
     ...(profile.jobTitle ? { jobTitle: profile.jobTitle } : {}),
-    ...(profile.description ? { description: profile.description } : {}),
+    ...(description ? { description } : {}),
     ...(profile.worksFor
       ? {
           worksFor: {
