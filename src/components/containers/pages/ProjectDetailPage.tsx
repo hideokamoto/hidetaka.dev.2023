@@ -1,7 +1,7 @@
 import Image from 'next/image'
+import ProfileCardLoader from '@/components/containers/ProfileCardLoader'
 import Container from '@/components/tailwindui/Container'
 import PageShell from '@/components/ui/PageShell'
-import ProfileCard from '@/components/ui/ProfileCard'
 import ProjectDetailSidebar from '@/components/ui/ProjectDetailSidebar'
 import SidebarLayout from '@/components/ui/SidebarLayout'
 import type { MicroCMSProjectsRecord } from '@/libs/microCMS/types'
@@ -161,7 +161,7 @@ export default function ProjectDetailPage({
                 {visitLabel}
               </a>
             )}
-            <ProfileCard lang={lang} imageSrc="/images/profile.jpg" />
+            <ProfileCardLoader lang={lang} imageSrc="/images/profile.jpg" />
           </div>
         </article>
       </SidebarLayout>

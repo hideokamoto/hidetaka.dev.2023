@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import ProfileCard from '@/components/ui/ProfileCard'
+import ProfileCardLoader from '@/components/containers/ProfileCardLoader'
 import type { MicroCMSProjectsRecord } from '@/libs/microCMS/types'
 import { cn } from '@/libs/utils/cn'
 
@@ -85,7 +85,7 @@ export default function ProjectDetailSidebar({
       )}
 
       {/* プロフィールカード */}
-      <ProfileCard lang={lang} imageSrc="/images/profile.jpg" imageSize="responsive" />
+      <ProfileCardLoader lang={lang} imageSrc="/images/profile.jpg" imageSize="responsive" />
 
       {/* 一覧に戻る */}
       <Link
