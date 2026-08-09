@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      {
+        "command": ".cursor/hooks/chunk-commit-gate.sh",
+        "matcher": "git commit",
+        "timeout": 900
+      }
+    ],
+    "stop": [
+      {
+        "command": ".cursor/hooks/chunk-validate-stop.sh",
+        "loop_limit": null,
+        "timeout": 420
+      }
+    ]
+  }
+}
