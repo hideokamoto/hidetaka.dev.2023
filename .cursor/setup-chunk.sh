@@ -59,8 +59,17 @@ install_chunk() {
   install -m 0755 "${tmpdir}/chunk" "${BIN_DIR}/chunk"
 }
 
+desired_version="${CHUNK_VERSION:-v0.7.138}"
+version_number="${desired_version#v}"
+
 if command -v chunk >/dev/null 2>&1; then
-  echo "chunk already installed: $(chunk --version)"
+  actual_version="$(chunk --version 2>/dev/null || true)"
+  if [[ "$actual_version" == *"$version_number"* ]]; then
+    echo "chunk already installed: $actual_version"
+  else
+    install_chunk
+    echo "Installed: $(chunk --version)"
+  fi
 else
   install_chunk
   echo "Installed: $(chunk --version)"
