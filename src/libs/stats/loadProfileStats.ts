@@ -16,8 +16,33 @@ type DatedEntity = {
   date: string
 }
 
+/**
+ * 執筆記事としてカウントする投稿タイプ。
+ *
+ * wp-kyoto.net に登録されている投稿タイプの分類（`/wp-json/wp/v2/types`）:
+ * - 執筆記事  … posts（投稿）/ thoughs（雑記）/ stripe（Stripe）/ dev-notes（DevNotes）← ここで集計
+ * - 登壇      … events ← `loadSpeakingReportCount` で別軸として集計
+ * - 記事以外  … products（リリース告知）/ stripe-products（製品データ）/ llms-texts（機械向け）
+ * - 対象外    … pages / attachment / wp_block / wp_template(_part) / wp_navigation /
+ *                nav_menu_item / wp_font_family / wp_font_face
+ * - 取得不可  … developer-deep-dives（REST が 401 を返す非公開タイプ）
+ *
+ * `langs` は Polylang の言語別取得が必要かどうか。posts のみ言語ごとに
+ * 記事が分かれており、他は `filter[lang]` を付けても全件が返るため、
+ * 言語別に取得すると二重計上になる。
+ */
+const WRITING_COLLECTIONS: ReadonlyArray<{
+  restBase: string
+  langs: ReadonlyArray<'ja' | 'en' | null>
+}> = [
+  { restBase: 'posts', langs: ['ja', 'en'] },
+  { restBase: 'thoughs', langs: [null] },
+  { restBase: 'stripe', langs: [null] },
+  { restBase: 'dev-notes', langs: [null] },
+]
+
 export type WritingStats = {
-  /** 累計記事数（日本語 + 英語） */
+  /** 累計記事数（WRITING_COLLECTIONS の全投稿タイプ、日本語 + 英語） */
   total: number
   /** 最初の記事の年 */
   firstYear: number | null
@@ -51,7 +76,7 @@ export type ProfileStats = {
  */
 const fetchPublishedDates = async (
   restBase: string,
-  lang?: 'ja' | 'en',
+  lang: 'ja' | 'en' | null,
 ): Promise<string[] | null> => {
   try {
     const items = await wpClient.postType<DatedEntity>(restBase).listAll(
@@ -74,15 +99,15 @@ const fetchPublishedDates = async (
 }
 
 const loadWritingStats = async (now: Date): Promise<WritingStats | null> => {
-  const [ja, en] = await Promise.all([
-    fetchPublishedDates('posts', 'ja'),
-    fetchPublishedDates('posts', 'en'),
-  ])
+  const results = await Promise.all(
+    WRITING_COLLECTIONS.flatMap((collection) =>
+      collection.langs.map((lang) => fetchPublishedDates(collection.restBase, lang)),
+    ),
+  )
 
-  // 片方でも取得できていれば表示する。両方失敗したときだけ非表示にする。
-  if (ja === null && en === null) return null
-
-  const dates = [...(ja ?? []), ...(en ?? [])]
+  // 一部の投稿タイプが取れなくても、取れた分で表示する。
+  // 全滅したときだけ非表示にする。
+  const dates = results.filter((result): result is string[] => result !== null).flat()
   if (dates.length === 0) return null
 
   return {
