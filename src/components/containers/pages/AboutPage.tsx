@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import type { ReactNode } from 'react'
 import Profile from '@/components/content/Profile'
 import Container from '@/components/tailwindui/Container'
 import SocialLink, {
@@ -175,7 +176,35 @@ function RecognitionBadge({ title, issuer }: { title: string; issuer: string }) 
   )
 }
 
-export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
+function TrackRecordSection({ isJa, children }: { isJa: boolean; children?: ReactNode }) {
+  // 実績データを渡されていないページ（静的レンダリング）ではセクションごと出さない
+  if (!children) return null
+
+  return (
+    <section className="relative py-24 sm:py-32" style={{ background: 'var(--rvt-bg3)' }}>
+      <Container>
+        <SectionHeader
+          title={isJa ? '活動の記録' : 'Track Record'}
+          description={
+            isJa
+              ? '執筆・OSS・登壇の積み上げを数字で'
+              : 'Writing, open source, and speaking in numbers'
+          }
+          align="center"
+        />
+        <div className="mt-20">{children}</div>
+      </Container>
+    </section>
+  )
+}
+
+type AboutPageContentProps = {
+  lang: 'ja' | 'en'
+  /** 実績サマリー（ProfileStatsSection）。データ取得はページ側で行う。 */
+  statsSlot?: ReactNode
+}
+
+export default function AboutPageContent({ lang, statsSlot }: AboutPageContentProps) {
   const isJa = lang.startsWith('ja')
 
   const pageTitle = isJa ? 'Hidetaka Okamotoについて' : 'About Hidetaka Okamoto'
@@ -309,6 +338,9 @@ export default function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
           </div>
         </Container>
       </section>
+
+      {/* Track Record Section */}
+      <TrackRecordSection isJa={isJa}>{statsSlot}</TrackRecordSection>
 
       {/* Experience Section */}
       <section className="relative py-24 sm:py-32">
