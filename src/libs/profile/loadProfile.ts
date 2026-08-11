@@ -4,12 +4,7 @@ import { parsePersonJsonLd } from './parsePerson'
 import type { Profile, ProfileLang } from './types'
 
 /**
- * Isomorphic loader for the profile served by profile-as-a-service.
- *
- * The artifact is public, unauthenticated, credential-free static JSON behind CloudFront
- * with `Access-Control-Allow-Origin: *`, so the *same* function works in both places it is
- * needed: a server component building the Person JSON-LD, and a client component rendering
- * the visible profile card. One module, two call sites — no duplicated wire format.
+ * Server-side loader for the profile served by profile-as-a-service.
  *
  * It never throws and never returns a partial profile. Every failure path — unconfigured,
  * unreachable, non-2xx, malformed body, wrong document type — resolves to the static
@@ -78,11 +73,8 @@ export async function loadProfile(lang: ProfileLang): Promise<Profile> {
 
 /**
  * Server-only dedup of {@link loadProfile}: multiple server components asking for the same
- * language within one request (root layout's Person JSON-LD, `AboutPageContent`'s bio) share
- * a single fetch instead of each re-fetching and re-parsing the same document.
- *
- * `React.cache()` is scoped to server rendering — memoizing forever with no invalidation is
- * exactly wrong for `loadProfile`'s other call site (`ProfileCardLoader`, client-side), so
- * that one keeps calling the plain, uncached `loadProfile`.
+ * language within one request (root layout's Person JSON-LD, `AboutPageContent`'s bio,
+ * `ProfileCardLoader`'s sidebar cards) share a single fetch instead of each re-fetching and
+ * re-parsing the same document.
  */
 export const loadProfileForRequest = cache(loadProfile)
