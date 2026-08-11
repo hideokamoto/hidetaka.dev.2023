@@ -9,10 +9,11 @@ echo "🚀 Starting Claude Code session..."
 # Check if running in Claude Code remote environment
 if [ -n "$CLAUDE_CODE_REMOTE" ]; then
   echo "📦 Installing dependencies..."
-  npm install
+  corepack enable
+  pnpm install --frozen-lockfile
 
   echo "🔨 Building project..."
-  npm run build
+  pnpm run build
 
   echo "✅ Session setup complete!"
 else
