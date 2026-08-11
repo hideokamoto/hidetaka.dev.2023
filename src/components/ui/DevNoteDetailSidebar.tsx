@@ -1,6 +1,6 @@
 import Link from 'next/link'
+import ProfileCardLoader from '@/components/containers/ProfileCardLoader'
 import CategoryTagList, { type Category } from '@/components/ui/CategoryTagList'
-import ProfileCard from '@/components/ui/ProfileCard'
 import type { AdjacentNote } from '@/libs/dataSources/devnotes'
 
 interface DevNoteDetailSidebarProps {
@@ -38,7 +38,7 @@ export default function DevNoteDetailSidebar({
       )}
 
       {/* プロフィールカード */}
-      <ProfileCard lang={lang} imageSrc="/images/profile.jpg" imageSize="responsive" />
+      <ProfileCardLoader lang={lang} imageSrc="/images/profile.jpg" imageSize="responsive" />
 
       {/* 前後の記事ナビゲーション */}
       {(previousNote || nextNote) && (

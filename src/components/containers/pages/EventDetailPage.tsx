@@ -1,10 +1,10 @@
 import Link from 'next/link'
+import ProfileCardLoader from '@/components/containers/ProfileCardLoader'
 import Container from '@/components/tailwindui/Container'
 import ArticleActions from '@/components/ui/ArticleActions'
 import ArticleCTA from '@/components/ui/ArticleCTA'
 import ArticleMeta from '@/components/ui/ArticleMeta'
 import PageShell from '@/components/ui/PageShell'
-import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
 import BlogReactions from '@/components/ui/reactions/BlogReactions'
 import SocialShareButtons from '@/components/ui/SocialShareButtons'
@@ -79,7 +79,7 @@ export default function EventDetailPage({
         />
 
         {/* プロフィールカード */}
-        <ProfileCard lang={lang} imageSrc="/images/profile.jpg" className="mt-12" />
+        <ProfileCardLoader lang={lang} imageSrc="/images/profile.jpg" className="mt-12" />
 
         {/* CTA */}
         <ArticleCTA lang={lang} articleType="event_report" className="mt-12" />
