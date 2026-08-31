@@ -1,6 +1,10 @@
 import Script from 'next/script'
 
-export default function GooglePreferredSource() {
+type GooglePreferredSourceProps = {
+  lang: string
+}
+
+export default function GooglePreferredSource({ lang }: GooglePreferredSourceProps) {
   return (
     <>
       <Script
@@ -8,7 +12,7 @@ export default function GooglePreferredSource() {
         src="https://news.google.com/swg/js/v1/publisher.js"
         strategy="afterInteractive"
       />
-      <div google-add-preferred-source-btn="" />
+      <div google-add-preferred-source-btn="" data-lang={lang} />
     </>
   )
 }

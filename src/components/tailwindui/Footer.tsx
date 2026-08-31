@@ -186,7 +186,7 @@ export default function Footer() {
                   >
                     {lang === 'ja' ? 'Google検索' : 'Google Search'}
                   </h3>
-                  <GooglePreferredSource />
+                  <GooglePreferredSource lang={lang} />
                 </div>
               </div>
 
