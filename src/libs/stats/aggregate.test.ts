@@ -30,6 +30,14 @@ describe('groupByMonth', () => {
     expect(feb?.bySource).toEqual({ Qiita: 1 })
   })
 
+  it('uses Unknown for items without a dataSource name', () => {
+    const now = new Date('2025-03-15T00:00:00Z')
+    const items: StatsInput[] = [{ datetime: '2025-03-01T10:00:00Z' }]
+    const result = groupByMonth(items, 3, now)
+    const march = result.find((b) => b.yearMonth === '2025-03')
+    expect(march?.bySource).toEqual({ Unknown: 1 })
+  })
+
   it('drops items outside the window', () => {
     const now = new Date('2025-03-15T00:00:00Z')
     const result = groupByMonth([post('2024-01-01T00:00:00Z')], 3, now)

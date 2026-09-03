@@ -2,7 +2,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { MicroCMSProjectStatus } from './microCMS/types'
 import {
   getMicroCMSProjectStatus,
+  getStatusBadgeVariant,
   getStatusFromLastUpdate,
+  getStatusLabel,
   isActiveStatus,
 } from './projectStatus.utils'
 
@@ -99,6 +101,44 @@ describe('projectStatus.utils', () => {
       // Aug 15 minus 6 months = Feb 15
       const date = new Date('2024-02-15T12:00:00Z')
       expect(getStatusFromLastUpdate(date)).toBe('active')
+    })
+
+    it('should return active when last update equals threshold date exactly', () => {
+      // Threshold uses local midnight on the boundary day; equality must count as active.
+      const thresholdDate = new Date(2024, 1, 15)
+      expect(getStatusFromLastUpdate(thresholdDate)).toBe('active')
+    })
+  })
+
+  describe('getStatusBadgeVariant', () => {
+    it('should return green for active status', () => {
+      expect(getStatusBadgeVariant('active')).toBe('green')
+    })
+
+    it('should return gray for non-active statuses', () => {
+      expect(getStatusBadgeVariant('deprecated')).toBe('gray')
+      expect(getStatusBadgeVariant('archived')).toBe('gray')
+      expect(getStatusBadgeVariant('completed')).toBe('gray')
+    })
+  })
+
+  describe('getStatusLabel', () => {
+    it('should return localized labels for known statuses', () => {
+      expect(getStatusLabel('active', 'ja')).toBe('アクティブ')
+      expect(getStatusLabel('active', 'en')).toBe('Active')
+      expect(getStatusLabel('deprecated', 'ja')).toBe('非推奨')
+      expect(getStatusLabel('deprecated', 'en')).toBe('Deprecated')
+      expect(getStatusLabel('archived', 'ja')).toBe('アーカイブ')
+      expect(getStatusLabel('completed', 'en')).toBe('Completed')
+    })
+
+    it('should default to Active labels for invalid status values', () => {
+      expect(getStatusLabel('', 'en')).toBe('Active')
+      expect(getStatusLabel('', 'ja')).toBe('アクティブ')
+    })
+
+    it('should capitalize unknown status strings', () => {
+      expect(getStatusLabel('beta', 'en')).toBe('Beta')
     })
   })
 
