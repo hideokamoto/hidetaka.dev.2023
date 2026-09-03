@@ -77,3 +77,9 @@ apply_and_test "MUT-008" \
   "if (!text.trim()) {" \
   "if (false && !text.trim()) {" \
   "pnpm vitest run src/libs/translator/translator.test.ts"
+
+apply_and_test "MUT-CTRL" \
+  "src/libs/logger.ts" \
+  "if (isDevelopment) {" \
+  "if (false \&\& isDevelopment) {" \
+  "pnpm vitest run src/libs/logger.test.ts"
