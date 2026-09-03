@@ -1,4 +1,4 @@
 {
-  "install": "corepack enable pnpm && pnpm install --frozen-lockfile && bash .cursor/setup-chunk.sh && (command -v rsync >/dev/null || sudo apt-get update -qq && sudo apt-get install -y -qq rsync)",
+  "install": "corepack enable pnpm && pnpm install --frozen-lockfile && bash .cursor/setup-chunk.sh && (command -v rsync >/dev/null || (sudo apt-get update -qq && sudo apt-get install -y -qq rsync))",
   "start": "echo \"Chunk sidecar workspace ready — run chunk validate --remote\""
 }

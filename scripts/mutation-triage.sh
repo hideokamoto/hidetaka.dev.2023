@@ -10,22 +10,34 @@ apply_and_test() {
   local replace="$4"
   local test_cmd="$5"
 
+  local backup log_file patch_file
+  backup="$(mktemp)"
+  log_file="$(mktemp)"
+  patch_file="$(mktemp)"
+
+  cleanup() {
+    if [ -f "$backup" ]; then
+      mv "$backup" "$file"
+    fi
+  }
+  trap cleanup EXIT INT TERM
+
   echo "=== $id ==="
-  cp "$file" "${file}.bak"
+  cp "$file" "$backup"
   sed -i "s|${search}|${replace}|" "$file"
 
   local exit_code=0
-  eval "$test_cmd" >/tmp/mut-${id}.log 2>&1 || exit_code=$?
+  eval "$test_cmd" >"$log_file" 2>&1 || exit_code=$?
 
-  git diff "$file" > "/tmp/mut-${id}.patch" || true
-  mv "${file}.bak" "$file"
+  git diff "$file" > "$patch_file" || true
 
   if [ "$exit_code" -eq 0 ]; then
     echo "SURVIVOR (tests passed)"
-    echo "PATCH: /tmp/mut-${id}.patch"
+    echo "PATCH: $patch_file"
+    echo "LOG: $log_file"
   else
     echo "KILLED (exit $exit_code)"
-    rm -f "/tmp/mut-${id}.patch"
+    rm -f "$patch_file" "$log_file"
   fi
   echo
 }

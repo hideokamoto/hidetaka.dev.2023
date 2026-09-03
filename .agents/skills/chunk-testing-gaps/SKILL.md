@@ -22,7 +22,7 @@ The objective is to find as many surviving mutants as possible, prioritised by r
 
 This prompt expects to be run in the context of a local clone of a VCS project. If that is not the case, stop and explain why you cannot proceed.
 
-Before any testing, ensure local dependencies are running (`docker compose up -d` or equivalent). On compose failure, check whether containers from another project are occupying ports and kill them.
+Before any testing, ensure local dependencies are running (`docker compose up -d` or equivalent). If compose fails due to port conflicts, identify which process or container owns the port before stopping anything — do not kill containers from other projects without explicit user approval.
 
 Stage 2 runs mutants on `chunk` sidecars, which needs `validation.sidecarImage` set in `.chunk/config.json`. Check it with `cat .chunk/config.json`. If it is missing, stop and tell the user to run the one-time setup in the `chunk-sidecar` skill (Step 3) first — booting a fresh unconfigured sidecar per mutant is slow enough to make the whole run impractical.
 

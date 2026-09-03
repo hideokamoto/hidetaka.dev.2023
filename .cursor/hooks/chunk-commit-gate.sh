@@ -24,7 +24,6 @@ esac
 
 cd "$REPO_ROOT"
 corepack enable pnpm
-pnpm install --frozen-lockfile
 if ! (CI=true pnpm lint:check && CI=true pnpm test && CI=true pnpm build); then
   printf '{"permission":"deny","user_message":"Commit blocked: lint, test, or build failed.","agent_message":"Fix lint/test/build failures before committing."}\n'
   exit 2

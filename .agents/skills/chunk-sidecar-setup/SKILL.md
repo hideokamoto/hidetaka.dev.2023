@@ -199,7 +199,7 @@ AskUserQuestion:
       description: "Installs the circleci CLI and circleci-testsuite plugin so
                     you can run 'doctor' validation on the sidecar."
       → install circleci CLI and circleci-testsuite:
-           chunk validate --remote --cmd "curl -fLSs https://raw.githubusercontent.com/CircleCI-Public/circleci-cli/main/install.sh | sudo bash"
+           chunk validate --remote --cmd "CIRCLECI_CLI_VERSION=v1.0.49536 && curl -fsSL https://github.com/CircleCI-Public/circleci-cli/releases/download/\${CIRCLECI_CLI_VERSION}/circleci-cli_\${CIRCLECI_CLI_VERSION#v}_linux_amd64.tar.gz -o /tmp/circleci-cli.tar.gz && curl -fsSL https://github.com/CircleCI-Public/circleci-cli/releases/download/\${CIRCLECI_CLI_VERSION}/checksums.txt | grep linux_amd64 | sha256sum -c - && sudo tar -xzf /tmp/circleci-cli.tar.gz -C /usr/local/bin circleci"
            chunk validate --remote --cmd "circleci update install"
            (follow any additional circleci-testsuite install steps for the org)
     - "No — skip"

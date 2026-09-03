@@ -12,21 +12,21 @@ Use the team's generated review prompt to review recent code changes. Runs the a
 
 1. **Determine the diff scope**: Use the following priority order to decide what to review:
    - If the user provided a PR number, PR URL, or said "this PR" — use GitHub CLI:
-     - Run `gh pr view <number-or-url> --json number,title,body,baseRefName,headRefName,headRepositoryOwner,headRepository` to get PR metadata
+     - Run `gh pr view <number-or-url> --json number,title,body,baseRefName,baseRepository,headRefName,headRepositoryOwner,headRepository` to get PR metadata
      - Run `gh pr diff <number-or-url>` to get the full diff
-     - If no PR number/URL was given but you are on a branch with an open PR, run `gh pr view --json number,title,body,baseRefName,headRefName,headRepositoryOwner,headRepository` to auto-detect it, then fetch the diff the same way
+     - If no PR number/URL was given but you are on a branch with an open PR, run `gh pr view --json number,title,body,baseRefName,baseRepository,headRefName,headRepositoryOwner,headRepository` to auto-detect it, then fetch the diff the same way
    - If the user specified a commit range, branch, or file list — use that
    - If there are staged changes (`git diff --cached`) — review those
-   - Otherwise, review uncommitted changes against the main branch (`git diff main...HEAD` or `git diff origin/main...HEAD`)
+   - Otherwise, review uncommitted changes against the main branch (`git diff main` or `git diff origin/main`, including the working tree)
 
 2. **Get the diff**: Obtain the changes using the method selected above. If the diff is empty, tell the user there is nothing to review. Store the full diff text — you will pass it inline to the subagent. For PR reviews also store the PR title and body.
 
 3. **Load the review prompt**: The source depends on the review type:
-   - **PR review**: fetch `.chunk/context/review-prompt.md` from the PR's head branch using:
+   - **PR review**: fetch `.chunk/context/review-prompt.md` from the PR's **base** branch (the merge target), not the head branch:
      ```
-     gh api repos/{headRepositoryOwner}/{headRepository}/contents/.chunk/context/review-prompt.md?ref={headRefName} --jq '.content' | base64 --decode
+     gh api repos/{baseRepositoryOwner}/{baseRepository}/contents/.chunk/context/review-prompt.md?ref={baseRefName} --jq '.content' | base64 --decode
      ```
-     From the PR metadata fetched in step 1, substitute `{headRepositoryOwner}` with `headRepositoryOwner.login`, `{headRepository}` with `headRepository.name`, and `{headRefName}` directly. If the file does not exist on that branch, fall back to the local `.chunk/context/review-prompt.md`.
+     From the PR metadata fetched in step 1, substitute `{baseRepositoryOwner}` with `baseRepository.owner.login`, `{baseRepository}` with `baseRepository.name`, and `{baseRefName}` directly. If the file does not exist on the base branch, tell the user and suggest they run `chunk build-prompt` on the base branch. Do not fall back to a local copy or the head branch.
    - **Local review**: read `.chunk/context/review-prompt.md` from the root of the current project.
    - If no review prompt is found in either location, tell the user and suggest they run `chunk build-prompt` to generate one. Do not proceed without it.
    - Store the full file contents — you will pass them inline to the subagent.
