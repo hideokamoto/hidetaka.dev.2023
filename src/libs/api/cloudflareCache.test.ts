@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { withCache, withCacheAndContext } from './cloudflareCache'
+import { withCache, withCacheAndContext } from '@/libs/api/cloudflareCache'
 
 vi.mock('@/libs/logger', () => ({
   logger: {
@@ -23,7 +23,7 @@ function createMockCache(): MockCache {
   }
 }
 
-function installCaches(mockCache: MockCache) {
+function installCaches(mockCache: MockCache): void {
   const cacheStorage = { default: mockCache } as CacheStorage & { default: Cache }
   vi.stubGlobal('caches', cacheStorage)
 }
@@ -96,6 +96,7 @@ describe('cloudflareCache', () => {
       )
 
       expect(result.status).toBe(200)
+      expect(await result.text()).toBe('generated-image')
       expect(callback).toHaveBeenCalledTimes(1)
       expect(logger.warn).toHaveBeenCalledWith(
         'Cache operation failed, falling back to uncached response',
@@ -103,6 +104,20 @@ describe('cloudflareCache', () => {
           url: 'https://hidetaka.dev/api/thumbnail/events/99',
         }),
       )
+    })
+
+    it('rethrows callback failures without invoking callback twice', async () => {
+      const callback = vi.fn().mockRejectedValue(new Error('generation failed'))
+
+      await expect(
+        withCacheAndContext(
+          new Request('https://hidetaka.dev/api/thumbnail/events/100'),
+          { waitUntil: vi.fn() },
+          callback,
+        ),
+      ).rejects.toThrow('generation failed')
+
+      expect(callback).toHaveBeenCalledTimes(1)
     })
 
     it('uses a GET-only cache key derived from the request URL', async () => {
@@ -151,6 +166,18 @@ describe('cloudflareCache', () => {
       expect(result.status).toBe(200)
       expect(callback).toHaveBeenCalledTimes(1)
       expect(logger.warn).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('withCache', () => {
+    it('rethrows callback failures without invoking callback twice', async () => {
+      const callback = vi.fn().mockRejectedValue(new Error('generation failed'))
+
+      await expect(
+        withCache(new Request('https://hidetaka.dev/api/thumbnail/events/101'), callback),
+      ).rejects.toThrow('generation failed')
+
+      expect(callback).toHaveBeenCalledTimes(1)
     })
   })
 })

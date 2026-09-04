@@ -37,10 +37,12 @@ export type CacheContext = WaitUntilContext | { ctx: WaitUntilContext }
 const DEFAULT_TTL = 31536000 // 1 year
 const ONE_DAY = 86400 // 24 hours
 
+/** Returns true when the Workers Cache API is available in the current runtime. */
 function isCacheAvailable(): boolean {
   return typeof caches !== 'undefined' && 'default' in caches
 }
 
+/** Returns the Workers default cache, or null when the Cache API is unavailable. */
 function getDefaultCache(): Cache | null {
   if (!isCacheAvailable()) {
     return null
@@ -56,6 +58,7 @@ export function createCacheKey(request: Request): Request {
   return new Request(request.url, { method: 'GET' })
 }
 
+/** Resolves waitUntil from ExecutionContext or OpenNext CloudflareContext shapes. */
 function resolveWaitUntil(context: CacheContext): ((promise: Promise<unknown>) => void) | null {
   if ('waitUntil' in context && typeof context.waitUntil === 'function') {
     return context.waitUntil.bind(context)
@@ -68,6 +71,7 @@ function resolveWaitUntil(context: CacheContext): ((promise: Promise<unknown>) =
   return null
 }
 
+/** Stores a response in the cache, using waitUntil when available. */
 function storeInCache(
   cache: Cache,
   cacheKey: Request,
@@ -87,6 +91,7 @@ function storeInCache(
   })
 }
 
+/** Formats cache errors for structured logging. */
 function formatCacheError(error: unknown): string {
   if (error instanceof Error) {
     return error.message
@@ -95,6 +100,7 @@ function formatCacheError(error: unknown): string {
   return String(error)
 }
 
+/** Clones a response and attaches cache-control headers for CDN storage. */
 function prepareCachedResponse(response: Response, ttl: number, immutable: boolean): Response {
   const responseHeaders = new Headers(response.headers)
 
@@ -129,6 +135,7 @@ export async function withCache(
 
   const { ttl = DEFAULT_TTL, immutable = ttl >= ONE_DAY } = options
   let generatedResponse: Response | undefined
+  let callbackAttempted = false
 
   try {
     const cacheKey = createCacheKey(request)
@@ -141,16 +148,17 @@ export async function withCache(
 
     logger.log('Cache miss', { url: request.url })
 
+    callbackAttempted = true
     generatedResponse = await callback()
 
     if (!generatedResponse.ok) {
       return generatedResponse
     }
 
-    const responseToCache = prepareCachedResponse(generatedResponse, ttl, immutable)
-    storeInCache(cache, cacheKey, responseToCache)
+    generatedResponse = prepareCachedResponse(generatedResponse, ttl, immutable)
+    storeInCache(cache, cacheKey, generatedResponse)
 
-    return responseToCache
+    return generatedResponse
   } catch (error) {
     logger.warn('Cache operation failed, falling back to uncached response', {
       url: request.url,
@@ -159,7 +167,10 @@ export async function withCache(
     if (generatedResponse) {
       return generatedResponse
     }
-    return callback()
+    if (!callbackAttempted) {
+      return callback()
+    }
+    throw error
   }
 }
 
@@ -186,6 +197,7 @@ export async function withCacheAndContext(
 
   const { ttl = DEFAULT_TTL, immutable = ttl >= ONE_DAY } = options
   let generatedResponse: Response | undefined
+  let callbackAttempted = false
 
   try {
     const cacheKey = createCacheKey(request)
@@ -198,16 +210,17 @@ export async function withCacheAndContext(
 
     logger.log('Cache miss', { url: request.url })
 
+    callbackAttempted = true
     generatedResponse = await callback()
 
     if (!generatedResponse.ok) {
       return generatedResponse
     }
 
-    const responseToCache = prepareCachedResponse(generatedResponse, ttl, immutable)
-    storeInCache(cache, cacheKey, responseToCache, ctx)
+    generatedResponse = prepareCachedResponse(generatedResponse, ttl, immutable)
+    storeInCache(cache, cacheKey, generatedResponse, ctx)
 
-    return responseToCache
+    return generatedResponse
   } catch (error) {
     logger.warn('Cache operation failed, falling back to uncached response', {
       url: request.url,
@@ -216,6 +229,9 @@ export async function withCacheAndContext(
     if (generatedResponse) {
       return generatedResponse
     }
-    return callback()
+    if (!callbackAttempted) {
+      return callback()
+    }
+    throw error
   }
 }
