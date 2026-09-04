@@ -6,7 +6,7 @@ cd "$(dirname "$0")/.."
 restore_backup() {
   local backup_path="$1"
   local target_file="$2"
-  if [ -n "$backup_path" ] && [ -f "$backup_path" ]; then
+  if [ -n "$backup_path" ] && [ -s "$backup_path" ]; then
     mv "$backup_path" "$target_file"
   fi
 }
@@ -23,10 +23,13 @@ apply_and_test() {
   log_file="$(mktemp)"
   patch_file="$(mktemp)"
 
+  echo "=== $id ==="
+  if ! cp "$file" "$backup"; then
+    rm -f "$backup" "$log_file" "$patch_file"
+    return 1
+  fi
   trap "restore_backup '${backup}' '${file}'" EXIT INT TERM
 
-  echo "=== $id ==="
-  cp "$file" "$backup"
   sed -i "s|${search}|${replace}|" "$file"
 
   local exit_code=0
