@@ -3,6 +3,14 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+restore_backup() {
+  local backup_path="$1"
+  local target_file="$2"
+  if [ -n "$backup_path" ] && [ -f "$backup_path" ]; then
+    mv "$backup_path" "$target_file"
+  fi
+}
+
 apply_and_test() {
   local id="$1"
   local file="$2"
@@ -15,12 +23,7 @@ apply_and_test() {
   log_file="$(mktemp)"
   patch_file="$(mktemp)"
 
-  cleanup() {
-    if [ -f "$backup" ]; then
-      mv "$backup" "$file"
-    fi
-  }
-  trap cleanup EXIT INT TERM
+  trap "restore_backup '${backup}' '${file}'" EXIT INT TERM
 
   echo "=== $id ==="
   cp "$file" "$backup"
@@ -30,6 +33,9 @@ apply_and_test() {
   eval "$test_cmd" >"$log_file" 2>&1 || exit_code=$?
 
   git diff "$file" > "$patch_file" || true
+
+  restore_backup "$backup" "$file"
+  trap - EXIT INT TERM
 
   if [ "$exit_code" -eq 0 ]; then
     echo "SURVIVOR (tests passed)"
