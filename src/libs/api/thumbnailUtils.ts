@@ -5,6 +5,7 @@
  * and Cloudflare context access.
  */
 
+import type { CloudflareContext as OpenNextCloudflareContext } from '@opennextjs/cloudflare'
 import { SITE_CONFIG } from '@/config'
 import type { WPEvent, WPThought } from '@/libs/dataSources/types'
 import { logger } from '@/libs/logger'
@@ -27,11 +28,10 @@ export type CloudflareEnv = {
 }
 
 /**
- * Cloudflare context with environment bindings
+ * Cloudflare context with project-specific environment bindings
  */
-export type CloudflareContext = {
-  env: CloudflareEnv
-  waitUntil?: (promise: Promise<unknown>) => void
+export type CloudflareContext = OpenNextCloudflareContext & {
+  env: OpenNextCloudflareContext['env'] & CloudflareEnv
 }
 
 /**
