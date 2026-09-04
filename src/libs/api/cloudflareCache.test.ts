@@ -69,13 +69,40 @@ describe('cloudflareCache', () => {
 
       await withCacheAndContext(
         request,
-        { ctx: { waitUntil } },
+        {
+          env: {},
+          cf: undefined,
+          ctx: { waitUntil },
+        },
         async () => new Response('image', { status: 200 }),
       )
 
       expect(waitUntil).toHaveBeenCalledTimes(1)
       expect(mockCache.put).toHaveBeenCalledTimes(1)
       expect(logger.warn).not.toHaveBeenCalled()
+    })
+
+    it('does not invoke callback twice when caching fails after generation', async () => {
+      const waitUntil = vi.fn()
+      const callback = vi.fn().mockResolvedValue(new Response('generated-image', { status: 200 }))
+      mockCache.put.mockImplementation(() => {
+        throw new Error('cache put failed')
+      })
+
+      const result = await withCacheAndContext(
+        new Request('https://hidetaka.dev/api/thumbnail/events/99'),
+        { waitUntil },
+        callback,
+      )
+
+      expect(result.status).toBe(200)
+      expect(callback).toHaveBeenCalledTimes(1)
+      expect(logger.warn).toHaveBeenCalledWith(
+        'Cache operation failed, falling back to uncached response',
+        expect.objectContaining({
+          url: 'https://hidetaka.dev/api/thumbnail/events/99',
+        }),
+      )
     })
 
     it('uses a GET-only cache key derived from the request URL', async () => {

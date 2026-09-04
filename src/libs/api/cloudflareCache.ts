@@ -31,7 +31,8 @@ type WaitUntilContext = {
   waitUntil: (promise: Promise<unknown>) => void
 }
 
-type CacheContext = WaitUntilContext | { ctx: WaitUntilContext }
+/** ExecutionContext, or an object that nests waitUntil under `ctx` (OpenNext). */
+export type CacheContext = WaitUntilContext | { ctx: WaitUntilContext }
 
 const DEFAULT_TTL = 31536000 // 1 year
 const ONE_DAY = 86400 // 24 hours
@@ -127,6 +128,7 @@ export async function withCache(
   }
 
   const { ttl = DEFAULT_TTL, immutable = ttl >= ONE_DAY } = options
+  let generatedResponse: Response | undefined
 
   try {
     const cacheKey = createCacheKey(request)
@@ -139,13 +141,13 @@ export async function withCache(
 
     logger.log('Cache miss', { url: request.url })
 
-    const response = await callback()
+    generatedResponse = await callback()
 
-    if (!response.ok) {
-      return response
+    if (!generatedResponse.ok) {
+      return generatedResponse
     }
 
-    const responseToCache = prepareCachedResponse(response, ttl, immutable)
+    const responseToCache = prepareCachedResponse(generatedResponse, ttl, immutable)
     storeInCache(cache, cacheKey, responseToCache)
 
     return responseToCache
@@ -154,6 +156,9 @@ export async function withCache(
       url: request.url,
       error: formatCacheError(error),
     })
+    if (generatedResponse) {
+      return generatedResponse
+    }
     return callback()
   }
 }
@@ -180,6 +185,7 @@ export async function withCacheAndContext(
   }
 
   const { ttl = DEFAULT_TTL, immutable = ttl >= ONE_DAY } = options
+  let generatedResponse: Response | undefined
 
   try {
     const cacheKey = createCacheKey(request)
@@ -192,13 +198,13 @@ export async function withCacheAndContext(
 
     logger.log('Cache miss', { url: request.url })
 
-    const response = await callback()
+    generatedResponse = await callback()
 
-    if (!response.ok) {
-      return response
+    if (!generatedResponse.ok) {
+      return generatedResponse
     }
 
-    const responseToCache = prepareCachedResponse(response, ttl, immutable)
+    const responseToCache = prepareCachedResponse(generatedResponse, ttl, immutable)
     storeInCache(cache, cacheKey, responseToCache, ctx)
 
     return responseToCache
@@ -207,6 +213,9 @@ export async function withCacheAndContext(
       url: request.url,
       error: formatCacheError(error),
     })
+    if (generatedResponse) {
+      return generatedResponse
+    }
     return callback()
   }
 }

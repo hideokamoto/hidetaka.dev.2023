@@ -36,7 +36,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         // Use Cloudflare Cache API with 1 year TTL
         return await withCacheAndContext(
           request,
-          context.ctx,
+          context,
           async () => {
             // Fetch WordPress post to validate and get title
             const { title } = await fetchWordPressPost(postId, 'dev-notes')
