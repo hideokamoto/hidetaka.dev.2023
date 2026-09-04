@@ -27,8 +27,86 @@ export type CacheOptions = {
   immutable?: boolean
 }
 
+type WaitUntilContext = {
+  waitUntil: (promise: Promise<unknown>) => void
+}
+
+type CacheContext = WaitUntilContext | { ctx: WaitUntilContext }
+
 const DEFAULT_TTL = 31536000 // 1 year
 const ONE_DAY = 86400 // 24 hours
+
+function isCacheAvailable(): boolean {
+  return typeof caches !== 'undefined' && 'default' in caches
+}
+
+function getDefaultCache(): Cache | null {
+  if (!isCacheAvailable()) {
+    return null
+  }
+
+  return (caches as CloudflareCacheStorage).default
+}
+
+/**
+ * Cache keys must be GET requests and should not include auth headers.
+ */
+export function createCacheKey(request: Request): Request {
+  return new Request(request.url, { method: 'GET' })
+}
+
+function resolveWaitUntil(context: CacheContext): ((promise: Promise<unknown>) => void) | null {
+  if ('waitUntil' in context && typeof context.waitUntil === 'function') {
+    return context.waitUntil.bind(context)
+  }
+
+  if ('ctx' in context && typeof context.ctx.waitUntil === 'function') {
+    return context.ctx.waitUntil.bind(context.ctx)
+  }
+
+  return null
+}
+
+function storeInCache(
+  cache: Cache,
+  cacheKey: Request,
+  response: Response,
+  context?: CacheContext,
+): void {
+  const putPromise = cache.put(cacheKey, response.clone())
+
+  const waitUntil = context ? resolveWaitUntil(context) : null
+  if (waitUntil) {
+    waitUntil(putPromise)
+    return
+  }
+
+  putPromise.catch((error) => {
+    logger.warn('Failed to cache response', { url: cacheKey.url, error })
+  })
+}
+
+function formatCacheError(error: unknown): string {
+  if (error instanceof Error) {
+    return error.message
+  }
+
+  return String(error)
+}
+
+function prepareCachedResponse(response: Response, ttl: number, immutable: boolean): Response {
+  const responseHeaders = new Headers(response.headers)
+
+  const cacheControl = `public, max-age=${ttl}, s-maxage=${ttl}${immutable ? ', immutable' : ''}`
+  responseHeaders.set('Cache-Control', cacheControl)
+  responseHeaders.set('CDN-Cache-Control', `public, max-age=${ttl}`)
+
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers: responseHeaders,
+  })
+}
 
 /**
  * Get cached response or execute callback and cache the result
@@ -43,13 +121,16 @@ export async function withCache(
   callback: () => Promise<Response>,
   options: CacheOptions = {},
 ): Promise<Response> {
+  const cache = getDefaultCache()
+  if (!cache) {
+    return callback()
+  }
+
   const { ttl = DEFAULT_TTL, immutable = ttl >= ONE_DAY } = options
 
   try {
-    const cache = (caches as CloudflareCacheStorage).default
-    const cacheKey = new Request(request.url, request)
+    const cacheKey = createCacheKey(request)
 
-    // Check cache first
     const cached = await cache.match(cacheKey)
     if (cached) {
       logger.log('Cache hit', { url: request.url })
@@ -58,40 +139,21 @@ export async function withCache(
 
     logger.log('Cache miss', { url: request.url })
 
-    // Generate fresh response
     const response = await callback()
 
-    // Only cache successful responses
     if (!response.ok) {
       return response
     }
 
-    // Clone response and add cache headers
-    const responseHeaders = new Headers(response.headers)
-
-    // Set Cache-Control for both browser and CDN
-    const cacheControl = `public, max-age=${ttl}, s-maxage=${ttl}${immutable ? ', immutable' : ''}`
-    responseHeaders.set('Cache-Control', cacheControl)
-
-    // Cloudflare-specific cache control
-    responseHeaders.set('CDN-Cache-Control', `public, max-age=${ttl}`)
-
-    const responseToCache = new Response(response.body, {
-      status: response.status,
-      statusText: response.statusText,
-      headers: responseHeaders,
-    })
-
-    // Store in cache asynchronously (non-blocking)
-    // Note: We can't use waitUntil in this context, so we use a fire-and-forget promise
-    cache.put(cacheKey, responseToCache.clone()).catch((error) => {
-      logger.error('Failed to cache response', { url: request.url, error })
-    })
+    const responseToCache = prepareCachedResponse(response, ttl, immutable)
+    storeInCache(cache, cacheKey, responseToCache)
 
     return responseToCache
   } catch (error) {
-    logger.error('Cache operation failed', { url: request.url, error })
-    // Fallback to callback if cache operation fails
+    logger.warn('Cache operation failed, falling back to uncached response', {
+      url: request.url,
+      error: formatCacheError(error),
+    })
     return callback()
   }
 }
@@ -101,24 +163,27 @@ export async function withCache(
  * This version supports waitUntil for proper cache storage
  *
  * @param request - The incoming request
- * @param ctx - Cloudflare context with waitUntil
+ * @param ctx - Cloudflare ExecutionContext or OpenNext CloudflareContext
  * @param callback - Function to generate response if cache miss
  * @param options - Cache options
  * @returns Cached or freshly generated response
  */
 export async function withCacheAndContext(
   request: Request,
-  ctx: { waitUntil: (promise: Promise<unknown>) => void },
+  ctx: CacheContext,
   callback: () => Promise<Response>,
   options: CacheOptions = {},
 ): Promise<Response> {
+  const cache = getDefaultCache()
+  if (!cache) {
+    return callback()
+  }
+
   const { ttl = DEFAULT_TTL, immutable = ttl >= ONE_DAY } = options
 
   try {
-    const cache = (caches as CloudflareCacheStorage).default
-    const cacheKey = new Request(request.url, request)
+    const cacheKey = createCacheKey(request)
 
-    // Check cache first
     const cached = await cache.match(cacheKey)
     if (cached) {
       logger.log('Cache hit', { url: request.url })
@@ -127,37 +192,21 @@ export async function withCacheAndContext(
 
     logger.log('Cache miss', { url: request.url })
 
-    // Generate fresh response
     const response = await callback()
 
-    // Only cache successful responses
     if (!response.ok) {
       return response
     }
 
-    // Clone response and add cache headers
-    const responseHeaders = new Headers(response.headers)
-
-    // Set Cache-Control for both browser and CDN
-    const cacheControl = `public, max-age=${ttl}, s-maxage=${ttl}${immutable ? ', immutable' : ''}`
-    responseHeaders.set('Cache-Control', cacheControl)
-
-    // Cloudflare-specific cache control
-    responseHeaders.set('CDN-Cache-Control', `public, max-age=${ttl}`)
-
-    const responseToCache = new Response(response.body, {
-      status: response.status,
-      statusText: response.statusText,
-      headers: responseHeaders,
-    })
-
-    // Store in cache asynchronously using waitUntil
-    ctx.waitUntil(cache.put(cacheKey, responseToCache.clone()))
+    const responseToCache = prepareCachedResponse(response, ttl, immutable)
+    storeInCache(cache, cacheKey, responseToCache, ctx)
 
     return responseToCache
   } catch (error) {
-    logger.error('Cache operation failed', { url: request.url, error })
-    // Fallback to callback if cache operation fails
+    logger.warn('Cache operation failed, falling back to uncached response', {
+      url: request.url,
+      error: formatCacheError(error),
+    })
     return callback()
   }
 }

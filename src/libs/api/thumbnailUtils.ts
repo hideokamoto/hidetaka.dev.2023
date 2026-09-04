@@ -32,6 +32,9 @@ export type CloudflareEnv = {
 export type CloudflareContext = {
   env: CloudflareEnv
   waitUntil?: (promise: Promise<unknown>) => void
+  ctx: {
+    waitUntil: (promise: Promise<unknown>) => void
+  }
 }
 
 /**
