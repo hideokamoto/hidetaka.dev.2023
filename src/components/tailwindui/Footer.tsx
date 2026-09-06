@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import GooglePreferredSource from '@/components/GooglePreferredSource'
 import { SITE_CONFIG } from '@/config'
 import {
   changeLanguageURL,
@@ -176,6 +177,16 @@ export default function Footer() {
                       </li>
                     ))}
                   </ul>
+                </div>
+
+                <div className="flex flex-col gap-6">
+                  <h3
+                    className="text-sm font-semibold uppercase tracking-wider"
+                    style={{ fontFamily: 'var(--rvt-font-mono)', color: 'var(--rvt-fg)' }}
+                  >
+                    {lang === 'ja' ? 'Google検索' : 'Google Search'}
+                  </h3>
+                  <GooglePreferredSource lang={lang} />
                 </div>
               </div>
 

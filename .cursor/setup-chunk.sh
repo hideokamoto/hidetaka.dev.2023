@@ -32,7 +32,7 @@ install_chunk() {
       ;;
   esac
 
-  version="${CHUNK_VERSION:-v0.7.138}"
+  version="${CHUNK_VERSION:-v0.7.167}"
   if [ -z "$version" ]; then
     echo "CHUNK_VERSION must be set to a pinned release tag (e.g. v0.7.138)" >&2
     return 1
@@ -59,7 +59,7 @@ install_chunk() {
   install -m 0755 "${tmpdir}/chunk" "${BIN_DIR}/chunk"
 }
 
-desired_version="${CHUNK_VERSION:-v0.7.138}"
+desired_version="${CHUNK_VERSION:-v0.7.167}"
 version_number="${desired_version#v}"
 
 if command -v chunk >/dev/null 2>&1; then

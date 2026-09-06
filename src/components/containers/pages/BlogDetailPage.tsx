@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import TransformedBlogContent from '@/components/BlogPosts/TransformedBlogContent'
+import ProfileCardLoader from '@/components/containers/ProfileCardLoader'
 import Container from '@/components/tailwindui/Container'
 import ArticleActions from '@/components/ui/ArticleActions'
 import ArticleCTA from '@/components/ui/ArticleCTA'
@@ -9,7 +10,6 @@ import BlogDetailSidebar from '@/components/ui/BlogDetailSidebar'
 import CategoryTagList from '@/components/ui/CategoryTagList'
 import FollowCTA from '@/components/ui/FollowCTA'
 import PageShell from '@/components/ui/PageShell'
-import ProfileCard from '@/components/ui/ProfileCard'
 import RelatedArticles from '@/components/ui/RelatedArticles'
 import BlogReactions from '@/components/ui/reactions/BlogReactions'
 import SidebarLayout from '@/components/ui/SidebarLayout'
@@ -161,7 +161,7 @@ export default function BlogDetailPage({
 
           {/* プロフィールカード（モバイルのみ表示） */}
           <div className="lg:hidden">
-            <ProfileCard lang={lang} imageSrc="/images/profile.jpg" className="mt-12" />
+            <ProfileCardLoader lang={lang} imageSrc="/images/profile.jpg" className="mt-12" />
           </div>
 
           {/* リアクション機能 */}

@@ -66,3 +66,4 @@ pnpm dev
 - **Package manager**: Use **pnpm** (not npm). Run `corepack enable pnpm` if needed.
 - **Pre-push quality gates**: Lint, test, and build must pass before push. Cloud Agent commit hooks enforce the same checks.
 - **microCMS**: Set `MICROCMS_API_KEY` in `.env.local` for live content; use `MICROCMS_API_MODE=mock` for offline development.
+- **Chunk mutation testing**: Install bundled skills with `chunk skill install --project` (writes to `.claude/skills/`). Run local triage then `chunk validate variants .chunk/variants.json --parallel 3 --name test` on the sidecar. Requires `rsync` locally and a sidecar snapshot with dependencies installed (`validation.sidecarImage` in `.chunk/config.json`).

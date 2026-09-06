@@ -19,6 +19,15 @@
     {
       "binding": "OG_IMAGE_GENERATOR",
       "service": "cf-ogp-image-gen-worker"
+    },
+    // Self-reference required by @opennextjs/cloudflare's Durable Object queue
+    // (open-next.config.ts: queue: doQueue) to trigger ISR background
+    // revalidation. Without it, DOQueueHandler throws "No service binding for
+    // cache revalidation worker" and every stale-page revalidation silently
+    // fails (observed: ~9.2k such errors/week in Workers Logs).
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "hidetaka-dev-workers"
     }
   ],
   // R2 bucket for incremental cache and ISR

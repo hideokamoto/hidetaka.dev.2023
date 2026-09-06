@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import ProfileCard from '@/components/ui/ProfileCard'
+import ProfileCardLoader from '@/components/containers/ProfileCardLoader'
 import type { WPEvent } from '@/libs/dataSources/types'
 
 interface SpeakingDetailSidebarProps {
@@ -24,7 +24,7 @@ export default function SpeakingDetailSidebar({
   return (
     <div className={`hidden lg:block lg:space-y-8 ${className}`}>
       {/* プロフィールカード */}
-      <ProfileCard lang={lang} imageSrc="/images/profile.jpg" imageSize="responsive" />
+      <ProfileCardLoader lang={lang} imageSrc="/images/profile.jpg" imageSize="responsive" />
 
       {/* 前後のレポートナビゲーション */}
       {(previousReport || nextReport) && (

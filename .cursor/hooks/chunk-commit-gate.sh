@@ -16,12 +16,18 @@ fi
 
 case "${command}" in
   "git commit"* | *" git commit"*) ;;
-  *) exit 0 ;;
+  *)
+    printf '{"permission":"allow"}\n'
+    exit 0
+    ;;
 esac
 
 cd "$REPO_ROOT"
 corepack enable pnpm
-pnpm install --frozen-lockfile
-CI=true pnpm lint:check
-CI=true pnpm test
-CI=true pnpm build
+if ! (CI=true pnpm lint:check && CI=true pnpm test && CI=true pnpm build); then
+  printf '{"permission":"deny","user_message":"Commit blocked: lint, test, or build failed.","agent_message":"Fix lint/test/build failures before committing."}\n'
+  exit 2
+fi
+
+printf '{"permission":"allow","user_message":"Pre-commit checks passed."}\n'
+exit 0

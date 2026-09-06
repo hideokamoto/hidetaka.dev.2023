@@ -1,6 +1,5 @@
 import Image from 'next/image'
 import type { ReactNode } from 'react'
-import Profile from '@/components/content/Profile'
 import Container from '@/components/tailwindui/Container'
 import SocialLink, {
   GitHubIcon,
@@ -12,6 +11,7 @@ import PageHeader from '@/components/ui/PageHeader'
 import ProfileImage from '@/components/ui/ProfileImage'
 import SectionHeader from '@/components/ui/SectionHeader'
 import { SITE_CONFIG } from '@/config'
+import { loadProfileForRequest } from '@/libs/profile/loadProfile'
 
 function SpeakerProfile({ lang }: { lang: 'ja' | 'en' }) {
   if (lang === 'ja') {
@@ -204,7 +204,10 @@ type AboutPageContentProps = {
   statsSlot?: ReactNode
 }
 
-export default function AboutPageContent({ lang, statsSlot }: AboutPageContentProps) {
+export default async function AboutPageContent({ lang, statsSlot }: AboutPageContentProps) {
+  // このページの主題そのものなので、サイドバーのカードと違ってサーバー側で取得する
+  // （インデックスされるべき本文であり、クライアント描画に賭ける理由がない）。
+  const profile = await loadProfileForRequest(lang)
   const isJa = lang.startsWith('ja')
 
   const pageTitle = isJa ? 'Hidetaka Okamotoについて' : 'About Hidetaka Okamoto'
@@ -329,7 +332,7 @@ export default function AboutPageContent({ lang, statsSlot }: AboutPageContentPr
                 className="space-y-6 text-base leading-relaxed"
                 style={{ color: 'var(--rvt-fg2)' }}
               >
-                <Profile lang={lang} />
+                {profile.description && <p>{profile.description}</p>}
               </div>
             </div>
 
