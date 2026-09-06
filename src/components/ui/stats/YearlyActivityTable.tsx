@@ -1,6 +1,6 @@
 import { peakCount, type YearCount } from '@/libs/stats/yearly'
 
-type Props = {
+interface Props {
   /** 新しい年が先頭の年次推移 */
   series: YearCount[]
   lang: string

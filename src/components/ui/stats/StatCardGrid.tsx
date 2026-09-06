@@ -10,7 +10,7 @@ export type StatCardItem = {
 /** 列レイアウト。`'2/3'` は sm で2列・lg で3列（カード数が多いとき向け）。 */
 export type StatCardColumns = 2 | 3 | '2/3'
 
-type Props = {
+interface Props {
   items: StatCardItem[]
   /** 列レイアウト。既定は 3。 */
   columns?: StatCardColumns

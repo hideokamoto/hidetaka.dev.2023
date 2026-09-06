@@ -1,9 +1,9 @@
+import StatCardGrid, { type StatCardItem } from '@/components/ui/stats/StatCardGrid'
+import YearlyActivityTable from '@/components/ui/stats/YearlyActivityTable'
 import type { OssStats, ProfileStats, WritingStats } from '@/libs/stats/loadProfileStats'
 import { WRITING_SOURCE_LABEL } from '@/libs/stats/loadProfileStats'
-import StatCardGrid, { type StatCardItem } from './StatCardGrid'
-import YearlyActivityTable from './YearlyActivityTable'
 
-type Props = {
+interface Props {
   stats: ProfileStats
   lang: string
 }

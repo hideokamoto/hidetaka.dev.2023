@@ -1,6 +1,6 @@
-import StatCardGrid, { type StatCardItem } from './StatCardGrid'
+import StatCardGrid, { type StatCardItem } from '@/components/ui/stats/StatCardGrid'
 
-type Props = {
+interface Props {
   total: number
   currentWeeks: number
   longestWeeks: number

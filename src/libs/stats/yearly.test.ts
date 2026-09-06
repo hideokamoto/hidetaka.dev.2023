@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { activeYearSpan, buildYearlySeries, firstYear, peakCount } from './yearly'
+import { activeYearSpan, buildYearlySeries, firstYear, peakCount } from '@/libs/stats/yearly'
 
 const NOW = new Date('2026-08-10T00:00:00Z')
 

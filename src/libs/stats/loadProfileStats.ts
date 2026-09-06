@@ -2,7 +2,7 @@ import { listMyNPMPackages } from '@/libs/dataSources/npmjs'
 import { wpClient } from '@/libs/dataSources/wpClient'
 import { listMyWordPressPlugins } from '@/libs/dataSources/wporg'
 import { logger } from '@/libs/logger'
-import { activeYearSpan, buildYearlySeries, firstYear, type YearCount } from './yearly'
+import { activeYearSpan, buildYearlySeries, firstYear, type YearCount } from '@/libs/stats/yearly'
 
 // プロフィール実績は日単位でしか動かないため、1日ごとの再検証で十分。
 const REVALIDATE_SECONDS = 86400
