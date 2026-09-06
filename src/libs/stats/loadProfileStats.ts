@@ -140,10 +140,19 @@ const loadWritingStats = async (now: Date): Promise<WritingStats | null> => {
   const dates = results.flat() as string[]
   if (dates.length === 0) return null
 
+  // total は系列の累計（= 妥当な公開日を持つ記事数）に揃える。dates.length を使うと
+  // 壊れた日付の分だけカードの「累計記事数」が表の累計を上回り、同じページに
+  // 食い違う2つの数字が並ぶ。
   const series = buildYearlySeries(dates, now)
+  // 取得はできたが全件の公開日が壊れている場合。series が空なので累計が 0 になり、
+  // 「累計記事数 0本」を実績として描いてしまう。取得失敗と同じくカードごと消す。
+  if (series.length === 0) {
+    logger.error('Skipping writing stats: no article has a usable publication date')
+    return null
+  }
 
   return {
-    total: series[0]?.cumulative ?? 0,
+    total: series[0].cumulative,
     firstYear: firstYear(dates, now),
     yearsActive: activeYearSpan(dates, now),
     series,
