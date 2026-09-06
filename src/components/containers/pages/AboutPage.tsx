@@ -181,7 +181,7 @@ function TrackRecordSection({ isJa, children }: { isJa: boolean; children?: Reac
   if (!children) return null
 
   return (
-    <section className="relative py-24 sm:py-32" style={{ background: 'var(--rvt-bg3)' }}>
+    <section className="relative bg-[var(--rvt-bg3)] py-24 sm:py-32">
       <Container>
         <SectionHeader
           title={isJa ? '活動の記録' : 'Track Record'}

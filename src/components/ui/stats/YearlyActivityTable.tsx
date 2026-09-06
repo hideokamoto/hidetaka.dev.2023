@@ -33,18 +33,16 @@ export default function YearlyActivityTable({ series, lang, note }: Props) {
             {isJa ? '年別の執筆本数と累計' : 'Posts and cumulative total by year'}
           </caption>
           <thead>
-            <tr style={{ borderBottom: '1px solid var(--rvt-border)' }}>
+            <tr className="border-b border-b-[color:var(--rvt-border)]">
               <th
                 scope="col"
-                className="py-3 pr-4 text-left text-xs font-semibold uppercase tracking-wider"
-                style={{ fontFamily: 'var(--rvt-font-mono)', color: 'var(--rvt-fg2)' }}
+                className="py-3 pr-4 text-left font-[family-name:var(--rvt-font-mono)] text-xs font-semibold uppercase tracking-wider text-[color:var(--rvt-fg2)]"
               >
                 {headers.year}
               </th>
               <th
                 scope="col"
-                className="py-3 pr-4 text-right text-xs font-semibold uppercase tracking-wider"
-                style={{ fontFamily: 'var(--rvt-font-mono)', color: 'var(--rvt-fg2)' }}
+                className="py-3 pr-4 text-right font-[family-name:var(--rvt-font-mono)] text-xs font-semibold uppercase tracking-wider text-[color:var(--rvt-fg2)]"
               >
                 {headers.count}
               </th>
@@ -53,8 +51,7 @@ export default function YearlyActivityTable({ series, lang, note }: Props) {
               </th>
               <th
                 scope="col"
-                className="py-3 text-right text-xs font-semibold uppercase tracking-wider"
-                style={{ fontFamily: 'var(--rvt-font-mono)', color: 'var(--rvt-fg2)' }}
+                className="py-3 text-right font-[family-name:var(--rvt-font-mono)] text-xs font-semibold uppercase tracking-wider text-[color:var(--rvt-fg2)]"
               >
                 {headers.cumulative}
               </th>
@@ -62,36 +59,29 @@ export default function YearlyActivityTable({ series, lang, note }: Props) {
           </thead>
           <tbody>
             {series.map((row) => (
-              <tr key={row.year} style={{ borderBottom: '1px solid var(--rvt-border)' }}>
+              <tr key={row.year} className="border-b border-b-[color:var(--rvt-border)]">
                 <th
                   scope="row"
-                  className="py-3 pr-4 text-left font-medium"
-                  style={{ color: 'var(--rvt-fg)' }}
+                  className="py-3 pr-4 text-left font-medium text-[color:var(--rvt-fg)]"
                 >
                   {row.year}
                 </th>
-                <td
-                  className="py-3 pr-4 text-right tabular-nums"
-                  style={{ color: 'var(--rvt-fg)' }}
-                >
+                <td className="py-3 pr-4 text-right tabular-nums text-[color:var(--rvt-fg)]">
                   {row.count.toLocaleString(locale)}
                 </td>
                 <td className="py-3 pr-4">
                   <div
-                    className="h-2 w-full overflow-hidden rounded-full"
-                    style={{ background: 'var(--rvt-bg3)' }}
+                    className="h-2 w-full overflow-hidden rounded-full bg-[var(--rvt-bg3)]"
                     aria-hidden="true"
                   >
                     <div
-                      className="h-full rounded-full"
-                      style={{
-                        width: peak > 0 ? `${(row.count / peak) * 100}%` : '0%',
-                        background: 'var(--rvt-accent)',
-                      }}
+                      className="h-full rounded-full bg-[var(--rvt-accent)]"
+                      // 幅は件数に応じて変わる実行時の値。静的な utility class にはできない。
+                      style={{ width: peak > 0 ? `${(row.count / peak) * 100}%` : '0%' }}
                     />
                   </div>
                 </td>
-                <td className="py-3 text-right tabular-nums" style={{ color: 'var(--rvt-fg2)' }}>
+                <td className="py-3 text-right tabular-nums text-[color:var(--rvt-fg2)]">
                   {row.cumulative.toLocaleString(locale)}
                 </td>
               </tr>
@@ -99,11 +89,7 @@ export default function YearlyActivityTable({ series, lang, note }: Props) {
           </tbody>
         </table>
       </div>
-      {note && (
-        <p className="mt-4 text-xs leading-relaxed" style={{ color: 'var(--rvt-fg3)' }}>
-          {note}
-        </p>
-      )}
+      {note && <p className="mt-4 text-xs leading-relaxed text-[color:var(--rvt-fg3)]">{note}</p>}
     </div>
   )
 }

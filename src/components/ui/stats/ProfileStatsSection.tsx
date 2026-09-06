@@ -173,14 +173,8 @@ export default function ProfileStatsSection({ stats, lang }: Props) {
       <StatCardGrid items={items} columns="2/3" />
 
       {series.length > 0 && (
-        <div
-          className="rounded-2xl p-6 sm:p-8"
-          style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
-        >
-          <h3
-            className="mb-6 text-sm font-semibold uppercase tracking-wider"
-            style={{ fontFamily: 'var(--rvt-font-mono)', color: 'var(--rvt-fg2)' }}
-          >
+        <div className="rounded-2xl border border-[color:var(--rvt-border)] bg-[var(--rvt-bg2)] p-6 sm:p-8">
+          <h3 className="mb-6 font-[family-name:var(--rvt-font-mono)] text-sm font-semibold uppercase tracking-wider text-[color:var(--rvt-fg2)]">
             {copy.tableTitle}
           </h3>
           <YearlyActivityTable series={series} lang={lang} note={copy.tableNote} />

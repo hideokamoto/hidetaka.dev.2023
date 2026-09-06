@@ -36,22 +36,14 @@ export default function StatCardGrid({ items, columns = 3, className = '' }: Pro
       {items.map((item) => (
         <div
           key={item.label}
-          className="rounded-2xl p-6 text-center"
-          style={{ border: '1px solid var(--rvt-border)', background: 'var(--rvt-bg2)' }}
+          className="rounded-2xl border border-[color:var(--rvt-border)] bg-[var(--rvt-bg2)] p-6 text-center"
         >
-          <dt className="text-sm font-medium" style={{ color: 'var(--rvt-fg2)' }}>
-            {item.label}
-          </dt>
-          <dd
-            className="mt-2 text-4xl font-extrabold tracking-tight"
-            style={{ color: 'var(--rvt-accent)' }}
-          >
+          <dt className="text-sm font-medium text-[color:var(--rvt-fg2)]">{item.label}</dt>
+          <dd className="mt-2 text-4xl font-extrabold tracking-tight text-[color:var(--rvt-accent)]">
             {item.value}
           </dd>
           {item.hint && (
-            <p className="mt-2 text-xs leading-relaxed" style={{ color: 'var(--rvt-fg3)' }}>
-              {item.hint}
-            </p>
+            <p className="mt-2 text-xs leading-relaxed text-[color:var(--rvt-fg3)]">{item.hint}</p>
           )}
         </div>
       ))}
