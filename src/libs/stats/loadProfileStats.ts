@@ -140,11 +140,13 @@ const loadWritingStats = async (now: Date): Promise<WritingStats | null> => {
   const dates = results.flat() as string[]
   if (dates.length === 0) return null
 
+  const series = buildYearlySeries(dates, now)
+
   return {
-    total: dates.length,
-    firstYear: firstYear(dates),
+    total: series[0]?.cumulative ?? 0,
+    firstYear: firstYear(dates, now),
     yearsActive: activeYearSpan(dates, now),
-    series: buildYearlySeries(dates, now),
+    series,
   }
 }
 
