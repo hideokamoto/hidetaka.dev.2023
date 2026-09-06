@@ -86,6 +86,7 @@ const EN_COPY: StatsCopy = {
 
 type NumberFormatter = (value: number) => string
 
+/** 執筆軸のカード。最初の記事の年が取れない場合は発信歴カードを省く。 */
 const buildWritingCards = (
   writing: WritingStats,
   copy: StatsCopy,
@@ -110,6 +111,7 @@ const buildWritingCards = (
   return cards
 }
 
+/** OSS 軸のカード。稼働サイト数と累計DLは 0 なら 0 を並べずカードごと省く。 */
 const buildOssCards = (oss: OssStats, copy: StatsCopy, num: NumberFormatter): StatCardItem[] => {
   const cards: StatCardItem[] = [
     {

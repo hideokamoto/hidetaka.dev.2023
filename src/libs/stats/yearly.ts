@@ -20,6 +20,10 @@ const EARLIEST_PLAUSIBLE_YEAR = 1990
 /** 現在から何年先までを妥当な公開日とみなすか（予約投稿を想定して1年）。 */
 const FUTURE_YEAR_TOLERANCE = 1
 
+/**
+ * 日付文字列を年に変換する。パースできない場合と妥当な範囲外の場合は null。
+ * 範囲外を弾くのは、壊れた日付1件で年次系列が数千行に膨れるのを防ぐため。
+ */
 const parseYear = (date: string, nowYear: number): number | null => {
   const d = new Date(date)
   if (Number.isNaN(d.getTime())) return null

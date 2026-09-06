@@ -121,6 +121,10 @@ const fetchPublishedDates = async (
   }
 }
 
+/**
+ * 執筆記事の累計・発信歴・年次推移を返す。
+ * 取得に失敗した投稿タイプが1つでもあれば null（部分的な結果を「累計」と名乗らない）。
+ */
 const loadWritingStats = async (now: Date): Promise<WritingStats | null> => {
   const results = await Promise.all(
     WRITING_COLLECTIONS.flatMap((collection) =>
@@ -159,6 +163,7 @@ const loadWritingStats = async (now: Date): Promise<WritingStats | null> => {
   }
 }
 
+/** 登壇レポート（events 投稿タイプ）の総件数。取得に失敗したら null。 */
 const loadSpeakingReportCount = async (): Promise<number | null> => {
   try {
     const { total } = await wpClient.postType<DatedEntity>('events').list(
@@ -174,6 +179,10 @@ const loadSpeakingReportCount = async (): Promise<number | null> => {
   }
 }
 
+/**
+ * npm と WordPress.org の公開実績を返す。取得に失敗したら null。
+ * 両ソースとも実際には非空なので、片方でも空なら取得失敗とみなす。
+ */
 const loadOssStats = async (): Promise<OssStats | null> => {
   const [npmPackages, wpPlugins] = await Promise.all([
     listMyNPMPackages(),
@@ -202,15 +211,21 @@ const loadOssStats = async (): Promise<OssStats | null> => {
 }
 
 /**
- * /about で表示するプロフィール実績を集約して返す。
+ * 表示できる指標が1つでもあるか。
  *
- * 各指標は独立して失敗しうる（外部APIが落ちてもページは壊さない）ため、
- * 取得できなかったものは null にして呼び出し側で非表示にする。
+ * false のときはページ側でスロットごと渡さない。渡すと ProfileStatsSection が
+ * null を返し、見出しと余白だけのセクションが残る。
  */
 export function hasAnyProfileStat(stats: ProfileStats): boolean {
   return stats.writing !== null || stats.oss !== null || (stats.speakingReports ?? 0) > 0
 }
 
+/**
+ * /about で表示するプロフィール実績を集約して返す。
+ *
+ * 各指標は独立して失敗しうる（外部APIが落ちてもページは壊さない）ため、
+ * 取得できなかったものは null にして呼び出し側で非表示にする。
+ */
 export async function loadProfileStats(now: Date = new Date()): Promise<ProfileStats> {
   const [writing, speakingReports, oss] = await Promise.all([
     loadWritingStats(now),

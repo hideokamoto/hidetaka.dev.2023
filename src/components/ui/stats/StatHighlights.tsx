@@ -7,6 +7,10 @@ interface Props {
   lang: string
 }
 
+/**
+ * 直近12ヶ月の投稿数と週連続投稿を並べるカード。
+ * レイアウトは StatCardGrid に委譲し、値の整形と i18n のみを担う。
+ */
 export default function StatHighlights({ total, currentWeeks, longestWeeks, lang }: Props) {
   const isJa = lang === 'ja'
 
