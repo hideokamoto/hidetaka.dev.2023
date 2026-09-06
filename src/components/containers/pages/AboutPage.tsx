@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import type { ReactNode } from 'react'
 import Container from '@/components/tailwindui/Container'
 import SocialLink, {
   GitHubIcon,
@@ -175,7 +176,35 @@ function RecognitionBadge({ title, issuer }: { title: string; issuer: string }) 
   )
 }
 
-export default async function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) {
+function TrackRecordSection({ isJa, children }: { isJa: boolean; children?: ReactNode }) {
+  // 実績データを渡されていないページ（静的レンダリング）ではセクションごと出さない
+  if (!children) return null
+
+  return (
+    <section className="relative bg-[var(--rvt-bg3)] py-24 sm:py-32">
+      <Container>
+        <SectionHeader
+          title={isJa ? '活動の記録' : 'Track Record'}
+          description={
+            isJa
+              ? '執筆・OSS・登壇の積み上げを数字で'
+              : 'Writing, open source, and speaking in numbers'
+          }
+          align="center"
+        />
+        <div className="mt-20">{children}</div>
+      </Container>
+    </section>
+  )
+}
+
+type AboutPageContentProps = {
+  lang: 'ja' | 'en'
+  /** 実績サマリー（ProfileStatsSection）。データ取得はページ側で行う。 */
+  statsSlot?: ReactNode
+}
+
+export default async function AboutPageContent({ lang, statsSlot }: AboutPageContentProps) {
   // このページの主題そのものなので、サイドバーのカードと違ってサーバー側で取得する
   // （インデックスされるべき本文であり、クライアント描画に賭ける理由がない）。
   const profile = await loadProfileForRequest(lang)
@@ -312,6 +341,9 @@ export default async function AboutPageContent({ lang }: { lang: 'ja' | 'en' }) 
           </div>
         </Container>
       </section>
+
+      {/* Track Record Section */}
+      <TrackRecordSection isJa={isJa}>{statsSlot}</TrackRecordSection>
 
       {/* Experience Section */}
       <section className="relative py-24 sm:py-32">
