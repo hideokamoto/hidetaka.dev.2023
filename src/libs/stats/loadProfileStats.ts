@@ -7,13 +7,23 @@ import { activeYearSpan, buildYearlySeries, firstYear, type YearCount } from './
 // プロフィール実績は日単位でしか動かないため、1日ごとの再検証で十分。
 const REVALIDATE_SECONDS = 86400
 
-// 年次推移の対象は wp-kyoto.net の記事のみ。Qiita/Zenn/dev.to は
-// 全期間の取得手段が無い（RSS が直近数十件に限られる）ため、
+// 年次推移の対象は WordPress（wp-api.wp-kyoto.net）が配信する記事のみ。
+// Qiita/Zenn/dev.to は全期間の取得手段が無い（RSS が直近数十件に限られる）ため、
 // 「累計」を名乗る数字に混ぜない。
-export const WRITING_SOURCE_LABEL = 'wp-kyoto.net'
+//
+// 単一サイト名を名乗らないのは、同じ WordPress から複数サイトへ配信しているため。
+// posts は wp-kyoto.net、thoughs と dev-notes は hidetaka.dev、stripe は
+// revtrona.com 側で公開されており、「wp-kyoto.net の記事数」と書くと誤りになる。
+export const WRITING_SOURCE_LABEL = 'WordPress'
 
 type DatedEntity = {
-  date: string
+  /**
+   * UTC の公開日時。WordPress は `date`（サイトのローカル時刻）と
+   * `date_gmt`（UTC）の両方を返すが、どちらもオフセット表記を持たない。
+   * `date` を `new Date()` に渡すと実行環境のローカル時刻として解釈され、
+   * 年の割り当てが TZ 依存になるため、UTC 側だけを使う。
+   */
+  date_gmt: string
 }
 
 /**
@@ -71,8 +81,18 @@ export type ProfileStats = {
 }
 
 /**
- * 指定した投稿タイプの全記事の公開日を取得する。
- * `_fields=date` で日付だけに絞ることで、1,000件超でも転送量を抑える。
+ * WordPress の `date_gmt`（オフセット無しの UTC 表記）を UTC として確定させる。
+ * 既にオフセットや `Z` を持つ値はそのまま返す。
+ */
+const toUtcIso = (dateGmt: string): string =>
+  /(?:Z|[+-]\d{2}:?\d{2})$/.test(dateGmt) ? dateGmt : `${dateGmt}Z`
+
+/**
+ * 指定した投稿タイプの全記事の公開日（UTC）を取得する。
+ * `_fields=date_gmt` で日付だけに絞ることで、1,000件超でも転送量を抑える。
+ *
+ * 返す文字列には `Z` を付ける。`date_gmt` は `2026-09-02T00:03:03` のように
+ * オフセットを持たず、そのままでは実行環境のローカル時刻として解釈されるため。
  */
 const fetchPublishedDates = async (
   restBase: string,
@@ -82,7 +102,7 @@ const fetchPublishedDates = async (
     const items = await wpClient.postType<DatedEntity>(restBase).listAll(
       {
         per_page: 100,
-        _fields: ['date'],
+        _fields: ['date_gmt'],
         orderby: 'date',
         order: 'desc',
         ...(lang ? { 'filter[lang]': lang } : {}),
@@ -91,7 +111,10 @@ const fetchPublishedDates = async (
         next: { revalidate: REVALIDATE_SECONDS },
       },
     )
-    return items.map((item) => item.date).filter((date): date is string => Boolean(date))
+    return items
+      .map((item) => item.date_gmt)
+      .filter((date): date is string => Boolean(date))
+      .map(toUtcIso)
   } catch (error) {
     logger.error('Failed to load published dates for profile stats', { error, restBase, lang })
     return null
@@ -105,9 +128,16 @@ const loadWritingStats = async (now: Date): Promise<WritingStats | null> => {
     ),
   )
 
-  // 一部の投稿タイプが取れなくても、取れた分で表示する。
-  // 全滅したときだけ非表示にする。
-  const dates = results.filter((result): result is string[] => result !== null).flat()
+  // 1つでも取得に失敗したら、累計記事数を出さない。
+  // 部分的な結果で「累計」を名乗ると、実際より大幅に少ない本数を24時間
+  // キャッシュしたまま公開してしまう（posts の ja が落ちるだけで1,000本以上減る）。
+  // 誤った数字を出すより、カードごと消えるほうが害が小さい。
+  if (results.some((result) => result === null)) {
+    logger.error('Skipping writing stats: at least one collection failed to load')
+    return null
+  }
+
+  const dates = results.flat() as string[]
   if (dates.length === 0) return null
 
   return {
@@ -121,7 +151,7 @@ const loadWritingStats = async (now: Date): Promise<WritingStats | null> => {
 const loadSpeakingReportCount = async (): Promise<number | null> => {
   try {
     const { total } = await wpClient.postType<DatedEntity>('events').list(
-      { per_page: 1, _fields: ['date'] },
+      { per_page: 1, _fields: ['date_gmt'] },
       {
         next: { revalidate: REVALIDATE_SECONDS },
       },
@@ -139,17 +169,24 @@ const loadOssStats = async (): Promise<OssStats | null> => {
     listMyWordPressPlugins(),
   ])
 
-  const activeInstalls = wpPlugins.reduce((sum, plugin) => sum + (plugin.active_installs ?? 0), 0)
-  const downloads = wpPlugins.reduce((sum, plugin) => sum + (plugin.downloaded ?? 0), 0)
-
-  // 両方とも空（＝取得失敗またはデータ無し）なら、0 を並べるより非表示にする
-  if (npmPackages.length === 0 && wpPlugins.length === 0) return null
+  // `listMyNPMPackages` / `listMyWordPressPlugins` はエラーを内部で握りつぶして
+  // 空配列を返すため、「0件」と「取得失敗」を戻り値から区別できない。
+  // どちらも実際には非空なので、片方でも空なら取得失敗とみなして OSS 指標を出さない。
+  // 片方だけ空のまま表示すると「WordPress.org 0」という誤った実績を公開し、
+  // 稼働サイト数・累計DLのカードも黙って消える。
+  if (npmPackages.length === 0 || wpPlugins.length === 0) {
+    logger.error('Skipping OSS stats: at least one source returned no data', {
+      npmPackages: npmPackages.length,
+      wpPlugins: wpPlugins.length,
+    })
+    return null
+  }
 
   return {
     npmPackages: npmPackages.length,
     wpPlugins: wpPlugins.length,
-    activeInstalls,
-    downloads,
+    activeInstalls: wpPlugins.reduce((sum, plugin) => sum + (plugin.active_installs ?? 0), 0),
+    downloads: wpPlugins.reduce((sum, plugin) => sum + (plugin.downloaded ?? 0), 0),
   }
 }
 
@@ -159,6 +196,10 @@ const loadOssStats = async (): Promise<OssStats | null> => {
  * 各指標は独立して失敗しうる（外部APIが落ちてもページは壊さない）ため、
  * 取得できなかったものは null にして呼び出し側で非表示にする。
  */
+export function hasAnyProfileStat(stats: ProfileStats): boolean {
+  return stats.writing !== null || stats.oss !== null || (stats.speakingReports ?? 0) > 0
+}
+
 export async function loadProfileStats(now: Date = new Date()): Promise<ProfileStats> {
   const [writing, speakingReports, oss] = await Promise.all([
     loadWritingStats(now),

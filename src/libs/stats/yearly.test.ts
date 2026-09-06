@@ -31,8 +31,12 @@ describe('activeYearSpan', () => {
     expect(activeYearSpan([], NOW)).toBe(0)
   })
 
-  it('未来の日付しか無くても 1 を下回らない', () => {
-    expect(activeYearSpan(['2030-01-01T00:00:00Z'], NOW)).toBe(1)
+  it('翌年までの予約投稿は発信歴に含める', () => {
+    expect(activeYearSpan(['2027-01-01T00:00:00Z'], NOW)).toBe(1)
+  })
+
+  it('遠い未来の日付しか無ければ 0（壊れた日付として除外される）', () => {
+    expect(activeYearSpan(['2030-01-01T00:00:00Z'], NOW)).toBe(0)
   })
 })
 
@@ -69,7 +73,7 @@ describe('buildYearlySeries', () => {
     expect(series[0]?.cumulative).toBe(1)
   })
 
-  it('未来日付の投稿も系列に含める', () => {
+  it('翌年までの予約投稿は系列に含める', () => {
     const series = buildYearlySeries(['2026-01-01T00:00:00Z', '2027-05-01T00:00:00Z'], NOW)
     expect(series[0]?.year).toBe(2027)
     expect(series[0]?.count).toBe(1)
@@ -94,5 +98,35 @@ describe('peakCount', () => {
 
   it('空の系列では 0 を返す', () => {
     expect(peakCount([])).toBe(0)
+  })
+})
+
+describe('壊れた日付で系列が膨れない', () => {
+  it('遠い未来の年は除外する', () => {
+    const series = buildYearlySeries(['2026-01-01T00:00:00Z', '9999-01-01T00:00:00Z'], NOW)
+    expect(series.map((row) => row.year)).toEqual([2026])
+  })
+
+  it('遠い過去の年も除外する', () => {
+    const series = buildYearlySeries(['2026-01-01T00:00:00Z', '0001-01-01T00:00:00Z'], NOW)
+    expect(series.map((row) => row.year)).toEqual([2026])
+  })
+
+  it('壊れた日付だけなら空配列', () => {
+    expect(buildYearlySeries(['9999-01-01T00:00:00Z'], NOW)).toEqual([])
+    expect(firstYear(['9999-01-01T00:00:00Z'], NOW)).toBeNull()
+  })
+})
+
+describe('タイムゾーン非依存であること（オフセット付きの入力が前提）', () => {
+  it('Z 付きの文字列は実行環境の TZ に関わらず同じ年になる', () => {
+    // JST では 2025-01-01、UTC では 2024-12-31
+    const dates = ['2024-12-31T23:00:00Z']
+    expect(firstYear(dates, NOW)).toBe(2024)
+  })
+
+  it('オフセット付きの文字列も UTC に正規化して集計する', () => {
+    // JST 2025-01-01T08:00+09:00 = UTC 2024-12-31T23:00
+    expect(firstYear(['2025-01-01T08:00:00+09:00'], NOW)).toBe(2024)
   })
 })

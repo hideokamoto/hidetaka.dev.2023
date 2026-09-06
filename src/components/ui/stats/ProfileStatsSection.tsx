@@ -24,7 +24,7 @@ const JA_COPY: StatsCopy = {
   articles: {
     label: '累計記事数',
     value: (total) => `${total}本`,
-    hint: `${WRITING_SOURCE_LABEL}（投稿・雑記・Stripe・DevNotes / 日本語 + 英語）`,
+    hint: `${WRITING_SOURCE_LABEL} 配信の全記事（投稿・雑記・Stripe・DevNotes / 日本語 + 英語）`,
   },
   yearsWriting: {
     label: '発信歴',
@@ -49,14 +49,14 @@ const JA_COPY: StatsCopy = {
     hint: 'イベント登壇の記録',
   },
   tableTitle: '年別の執筆本数',
-  tableNote: `${WRITING_SOURCE_LABEL} の全記事（投稿・雑記・Stripe・DevNotes）の公開日を基準に集計。本年は集計途中の数値です。`,
+  tableNote: `${WRITING_SOURCE_LABEL} が配信する全記事（投稿・雑記・Stripe・DevNotes）の公開日（UTC）を基準に集計。複数サイトへの配信を含みます。本年は集計途中の数値です。`,
 }
 
 const EN_COPY: StatsCopy = {
   articles: {
     label: 'Articles published',
     value: (total) => total,
-    hint: `${WRITING_SOURCE_LABEL} (blog, notes, Stripe, dev notes / Japanese + English)`,
+    hint: `All ${WRITING_SOURCE_LABEL}-published articles (blog, notes, Stripe, dev notes / Japanese + English)`,
   },
   yearsWriting: {
     label: 'Years writing',
@@ -81,7 +81,7 @@ const EN_COPY: StatsCopy = {
     hint: 'Write-ups from events I spoke at',
   },
   tableTitle: 'Articles per year',
-  tableNote: `Based on publication dates of every article on ${WRITING_SOURCE_LABEL} (blog, notes, Stripe, dev notes). The current year is still in progress.`,
+  tableNote: `Based on UTC publication dates of every ${WRITING_SOURCE_LABEL}-published article (blog, notes, Stripe, dev notes), across several sites. The current year is still in progress.`,
 }
 
 type NumberFormatter = (value: number) => string

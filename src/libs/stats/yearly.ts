@@ -1,6 +1,10 @@
 // 年次アクティビティの集計ユーティリティ。
 // `aggregate.ts` が「直近Nヶ月の勢い」を扱うのに対し、こちらは「全期間の積み上げ」を扱う。
-// すべて純粋関数で、UTC 基準で計算するため実行環境のタイムゾーンに依存しない。
+//
+// すべて純粋関数。UTC の年で集計するが、**渡す文字列が UTC として解釈できることが前提**。
+// オフセットを持たない文字列（WordPress の `date` / `date_gmt` そのまま）を渡すと
+// `new Date()` が実行環境のローカル時刻として解釈し、年の割り当てが TZ 依存になる。
+// 呼び出し側（`loadProfileStats`）が `Z` を付けてから渡している。
 
 export type YearCount = {
   year: number
@@ -10,19 +14,31 @@ export type YearCount = {
   cumulative: number
 }
 
-const parseYear = (date: string): number | null => {
+/** 年次系列に含めてよい最も古い年。これより古い年は取得元の壊れた日付とみなす。 */
+const EARLIEST_PLAUSIBLE_YEAR = 1990
+
+/** 現在から何年先までを妥当な公開日とみなすか（予約投稿を想定して1年）。 */
+const FUTURE_YEAR_TOLERANCE = 1
+
+const parseYear = (date: string, nowYear: number): number | null => {
   const d = new Date(date)
   if (Number.isNaN(d.getTime())) return null
-  return d.getUTCFullYear()
+
+  const year = d.getUTCFullYear()
+  // 壊れた日付1件で系列が数千行に膨れるのを防ぐ。範囲外はパース不能と同じ扱い。
+  if (year < EARLIEST_PLAUSIBLE_YEAR) return null
+  if (year > nowYear + FUTURE_YEAR_TOLERANCE) return null
+
+  return year
 }
 
-/** 有効な日付だけを年に変換して返す。 */
-const toYears = (dates: readonly string[]): number[] =>
-  dates.map(parseYear).filter((year): year is number => year !== null)
+/** 有効かつ妥当な範囲の日付だけを年に変換して返す。 */
+const toYears = (dates: readonly string[], nowYear: number): number[] =>
+  dates.map((date) => parseYear(date, nowYear)).filter((year): year is number => year !== null)
 
 /** 最も古い年。有効な日付が無ければ null。 */
-export function firstYear(dates: readonly string[]): number | null {
-  const years = toYears(dates)
+export function firstYear(dates: readonly string[], now: Date = new Date()): number | null {
+  const years = toYears(dates, now.getUTCFullYear())
   return years.length === 0 ? null : Math.min(...years)
 }
 
@@ -31,7 +47,7 @@ export function firstYear(dates: readonly string[]): number | null {
  * 2013年に開始して現在が2026年なら 14 を返す。有効な日付が無ければ 0。
  */
 export function activeYearSpan(dates: readonly string[], now: Date = new Date()): number {
-  const first = firstYear(dates)
+  const first = firstYear(dates, now)
   if (first === null) return 0
   return Math.max(1, now.getUTCFullYear() - first + 1)
 }
@@ -41,7 +57,7 @@ export function activeYearSpan(dates: readonly string[], now: Date = new Date())
  * 表示順は新しい年が先頭。
  */
 export function buildYearlySeries(dates: readonly string[], now: Date = new Date()): YearCount[] {
-  const years = toYears(dates)
+  const years = toYears(dates, now.getUTCFullYear())
   if (years.length === 0) return []
 
   const counts = new Map<number, number>()
