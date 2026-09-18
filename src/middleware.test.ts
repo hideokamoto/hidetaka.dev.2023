@@ -22,9 +22,7 @@ describe('middleware', () => {
   })
 
   it('rewrites /ja/about with Accept: text/markdown to /api/markdown/about?lang=ja', () => {
-    const response = middleware(
-      buildRequest('/ja/about', { headers: { accept: 'text/markdown' } }),
-    )
+    const response = middleware(buildRequest('/ja/about', { headers: { accept: 'text/markdown' } }))
 
     const rewriteTarget = new URL(response.headers.get('x-middleware-rewrite') ?? '')
     expect(rewriteTarget.pathname).toBe('/api/markdown/about')
@@ -116,12 +114,12 @@ describe('acceptsMarkdown', () => {
     // CodeRabbit review finding on PR #262: `Accept: Text/Markdown` (mixed case) previously
     // failed to match, silently falling through to the normal HTML response instead of
     // rewriting to the Markdown API.
-    expect(
-      acceptsMarkdown(buildRequest('/about', { headers: { accept: 'Text/Markdown' } })),
-    ).toBe(true)
-    expect(
-      acceptsMarkdown(buildRequest('/about', { headers: { accept: 'TEXT/MARKDOWN' } })),
-    ).toBe(true)
+    expect(acceptsMarkdown(buildRequest('/about', { headers: { accept: 'Text/Markdown' } }))).toBe(
+      true,
+    )
+    expect(acceptsMarkdown(buildRequest('/about', { headers: { accept: 'TEXT/MARKDOWN' } }))).toBe(
+      true,
+    )
   })
 
   it('matches text/markdown alongside other media types in the Accept header', () => {
