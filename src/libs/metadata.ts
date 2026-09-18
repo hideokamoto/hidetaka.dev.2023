@@ -99,6 +99,8 @@ export function generateDevNoteMetadata(note: WPThought, path: string): Metadata
   const lang = getLanguageFromURL(path)
   // dev-notesはen/jaで同一の日本語コンテンツを返すため、canonicalはja側へ正規化する
   const alternates = buildAlternates(path, { canonicalLang: 'ja' })
+  // /writing/dev-notes/[slug].md でMarkdown版を配信しているため、HTML側にも発見経路を残す
+  alternates.types = { 'text/markdown': toAbsoluteUrl(`${path}.md`) }
 
   return {
     title: note.title.rendered,
@@ -141,11 +143,14 @@ export function generateBlogPostMetadata(
 
   const description = buildDescription(thought)
   const lang = getLanguageFromURL(path)
+  const alternates = buildAlternates(path, alternatesOptions)
+  // /blog/[slug].md, /news/[slug].md でMarkdown版を配信しているため、HTML側にも発見経路を残す
+  alternates.types = { 'text/markdown': toAbsoluteUrl(`${path}.md`) }
 
   return {
     title: thought.title.rendered,
     description,
-    alternates: buildAlternates(path, alternatesOptions),
+    alternates,
     openGraph: {
       title: thought.title.rendered,
       description,
