@@ -17,6 +17,10 @@ export function determineLanguage(url: URL): 'ja' | 'en' {
   return 'en'
 }
 
+/**
+ * プロフィールをMarkdownで返す。`/about.md`・`/ja/about.md`・`Accept: text/markdown` での
+ * `/about`・`/ja/about` へのアクセスは、middlewareのrewriteによりここに到達する。
+ */
 export async function GET(request: Request): Promise<Response> {
   const url = new URL(request.url)
   const lang = determineLanguage(url)

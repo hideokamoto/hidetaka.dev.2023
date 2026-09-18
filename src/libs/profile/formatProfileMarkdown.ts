@@ -1,15 +1,6 @@
 import { SITE_CONFIG } from '@/config'
 import type { Profile, ProfileLang } from './types'
 
-/**
- * Renders a {@link Profile} as plain Markdown for `/about.md` and `/ja/about.md`.
- *
- * This exists so AI agents fetching the site have a canonical, structured-but-plain-text
- * landing point for "who is this person and where do I find their social links" — the same
- * question the Person JSON-LD in `<head>` answers for search engines, but JSON-LD is
- * typically stripped when a page is converted to Markdown for an LLM, so it never reaches
- * agent-facing tooling. Kept as a pure function (no fetch) so it's testable without a network.
- */
 /** Role line: "{jobTitle} at {employer}", skipping either half when absent. */
 function formatRoleLine(profile: Profile, isJapanese: boolean): string | undefined {
   const roleParts = [profile.jobTitle, profile.worksFor?.name].filter(Boolean)
@@ -23,6 +14,15 @@ function formatBulletSection(heading: string, items: readonly string[]): string[
   return [heading, ...items.map((item) => `- ${item}`), '']
 }
 
+/**
+ * Renders a {@link Profile} as plain Markdown for `/about.md` and `/ja/about.md`.
+ *
+ * This exists so AI agents fetching the site have a canonical, structured-but-plain-text
+ * landing point for "who is this person and where do I find their social links" — the same
+ * question the Person JSON-LD in `<head>` answers for search engines, but JSON-LD is
+ * typically stripped when a page is converted to Markdown for an LLM, so it never reaches
+ * agent-facing tooling. Kept as a pure function (no fetch) so it's testable without a network.
+ */
 export function formatProfileAsMarkdown(profile: Profile, lang: ProfileLang): string {
   const isJapanese = lang === 'ja'
   const lines: string[] = [`# ${profile.name}`, '']

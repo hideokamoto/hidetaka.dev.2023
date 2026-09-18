@@ -16,8 +16,10 @@ const markdownRewriteEngine = new MarkdownRewriteRuleEngine(createMarkdownRewrit
  * @param request リクエスト
  * @returns text/markdownがAcceptヘッダーに含まれている場合true
  */
-function acceptsMarkdown(request: NextRequest): boolean {
-  const acceptHeader = request.headers.get('accept') || ''
+export function acceptsMarkdown(request: NextRequest): boolean {
+  // メディアタイプ名は大文字小文字を区別しない（RFC 9110）ため、`Accept: Text/Markdown` の
+  // ような表記も有効。正規表現は小文字前提なので、比較前に正規化する。
+  const acceptHeader = (request.headers.get('accept') || '').toLowerCase()
   return /(^|,\s*)text\/markdown($|;|,)/.test(acceptHeader)
 }
 
@@ -257,6 +259,10 @@ function handleMarkdownExtension(pathname: string, request: NextRequest): NextRe
   return NextResponse.rewrite(newUrl)
 }
 
+/**
+ * Next.jsのmiddlewareエントリポイント。Markdownのコンテントネゴシエーション、
+ * `.md`拡張子のリライト、レガシーURLのリダイレクトを順に判定する。
+ */
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const baseUrl = request.url.split(request.nextUrl.pathname)[0]
