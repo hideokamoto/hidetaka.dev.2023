@@ -97,6 +97,34 @@ describe('RegexMarkdownRewriteRule', () => {
       expect(result.searchParams).toEqual({ lang: 'ja' })
     })
   })
+
+  describe('about pattern', () => {
+    const rule = new RegexMarkdownRewriteRule(/^(\/ja)?\/about\.md$/, '/api/markdown/about', true)
+
+    it('should match English about path', () => {
+      expect(rule.matches('/about.md')).toBe(true)
+    })
+
+    it('should match Japanese about path', () => {
+      expect(rule.matches('/ja/about.md')).toBe(true)
+    })
+
+    it('should not match a slugged path under about', () => {
+      expect(rule.matches('/about/foo.md')).toBe(false)
+    })
+
+    it('should rewrite English about path correctly', () => {
+      const result = rule.getRewritePath('/about.md')
+      expect(result.pathname).toBe('/api/markdown/about')
+      expect(result.searchParams).toBeUndefined()
+    })
+
+    it('should rewrite Japanese about path correctly', () => {
+      const result = rule.getRewritePath('/ja/about.md')
+      expect(result.pathname).toBe('/api/markdown/about')
+      expect(result.searchParams).toEqual({ lang: 'ja' })
+    })
+  })
 })
 
 describe('MarkdownRewriteRuleEngine', () => {
@@ -120,7 +148,7 @@ describe('MarkdownRewriteRuleEngine', () => {
     })
 
     it('should return false for non-matching paths', () => {
-      expect(engine.shouldRewrite('/about.md')).toBe(false)
+      expect(engine.shouldRewrite('/privacy.md')).toBe(false)
       expect(engine.shouldRewrite('/blog/test.html')).toBe(false)
     })
   })
@@ -161,7 +189,7 @@ describe('MarkdownRewriteRuleEngine', () => {
     })
 
     it('should throw error for non-matching paths', () => {
-      expect(() => engine.getRewritePath('/about.md')).toThrow()
+      expect(() => engine.getRewritePath('/privacy.md')).toThrow()
     })
   })
 })

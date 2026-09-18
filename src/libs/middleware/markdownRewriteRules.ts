@@ -130,5 +130,14 @@ export function createMarkdownRewriteRules(): MarkdownRewriteRule[] {
       '/api/markdown/news/{slug}',
       true, // 言語プレフィックスを抽出
     ),
+
+    // /about.md または /ja/about.md → /api/markdown/about
+    // スラッグを持たない単一ページなので{slug}は使わないが、テンプレートに含まれなければ
+    // replace()は素通りするだけなので他ルールと同じ実装で扱える
+    new RegexMarkdownRewriteRule(
+      /^(\/ja)?\/about\.md$/,
+      '/api/markdown/about',
+      true, // 言語プレフィックスを抽出
+    ),
   ]
 }

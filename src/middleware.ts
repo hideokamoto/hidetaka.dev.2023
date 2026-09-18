@@ -16,8 +16,10 @@ const markdownRewriteEngine = new MarkdownRewriteRuleEngine(createMarkdownRewrit
  * @param request リクエスト
  * @returns text/markdownがAcceptヘッダーに含まれている場合true
  */
-function acceptsMarkdown(request: NextRequest): boolean {
-  const acceptHeader = request.headers.get('accept') || ''
+export function acceptsMarkdown(request: NextRequest): boolean {
+  // メディアタイプ名は大文字小文字を区別しない（RFC 9110）ため、`Accept: Text/Markdown` の
+  // ような表記も有効。正規表現は小文字前提なので、比較前に正規化する。
+  const acceptHeader = (request.headers.get('accept') || '').toLowerCase()
   return /(^|,\s*)text\/markdown($|;|,)/.test(acceptHeader)
 }
 
@@ -55,6 +57,15 @@ function isNewsUrl(pathname: string): boolean {
   // ニュース記事URLのパターン: /news/[slug] または /ja/news/[slug]
   const newsPattern = /^\/(?:ja\/)?news\/[^/]+$/
   return newsPattern.test(pathname)
+}
+
+/**
+ * aboutページのURLかどうかを判定
+ * @param pathname パス
+ * @returns about URLの場合true
+ */
+function isAboutUrl(pathname: string): boolean {
+  return pathname === '/about' || pathname === '/ja/about'
 }
 
 /**
@@ -148,6 +159,27 @@ function getNewsMarkdownRewritePath(pathname: string): {
 }
 
 /**
+ * aboutページURLをAPIパスに変換
+ * @param pathname パス
+ * @returns リライト先のパスとクエリパラメータ
+ */
+function getAboutMarkdownRewritePath(pathname: string): {
+  pathname: string
+  searchParams?: Record<string, string>
+} {
+  if (pathname === '/ja/about') {
+    return {
+      pathname: '/api/markdown/about',
+      searchParams: { lang: 'ja' },
+    }
+  }
+
+  return {
+    pathname: '/api/markdown/about',
+  }
+}
+
+/**
  * Content Negotiationの処理：Acceptヘッダーに基づいてMarkdownをrewrite
  * @param request リクエスト
  * @param pathname パス
@@ -176,6 +208,12 @@ function handleContentNegotiation(request: NextRequest, pathname: string): NextR
   // ニュース記事の処理
   else if (isNewsUrl(pathname)) {
     const result = getNewsMarkdownRewritePath(pathname)
+    rewritePath = result.pathname
+    searchParams = result.searchParams
+  }
+  // aboutページの処理
+  else if (isAboutUrl(pathname)) {
+    const result = getAboutMarkdownRewritePath(pathname)
     rewritePath = result.pathname
     searchParams = result.searchParams
   }
@@ -230,6 +268,10 @@ function hasMarkdownAlternate(pathname: string): boolean {
   return isBlogPostUrl(pathname) || isDevNoteUrl(pathname) || isNewsUrl(pathname)
 }
 
+/**
+ * Next.jsのmiddlewareエントリポイント。Markdownのコンテントネゴシエーション、
+ * `.md`拡張子のリライト、レガシーURLのリダイレクトを順に判定する。
+ */
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const baseUrl = request.url.split(request.nextUrl.pathname)[0]
