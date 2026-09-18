@@ -78,6 +78,27 @@ describe('generateDevNoteMetadata', () => {
     expect(result.twitter?.title).toBe('Test Dev Note')
   })
 
+  it('should expose the Markdown alternate link for /writing/dev-notes/[slug].md', () => {
+    const note = createMockWPThought({ id: 456 })
+
+    const result = generateDevNoteMetadata(note, '/writing/dev-notes/test-post')
+
+    expect(result.alternates?.types).toEqual({
+      'text/markdown': 'https://hidetaka.dev/writing/dev-notes/test-post.md',
+    })
+  })
+
+  it('should keep the Markdown alternate link on the requested (non-canonical) path', () => {
+    // canonicalはja側へ正規化されるが、.mdリンクはリクエストされたURL自身を指す必要がある
+    const note = createMockWPThought({ id: 456 })
+
+    const result = generateDevNoteMetadata(note, '/ja/writing/dev-notes/test-post')
+
+    expect(result.alternates?.types).toEqual({
+      'text/markdown': 'https://hidetaka.dev/ja/writing/dev-notes/test-post.md',
+    })
+  })
+
   it('should generate correct OG image URL for dev-notes', () => {
     const note = createMockWPThought({
       id: 789,
@@ -252,6 +273,36 @@ describe('generateBlogPostMetadata', () => {
     expect(result.twitter).toBeDefined()
     expect(result.twitter?.card).toBe('summary_large_image')
     expect(result.twitter?.title).toBe('Test Blog Post')
+  })
+
+  it('should expose the Markdown alternate link for /blog/[slug].md', () => {
+    const thought = createMockWPThought({ id: 456 })
+
+    const result = generateBlogPostMetadata(thought, '/blog/test-post')
+
+    expect(result.alternates?.types).toEqual({
+      'text/markdown': 'https://hidetaka.dev/blog/test-post.md',
+    })
+  })
+
+  it('should expose the Markdown alternate link for /news/[slug].md (reuses blog metadata)', () => {
+    const thought = createMockWPThought({ id: 456 })
+
+    const result = generateBlogPostMetadata(thought, '/news/test-post')
+
+    expect(result.alternates?.types).toEqual({
+      'text/markdown': 'https://hidetaka.dev/news/test-post.md',
+    })
+  })
+
+  it('should expose the Markdown alternate link for the Japanese path', () => {
+    const thought = createMockWPThought({ id: 456 })
+
+    const result = generateBlogPostMetadata(thought, '/ja/blog/test-post')
+
+    expect(result.alternates?.types).toEqual({
+      'text/markdown': 'https://hidetaka.dev/ja/blog/test-post.md',
+    })
   })
 
   it('should generate correct OG image URL for thoughts', () => {
