@@ -221,6 +221,15 @@ function handleMarkdownExtension(pathname: string, request: NextRequest): NextRe
   return NextResponse.rewrite(newUrl)
 }
 
+/**
+ * Markdown版が存在する個別記事URLかどうかを判定
+ * @param pathname パス
+ * @returns Markdown版が存在する場合true
+ */
+function hasMarkdownAlternate(pathname: string): boolean {
+  return isBlogPostUrl(pathname) || isDevNoteUrl(pathname) || isNewsUrl(pathname)
+}
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const baseUrl = request.url.split(request.nextUrl.pathname)[0]
@@ -249,7 +258,13 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(redirectUrl))
   }
 
-  return NextResponse.next()
+  const response = NextResponse.next()
+  // Markdown版が存在する記事ページには、HTTP Linkヘッダーで発見経路を提供する
+  // （<link rel="alternate">はHTML本文にしか効かず、HEADリクエストやAPIクライアントからは見えないため）
+  if (hasMarkdownAlternate(pathname)) {
+    response.headers.set('Link', `<${pathname}.md>; rel="alternate"; type="text/markdown"`)
+  }
+  return response
 }
 
 export const config = {
