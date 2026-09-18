@@ -58,6 +58,15 @@ function isNewsUrl(pathname: string): boolean {
 }
 
 /**
+ * aboutページのURLかどうかを判定
+ * @param pathname パス
+ * @returns about URLの場合true
+ */
+function isAboutUrl(pathname: string): boolean {
+  return pathname === '/about' || pathname === '/ja/about'
+}
+
+/**
  * ブログ記事URLからslugを抽出し、APIパスに変換
  * @param pathname パス
  * @returns リライト先のパスとクエリパラメータ
@@ -148,6 +157,27 @@ function getNewsMarkdownRewritePath(pathname: string): {
 }
 
 /**
+ * aboutページURLをAPIパスに変換
+ * @param pathname パス
+ * @returns リライト先のパスとクエリパラメータ
+ */
+function getAboutMarkdownRewritePath(pathname: string): {
+  pathname: string
+  searchParams?: Record<string, string>
+} {
+  if (pathname === '/ja/about') {
+    return {
+      pathname: '/api/markdown/about',
+      searchParams: { lang: 'ja' },
+    }
+  }
+
+  return {
+    pathname: '/api/markdown/about',
+  }
+}
+
+/**
  * Content Negotiationの処理：Acceptヘッダーに基づいてMarkdownをrewrite
  * @param request リクエスト
  * @param pathname パス
@@ -176,6 +206,12 @@ function handleContentNegotiation(request: NextRequest, pathname: string): NextR
   // ニュース記事の処理
   else if (isNewsUrl(pathname)) {
     const result = getNewsMarkdownRewritePath(pathname)
+    rewritePath = result.pathname
+    searchParams = result.searchParams
+  }
+  // aboutページの処理
+  else if (isAboutUrl(pathname)) {
+    const result = getAboutMarkdownRewritePath(pathname)
     rewritePath = result.pathname
     searchParams = result.searchParams
   }
