@@ -65,6 +65,34 @@ export type AboutGold = {
   oss: AboutGoldOss
 }
 
+export type OssReachMetricPoint = { date: string; value: number }
+
+export type OssReachMetric = {
+  /** `provider:subject:metric` 形式（例: `github:hideokamoto/repo:stars`）。 */
+  metricId: string
+  latest: OssReachMetricPoint
+  series: OssReachMetricPoint[]
+}
+
+export type SummaryGoldArticles = {
+  total: number
+  firstYear: number | null
+  firstYearBySource: Record<string, number>
+  bySource: Record<string, number>
+  byYear: { year: number; total: number; bySource: Record<string, number> }[]
+}
+
+export type SummaryGold = {
+  schemaVersion: 2
+  target: string
+  generatedAt: string
+  range: { from: string; to: string }
+  articles: SummaryGoldArticles
+  events: { total: number }
+  /** metricId をキーとした反響メトリクス時系列。 */
+  ossReach: Record<string, OssReachMetric>
+}
+
 export type SlideGoldDataSource = { name: string; href: string; color: string }
 
 export type SlideGoldItem = {

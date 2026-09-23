@@ -2,6 +2,7 @@ import AboutPageContent from '@/components/containers/pages/AboutPage'
 import ProfileStatsSection from '@/components/ui/stats/ProfileStatsSection'
 import { buildAlternates } from '@/libs/metadata'
 import { hasAnyProfileStat, loadProfileStats } from '@/libs/stats/loadProfileStats'
+import { loadOssReach } from '@/libs/stats/ossReach'
 
 export const metadata = {
   alternates: buildAlternates('/about'),
@@ -12,13 +13,14 @@ export const metadata = {
 export const revalidate = 86400
 
 export default async function AboutPage() {
-  const stats = await loadProfileStats()
+  const [stats, trends] = await Promise.all([loadProfileStats(), loadOssReach()])
 
   // 指標が1つも取れなければスロットごと渡さない。
   // 渡すと ProfileStatsSection が null を返し、見出しだけのセクションが残る。
-  const statsSlot = hasAnyProfileStat(stats) ? (
-    <ProfileStatsSection stats={stats} lang="en" />
-  ) : undefined
+  const statsSlot =
+    hasAnyProfileStat(stats) || (trends?.length ?? 0) > 0 ? (
+      <ProfileStatsSection stats={stats} trends={trends} lang="en" />
+    ) : undefined
 
   return <AboutPageContent lang="en" statsSlot={statsSlot} />
 }
