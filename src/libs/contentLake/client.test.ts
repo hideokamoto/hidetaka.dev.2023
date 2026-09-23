@@ -1,11 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { logger } from '@/libs/logger'
-import {
-  buildGoldUrl,
-  DEFAULT_CONTENT_LAKE_GOLD_URL,
-  fetchGold,
-  readGoldBaseUrl,
-} from './client'
+import { buildGoldUrl, DEFAULT_CONTENT_LAKE_GOLD_URL, fetchGold, readGoldBaseUrl } from './client'
 
 const isRecord = (data: unknown): data is Record<string, unknown> =>
   typeof data === 'object' && data !== null
@@ -56,9 +51,7 @@ describe('buildGoldUrl', () => {
 
 describe('fetchGold', () => {
   it('returns parsed data when the response is ok and valid', async () => {
-    const fetchSpy = vi
-      .spyOn(globalThis, 'fetch')
-      .mockResolvedValue(okResponse({ hello: 'world' }))
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(okResponse({ hello: 'world' }))
     vi.spyOn(logger, 'error').mockImplementation(() => {})
 
     const data = await fetchGold('about.json', { revalidate: 60, validate: isRecord })
@@ -100,9 +93,7 @@ describe('fetchGold', () => {
 
   it('honours CONTENT_LAKE_GOLD_URL for the request URL', async () => {
     vi.stubEnv('CONTENT_LAKE_GOLD_URL', 'lake-staging.example.com')
-    const fetchSpy = vi
-      .spyOn(globalThis, 'fetch')
-      .mockResolvedValue(okResponse({ hello: 'world' }))
+    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(okResponse({ hello: 'world' }))
     vi.spyOn(logger, 'error').mockImplementation(() => {})
 
     await fetchGold('writing.json', { revalidate: 60, validate: isRecord })
