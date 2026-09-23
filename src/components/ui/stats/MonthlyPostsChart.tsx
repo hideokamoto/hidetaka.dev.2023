@@ -17,6 +17,7 @@ import type { MonthlyBucket } from '@/libs/stats/aggregate'
 // 自前コンテンツは折衷パレット（藍青・松葉緑）。未知はフォールバック。
 const SOURCE_COLORS: Record<string, string> = {
   'WP Kyoto Blog': '#2f5375', // 藍青
+  WordPress: '#2f5375', // 藍青
   Qiita: '#55c500',
   Zenn: '#3ea8ff',
   'Dev.to': '#0a0a0a',

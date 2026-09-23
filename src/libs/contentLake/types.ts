@@ -21,6 +21,41 @@ export type AboutGoldOss = {
   } | null
 }
 
+export type WritingGoldMonthly = {
+  year: number
+  month: number
+  total: number
+  bySource: Record<string, number>
+}
+
+export type WritingGold = {
+  schemaVersion: 1
+  target: string
+  generatedAt: string
+  monthly: WritingGoldMonthly[]
+  topTags: { tag: string; count: number }[]
+  coverage: Record<string, number>
+  firstPublishedAt: string | null
+  lastPublishedAt: string | null
+  totals: { articleCount: number; bySource: Record<string, number> }
+}
+
+export type ContentIndexItem = {
+  id: string
+  title: string
+  url: string
+  publishedAt: string
+  source: string
+  type: string
+}
+
+export type ContentIndexGold = {
+  target: string
+  updatedAt: string
+  itemCount: number
+  items: ContentIndexItem[]
+}
+
 export type AboutGold = {
   schemaVersion: 1
   target: string

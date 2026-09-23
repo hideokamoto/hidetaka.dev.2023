@@ -1,28 +1,19 @@
-import type { FeedItem } from '@/libs/dataSources/types'
-import { cumulativeTotal, groupByMonth, weeklyStreak } from '@/libs/stats/aggregate'
-import { STATS_WINDOW_MONTHS } from '@/libs/stats/loadStatsPosts'
+import { STATS_WINDOW_MONTHS, type WritingActivity } from '@/libs/stats/writingActivity'
 import MonthlyPostsChart from './MonthlyPostsChart'
 import StatHighlights from './StatHighlights'
 
 type Props = {
-  items: FeedItem[]
+  activity: WritingActivity | null
   lang: string
 }
 
-export default function StatsSection({ items, lang }: Props) {
-  if (items.length === 0) return null
+export default function StatsSection({ activity, lang }: Props) {
+  if (!activity) return null
 
   const isJa = lang === 'ja'
 
-  const monthly = groupByMonth(items, STATS_WINDOW_MONTHS)
-  const total = cumulativeTotal(items)
-  const streak = weeklyStreak(items)
-
-  const sources = Array.from(new Set(items.map((i) => i.dataSource?.name).filter(Boolean)))
-  const hasZenn = sources.includes('Zenn')
-
   const title = isJa ? '執筆アクティビティ' : 'Writing activity'
-  const sourcesText = sources.join(' / ')
+  const sourcesText = activity.sources.join(' / ')
   const subtitle = isJa
     ? `直近${STATS_WINDOW_MONTHS}ヶ月の集計（${sourcesText}）。`
     : `Last ${STATS_WINDOW_MONTHS} months across ${sourcesText}.`
@@ -39,12 +30,7 @@ export default function StatsSection({ items, lang }: Props) {
       </div>
 
       <div className="space-y-8">
-        <StatHighlights
-          total={total}
-          currentWeeks={streak.currentWeeks}
-          longestWeeks={streak.longestWeeks}
-          lang={lang}
-        />
+        <StatHighlights total={activity.total} streak={activity.streak} lang={lang} />
 
         <div
           className="rounded-2xl p-6"
@@ -56,16 +42,8 @@ export default function StatsSection({ items, lang }: Props) {
           >
             {isJa ? '月別の投稿本数' : 'Posts per month'}
           </h3>
-          <MonthlyPostsChart data={monthly} lang={lang} />
+          <MonthlyPostsChart data={activity.monthly} lang={lang} />
         </div>
-
-        {hasZenn && (
-          <p className="text-xs" style={{ color: 'var(--rvt-fg3)' }}>
-            {isJa
-              ? '注: Zenn は RSS の制約により直近約20本のみを集計しています。'
-              : 'Note: Zenn data is limited to the most recent ~20 posts due to RSS constraints.'}
-          </p>
-        )}
       </div>
     </section>
   )
