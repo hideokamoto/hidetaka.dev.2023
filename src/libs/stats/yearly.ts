@@ -4,7 +4,7 @@
 // すべて純粋関数。UTC の年で集計するが、**渡す文字列が UTC として解釈できることが前提**。
 // オフセットを持たない文字列（WordPress の `date` / `date_gmt` そのまま）を渡すと
 // `new Date()` が実行環境のローカル時刻として解釈し、年の割り当てが TZ 依存になる。
-// 呼び出し側（`loadProfileStats`）が `Z` を付けてから渡している。
+// 呼び出し側が `Z` を付けてから渡すこと。
 
 export type YearCount = {
   year: number
