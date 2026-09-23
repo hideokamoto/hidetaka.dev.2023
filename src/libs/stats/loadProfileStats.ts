@@ -3,8 +3,8 @@ import type { AboutGold } from '@/libs/contentLake/types'
 import type { YearCount } from '@/libs/stats/yearly'
 
 // プロフィール実績は Content Lake Gold の about.json から読む。
-// vibes-wp-content-enrichment が日次で生成・配信する集計済み JSON で、
-// WordPress REST / npm / WordPress.org への個別 fetch は不要になった。
+// vibes-wp-content-enrichment が日次で生成・配信する集計済み JSON（WordPress の
+// 執筆記事、登壇レポート、npm / WordPress.org の到達数）を単一読み取りで使う。
 //
 // WRITING_SOURCE_LABEL は 'WordPress' のまま。Gold の writing は WordPress 由来の
 // 記事のみを集計している（Qiita/Zenn/dev.to は全期間の取得手段が無く「累計」に混ぜない）。
