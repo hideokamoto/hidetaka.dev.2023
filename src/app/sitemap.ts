@@ -37,7 +37,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // 静的ページ（英語版）
   // /articles, /oss, /projects は middleware でリダイレクトされるため除外
-  const staticRoutes = ['', '/about', '/blog', '/news', '/speaking', '/work', '/writing']
+  const staticRoutes = [
+    '',
+    '/about',
+    '/blog',
+    '/news',
+    '/speaking',
+    '/speaking/slides',
+    '/work',
+    '/writing',
+  ]
 
   // 静的ページ（日本語版）
   // /ja/articles, /ja/oss, /ja/projects は middleware でリダイレクトされるため除外
@@ -47,6 +56,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     '/ja/blog',
     '/ja/news',
     '/ja/speaking',
+    '/ja/speaking/slides',
     '/ja/work',
     '/ja/writing',
   ]

@@ -29,3 +29,23 @@ export type AboutGold = {
   speaking: { reports: number }
   oss: AboutGoldOss
 }
+
+export type SlideGoldDataSource = { name: string; href: string; color: string }
+
+export type SlideGoldItem = {
+  id: string
+  source: string
+  type: string
+  title: string
+  url: string
+  publishedAt: string
+  excerpt?: string
+  dataSource?: SlideGoldDataSource
+}
+
+export type SlidesGold = {
+  target: string
+  updatedAt: string
+  itemCount: number
+  items: SlideGoldItem[]
+}
