@@ -61,9 +61,9 @@ describe('isContentIndexGold', () => {
 
 describe('loadContentIndexGold', () => {
   it('returns the parsed ContentIndexGold on success', async () => {
-    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(JSON.stringify(validIndex), { status: 200 }),
-    )
+    const fetchSpy = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(new Response(JSON.stringify(validIndex), { status: 200 }))
     vi.spyOn(logger, 'error').mockImplementation(() => {})
 
     const index = await loadContentIndexGold()

@@ -86,9 +86,9 @@ describe('isWritingGold', () => {
 
 describe('loadWritingGold', () => {
   it('returns the parsed WritingGold on success', async () => {
-    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(JSON.stringify(validWriting), { status: 200 }),
-    )
+    const fetchSpy = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(new Response(JSON.stringify(validWriting), { status: 200 }))
     vi.spyOn(logger, 'error').mockImplementation(() => {})
 
     const writing = await loadWritingGold()

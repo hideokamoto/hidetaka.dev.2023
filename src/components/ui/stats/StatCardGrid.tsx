@@ -8,7 +8,7 @@ export type StatCardItem = {
 }
 
 /** 列レイアウト。`'2/3'` は sm で2列・lg で3列（カード数が多いとき向け）。 */
-export type StatCardColumns = 2 | 3 | '2/3'
+export type StatCardColumns = 1 | 2 | 3 | '2/3'
 
 interface Props {
   items: StatCardItem[]
@@ -19,6 +19,7 @@ interface Props {
 
 // Tailwind の JIT が拾えるよう、クラス名は完全な文字列で保持する。
 const COLUMN_CLASSES: Record<StatCardColumns, string> = {
+  1: 'sm:grid-cols-1',
   2: 'sm:grid-cols-2',
   3: 'sm:grid-cols-3',
   '2/3': 'sm:grid-cols-2 lg:grid-cols-3',
