@@ -351,6 +351,16 @@ export default function SpeakingPageContent({
         <Container>
           <PageHeader title={title} description={description} />
 
+          <p className="mb-6">
+            <Link
+              href={`${lang === 'ja' ? '/ja' : ''}/speaking/slides`}
+              className="text-sm font-medium hover:opacity-80 transition-opacity"
+              style={{ color: 'var(--rvt-accent)' }}
+            >
+              {lang === 'ja' ? 'スライド一覧を見る →' : 'View slide decks →'}
+            </Link>
+          </p>
+
           {/* モバイル用検索バーとフィルターボタン */}
           <div className="lg:hidden mb-6 space-y-4">
             <SearchBar

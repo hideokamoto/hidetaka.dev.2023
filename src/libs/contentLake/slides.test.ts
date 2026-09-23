@@ -71,9 +71,9 @@ describe('isSlidesGold', () => {
 
 describe('loadSlidesGold', () => {
   it('returns the parsed SlidesGold on success', async () => {
-    const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(JSON.stringify(validSlides), { status: 200 }),
-    )
+    const fetchSpy = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(new Response(JSON.stringify(validSlides), { status: 200 }))
     vi.spyOn(logger, 'error').mockImplementation(() => {})
 
     const slides = await loadSlidesGold()
