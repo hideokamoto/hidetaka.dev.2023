@@ -1,0 +1,41 @@
+version: 2.1
+
+# Scheduled crawler-access check for hidetaka.dev.
+#
+# This pipeline is meant to be triggered by a CircleCI Scheduled Trigger.
+# To set it up:
+#   1. CircleCI > Project Settings > Triggers > Add Scheduled Trigger
+#   2. Name: e.g. "nightly-bot-access-check", schedule: cron (e.g. `0 0 * * *` UTC)
+#   3. Add pipeline parameter:  run-bot-access-check = true
+#
+# Or via API:
+#   curl -X POST "https://circleci.com/api/v2/project/<vcs>/<org>/<repo>/schedule" \
+#     -H "Circle-Token: $CIRCLE_TOKEN" -H "Content-Type: application/json" \
+#     -d '{
+#           "name": "nightly-bot-access-check",
+#           "description": "Verify search crawlers are not blocked on hidetaka.dev",
+#           "attribution": "system",
+#           "parameters": {"run-bot-access-check": true},
+#           "timetable": {"per-hour": 1, "hours-of-day": [0], "days-of-week": ["MON","TUE","WED","THU","FRI","SAT","SUN"]}
+#         }'
+
+parameters:
+  run-bot-access-check:
+    type: boolean
+    default: false
+
+jobs:
+  check-bot-access:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - run:
+          name: Verify crawlers are not blocked on hidetaka.dev
+          command: bash scripts/check-bot-access.sh
+
+workflows:
+  scheduled-bot-access:
+    when: << pipeline.parameters.run-bot-access-check >>
+    jobs:
+      - check-bot-access
