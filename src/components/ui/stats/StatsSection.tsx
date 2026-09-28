@@ -1,4 +1,5 @@
 import { STATS_WINDOW_MONTHS, type WritingActivity } from '@/libs/stats/writingActivity'
+import AllTimeSummary from './AllTimeSummary'
 import MonthlyPostsChart from './MonthlyPostsChart'
 import StatHighlights from './StatHighlights'
 
@@ -44,6 +45,8 @@ export default function StatsSection({ activity, lang }: Props) {
           </h3>
           <MonthlyPostsChart data={activity.monthly} lang={lang} />
         </div>
+
+        <AllTimeSummary allTime={activity.allTime} lang={lang} />
       </div>
     </section>
   )
