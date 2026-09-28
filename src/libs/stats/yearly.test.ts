@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { activeYearSpan, buildYearlySeries, firstYear, peakCount } from '@/libs/stats/yearly'
+import {
+  activeYearSpan,
+  buildYearlySeries,
+  buildYearlySeriesFromMonthly,
+  firstYear,
+  peakCount,
+} from '@/libs/stats/yearly'
 
 const NOW = new Date('2026-08-10T00:00:00Z')
 
@@ -128,5 +134,42 @@ describe('タイムゾーン非依存であること（オフセット付きの�
   it('オフセット付きの文字列も UTC に正規化して集計する', () => {
     // JST 2025-01-01T08:00+09:00 = UTC 2024-12-31T23:00
     expect(firstYear(['2025-01-01T08:00:00+09:00'], NOW)).toBe(2024)
+  })
+})
+
+describe('buildYearlySeriesFromMonthly', () => {
+  it('月次バケットを年単位に合算し、新しい年が先頭で累計を積む', () => {
+    const series = buildYearlySeriesFromMonthly([
+      { year: 2024, month: 1, total: 2 },
+      { year: 2024, month: 6, total: 3 },
+      { year: 2025, month: 1, total: 4 },
+    ])
+
+    expect(series).toEqual([
+      { year: 2025, count: 4, cumulative: 9 },
+      { year: 2024, count: 5, cumulative: 5 },
+    ])
+  })
+
+  it('total が 0 の月次バケットしかない年も 0 件として残す', () => {
+    const series = buildYearlySeriesFromMonthly([
+      { year: 2024, month: 1, total: 0 },
+      { year: 2024, month: 2, total: 0 },
+    ])
+
+    expect(series).toEqual([{ year: 2024, count: 0, cumulative: 0 }])
+  })
+
+  it('空配列を渡すと空配列を返す', () => {
+    expect(buildYearlySeriesFromMonthly([])).toEqual([])
+  })
+
+  it('同じ年の複数月次バケットを正しく合算する', () => {
+    const series = buildYearlySeriesFromMonthly([
+      { year: 2023, month: 1, total: 1 },
+      { year: 2023, month: 2, total: 1 },
+      { year: 2023, month: 3, total: 1 },
+    ])
+    expect(series).toEqual([{ year: 2023, count: 3, cumulative: 3 }])
   })
 })

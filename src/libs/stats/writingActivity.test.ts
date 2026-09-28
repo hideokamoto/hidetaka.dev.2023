@@ -13,7 +13,9 @@ import { loadWritingGold } from '@/libs/contentLake/writing'
 import {
   loadWritingActivity,
   STATS_WINDOW_MONTHS,
+  toAllTimeStats,
   toMonthlyBuckets,
+  toSourceCoverage,
   toWritingActivity,
 } from './writingActivity'
 
@@ -162,5 +164,101 @@ describe('loadWritingActivity', () => {
 
     const activity = await loadWritingActivity(NOW)
     expect(activity?.streak?.currentWeeks).toBeGreaterThanOrEqual(2)
+  })
+})
+
+describe('toSourceCoverage', () => {
+  it('bySource と coverage を合成し、件数の多い順に並べる', () => {
+    const rows = toSourceCoverage({ wordpress: 1395, qiita: 400 }, { wordpress: 2013, qiita: 2013 })
+    expect(rows.map((r) => r.key)).toEqual(['wordpress', 'qiita'])
+    expect(rows[0]).toEqual({
+      key: 'wordpress',
+      label: 'WordPress',
+      count: 1395,
+      sinceYear: 2013,
+      isPartialCoverage: false,
+    })
+  })
+
+  it('他媒体より coverage 開始年が遅い媒体を欠測扱い（isPartialCoverage）にする', () => {
+    const rows = toSourceCoverage(
+      { wordpress: 1395, zenn: 12 },
+      { wordpress: 2013, zenn: 2020 },
+    )
+    const zenn = rows.find((r) => r.key === 'zenn')
+    const wordpress = rows.find((r) => r.key === 'wordpress')
+    expect(zenn?.isPartialCoverage).toBe(true)
+    expect(wordpress?.isPartialCoverage).toBe(false)
+  })
+
+  it('npm を除外する（articles のみのはずだが型上は混在できるため防御的に除外）', () => {
+    const rows = toSourceCoverage(
+      { wordpress: 10, npm: 999 },
+      { wordpress: 2013, npm: 2015 },
+    )
+    expect(rows.some((r) => r.key === 'npm')).toBe(false)
+    expect(rows.map((r) => r.key)).toEqual(['wordpress'])
+  })
+
+  it('coverage に無い媒体は sinceYear が null で isPartialCoverage は false', () => {
+    const rows = toSourceCoverage({ medium: 3 }, {})
+    expect(rows).toEqual([
+      { key: 'medium', label: 'medium', count: 0, sinceYear: null, isPartialCoverage: false },
+    ])
+  })
+
+  it('空の入力では空配列を返す', () => {
+    expect(toSourceCoverage({}, {})).toEqual([])
+  })
+})
+
+describe('toAllTimeStats', () => {
+  it('writing.json の totals / firstPublishedAt / lastPublishedAt / monthly から全期間統計を組み立てる', () => {
+    const allTime = toAllTimeStats(baseWriting)
+
+    expect(allTime.totalArticles).toBe(1856)
+    expect(allTime.firstPublishedAt).toBe('2013-06-26T01:13:28.000Z')
+    expect(allTime.lastPublishedAt).toBe('2026-09-22T02:57:00.000Z')
+    expect(allTime.bySource.map((r) => r.key)).toEqual(['wordpress'])
+    expect(allTime.yearly.length).toBeGreaterThan(0)
+  })
+
+  it('npm が totals.bySource に混在していても除外する', () => {
+    const withNpm: WritingGold = {
+      ...baseWriting,
+      totals: { articleCount: 1856, bySource: { wordpress: 1395, npm: 5 } },
+    }
+    const allTime = toAllTimeStats(withNpm)
+    expect(allTime.bySource.some((r) => r.key === 'npm')).toBe(false)
+  })
+
+  it('記事が1件も無いとき（totals.articleCount 0, monthly 空）は空の全期間統計を返す', () => {
+    const empty: WritingGold = {
+      schemaVersion: 1,
+      target: 'hidetaka.dev',
+      generatedAt: '2026-09-23T01:30:00.000Z',
+      monthly: [],
+      topTags: [],
+      coverage: {},
+      firstPublishedAt: null,
+      lastPublishedAt: null,
+      totals: { articleCount: 0, bySource: {} },
+    }
+    const allTime = toAllTimeStats(empty)
+    expect(allTime).toEqual({
+      totalArticles: 0,
+      firstPublishedAt: null,
+      lastPublishedAt: null,
+      bySource: [],
+      yearly: [],
+    })
+  })
+})
+
+describe('toWritingActivity includes allTime', () => {
+  it('allTime を組み込む', () => {
+    const activity = toWritingActivity(baseWriting, baseIndex, NOW)
+    expect(activity.allTime.totalArticles).toBe(1856)
+    expect(activity.allTime.bySource.some((r) => r.key === 'npm')).toBe(false)
   })
 })
