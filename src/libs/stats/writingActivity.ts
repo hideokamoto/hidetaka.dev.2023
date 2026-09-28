@@ -45,8 +45,8 @@ export type SourceCoverage = {
    */
   sinceYear: number | null
   /**
-   * 他の媒体より観測開始年が遅く、より古い記事を欠いている可能性がある媒体か。
-   * true の媒体は、累計・年別グラフの早い年で過少に見える可能性がある。
+   * 他の媒体より Lake の保持開始年が遅い媒体か。それより前に記事があったかは
+   * このデータからは分からないため、UI では保持開始年だけを示し、欠損とは断定しない。
    */
   isPartialCoverage: boolean
 }

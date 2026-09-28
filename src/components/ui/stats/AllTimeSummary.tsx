@@ -32,17 +32,21 @@ function buildScopeNote(
     : `Counts articles from ${labels} only.`
 }
 
-/** 他媒体より観測開始が遅く、より古い記事を欠いている可能性のある媒体について、脚注テキストを組み立てる。 */
+/**
+ * 他媒体より保持開始年が遅い媒体について脚注を組み立てる。
+ * `coverage` は「Lake が保持する最古の年」でしかなく、それより前に記事が存在したかは
+ * このデータからは分からない。そのため「欠損している」とは断定しない。
+ */
 function buildCoverageCaveat(bySource: SourceCoverage[], isJa: boolean): string | null {
   const partial = bySource.filter((row) => row.isPartialCoverage && row.sinceYear !== null)
   if (partial.length === 0) return null
 
   if (isJa) {
-    const notes = partial.map((row) => `${row.label}は${row.sinceYear}年以降のみ`)
-    return `注: ${notes.join('、')}。これより前の記事も存在しますが、Content Lake がまだ取り込んでいないため累計・年別グラフには含まれていません（媒体側の欠損ではありません）。`
+    const notes = partial.map((row) => `${row.label}は${row.sinceYear}年以降`)
+    return `注: Content Lake が保持している記事は、${notes.join('、')}です。これより前に公開された記事がある場合、累計・年別には含まれません。`
   }
-  const notes = partial.map((row) => `${row.label} only from ${row.sinceYear}`)
-  return `Note: ${notes.join(', ')}. Earlier posts on these sources exist but haven't been backfilled into Content Lake yet, so they're not reflected in the totals or yearly chart below (this is a data-retention gap, not a claim those sources published nothing earlier).`
+  const notes = partial.map((row) => `${row.label} posts only from ${row.sinceYear}`)
+  return `Note: Content Lake holds ${notes.join(', ')}. Any posts published earlier on these sources are not included in the totals or the yearly breakdown.`
 }
 
 /**
