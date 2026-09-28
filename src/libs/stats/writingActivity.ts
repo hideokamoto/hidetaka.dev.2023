@@ -85,14 +85,18 @@ export function toSourceCoverage(
   bySource: Record<string, number>,
   coverage: Record<string, number>,
 ): SourceCoverage[] {
-  const years = Object.values(coverage).filter((year): year is number => typeof year === 'number')
-  const earliestYear = years.length > 0 ? Math.min(...years) : null
+  const keys = Object.keys(bySource).filter((key) => !EXCLUDED_ALL_TIME_SOURCES.has(key))
 
-  const keys = Object.keys(bySource)
+  // earliestYear は実際に記事として表示される媒体（除外後）の年だけで決める。
+  // coverage には npm 等の除外対象の年も入っているため、除外前に計算すると
+  // 表示されない媒体の年で isPartialCoverage の判定がずれる。
+  const years = keys
+    .map((key) => coverage[key])
+    .filter((year): year is number => typeof year === 'number')
+  const earliestYear = years.length > 0 ? Math.min(...years) : null
 
   const rows: SourceCoverage[] = []
   for (const key of keys) {
-    if (EXCLUDED_ALL_TIME_SOURCES.has(key)) continue
     const sinceYear = coverage[key] ?? null
     rows.push({
       key,

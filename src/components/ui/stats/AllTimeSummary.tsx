@@ -7,8 +7,15 @@ type Props = {
   lang: string
 }
 
+// 年別集計は UTC の年で作られている（WritingBuilder）ため、表示もUTCに揃える。
+// 閲覧者のタイムゾーンで表示すると、年境界付近の投稿で表示年と集計年がずれる。
 const formatDate = (iso: string, locale: string): string =>
-  new Date(iso).toLocaleDateString(locale, { year: 'numeric', month: 'long', day: 'numeric' })
+  new Date(iso).toLocaleDateString(locale, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC',
+  })
 
 /**
  * 「この累計に何が含まれ、いつからか」を明示するための定義文。

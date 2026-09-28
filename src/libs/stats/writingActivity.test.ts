@@ -194,6 +194,21 @@ describe('toSourceCoverage', () => {
     expect(rows.map((r) => r.key)).toEqual(['wordpress'])
   })
 
+  it('除外対象媒体（npm）の年は earliestYear の判定に混入しない', () => {
+    // npm が最古年（2010）を持っていても、記事媒体の wordpress は唯一の記事媒体なので
+    // 部分カバレッジとして扱ってはいけない（npm 除外後の年だけで比較する）。
+    const rows = toSourceCoverage({ wordpress: 10, npm: 999 }, { npm: 2010, wordpress: 2013 })
+    expect(rows).toEqual([
+      {
+        key: 'wordpress',
+        label: 'WordPress',
+        count: 10,
+        sinceYear: 2013,
+        isPartialCoverage: false,
+      },
+    ])
+  })
+
   it('coverage に無い媒体は sinceYear が null で isPartialCoverage は false', () => {
     const rows = toSourceCoverage({ medium: 3 }, {})
     expect(rows).toEqual([
