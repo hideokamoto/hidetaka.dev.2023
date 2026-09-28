@@ -88,3 +88,35 @@ export function buildYearlySeries(dates: readonly string[], now: Date = new Date
 export function peakCount(series: readonly YearCount[]): number {
   return series.reduce((max, row) => (row.count > max ? row.count : max), 0)
 }
+
+/** `buildYearlySeriesFromMonthly` に渡す最小限の月次バケット形。 */
+export type MonthlyTotal = { year: number; month: number; total: number }
+
+/**
+ * 月次バケット（Content Lake Gold `writing.json` の `monthly`）を年単位に合算する。
+ *
+ * `buildYearlySeries` は生の日付配列から年を数えるが、`writing.json` は個々の記事の
+ * 日付を持たず既に月次集計済みなので、この関数は「月の total を年ごとに足す」だけで
+ * よい（日付のパース・妥当性チェックは producer 側の `WritingBuilder` が済ませている）。
+ * 表示順は `buildYearlySeries` と同じく新しい年が先頭。
+ */
+export function buildYearlySeriesFromMonthly(monthly: readonly MonthlyTotal[]): YearCount[] {
+  if (monthly.length === 0) return []
+
+  const totalsByYear = new Map<number, number>()
+  for (const entry of monthly) {
+    totalsByYear.set(entry.year, (totalsByYear.get(entry.year) ?? 0) + entry.total)
+  }
+
+  const years = Array.from(totalsByYear.keys()).sort((a, b) => a - b)
+
+  const ascending: YearCount[] = []
+  let cumulative = 0
+  for (const year of years) {
+    const count = totalsByYear.get(year) ?? 0
+    cumulative += count
+    ascending.push({ year, count, cumulative })
+  }
+
+  return ascending.reverse()
+}

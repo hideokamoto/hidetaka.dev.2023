@@ -181,10 +181,7 @@ describe('toSourceCoverage', () => {
   })
 
   it('他媒体より coverage 開始年が遅い媒体を欠測扱い（isPartialCoverage）にする', () => {
-    const rows = toSourceCoverage(
-      { wordpress: 1395, zenn: 12 },
-      { wordpress: 2013, zenn: 2020 },
-    )
+    const rows = toSourceCoverage({ wordpress: 1395, zenn: 12 }, { wordpress: 2013, zenn: 2020 })
     const zenn = rows.find((r) => r.key === 'zenn')
     const wordpress = rows.find((r) => r.key === 'wordpress')
     expect(zenn?.isPartialCoverage).toBe(true)
@@ -192,10 +189,7 @@ describe('toSourceCoverage', () => {
   })
 
   it('npm を除外する（articles のみのはずだが型上は混在できるため防御的に除外）', () => {
-    const rows = toSourceCoverage(
-      { wordpress: 10, npm: 999 },
-      { wordpress: 2013, npm: 2015 },
-    )
+    const rows = toSourceCoverage({ wordpress: 10, npm: 999 }, { wordpress: 2013, npm: 2015 })
     expect(rows.some((r) => r.key === 'npm')).toBe(false)
     expect(rows.map((r) => r.key)).toEqual(['wordpress'])
   })
@@ -203,7 +197,7 @@ describe('toSourceCoverage', () => {
   it('coverage に無い媒体は sinceYear が null で isPartialCoverage は false', () => {
     const rows = toSourceCoverage({ medium: 3 }, {})
     expect(rows).toEqual([
-      { key: 'medium', label: 'medium', count: 0, sinceYear: null, isPartialCoverage: false },
+      { key: 'medium', label: 'medium', count: 3, sinceYear: null, isPartialCoverage: false },
     ])
   })
 
