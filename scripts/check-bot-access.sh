@@ -32,19 +32,34 @@ expect_status() {
   if [[ "$code" == "$4" ]]; then pass "$1" "$code"; else fail "$1" "expected $4, got $code"; fi
 }
 
-# expect_allowed <name> <url> <ua> — 403/429/503(チャレンジ)が出たら失敗。2xx/3xxは許容。
+# expect_allowed <name> <url> <ua> — リダイレクト追跡後の最終レスポンスが200なら許容。
 expect_allowed() {
   local code
-  code=$(fetch_code "$2" "$3")
+  code=$(curl "${CURL_OPTS[@]}" -L -w '%{http_code}' -A "$3" "$2" 2>/dev/null || echo "000")
   case "$code" in
-    200|301|302|307|308) pass "$1" "$code" ;;
-    *)                   fail "$1" "blocked? status=$code" ;;
+    200) pass "$1" "$code" ;;
+    *)   fail "$1" "blocked? status=$code" ;;
   esac
+}
+
+# expect_normal_body <name> <url> <ua>
+expect_normal_body() {
+  local body
+  if ! body=$(curl -sS --max-time 20 -A "$3" "$2" 2>/dev/null); then
+    fail "$1" "failed to fetch response body"
+    return
+  fi
+  if printf '%s' "$body" | grep -qiE 'cf-chl|challenge-platform|Attention Required|cf-error-details|Your request was blocked|error code: 10[0-9]{2}'; then
+    fail "$1" "body looks like a Cloudflare challenge/block page"
+  else
+    pass "$1" "normal page body"
+  fi
 }
 
 echo "== Googlebot: main pages must return 200 =="
 for path in / /ja /about /blog /work /writing /speaking; do
   expect_status "GET $path (Googlebot)" "$BASE_URL$path" "$UA_GOOGLEBOT_SP" 200
+  expect_normal_body "$path" "$BASE_URL$path" "$UA_GOOGLEBOT_SP"
 done
 
 echo "== Googlebot: feed/discovery files =="
@@ -66,20 +81,12 @@ expect_allowed "Google-Extended"            "$BASE_URL/" "Mozilla/5.0 (compatibl
 expect_allowed "PageSpeed/Lighthouse"       "$BASE_URL/" "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Chrome-Lighthouse"
 expect_allowed "DuplexWeb-Google"           "$BASE_URL/" "Mozilla/5.0 (Linux; Android 11; Pixel 2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.91 Mobile Safari/537.36 (compatible; DuplexWeb-Google/1.0; +http://www.google.com/bot.html)"
 
-echo "== Response must not be a Cloudflare challenge/block page =="
-body=$(curl -sS --max-time 20 -A "$UA_GOOGLEBOT_SP" "$BASE_URL/" 2>/dev/null || true)
-if printf '%s' "$body" | grep -qiE 'cf-chl|challenge-platform|Attention Required|cf-error-details|Your request was blocked|error code: 10[0-9]{2}'; then
-  fail "/" "body looks like a Cloudflare challenge/block page"
-else
-  pass "/" "normal page body"
-fi
-
 echo "== www must redirect to apex (path/query preserved) =="
 loc=$(curl -sS -o /dev/null -w '%{http_code} %{redirect_url}' --max-time 20 "$WWW_URL/some/path?q=1" 2>/dev/null || echo "000")
-if [[ "$loc" =~ ^30[178]\ https://hidetaka\.dev/some/path ]]; then
+if [[ "$loc" =~ ^30[178]\ https://hidetaka\.dev/some/path\?q=1$ ]]; then
   pass "www -> apex" "$loc"
 else
-  fail "www -> apex" "expected 301/308 to https://hidetaka.dev/some/path..., got: $loc"
+  fail "www -> apex" "expected 301/308 to https://hidetaka.dev/some/path?q=1, got: $loc"
 fi
 
 echo "== Negative control: AI crawler still blocked at edge (info only) =="

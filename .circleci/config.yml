@@ -14,8 +14,8 @@ version: 2.1
 #     -d '{
 #           "name": "nightly-bot-access-check",
 #           "description": "Verify search crawlers are not blocked on hidetaka.dev",
-#           "attribution": "system",
-#           "parameters": {"run-bot-access-check": true},
+#           "attribution-actor": "system",
+#           "parameters": {"branch": "main", "run-bot-access-check": true},
 #           "timetable": {"per-hour": 1, "hours-of-day": [0], "days-of-week": ["MON","TUE","WED","THU","FRI","SAT","SUN"]}
 #         }'
 
