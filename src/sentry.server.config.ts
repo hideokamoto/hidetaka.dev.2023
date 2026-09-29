@@ -17,8 +17,16 @@ Sentry.init({
   // Release tracking for correlating errors with deployments
   release: process.env.SENTRY_RELEASE,
 
-  // Environment name
-  environment: process.env.NODE_ENV || 'development',
+  // Environment name.
+  // Fixed to 'local': this config only loads when NEXT_RUNTIME=nodejs (see
+  // instrumentation.ts), which never happens on the deployed Cloudflare
+  // Worker (edge runtime only, via sentry.edge.config.ts) — only during
+  // local `next dev`/`next build`/`next start`. Using NODE_ENV here mislabels
+  // local production-mode builds/tests as environment=production in Sentry,
+  // creating false-positive production incidents (observed 2026-09-23:
+  // HIDETAKA-DEV-M, HIDETAKA-DEV-N, both from a local MacBook-Pro-3.local
+  // session against http://localhost:3000, tagged environment=production).
+  environment: 'local',
 
   // Performance Monitoring - disabled to reduce overhead
   tracesSampleRate: 0,
