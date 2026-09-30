@@ -1,11 +1,15 @@
+import OssReachChart from '@/components/ui/stats/OssReachChart'
 import StatCardGrid, { type StatCardItem } from '@/components/ui/stats/StatCardGrid'
 import YearlyActivityTable from '@/components/ui/stats/YearlyActivityTable'
 import type { OssStats, ProfileStats, WritingStats } from '@/libs/stats/loadProfileStats'
 import { WRITING_SOURCE_LABEL } from '@/libs/stats/loadProfileStats'
+import type { OssReachTrend } from '@/libs/stats/ossReach'
 
 interface Props {
   stats: ProfileStats
   lang: string
+  /** summary.json の ossReach 由来の反響トレンド。未取得時はパネルごと出さない。 */
+  trends?: OssReachTrend[] | null
 }
 
 // 文言は言語ごとにまとめて持ち、組み立て側では分岐しない。
@@ -18,6 +22,8 @@ type StatsCopy = {
   speaking: { label: string; value: (count: string) => string; hint: string }
   tableTitle: string
   tableNote: string
+  reachTitle: string
+  reachNote: string
 }
 
 const JA_COPY: StatsCopy = {
@@ -50,6 +56,9 @@ const JA_COPY: StatsCopy = {
   },
   tableTitle: '年別の執筆本数',
   tableNote: `${WRITING_SOURCE_LABEL} が配信する全記事（投稿・雑記・Stripe・DevNotes）の公開日（UTC）を基準に集計。複数サイトへの配信を含みます。本年は集計途中の数値です。`,
+  reachTitle: 'OSS・記事への反響',
+  reachNote:
+    'Content Lake が各プラットフォームを日次で計測した値の推移。リポジトリ・プラグイン・アカウントごとの値を合算しています。',
 }
 
 const EN_COPY: StatsCopy = {
@@ -82,6 +91,9 @@ const EN_COPY: StatsCopy = {
   },
   tableTitle: 'Articles per year',
   tableNote: `Based on UTC publication dates of every ${WRITING_SOURCE_LABEL}-published article (blog, notes, Stripe, dev notes), across several sites. The current year is still in progress.`,
+  reachTitle: 'OSS & article reach',
+  reachNote:
+    'Daily measurements collected by Content Lake, summed across repositories, plugins, and accounts.',
 }
 
 type NumberFormatter = (value: number) => string
@@ -144,13 +156,14 @@ const buildOssCards = (oss: OssStats, copy: StatsCopy, num: NumberFormatter): St
  * /about の実績サマリー。
  * 取得できなかった指標（null）はカードごと省き、0 を並べない。
  */
-export default function ProfileStatsSection({ stats, lang }: Props) {
+export default function ProfileStatsSection({ stats, lang, trends }: Props) {
   const isJa = lang === 'ja'
   const copy = isJa ? JA_COPY : EN_COPY
   const locale = isJa ? 'ja-JP' : 'en-US'
   const num: NumberFormatter = (value) => value.toLocaleString(locale)
 
   const { writing, speakingReports, oss } = stats
+  const reachTrends = trends ?? []
 
   const items: StatCardItem[] = [
     ...(writing ? buildWritingCards(writing, copy, num) : []),
@@ -166,7 +179,7 @@ export default function ProfileStatsSection({ stats, lang }: Props) {
       : []),
   ]
 
-  if (items.length === 0) return null
+  if (items.length === 0 && reachTrends.length === 0) return null
 
   const series = writing?.series ?? []
 
@@ -180,6 +193,18 @@ export default function ProfileStatsSection({ stats, lang }: Props) {
             {copy.tableTitle}
           </h3>
           <YearlyActivityTable series={series} lang={lang} note={copy.tableNote} />
+        </div>
+      )}
+
+      {reachTrends.length > 0 && (
+        <div className="rounded-2xl border border-[color:var(--rvt-border)] bg-[var(--rvt-bg2)] p-6 sm:p-8">
+          <h3 className="mb-6 font-[family-name:var(--rvt-font-mono)] text-sm font-semibold uppercase tracking-wider text-[color:var(--rvt-fg2)]">
+            {copy.reachTitle}
+          </h3>
+          <OssReachChart trends={reachTrends} lang={lang} />
+          <p className="mt-4 text-xs" style={{ color: 'var(--rvt-fg3)' }}>
+            {copy.reachNote}
+          </p>
         </div>
       )}
     </div>
