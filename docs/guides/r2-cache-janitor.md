@@ -19,7 +19,9 @@ OpenNext の R2 incremental cache は、キャッシュを `incremental-cache/<B
   取れなければ静的アセットの `BUILD_ID` を読む。
 - フォルダごとに独立して判定する。**現在のビルド**、**直近 `JANITOR_KEEP_DAYS` 日以内に現在のビルドだったもの**、
   **直近 `JANITOR_KEEP_DAYS` 日以内に書き込みのあるもの**は残し、それ以外を削除する。
-  フォルダ内を最後まで確認してから削除するので、一部だけ消えたビルドは作らない。
+  削除に入る前にフォルダ内を最後まで確認するので、最近書き込まれたオブジェクトが1つでもあるビルドは手を付けない。
+  ただし削除そのものは複数回の実行にまたがることがあり（サブリクエスト上限のため）、途中の回や、削除中に新しい書き込みが見つかって止まった場合は、
+  一部だけ削除されたビルドが残りうる。そのビルドは現行でも直近の利用でもないが、半分消えた状態であることは承知しておく。
 - 1回の実行で使う R2 の呼び出しは最大 40 回（無料プランのサブリクエスト上限 50 回の内側）。
   途中で打ち切っても進捗を `opennext-r2-janitor/state.json` に保存し、次回の実行が続きから処理する。
 
@@ -67,7 +69,11 @@ Workers Logs で `[r2-janitor]` を検索する。1回の実行につき、次�
 ## 止めたいとき・戻したいとき
 
 - **削除を止める**: `JANITOR_DRY_RUN` を `"true"` に戻した PR をデプロイする（次の実行からドライラン）。
-- **掃除自体をやめる**: `wrangler.jsonc` の `triggers` を削除する（fetch の挙動は変わらない）。`main` を `.open-next/worker.js` に戻せば完全に元の構成になる。
+- **掃除自体をやめる**: `wrangler.jsonc` の `triggers.crons` を `[]` にする（fetch の挙動は変わらない）。
+  **`triggers` やその中の `crons` を消す・コメントアウトするだけでは、すでに登録された cron は止まらない**
+  （Cloudflare の公式ドキュメント: "To disable a Cron Trigger, set `crons = []`. Commenting out the `crons` key will not disable a Cron Trigger."）。
+- **完全に元の構成へ戻す**: 同じ変更の中で `triggers.crons` を `[]` にし、`main` を `.open-next/worker.js` に戻す。
+  `main` だけ戻すと、登録済みの cron が毎時起動し、生成された Worker に `scheduled` がないため失敗し続ける。
 - 状態ファイルを作り直したい場合は `opennext-r2-janitor/state.json` を削除する。ただし「最近まで本番だったビルド」の履歴が消えるので、しばらくドライランで様子を見る。
 
 ## 制約

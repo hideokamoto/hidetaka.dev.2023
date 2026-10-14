@@ -25,6 +25,10 @@ export type JanitorOptions = {
   warnings: string[]
 }
 
+/**
+ * env から掃除の設定を読む。
+ * 実削除は `JANITOR_DRY_RUN` が厳密に "false" のときだけ。`JANITOR_KEEP_DAYS` が不正なら 14 に戻して警告を返す。
+ */
 export function parseJanitorOptions(
   env: Pick<JanitorEnv, 'JANITOR_DRY_RUN' | 'JANITOR_KEEP_DAYS'>,
 ): JanitorOptions {
