@@ -50,6 +50,9 @@ importers:
       node-wp-api-client:
         specifier: 0.1.0
         version: 0.1.0
+      opennext-r2-janitor:
+        specifier: ^0.1.1
+        version: 0.1.1
       react:
         specifier: 19.2.3
         version: 19.2.3
@@ -3259,6 +3262,10 @@ packages:
   onetime@5.1.2:
     resolution: {integrity: sha512-kbpaSSGJTWdAY5KPVeMOKXSrPtr8C8C7wodJbcsd51jRnmD+GZu8Y0VoU6Dm5Z4vWr0Ig/1NKuWRKf7j5aaYSg==}
     engines: {node: '>=6'}
+
+  opennext-r2-janitor@0.1.1:
+    resolution: {integrity: sha512-OnGTxDojSd06d2rtmaUSE9sdmzIpim/CsPNmah0wqDJDYJy6FaO2wcxBRclw2pqn97roKojw3Nxz8oNvtKekyQ==}
+    engines: {node: '>=20'}
 
   p-limit@3.1.0:
     resolution: {integrity: sha512-TYOanM3wGwNGsZN2cVTYPArw454xnXj5qmWF1bEoAc4+cU/ol7GVh7odevjp1FNHduHc3KZMcFduxU5Xc6uJRQ==}
@@ -7301,6 +7308,8 @@ snapshots:
   onetime@5.1.2:
     dependencies:
       mimic-fn: 2.1.0
+
+  opennext-r2-janitor@0.1.1: {}
 
   p-limit@3.1.0:
     dependencies:
