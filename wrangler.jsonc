@@ -1,6 +1,8 @@
 {
   "name": "hidetaka-dev-workers",
-  "main": ".open-next/worker.js",
+  // OpenNext が生成する worker を包み、cron 用の scheduled ハンドラを足したエントリ
+  // (src/custom-worker.ts)。R2 キャッシュ掃除の詳細は docs/guides/r2-cache-janitor.md
+  "main": "src/custom-worker.ts",
   "compatibility_date": "2025-08-16",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": {
@@ -53,6 +55,17 @@
       "new_classes": ["DOQueueHandler"]
     }
   ],
+  // R2 incremental cache に残る古いビルドのキャッシュを掃除する cron（毎時 17 分）。
+  // 実削除に切り替えるまでは JANITOR_DRY_RUN="true" のまま、削除対象をログに出すだけ。
+  "triggers": {
+    "crons": ["17 * * * *"]
+  },
+  // このファイルが設定の正。keep_vars が既定（false）のため、ダッシュボードでの編集は
+  // 次回デプロイで消える。実削除への切り替えは "false" に変えた PR で行う。
+  "vars": {
+    "JANITOR_DRY_RUN": "true",
+    "JANITOR_KEEP_DAYS": "14"
+  },
   // Version metadata binding for Sentry release tracking
   "version_metadata": {
     "binding": "CF_VERSION_METADATA"
