@@ -56,14 +56,14 @@
     }
   ],
   // R2 incremental cache に残る古いビルドのキャッシュを掃除する cron（毎時 17 分）。
-  // 実削除に切り替えるまでは JANITOR_DRY_RUN="true" のまま、削除対象をログに出すだけ。
+  // 溜まった分を消し終えたら 1 日 1 回に減らす。
   "triggers": {
     "crons": ["17 * * * *"]
   },
   // このファイルが設定の正。keep_vars が既定（false）のため、ダッシュボードでの編集は
-  // 次回デプロイで消える。実削除への切り替えは "false" に変えた PR で行う。
+  // 次回デプロイで消える。削除を止めるときは JANITOR_DRY_RUN を "true" に戻した PR で行う。
   "vars": {
-    "JANITOR_DRY_RUN": "true",
+    "JANITOR_DRY_RUN": "false",
     "JANITOR_KEEP_DAYS": "14"
   },
   // Version metadata binding for Sentry release tracking
